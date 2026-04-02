@@ -1,0 +1,36 @@
+export const Theme = {
+  colors: {
+    primary: '#007AFF',
+    background: '#FFFFFF',
+    surface: '#F2F2F7',
+    text: '#000000',
+    secondaryText: '#8E8E93',
+    border: '#C6C6C8',
+    error: '#FF3B30',
+    success: '#34C759',
+    gold: '#CCAB66',
+    white: '#FFFFFF',
+    black: '#000000',
+  },
+  spacing: {
+    xs: 4,
+    sm: 8,
+    md: 16,
+    lg: 24,
+    xl: 32,
+    xxl: 40,
+  },
+  roundness: {
+    sm: 8,
+    md: 12,
+    lg: 20,
+    full: 9999,
+  },
+  typography: {
+    h1: { fontSize: 32, fontWeight: '700' as const },
+    h2: { fontSize: 24, fontWeight: '600' as const },
+    h3: { fontSize: 20, fontWeight: '600' as const },
+    body: { fontSize: 16, fontWeight: '400' as const },
+    caption: { fontSize: 12, fontWeight: '400' as const },
+  },
+};
