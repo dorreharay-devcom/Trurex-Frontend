@@ -5,9 +5,10 @@ import { isWeb } from '~/utils';
 interface ContainerProps {
   children: ReactNode;
   scrollable?: boolean;
+  className?: string; // Support for Nativewind styling
 }
 
-export const Container: React.FC<ContainerProps> = ({ children, scrollable = true }) => {
+export const Container: React.FC<ContainerProps> = ({ children, scrollable = true, className = "" }) => {
   const content = (
     <View
       className={`
@@ -21,11 +22,11 @@ export const Container: React.FC<ContainerProps> = ({ children, scrollable = tru
 
   if (scrollable) {
     return (
-      <ScrollView contentContainerClassName="flex-grow" className="flex-1 bg-white">
+      <ScrollView contentContainerClassName="flex-grow" className={`flex-1 bg-white ${className}`}>
         {content}
       </ScrollView>
     );
   }
 
-  return <View className="flex-1 bg-white">{content}</View>;
+  return <View className={`flex-1 bg-white ${className}`}>{content}</View>;
 };

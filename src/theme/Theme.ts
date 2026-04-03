@@ -1,36 +1,57 @@
+
+
+export const FontFamily = {
+  light:    'HankenGrotesk_300Light',
+  regular:  'HankenGrotesk_400Regular',
+  medium:   'HankenGrotesk_500Medium',
+  semibold: 'HankenGrotesk_600SemiBold',
+  bold:     'HankenGrotesk_700Bold',
+  extrabold:'HankenGrotesk_800ExtraBold',
+} as const;
+
+export const Colors = {
+  primary:             '#E9560C',
+  primaryForeground:   '#FFF4EB',
+  secondary:           '#525252',
+  secondaryForeground: '#FAFAFA',
+  accent:              '#FFFBEB',
+  accentForeground:    '#F59B0A',
+  
+  background:          '#F5F5F5',
+  foreground:          '#171717',
+  muted:               '#A1A1A1',
+  secondaryText:       '#737373',
+  border:              '#D4D4D4',
+  
+  destructive:         '#DB2424',
+  
+  sand:                '#E4DBCD',
+  sandDark:            '#3D3529',
+  sandMuted:           '#9E8F7B',
+
+  white:               '#FFFFFF',
+  black:               '#000000',
+  transparent:         'transparent',
+} as const;
+
+export const Size = {
+  icon: {
+    sm: 14, 
+    md: 18, 
+    lg: 24,  
+  },
+  logo: {
+    height: 40,
+  },
+  collectionCard: {
+    width:  176,
+    height: 224,
+  },
+  maxFormWidth: 384,
+} as const;
+
 export const Theme = {
-  colors: {
-    primary: '#007AFF',
-    background: '#FFFFFF',
-    surface: '#F2F2F7',
-    text: '#000000',
-    secondaryText: '#8E8E93',
-    border: '#C6C6C8',
-    error: '#FF3B30',
-    success: '#34C759',
-    gold: '#CCAB66',
-    white: '#FFFFFF',
-    black: '#000000',
-  },
-  spacing: {
-    xs: 4,
-    sm: 8,
-    md: 16,
-    lg: 24,
-    xl: 32,
-    xxl: 40,
-  },
-  roundness: {
-    sm: 8,
-    md: 12,
-    lg: 20,
-    full: 9999,
-  },
-  typography: {
-    h1: { fontSize: 32, fontWeight: '700' as const },
-    h2: { fontSize: 24, fontWeight: '600' as const },
-    h3: { fontSize: 20, fontWeight: '600' as const },
-    body: { fontSize: 16, fontWeight: '400' as const },
-    caption: { fontSize: 12, fontWeight: '400' as const },
-  },
-};
+  colors:     Colors,
+  font:       FontFamily,
+  size:       Size,
+} as const;

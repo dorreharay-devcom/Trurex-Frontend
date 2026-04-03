@@ -1,18 +1,26 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Routes } from '~/constants/routes';
-import { Button } from '~/components/common/Button';
+import { Button, ButtonVariant } from '~/components/common/Button';
 import { Container } from '~/components/common/Container';
 import { Apple as AppleIcon, Mail, Lock, Globe as GoogleIcon } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
 
+import { useAuth } from '~/services/AuthContext';
+
 export default function AuthScreen() {
   const router = useRouter();
+  const { loginAsGuest } = useAuth() as any; // Cast for now if TS is strict
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSignIn = () => {
+    router.replace(Routes.Main);
+  };
+
+  const handleGuestLogin = () => {
+    loginAsGuest();
     router.replace(Routes.Main);
   };
 
@@ -81,11 +89,12 @@ export default function AuthScreen() {
               onPress={handleSignIn}
               className="w-full h-[56px] rounded-2xl bg-black"
             />
-            <TouchableOpacity onPress={handleSignUp}>
-              <Text className="text-center text-gray-500 font-medium">
-                Don't have an account? <Text className="text-black font-bold">Sign Up</Text>
-              </Text>
-            </TouchableOpacity>
+            <Button 
+              variant={ButtonVariant.Link} 
+              onPress={handleSignUp}
+              label="Don't have an account?"
+              title="Sign Up"
+            />
           </View>
 
           <View className="flex-row items-center my-10">
@@ -97,21 +106,29 @@ export default function AuthScreen() {
           </View>
 
           <View className="flex-row space-x-4">
-            <TouchableOpacity
+            <Button
               onPress={handleGoogleLogin}
-              className="flex-1 flex-row items-center justify-center bg-white border border-gray-200 h-[56px] rounded-2xl shadow-sm"
-            >
-              <GoogleIcon size={20} color={Theme.colors.black} />
-              <Text className="ml-3 font-bold text-black">Google</Text>
-            </TouchableOpacity>
+              variant={ButtonVariant.Outline}
+              icon={<GoogleIcon size={20} color={Theme.colors.black} />}
+              title="Google"
+              className="flex-1"
+            />
 
-            <TouchableOpacity
+            <Button
               onPress={handleAppleLogin}
-              className="flex-1 flex-row items-center justify-center bg-black h-[56px] rounded-2xl shadow-sm"
-            >
-              <AppleIcon size={20} color={Theme.colors.white} />
-              <Text className="ml-3 font-bold text-white">Apple</Text>
-            </TouchableOpacity>
+              className="flex-1 bg-black"
+              icon={<AppleIcon size={20} color={Theme.colors.white} />}
+              title="Apple"
+            />
+          </View>
+
+          <View className="items-center mt-12 pb-8">
+            <Button
+              variant={ButtonVariant.Link}
+              onPress={handleGuestLogin}
+              title="Continue as Guest"
+              textClassName="text-sm font-bold text-gray-500"
+            />
           </View>
         </View>
       </View>
