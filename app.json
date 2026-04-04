@@ -26,7 +26,8 @@
     },
     "web": {
       "bundler": "metro",
-      "favicon": "./assets/truRexIcon.png"
+      "favicon": "./assets/truRexIcon.png",
+      "name": "TruRex"
     },
     "plugins": ["expo-web-browser", "expo-router", "expo-secure-store"]
   }

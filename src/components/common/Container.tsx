@@ -5,10 +5,14 @@ import { isWeb } from '~/utils';
 interface ContainerProps {
   children: ReactNode;
   scrollable?: boolean;
-  className?: string; // Support for Nativewind styling
+  className?: string;
 }
 
-export const Container: React.FC<ContainerProps> = ({ children, scrollable = true, className = "" }) => {
+export const Container: React.FC<ContainerProps> = ({
+  children,
+  scrollable = true,
+  className = '',
+}) => {
   const content = (
     <View
       className={`

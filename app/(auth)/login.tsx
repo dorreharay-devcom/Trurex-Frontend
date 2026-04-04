@@ -1,137 +1,139 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
+import { Auth } from '~/services/AuthService';
+import { useAuth } from '~/services/AuthContext';
 import { Routes } from '~/constants/routes';
 import { Button, ButtonVariant } from '~/components/common/Button';
-import { Container } from '~/components/common/Container';
-import { Apple as AppleIcon, Mail, Lock, Globe as GoogleIcon } from 'lucide-react-native';
+import AuthLayout from '~/components/common/AuthLayout';
+import Input from '~/components/common/Input';
+import { Globe as GoogleIcon, Apple as AppleIcon } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
+import { isWeb } from '~/utils';
 
-import { useAuth } from '~/services/AuthContext';
+WebBrowser.maybeCompleteAuthSession();
 
-export default function AuthScreen() {
+export default function LoginScreen() {
   const router = useRouter();
-  const { loginAsGuest } = useAuth() as any; // Cast for now if TS is strict
+  const { loginAsGuest } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSignIn = () => {
-    router.replace(Routes.Main);
+  const getRedirectUrl = () => (isWeb ? window.location.origin : Linking.createURL('/'));
+
+  const handleLogin = async () => {
+    setLoading(true);
+    const { error } = await Auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) {
+      Alert.alert('Login failed', error.message);
+    } else {
+      router.replace(Routes.Main);
+    }
   };
 
-  const handleGuestLogin = () => {
-    loginAsGuest();
-    router.replace(Routes.Main);
-  };
-
-  const handleSignUp = () => {
-    console.log('Sign up pressed');
-  };
-
-  const handleGoogleLogin = () => {
-    console.log('Google login pressed');
-  };
-
-  const handleAppleLogin = () => {
-    console.log('Apple login pressed');
+  const handleOAuth = async (provider: 'google' | 'apple') => {
+    const redirectUrl = getRedirectUrl();
+    const { data, error } = await Auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: redirectUrl },
+    });
+    if (error) {
+      Alert.alert(`${provider === 'google' ? 'Google' : 'Apple'} sign-in failed`, error.message);
+      return;
+    }
+    if (!isWeb && data.url) {
+      await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
+    }
   };
 
   return (
-    <Container>
-      <View className="flex-1 justify-center px-8 py-12">
-        <View className="items-center mb-12">
-          <Text className="text-5xl font-extrabold text-black tracking-tighter">truRex</Text>
-          <View className="h-1 w-12 bg-gold mt-2 rounded-full" />
-          <Text className="text-gray-400 mt-4 text-center font-medium tracking-wide">
-            REDEFINING LUXURY ASSETS
-          </Text>
-        </View>
+    <AuthLayout>
+      <View className="items-center gap-4">
+        <Image
+          source={require('../../assets/truRexLogo.png')}
+          style={{ height: 40, resizeMode: 'contain' }}
+        />
+        <Text className="text-muted-foreground text-sm">Sign in to your account</Text>
+      </View>
 
-        <View className="space-y-6">
-          <View>
-            <View className="flex-row items-center mb-2 ml-1">
-              <Mail size={14} color={Theme.colors.secondaryText} />
-              <Text className="text-xs text-gray-400 uppercase font-black tracking-[2px] ml-2">
-                Email Address
-              </Text>
-            </View>
-            <TextInput
-              className="p-4 bg-gray-50 rounded-2xl text-base text-black border border-gray-100 shadow-sm"
-              onChangeText={setEmail}
-              value={email}
-              placeholder="Enter your email"
-              placeholderTextColor={Theme.colors.secondaryText}
-              autoCapitalize={'none'}
-            />
-          </View>
+      <View className="space-y-3">
+        <TouchableOpacity
+          onPress={() => handleOAuth('google')}
+          className="w-full flex-row items-center justify-center gap-2 py-2.5 rounded-lg bg-card border border-border"
+        >
+          <GoogleIcon size={16} color={Theme.colors.foreground} />
+          <Text className="text-foreground font-medium text-sm">Continue with Google</Text>
+        </TouchableOpacity>
 
-          <View>
-            <View className="flex-row items-center mb-2 ml-1">
-              <Lock size={14} color={Theme.colors.secondaryText} />
-              <Text className="text-xs text-gray-400 uppercase font-black tracking-[2px] ml-2">
-                Password
-              </Text>
-            </View>
-            <TextInput
-              className="p-4 bg-gray-50 rounded-2xl text-base text-black border border-gray-100 shadow-sm"
-              onChangeText={setPassword}
-              value={password}
-              secureTextEntry={true}
-              placeholder="••••••••"
-              placeholderTextColor={Theme.colors.secondaryText}
-              autoCapitalize={'none'}
-            />
-          </View>
+        <TouchableOpacity
+          onPress={() => handleOAuth('apple')}
+          className="w-full flex-row items-center justify-center gap-2 py-2.5 rounded-lg bg-card border border-border"
+        >
+          <AppleIcon size={16} color={Theme.colors.foreground} />
+          <Text className="text-foreground font-medium text-sm">Continue with Apple</Text>
+        </TouchableOpacity>
+      </View>
 
-          <View className="mt-4 space-y-3">
-            <Button
-              title="Sign In"
-              onPress={handleSignIn}
-              className="w-full h-[56px] rounded-2xl bg-black"
-            />
-            <Button 
-              variant={ButtonVariant.Link} 
-              onPress={handleSignUp}
-              label="Don't have an account?"
-              title="Sign Up"
-            />
-          </View>
+      <View className="flex-row items-center gap-3">
+        <View className="flex-1 h-px bg-border" />
+        <Text className="text-xs text-muted-foreground">or</Text>
+        <View className="flex-1 h-px bg-border" />
+      </View>
 
-          <View className="flex-row items-center my-10">
-            <View className="flex-1 h-[0.5px] bg-gray-200" />
-            <Text className="mx-4 text-xs text-gray-400 uppercase font-bold tracking-widest">
-              OR CONTINUE WITH
-            </Text>
-            <View className="flex-1 h-[0.5px] bg-gray-200" />
-          </View>
+      <View className="space-y-4">
+        <Input
+          label="Email"
+          value={email}
+          onChangeText={setEmail}
+          placeholder="you@example.com"
+          keyboardType="email-address"
+        />
 
-          <View className="flex-row space-x-4">
-            <Button
-              onPress={handleGoogleLogin}
-              variant={ButtonVariant.Outline}
-              icon={<GoogleIcon size={20} color={Theme.colors.black} />}
-              title="Google"
-              className="flex-1"
-            />
-
-            <Button
-              onPress={handleAppleLogin}
-              className="flex-1 bg-black"
-              icon={<AppleIcon size={20} color={Theme.colors.white} />}
-              title="Apple"
-            />
-          </View>
-
-          <View className="items-center mt-12 pb-8">
+        <Input
+          label="Password"
+          labelRight={
             <Button
               variant={ButtonVariant.Link}
-              onPress={handleGuestLogin}
-              title="Continue as Guest"
-              textClassName="text-sm font-bold text-gray-500"
+              onPress={() => router.push(Routes.ForgotPassword)}
+              title="Forgot password?"
+              textClassName="text-xs text-accent-foreground font-normal"
             />
-          </View>
-        </View>
+          }
+          value={password}
+          onChangeText={setPassword}
+          placeholder="••••••••"
+          secure
+        />
+
+        <Button
+          title="Sign in"
+          onPress={handleLogin}
+          loading={loading}
+          disabled={loading}
+          className="w-full"
+        />
       </View>
-    </Container>
+
+      <Button
+        variant={ButtonVariant.Muted}
+        title="Continue as Guest"
+        onPress={() => {
+          loginAsGuest();
+          router.replace(Routes.Main);
+        }}
+        className="w-full"
+      />
+
+      <Text className="text-center text-sm text-muted-foreground">
+        Don't have an account?{' '}
+        <Text className="text-foreground font-medium" onPress={() => router.push(Routes.Signup)}>
+          Sign up
+        </Text>
+      </Text>
+    </AuthLayout>
   );
 }

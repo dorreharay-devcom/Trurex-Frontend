@@ -2,11 +2,20 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { Auth } from './AuthService';
 
+export enum AuthEvent {
+  PasswordRecovery = 'PASSWORD_RECOVERY',
+  SignedOut = 'SIGNED_OUT',
+  SignedIn = 'SIGNED_IN',
+  TokenRefreshed = 'TOKEN_REFRESHED',
+  UserUpdated = 'USER_UPDATED',
+}
+
 interface AuthState {
   session: Session | null;
   user: User | null;
   loading: boolean;
-  isGuest: boolean; // True if user is bypassing auth
+  isGuest: boolean;
+  loginAsGuest: () => void;
 }
 
 const AuthContext = createContext<AuthState>({
@@ -14,6 +23,7 @@ const AuthContext = createContext<AuthState>({
   user: null,
   loading: true,
   isGuest: false,
+  loginAsGuest: () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -51,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, loading, isGuest }}>
+    <AuthContext.Provider value={{ session, user, loading, isGuest, loginAsGuest }}>
       {children}
     </AuthContext.Provider>
   );

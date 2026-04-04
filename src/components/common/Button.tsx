@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, View } from 'react-native';
 import { Theme } from '~/theme/Theme';
@@ -6,6 +5,7 @@ import { Theme } from '~/theme/Theme';
 export enum ButtonVariant {
   Primary = 'primary',
   Secondary = 'secondary',
+  Muted = 'muted',
   Ghost = 'ghost',
   Danger = 'danger',
   Outline = 'outline',
@@ -15,7 +15,7 @@ export enum ButtonVariant {
 interface ButtonProps {
   title?: string;
   onPress: () => void;
-  label?: string; 
+  label?: string;
   variant?: ButtonVariant;
   loading?: boolean;
   disabled?: boolean;
@@ -26,30 +26,33 @@ interface ButtonProps {
 }
 
 const buttonVariants: Record<ButtonVariant, string> = {
-  [ButtonVariant.Primary]: 'h-14 px-6 bg-black rounded-2xl',
-  [ButtonVariant.Secondary]: 'h-14 px-6 bg-white border border-gray-200 rounded-2xl',
-  [ButtonVariant.Ghost]: 'h-14 px-6 bg-transparent rounded-2xl',
-  [ButtonVariant.Danger]: 'h-14 px-6 bg-red-500 rounded-2xl',
-  [ButtonVariant.Outline]: 'h-14 px-6 bg-white border border-gray-200 rounded-2xl shadow-sm',
-  [ButtonVariant.Link]: 'h-auto p-0 bg-transparent',
+  [ButtonVariant.Primary]: 'py-2.5 px-6 bg-primary rounded-lg',
+  [ButtonVariant.Secondary]: 'py-2.5 px-6 bg-card border border-border rounded-lg',
+  [ButtonVariant.Muted]: 'py-2.5 px-6 bg-muted rounded-lg',
+  [ButtonVariant.Ghost]: 'py-2.5 px-6 bg-transparent rounded-lg',
+  [ButtonVariant.Danger]: 'py-2.5 px-6 bg-destructive rounded-lg',
+  [ButtonVariant.Outline]: 'py-2.5 px-6 bg-card border border-border rounded-lg',
+  [ButtonVariant.Link]: 'p-0 bg-transparent',
 };
 
 const textVariants: Record<ButtonVariant, string> = {
-  [ButtonVariant.Primary]: 'text-white font-semibold',
-  [ButtonVariant.Secondary]: 'text-black font-semibold',
-  [ButtonVariant.Ghost]: 'text-primary font-semibold',
-  [ButtonVariant.Danger]: 'text-white font-semibold',
-  [ButtonVariant.Outline]: 'text-black font-bold',
-  [ButtonVariant.Link]: 'text-black font-bold',
+  [ButtonVariant.Primary]: 'text-primary-foreground font-medium',
+  [ButtonVariant.Secondary]: 'text-foreground font-medium',
+  [ButtonVariant.Muted]: 'text-muted-foreground font-medium',
+  [ButtonVariant.Ghost]: 'text-primary font-medium',
+  [ButtonVariant.Danger]: 'text-white font-medium',
+  [ButtonVariant.Outline]: 'text-foreground font-medium',
+  [ButtonVariant.Link]: 'text-foreground font-medium',
 };
 
 const spinnerColor: Record<ButtonVariant, string> = {
-  [ButtonVariant.Primary]: Theme.colors.white,
-  [ButtonVariant.Secondary]: Theme.colors.black,
+  [ButtonVariant.Primary]: Theme.colors.primaryForeground,
+  [ButtonVariant.Secondary]: Theme.colors.foreground,
+  [ButtonVariant.Muted]: Theme.colors.muted,
   [ButtonVariant.Ghost]: Theme.colors.primary,
   [ButtonVariant.Danger]: Theme.colors.white,
-  [ButtonVariant.Outline]: Theme.colors.black,
-  [ButtonVariant.Link]: Theme.colors.black,
+  [ButtonVariant.Outline]: Theme.colors.foreground,
+  [ButtonVariant.Link]: Theme.colors.foreground,
 };
 
 export const Button: React.FC<ButtonProps> = ({
@@ -64,8 +67,6 @@ export const Button: React.FC<ButtonProps> = ({
   labelClassName,
   icon,
 }) => {
-  const isLink = variant === ButtonVariant.Link;
-
   return (
     <TouchableOpacity
       activeOpacity={0.7}
@@ -84,7 +85,7 @@ export const Button: React.FC<ButtonProps> = ({
                 {label}
               </Text>
             )}
-            <Text className={`text-base ${textVariants[variant]} ${textClassName ?? ''}`}>
+            <Text className={`text-sm ${textVariants[variant]} ${textClassName ?? ''}`}>
               {title}
             </Text>
           </View>
