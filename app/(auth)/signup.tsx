@@ -4,9 +4,8 @@ import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 import { Auth } from '~/services/AuthService';
-import { useAuth } from '~/services/AuthContext';
 import { Routes } from '~/constants/routes';
-import { Button, ButtonVariant } from '~/components/common/Button';
+import { Button } from '~/components/common/Button';
 import AuthLayout from '~/components/common/AuthLayout';
 import Input from '~/components/common/Input';
 import { Globe as GoogleIcon, Apple as AppleIcon } from 'lucide-react-native';
@@ -15,23 +14,31 @@ import { isWeb } from '~/utils';
 
 WebBrowser.maybeCompleteAuthSession();
 
-export default function LoginScreen() {
+export default function SignupScreen() {
   const router = useRouter();
-  const { loginAsGuest } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
 
   const getRedirectUrl = () => (isWeb ? window.location.origin : Linking.createURL('/'));
 
-  const handleLogin = async () => {
+  const handleSignup = async () => {
     setLoading(true);
-    const { error } = await Auth.signInWithPassword({ email, password });
+    const { error } = await Auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: getRedirectUrl(),
+        data: { full_name: fullName },
+      },
+    });
     setLoading(false);
     if (error) {
-      Alert.alert('Login failed', error.message);
+      Alert.alert('Signup failed', error.message);
     } else {
-      router.replace(Routes.Main);
+      Alert.alert('Check your email', 'We sent you a confirmation link to verify your account.');
+      router.replace(Routes.Login);
     }
   };
 
@@ -42,7 +49,7 @@ export default function LoginScreen() {
       options: { redirectTo: redirectUrl },
     });
     if (error) {
-      Alert.alert(`${provider === 'google' ? 'Google' : 'Apple'} sign-in failed`, error.message);
+      Alert.alert(`${provider} sign-up failed`, error.message);
       return;
     }
     if (!isWeb && data.url) {
@@ -57,7 +64,7 @@ export default function LoginScreen() {
           source={require('../../assets/truRexLogo.png')}
           style={{ height: 40, resizeMode: 'contain' }}
         />
-        <Text className="text-muted-foreground text-sm">Sign in to your account</Text>
+        <Text className="text-muted-foreground text-sm">Create your TruRex account</Text>
       </View>
 
       <View className="space-y-3">
@@ -86,6 +93,14 @@ export default function LoginScreen() {
 
       <View className="space-y-4">
         <Input
+          label="Full name"
+          value={fullName}
+          onChangeText={setFullName}
+          placeholder="Jane Doe"
+          autoCapitalize="words"
+        />
+
+        <Input
           label="Email"
           value={email}
           onChangeText={setEmail}
@@ -95,43 +110,25 @@ export default function LoginScreen() {
 
         <Input
           label="Password"
-          labelRight={
-            <Button
-              variant={ButtonVariant.Link}
-              onPress={() => router.push(Routes.ForgotPassword)}
-              title="Forgot password?"
-              textClassName="text-xs text-accent-foreground font-normal"
-            />
-          }
           value={password}
           onChangeText={setPassword}
-          placeholder="••••••••"
+          placeholder="At least 6 characters"
           secure
         />
 
         <Button
-          title="Sign in"
-          onPress={handleLogin}
+          title="Create account"
+          onPress={handleSignup}
           loading={loading}
           disabled={loading}
           className="w-full"
         />
       </View>
 
-      <Button
-        variant={ButtonVariant.Muted}
-        title="Continue as Guest"
-        onPress={() => {
-          loginAsGuest();
-          router.replace(Routes.Main);
-        }}
-        className="w-full"
-      />
-
       <Text className="text-center text-sm text-muted-foreground">
-        Don't have an account?{' '}
-        <Text className="text-foreground font-medium" onPress={() => router.push(Routes.Signup)}>
-          Sign up
+        Already have an account?{' '}
+        <Text className="text-foreground font-medium" onPress={() => router.replace(Routes.Login)}>
+          Sign in
         </Text>
       </Text>
     </AuthLayout>
