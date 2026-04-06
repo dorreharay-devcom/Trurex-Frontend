@@ -10,9 +10,16 @@ interface HeaderProps {
   onSearchChange: (text: string) => void;
   onProfilePress: () => void;
   onAddPress: () => void;
+  isProfileActive?: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchChange, onProfilePress, onAddPress }) => {
+export const Header: React.FC<HeaderProps> = ({
+  searchQuery,
+  onSearchChange,
+  onProfilePress,
+  onAddPress,
+  isProfileActive,
+}) => {
   const { width } = useWindowDimensions();
   const isMobile = !isWeb || width < 640;
 
@@ -25,11 +32,10 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchChange, onP
             style={{ width: 80, height: 28, resizeMode: 'contain' }}
           />
 
-          <View
-            className="absolute inset-x-0 items-center"
-            pointerEvents="box-none"
-          >
-            <View className={`${isWeb && !isMobile ? 'w-[448px]' : 'w-[55%]'} relative justify-center`}>
+          <View className="absolute inset-x-0 items-center" pointerEvents="box-none">
+            <View
+              className={`${isWeb && !isMobile ? 'w-[448px]' : 'w-[55%]'} relative justify-center`}
+            >
               <View className="absolute left-3 z-10">
                 <Search size={16} color={Theme.colors.foreground} />
               </View>
@@ -62,7 +68,7 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchChange, onP
             </TouchableOpacity>
             <TouchableOpacity
               onPress={onProfilePress}
-              className="w-9 h-9 rounded-full bg-border items-center justify-center"
+              className={`w-9 h-9 rounded-full items-center justify-center border-2 ${isProfileActive ? 'border-primary' : 'border-transparent'}`}
             >
               <UserCircle2 size={20} color={Theme.colors.secondaryText} />
             </TouchableOpacity>

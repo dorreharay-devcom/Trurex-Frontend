@@ -59,6 +59,7 @@ const ACTIVITY_ITEMS = [
   { emoji: '📝', text: 'Added Attaboy to Bars', time: '2d ago' },
 ];
 
+
 enum ProfileTab {
   Recs = 'recs',
   Collections = 'collections',
@@ -168,28 +169,16 @@ const ProfileView = () => {
 
         <View className="pb-4">
           {activeTab === ProfileTab.Recs && (
-            <View className="flex-row flex-wrap gap-3 p-4">
+            <View className="flex-row flex-wrap px-3 pt-3 pb-1">
               {MOCK_RECS.map((rec) => (
-                <View
-                  key={rec.id}
-                  className="rounded-xl overflow-hidden bg-background border border-border"
-                  style={{ width: '47.5%' }}
-                >
-                  <Image
-                    source={{ uri: rec.image }}
-                    className="w-full aspect-square"
-                    resizeMode="cover"
-                  />
-                  <View className="p-2.5">
-                    <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>
-                      {rec.title}
-                    </Text>
-                    <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
-                      {rec.location || rec.category}
-                    </Text>
-                    <Text className="text-[10px] text-accent-foreground font-medium">
-                      ★ {rec.rating}
-                    </Text>
+                <View key={rec.id} className="w-1/4 p-1">
+                  <View className="rounded-xl overflow-hidden bg-background border border-border shadow-card">
+                    <Image source={{ uri: rec.image }} className="w-full aspect-square" resizeMode="cover" />
+                    <View className="p-2.5">
+                      <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>{rec.title}</Text>
+                      <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>{rec.location || rec.category}</Text>
+                      <Text className="text-[10px] text-accent-foreground font-medium">★ {rec.rating}</Text>
+                    </View>
                   </View>
                 </View>
               ))}

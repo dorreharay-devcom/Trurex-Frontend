@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { PlusCircle } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
+import { webContainerStyle } from '~/utils';
 import { Header } from './_components/Header';
 import { TabBar, Tab } from './_components/TabBar';
 import CategoryPills, { Category } from './_components/CategoryPills';
 import RecommendationCard, { Recommendation } from './_components/RecommendationCard';
 import ProfileView from './_components/ProfileView';
+import FavesView from './_components/FavesView';
 
 
 const CATEGORIES: Category[] = [
@@ -81,8 +83,6 @@ const PlaceholderView = ({ title }: { title: string }) => (
   </View>
 );
 
-import { webContainerStyle } from '~/utils';
-
 const FeedView = ({ onTapRec }: { onTapRec?: (rec: Recommendation) => void }) => {
   const [activeCategory, setActiveCategory] = useState('all');
 
@@ -96,7 +96,8 @@ const FeedView = ({ onTapRec }: { onTapRec?: (rec: Recommendation) => void }) =>
         data={filtered}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[webContainerStyle, { paddingBottom: 96 }]}
+        contentContainerStyle={webContainerStyle}
+        contentContainerClassName="pb-24"
         ListHeaderComponent={() => (
           <View style={webContainerStyle} className="px-4 pt-8 pb-3">
             <CategoryPills
@@ -132,6 +133,7 @@ export default function HomeScreen() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onProfilePress={() => setCurrentTab('profile')}
+        isProfileActive={currentTab === 'profile'}
         onAddPress={() => {}}
       />
 
@@ -140,15 +142,14 @@ export default function HomeScreen() {
       <View className="flex-1">
         {currentTab === 'feed' && <FeedView />}
         {currentTab === 'discover' && <PlaceholderView title="Discover" />}
-        {currentTab === 'faves' && <PlaceholderView title="My Faves" />}
+        {currentTab === 'faves' && <FavesView />}
         {currentTab === 'network' && <PlaceholderView title="Network" />}
         {currentTab === 'map' && <PlaceholderView title="Map" />}
         {currentTab === 'profile' && <ProfileView />}
       </View>
 
       <TouchableOpacity
-        className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-primary items-center justify-center"
-        style={{ elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4 }}
+        className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-primary items-center justify-center shadow-md"
       >
         <PlusCircle size={28} color={Theme.colors.primaryForeground} />
       </TouchableOpacity>

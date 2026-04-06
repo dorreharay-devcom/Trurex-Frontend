@@ -7,9 +7,9 @@ interface CurrentlySectionProps {
 }
 
 const ITEMS = [
-  { key: 'binging' as const, emoji: '🎬', label: 'Binging' },
-  { key: 'listening' as const, emoji: '🎵', label: 'Listening to' },
-  { key: 'reading' as const, emoji: '📖', label: 'Reading' },
+  { key: 'binging' as const, emoji: '🎬', label: 'Currently Binging' },
+  { key: 'listening' as const, emoji: '🎵', label: 'Currently Listening to' },
+  { key: 'reading' as const, emoji: '📖', label: 'Currently Reading' },
 ];
 
 const CurrentlySection = ({ currently }: CurrentlySectionProps) => {
@@ -17,17 +17,22 @@ const CurrentlySection = ({ currently }: CurrentlySectionProps) => {
   if (!currently || active.length === 0) return null;
 
   return (
-    <View className="px-4 py-3 border-b border-border gap-2">
-      <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+    <View className="px-4 pt-5 pb-3 gap-2">
+      <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">
         Currently...
       </Text>
       {active.map((item) => (
-        <View key={item.key} className="flex-row items-center gap-2">
-          <Text className="text-sm">{item.emoji}</Text>
-          <Text className="text-xs text-muted-foreground">{item.label}:</Text>
-          <Text className="text-xs text-foreground font-medium flex-1" numberOfLines={1}>
-            {currently[item.key]}
-          </Text>
+        <View
+          key={item.key}
+          className="flex-row items-center gap-3 p-3 rounded-xl bg-background border border-border"
+        >
+          <Text className="text-xl">{item.emoji}</Text>
+          <View className="flex-1">
+            <Text className="text-[11px] text-muted-foreground mb-0.5">{item.label}</Text>
+            <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
+              {currently[item.key]}
+            </Text>
+          </View>
         </View>
       ))}
     </View>

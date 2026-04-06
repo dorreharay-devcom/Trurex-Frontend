@@ -6,6 +6,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['HankenGrotesk_400Regular'],
+        display: ['HankenGrotesk_700Bold'],
         'hk-light': ['HankenGrotesk_300Light'],
         'hk-regular': ['HankenGrotesk_400Regular'],
         'hk-medium': ['HankenGrotesk_500Medium'],
@@ -34,8 +35,8 @@ module.exports = {
         'sand-muted': '#9E8F7B', // hsl(35 15% 55%)
       },
       borderRadius: {
-        xl: '20px',
-        '2xl': '24px',
+        xl: '12px',
+        '2xl': '16px',
       },
     },
   },
