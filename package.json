@@ -13,6 +13,7 @@
     "clean": "rm -rf node_modules pnpm-lock.yaml && pnpm install"
   },
   "dependencies": {
+    "@expo-google-fonts/hanken-grotesk": "^0.4.3",
     "@expo/metro-runtime": "~6.1.2",
     "@hookform/resolvers": "^5.2.2",
     "@react-native-async-storage/async-storage": "^2.2.0",
@@ -23,7 +24,10 @@
     "dayjs": "^1.11.20",
     "expo": "~54.0.33",
     "expo-constants": "~18.0.13",
+    "expo-font": "~14.0.11",
     "expo-image": "~3.0.11",
+    "expo-image-picker": "~17.0.10",
+    "expo-linear-gradient": "~15.0.8",
     "expo-linking": "~8.0.11",
     "expo-router": "~6.0.23",
     "expo-secure-store": "~15.0.8",

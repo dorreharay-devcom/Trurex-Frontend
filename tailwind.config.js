@@ -4,6 +4,15 @@ module.exports = {
   presets: [require('nativewind/preset')],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['HankenGrotesk_400Regular'],
+        'hk-light': ['HankenGrotesk_300Light'],
+        'hk-regular': ['HankenGrotesk_400Regular'],
+        'hk-medium': ['HankenGrotesk_500Medium'],
+        'hk-semibold': ['HankenGrotesk_600SemiBold'],
+        'hk-bold': ['HankenGrotesk_700Bold'],
+        'hk-extrabold': ['HankenGrotesk_800ExtraBold'],
+      },
       colors: {
         background: '#F5F5F5', // hsl(0 0% 96%)
         foreground: '#171717', // hsl(0 0% 9%)

@@ -6,6 +6,7 @@ import { Header } from './_components/Header';
 import { TabBar, Tab } from './_components/TabBar';
 import CategoryPills, { Category } from './_components/CategoryPills';
 import RecommendationCard, { Recommendation } from './_components/RecommendationCard';
+import ProfileView from './_components/ProfileView';
 
 
 const CATEGORIES: Category[] = [
@@ -80,11 +81,7 @@ const PlaceholderView = ({ title }: { title: string }) => (
   </View>
 );
 
-import { isWeb } from '~/utils';
-
-const containerStyle = isWeb
-  ? { maxWidth: 1280, width: '100%' as const, alignSelf: 'center' as const }
-  : undefined;
+import { webContainerStyle } from '~/utils';
 
 const FeedView = ({ onTapRec }: { onTapRec?: (rec: Recommendation) => void }) => {
   const [activeCategory, setActiveCategory] = useState('all');
@@ -95,18 +92,20 @@ const FeedView = ({ onTapRec }: { onTapRec?: (rec: Recommendation) => void }) =>
 
   return (
     <View className="flex-1">
-      <View style={containerStyle} className="px-4 pt-8 pb-3">
-        <CategoryPills
-          categories={CATEGORIES}
-          activeCategory={activeCategory}
-          onSelect={setActiveCategory}
-        />
-      </View>
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[containerStyle, { paddingHorizontal: 16, paddingBottom: 96 }]}
+        contentContainerStyle={[webContainerStyle, { paddingBottom: 96 }]}
+        ListHeaderComponent={() => (
+          <View style={webContainerStyle} className="px-4 pt-8 pb-3">
+            <CategoryPills
+              categories={CATEGORIES}
+              activeCategory={activeCategory}
+              onSelect={setActiveCategory}
+            />
+          </View>
+        )}
         ListEmptyComponent={() => (
           <View className="items-center py-16">
             <Text className="text-4xl mb-3">🦖</Text>
@@ -114,7 +113,9 @@ const FeedView = ({ onTapRec }: { onTapRec?: (rec: Recommendation) => void }) =>
           </View>
         )}
         renderItem={({ item }) => (
-          <RecommendationCard recommendation={item} onTap={onTapRec} />
+          <View className="px-4">
+            <RecommendationCard recommendation={item} onTap={onTapRec} />
+          </View>
         )}
       />
     </View>
@@ -142,7 +143,7 @@ export default function HomeScreen() {
         {currentTab === 'faves' && <PlaceholderView title="My Faves" />}
         {currentTab === 'network' && <PlaceholderView title="Network" />}
         {currentTab === 'map' && <PlaceholderView title="Map" />}
-        {currentTab === 'profile' && <PlaceholderView title="Profile" />}
+        {currentTab === 'profile' && <ProfileView />}
       </View>
 
       <TouchableOpacity

@@ -6,16 +6,20 @@ import { Theme } from '~/theme/Theme';
 interface InputProps extends Omit<TextInputProps, 'style'> {
   label: string;
   labelRight?: React.ReactNode;
+  labelClassName?: string;
+  inputClassName?: string;
   secure?: boolean;
 }
 
-const Input = ({ label, labelRight, secure, ...props }: InputProps) => {
+const Input = ({ label, labelRight, labelClassName, inputClassName, secure, ...props }: InputProps) => {
   const [showPassword, setShowPassword] = useState(false);
+
+  const baseInput = `w-full px-3 py-2.5 rounded-lg bg-card border border-border text-foreground text-sm ${inputClassName ?? ''}`;
 
   return (
     <View>
       <View className="flex-row items-center justify-between mb-1.5">
-        <Text className="text-sm font-medium text-foreground">{label}</Text>
+        <Text className={`text-sm font-medium text-foreground ${labelClassName ?? ''}`}>{label}</Text>
         {labelRight}
       </View>
 
@@ -38,7 +42,8 @@ const Input = ({ label, labelRight, secure, ...props }: InputProps) => {
         </View>
       ) : (
         <TextInput
-          className="w-full px-3 py-2.5 rounded-lg bg-card border border-border text-foreground text-sm"
+          className={baseInput}
+          style={props.multiline ? { textAlignVertical: 'top' } : undefined}
           placeholderTextColor={Theme.colors.muted}
           autoCapitalize="none"
           {...props}

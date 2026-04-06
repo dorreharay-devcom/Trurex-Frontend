@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
@@ -61,21 +61,20 @@ export default function LoginScreen() {
       </View>
 
       <View className="space-y-3">
-        <TouchableOpacity
+        <Button
+          variant={ButtonVariant.Outline}
+          title="Continue with Google"
           onPress={() => handleOAuth('google')}
-          className="w-full flex-row items-center justify-center gap-2 py-2.5 rounded-lg bg-card border border-border"
-        >
-          <GoogleIcon size={16} color={Theme.colors.foreground} />
-          <Text className="text-foreground font-medium text-sm">Continue with Google</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
+          icon={<GoogleIcon size={16} color={Theme.colors.foreground} />}
+          className="w-full"
+        />
+        <Button
+          variant={ButtonVariant.Outline}
+          title="Continue with Apple"
           onPress={() => handleOAuth('apple')}
-          className="w-full flex-row items-center justify-center gap-2 py-2.5 rounded-lg bg-card border border-border"
-        >
-          <AppleIcon size={16} color={Theme.colors.foreground} />
-          <Text className="text-foreground font-medium text-sm">Continue with Apple</Text>
-        </TouchableOpacity>
+          icon={<AppleIcon size={16} color={Theme.colors.foreground} />}
+          className="w-full"
+        />
       </View>
 
       <View className="flex-row items-center gap-3">
