@@ -1,6 +1,5 @@
 import type { CreateRecSearchPlace } from '~/types/recommendation/create';
 
-/** Demo search results for the create-recommendation search step */
 export const CREATE_REC_SEARCH_PLACES: CreateRecSearchPlace[] = [
   {
     id: 'luna',

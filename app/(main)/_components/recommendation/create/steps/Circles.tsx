@@ -27,7 +27,6 @@ const RadioIndicator = ({ selected }: { selected: boolean }) => (
   </View>
 );
 
-/** Step: choose which circles can see this recommendation. */
 export const Circles: React.FC<Props> = ({ selectedIds, onToggle }) => {
   return (
     <ScrollView

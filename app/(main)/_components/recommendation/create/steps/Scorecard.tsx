@@ -26,7 +26,6 @@ type Props = {
   onReviewChange: (v: string) => void;
 };
 
-/** Step: rate the experience (stars, chips, tip, review). */
 export const Scorecard: React.FC<Props> = ({
   selectedCategoryId,
   starRatings,

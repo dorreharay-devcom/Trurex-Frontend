@@ -1,4 +1,3 @@
-/** Star row labels (scorecard step) */
 export const CREATE_REC_SCORE_ROWS = [
   'Drinks quality',
   'Value for money',
@@ -10,7 +9,6 @@ export const CREATE_REC_SCORE_ROWS = [
   'Food options (if applicable)',
 ] as const;
 
-/** “Applies to” chip labels */
 export const CREATE_REC_SCORE_CHIPS = [
   'Good for working/laptops',
   'Good for catchups',

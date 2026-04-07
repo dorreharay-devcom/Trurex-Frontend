@@ -26,7 +26,6 @@ type Props = {
   onTagLocationPress: () => void;
 };
 
-/** Step: find or add what you’re recommending (search list or manual entry). */
 export const Search: React.FC<Props> = ({
   mode,
   searchQuery,

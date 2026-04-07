@@ -3,7 +3,6 @@ export interface Recommendation {
   title: string;
   description: string;
   image: string;
-  /** Matches `REX_CATEGORIES` id for feed filtering */
   categoryId: string;
   category: string;
   location?: string;

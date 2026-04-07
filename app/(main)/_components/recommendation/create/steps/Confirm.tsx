@@ -24,7 +24,6 @@ type Props = {
   selectedCircleIds: Set<string>;
 };
 
-/** Static preview identity — matches product mock until profile is wired */
 const PREVIEW_USER = {
   name: 'Alex Morgan',
   handle: '@alexmorgan',
@@ -38,7 +37,6 @@ function averageStarRating(ratings: number[]): string | null {
   return (Math.round(avg * 10) / 10).toFixed(1);
 }
 
-/** Step: preview how the post will look before confirming. */
 export const Confirm: React.FC<Props> = ({
   searchMode,
   selectedPlaceId,

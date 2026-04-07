@@ -8,11 +8,9 @@ import { REX_CATEGORIES } from '~/constants/recommendation/rexCategories';
 import { CreateStepTitle } from '../CreateStepTitle';
 import { Theme } from '~/theme/Theme';
 
-/** Horizontal inset from step `p-6` (24px × 2) for tile width math */
 const H_PAD = 24;
 const GAP = 12;
 
-/** Narrow phones get 2 cols (readable labels + ~44pt+ tap targets); phablet 3; wide 4 */
 function columnCountForInnerWidth(inner: number): number {
   if (inner < 400) return 2;
   if (inner < 560) return 3;
@@ -22,11 +20,9 @@ function columnCountForInnerWidth(inner: number): number {
 type Props = {
   selectedCategoryId: string | null;
   onSelectCategory: (id: string) => void;
-  /** From selected search place; drives pill + primary highlight when still selected */
   autoSuggestedCategoryId: string | null;
 };
 
-/** Step: choose the category for this recommendation. */
 export const Category: React.FC<Props> = ({
   selectedCategoryId,
   onSelectCategory,

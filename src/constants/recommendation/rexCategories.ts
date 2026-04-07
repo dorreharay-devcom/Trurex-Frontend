@@ -1,9 +1,7 @@
-/** Full TruRex category list — used on the feed pills and New Rex category step grid. */
 export type RexCategory = {
   id: string;
   label: string;
   emoji: string;
-  /** Accent for selected state (borders / tint), same pattern as CategoryPills */
   color: string;
 };
 

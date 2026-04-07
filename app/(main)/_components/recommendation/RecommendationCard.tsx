@@ -28,7 +28,6 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation:
       {...(onTap ? { activeOpacity: 0.95, onPress: () => onTap(rec) } : {})}
       className="bg-card border border-border rounded-xl overflow-hidden mb-4"
     >
-      {/* Header */}
       <View className="flex-row items-center gap-3 p-4 pb-2">
         <Image
           source={{ uri: rec.user.avatar }}
@@ -46,7 +45,6 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation:
         </View>
       </View>
 
-      {/* Image with gradient overlay */}
       <View className="mx-4 rounded-lg overflow-hidden">
         <Image source={{ uri: rec.image }} className="w-full aspect-[4/3]" resizeMode="cover" />
         <View className="absolute bottom-0 left-0 right-0 p-3 bg-black/55">
@@ -72,12 +70,10 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation:
         </View>
       </View>
 
-      {/* Description */}
       <Text className="px-4 pt-3 text-sm text-foreground opacity-[0.85]" numberOfLines={3}>
         {rec.description}
       </Text>
 
-      {/* Tags */}
       {rec.tags.length > 0 && (
         <View className="flex-row flex-wrap gap-1.5 px-4 pt-2">
           {rec.tags.map((tag) => (
@@ -88,7 +84,6 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation:
         </View>
       )}
 
-      {/* Actions */}
       <View className="flex-row items-center justify-between px-4 py-3 mt-1">
         <View className="flex-row items-center gap-5">
           <TouchableOpacity onPress={toggleLike} className="flex-row items-center gap-1.5">
