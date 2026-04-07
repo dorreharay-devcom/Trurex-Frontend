@@ -10,6 +10,7 @@ interface HeaderProps {
   onSearchChange: (text: string) => void;
   onProfilePress: () => void;
   onAddPress: () => void;
+  isProfileActive?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -17,6 +18,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSearchChange,
   onProfilePress,
   onAddPress,
+  isProfileActive,
 }) => {
   const { width } = useWindowDimensions();
   const isMobile = !isWeb || width < 640;
@@ -68,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
             </TouchableOpacity>
             <TouchableOpacity
               onPress={onProfilePress}
-              className="w-9 h-9 rounded-full bg-border items-center justify-center"
+              className={`w-9 h-9 rounded-full items-center justify-center border-2 ${isProfileActive ? 'border-primary' : 'border-transparent'}`}
             >
               <UserCircle2 size={20} color={Theme.colors.secondaryText} />
             </TouchableOpacity>

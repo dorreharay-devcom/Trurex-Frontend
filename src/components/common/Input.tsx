@@ -14,6 +14,8 @@ import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 interface InputProps extends TextInputProps {
   label: string;
   labelRight?: React.ReactNode;
+  labelClassName?: string;
+  inputClassName?: string;
   secure?: boolean;
 }
 
@@ -25,7 +27,7 @@ const Input = ({ label, labelRight, secure, style, ...props }: InputProps) => {
   return (
     <View>
       <View className="flex-row items-center justify-between mb-1.5">
-        <Text className="text-sm font-medium text-foreground">{label}</Text>
+        <Text className={`text-sm font-medium text-foreground ${labelClassName ?? ''}`}>{label}</Text>
         {labelRight}
       </View>
 

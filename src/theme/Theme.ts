@@ -18,6 +18,7 @@ export const Colors = {
   accentForeground: '#F59B0A',
 
   background: '#F5F5F5',
+  card: '#FAFAFA',
   foreground: '#171717',
   muted: '#A1A1A1',
   secondaryText: '#737373',
