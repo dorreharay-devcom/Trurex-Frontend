@@ -3,10 +3,28 @@ import '~/i18n/config';
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '~/services/AuthContext';
-/**
- * Root Layout component that provides AuthContext to the entire app.
- */
+import { useFonts } from 'expo-font';
+import {
+  HankenGrotesk_300Light,
+  HankenGrotesk_400Regular,
+  HankenGrotesk_500Medium,
+  HankenGrotesk_600SemiBold,
+  HankenGrotesk_700Bold,
+  HankenGrotesk_800ExtraBold,
+} from '@expo-google-fonts/hanken-grotesk';
+
 export default function RootLayout() {
+  const [loaded] = useFonts({
+    HankenGrotesk_300Light,
+    HankenGrotesk_400Regular,
+    HankenGrotesk_500Medium,
+    HankenGrotesk_600SemiBold,
+    HankenGrotesk_700Bold,
+    HankenGrotesk_800ExtraBold,
+  });
+
+  if (!loaded) return null;
+
   return (
     <SafeAreaProvider>
       <AuthProvider>

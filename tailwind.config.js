@@ -6,6 +6,16 @@ module.exports = {
   presets: [require('nativewind/preset')],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['HankenGrotesk_400Regular'],
+        display: ['HankenGrotesk_700Bold'],
+        'hk-light': ['HankenGrotesk_300Light'],
+        'hk-regular': ['HankenGrotesk_400Regular'],
+        'hk-medium': ['HankenGrotesk_500Medium'],
+        'hk-semibold': ['HankenGrotesk_600SemiBold'],
+        'hk-bold': ['HankenGrotesk_700Bold'],
+        'hk-extrabold': ['HankenGrotesk_800ExtraBold'],
+      },
       colors: {
         background: '#F5F5F5', // hsl(0 0% 96%)
         foreground: '#171717', // hsl(0 0% 9%)
@@ -28,8 +38,8 @@ module.exports = {
         'sand-muted': '#9E8F7B', // hsl(35 15% 55%)
       },
       borderRadius: {
-        xl: '20px',
-        '2xl': '24px',
+        xl: '12px',
+        '2xl': '16px',
       },
       boxShadow: {
         elevated: '0 12px 24px rgba(0, 0, 0, 0.25)',
