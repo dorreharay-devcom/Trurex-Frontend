@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Web: default blue focus ring is outside TruRex palette; interactive components use ring-primary */
+@layer base {
+  button:focus,
+  [role='button']:focus {
+    outline: none;
+  }
+}

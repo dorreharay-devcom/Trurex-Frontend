@@ -1,16 +1,26 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, type TextInputProps } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  type TextInputProps,
+  type StyleProp,
+  type TextStyle,
+} from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
-import { Theme } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 
-interface InputProps extends Omit<TextInputProps, 'style'> {
+interface InputProps extends TextInputProps {
   label: string;
   labelRight?: React.ReactNode;
   secure?: boolean;
 }
 
-const Input = ({ label, labelRight, secure, ...props }: InputProps) => {
+const Input = ({ label, labelRight, secure, style, ...rest }: InputProps) => {
   const [showPassword, setShowPassword] = useState(false);
+
+  const caretStyle: StyleProp<TextStyle> = [style, textFieldCaretStyle];
 
   return (
     <View>
@@ -20,13 +30,15 @@ const Input = ({ label, labelRight, secure, ...props }: InputProps) => {
       </View>
 
       {secure ? (
-        <View className="flex-row bg-card border border-border rounded-lg items-center">
+        <View className="flex-row items-center rounded-lg border border-border bg-card focus-within:border-primary">
           <TextInput
+            {...rest}
             className="flex-1 px-3 py-2.5 text-sm text-foreground"
+            style={caretStyle}
             secureTextEntry={!showPassword}
             placeholderTextColor={Theme.colors.muted}
             autoCapitalize="none"
-            {...props}
+            selectionColor={Theme.colors.foreground}
           />
           <TouchableOpacity onPress={() => setShowPassword((v) => !v)} className="px-3">
             {showPassword ? (
@@ -38,10 +50,12 @@ const Input = ({ label, labelRight, secure, ...props }: InputProps) => {
         </View>
       ) : (
         <TextInput
-          className="w-full px-3 py-2.5 rounded-lg bg-card border border-border text-foreground text-sm"
+          {...rest}
+          className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary"
+          style={caretStyle}
           placeholderTextColor={Theme.colors.muted}
           autoCapitalize="none"
-          {...props}
+          selectionColor={Theme.colors.foreground}
         />
       )}
     </View>

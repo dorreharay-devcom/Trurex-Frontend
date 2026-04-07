@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  // Required for NativeWind on web: avoids "Cannot manually set color scheme" when dark mode is `media`.
+  darkMode: 'class',
   content: ['./app/**/*.{js,jsx,ts,tsx}', './src/**/*.{js,jsx,ts,tsx}'],
   presets: [require('nativewind/preset')],
   theme: {
@@ -14,11 +16,12 @@ module.exports = {
         secondary: '#525252', // hsl(0 0% 32%)
         'secondary-foreground': '#FAFAFA',
         muted: '#A1A1A1', // hsl(0 0% 63%)
-        'muted-foreground': '#171717', // hsl(0 0% 9%)
+        'muted-foreground': '#737373', // secondary body / links (was wrongly near-black)
         accent: '#FFFBEB', // hsl(47 100% 96%)
         'accent-foreground': '#F59B0A', // hsl(37 92% 50%)
         destructive: '#DB2424', // hsl(0 72% 50%)
         border: '#D4D4D4', // hsl(0 0% 83%)
+        ring: '#D4D4D4',
         gold: '#CCAB66',
         sand: '#E4DBCD', // hsl(35 30% 85%)
         'sand-dark': '#3D3529', // hsl(35 20% 20%)
