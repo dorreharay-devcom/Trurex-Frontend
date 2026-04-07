@@ -128,13 +128,9 @@ export default function LoginScreen() {
       />
 
       <View className="flex-row items-center justify-center">
-        <Text className="text-sm text-muted-foreground mr-1">
-          Don't have an account?
-        </Text>
+        <Text className="text-sm text-muted-foreground mr-1">Don't have an account?</Text>
         <TouchableOpacity onPress={() => router.push(Routes.Signup)}>
-          <Text className="text-sm text-foreground font-medium hover:underline">
-            Sign up
-          </Text>
+          <Text className="text-sm text-foreground font-medium hover:underline">Sign up</Text>
         </TouchableOpacity>
       </View>
     </AuthLayout>

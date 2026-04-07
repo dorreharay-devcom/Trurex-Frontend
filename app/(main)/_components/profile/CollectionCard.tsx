@@ -15,8 +15,8 @@ interface CollectionCardProps {
 }
 
 const CollectionCard: React.FC<CollectionCardProps> = ({ collection }) => (
-  <TouchableOpacity 
-    activeOpacity={0.85} 
+  <TouchableOpacity
+    activeOpacity={0.85}
     className="w-44 h-56 rounded-xl overflow-hidden shadow-card"
   >
     <Image source={{ uri: collection.image }} className="w-full h-full" resizeMode="cover" />

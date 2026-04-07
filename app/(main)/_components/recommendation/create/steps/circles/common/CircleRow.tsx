@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Globe } from 'lucide-react-native';
 import type { CreateRecCircle } from '~/constants/recommendation/createCircles';
-import { Theme } from '~/theme/Theme';
 import { cn } from '~/utils/general';
 import { CircleRadioIndicator } from './CircleRadioIndicator';
 

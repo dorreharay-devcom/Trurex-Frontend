@@ -16,3 +16,11 @@ export interface Recommendation {
   isLiked: boolean;
   isSaved: boolean;
 }
+
+export interface Collection {
+  id: string;
+  name: string;
+  emoji: string;
+  count: number;
+  image: string;
+}
