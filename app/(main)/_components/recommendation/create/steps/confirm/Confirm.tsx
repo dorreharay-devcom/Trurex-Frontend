@@ -63,11 +63,13 @@ export const Confirm: React.FC<Props> = ({
       showsVerticalScrollIndicator={false}
       contentContainerClassName="items-center pb-36"
     >
-      <View className={CREATE_REC_STEP_INNER}>
-        <CreateStepTitle>Looking good! 🦖</CreateStepTitle>
-        <Text className="mt-1.5 text-center text-sm font-normal text-foreground leading-5">
-          Here's how your recommendation will appear
-        </Text>
+      <View className={`${CREATE_REC_STEP_INNER} gap-6`}>
+        <View className="items-center space-y-2">
+          <CreateStepTitle>Looking good! 🦖</CreateStepTitle>
+          <Text className="text-center text-sm text-muted-foreground">
+            Here's how your recommendation will appear
+          </Text>
+        </View>
 
         <ConfirmPreviewCard
           place={place}

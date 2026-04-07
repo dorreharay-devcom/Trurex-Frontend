@@ -23,7 +23,6 @@ const ProfileHeader = ({ profile, isOwnProfile = false, onEditProfile }: Profile
       />
 
       <View className="px-4 -mt-12">
-
         <View className="self-start">
           <View className="w-24 h-24 rounded-2xl bg-muted overflow-hidden border-4 border-card">
             {profile.avatarUrl ? (
@@ -60,19 +59,27 @@ const ProfileHeader = ({ profile, isOwnProfile = false, onEditProfile }: Profile
 
         <View className="flex-row gap-6 mt-4 pb-4 border-b border-border">
           <View className="items-center">
-            <Text className="text-lg font-bold text-foreground text-center">{profile.rexCount}</Text>
+            <Text className="text-lg font-bold text-foreground text-center">
+              {profile.rexCount}
+            </Text>
             <Text className="text-xs text-muted-foreground text-center">Rex's</Text>
           </View>
           <View className="items-center">
-            <Text className="text-lg font-bold text-foreground text-center">{profile.followers}</Text>
+            <Text className="text-lg font-bold text-foreground text-center">
+              {profile.followers}
+            </Text>
             <Text className="text-xs text-muted-foreground text-center">Followers</Text>
           </View>
           <View className="items-center">
-            <Text className="text-lg font-bold text-foreground text-center">{profile.following}</Text>
+            <Text className="text-lg font-bold text-foreground text-center">
+              {profile.following}
+            </Text>
             <Text className="text-xs text-muted-foreground text-center">Following</Text>
           </View>
           <View className="items-center">
-            <Text className="text-lg font-bold text-accent-foreground text-center">{profile.trustScore}</Text>
+            <Text className="text-lg font-bold text-accent-foreground text-center">
+              {profile.trustScore}
+            </Text>
             <Text className="text-xs text-muted-foreground text-center">Trust</Text>
           </View>
         </View>
@@ -93,7 +100,6 @@ const ProfileHeader = ({ profile, isOwnProfile = false, onEditProfile }: Profile
             <Text className="text-sm font-bold text-primary-foreground">Trust This Rex</Text>
           </TouchableOpacity>
         )}
-
       </View>
     </View>
   );

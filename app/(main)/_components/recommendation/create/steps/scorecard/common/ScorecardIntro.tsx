@@ -10,15 +10,15 @@ type Props = {
 
 export function ScorecardIntro({ categoryEmoji, filledCount }: Props) {
   return (
-    <View>
+    <View className="items-center space-y-2">
       <CreateStepTitle>{categoryEmoji} Rate your experience</CreateStepTitle>
-      <Text className="mt-1.5 px-1 text-center text-sm font-normal text-foreground leading-5">
+      <Text className="text-center text-sm text-muted-foreground">
         All fields are optional — share as much or as little as you like
       </Text>
 
-      <View className="mt-4 items-center">
-        <View className="rounded-full bg-secondary px-3 py-1.5">
-          <Text className="text-xs font-normal text-secondary-foreground">
+      <View className="mt-2 items-center justify-center">
+        <View className="rounded-full bg-muted px-3 py-1.5">
+          <Text className="text-xs font-medium text-muted-foreground">
             {filledCount} of {CREATE_REC_SCORE_COUNT} ratings filled
           </Text>
         </View>

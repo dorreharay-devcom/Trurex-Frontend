@@ -26,7 +26,10 @@ export const Container: React.FC<ContainerProps> = ({
 
   if (scrollable) {
     return (
-      <ScrollView contentContainerClassName="flex-grow" className={`flex-1 bg-background ${className}`}>
+      <ScrollView
+        contentContainerClassName="flex-grow"
+        className={`flex-1 bg-background ${className}`}
+      >
         {content}
       </ScrollView>
     );

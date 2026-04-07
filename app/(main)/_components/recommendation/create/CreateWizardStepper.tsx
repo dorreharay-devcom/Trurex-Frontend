@@ -17,20 +17,17 @@ type Props = {
 
 export const CreateWizardStepper: React.FC<Props> = ({ currentIndex }) => {
   return (
-    <View className="flex-row bg-transparent px-2 pb-3 pt-1">
+    <View className="mt-3 flex-row gap-1.5 bg-transparent">
       {CREATE_REC_STEPS.map((id, index) => {
-        const active = index === currentIndex;
+        const reached = index <= currentIndex;
         return (
-          <View key={id} className="flex-1 min-w-0 px-0.5">
-            <View
-              className={cn('h-1 rounded-full mb-2', active ? 'bg-primary' : 'bg-border')}
-              style={{ opacity: active ? 1 : 0.6 }}
-            />
+          <View key={id} className="min-w-0 flex-1 flex-col items-center gap-1">
+            <View className={cn('h-1 w-full rounded-full', reached ? 'bg-primary' : 'bg-border')} />
             <Text
               numberOfLines={1}
               className={cn(
-                'text-center text-[10px] sm:text-xs font-medium',
-                active ? 'text-foreground' : 'text-muted',
+                'text-center text-[9px] font-medium',
+                reached ? 'text-foreground' : 'text-muted-foreground opacity-50',
               )}
             >
               {LABELS[id]}

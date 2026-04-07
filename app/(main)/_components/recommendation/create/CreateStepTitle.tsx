@@ -6,7 +6,7 @@ type Props = {
   className?: string;
 };
 
-const defaultClassName = 'text-xl font-semibold text-foreground text-center';
+const defaultClassName = 'text-xl font-display font-bold text-foreground text-center';
 
 export function CreateStepTitle({ children, className }: Props) {
   const merged = className ? `${defaultClassName} ${className}` : defaultClassName;

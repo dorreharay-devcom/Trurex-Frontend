@@ -103,7 +103,6 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
 
   return (
     <View className="bg-card rounded-xl border border-border overflow-hidden shadow-card">
-
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-4 border-b border-border">
         <View className="flex-row items-center gap-3">
@@ -118,11 +117,20 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
           <Text className="text-lg font-bold text-foreground">Edit Profile</Text>
         </View>
 
-        <Button title="Save" onPress={handleSave} loading={saving} disabled={saving} className="px-4 py-2" />
+        <Button
+          title="Save"
+          onPress={handleSave}
+          loading={saving}
+          disabled={saving}
+          className="px-4 py-2"
+        />
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} className="px-4" contentContainerClassName="py-6 gap-6">
-
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        className="px-4"
+        contentContainerClassName="py-6 gap-6"
+      >
         {/* Avatar */}
         <View className="items-center gap-3">
           <TouchableOpacity onPress={handleAvatarPick} activeOpacity={0.85} className="relative">
@@ -138,10 +146,11 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
               )}
             </View>
             <View className="absolute inset-0 rounded-2xl bg-foreground/40 items-center justify-center">
-              {uploading
-                ? <ActivityIndicator color={Theme.colors.card} size="small" />
-                : <Camera size={24} color={Theme.colors.card} />
-              }
+              {uploading ? (
+                <ActivityIndicator color={Theme.colors.card} size="small" />
+              ) : (
+                <Camera size={24} color={Theme.colors.card} />
+              )}
             </View>
           </TouchableOpacity>
           <Text className="text-xs text-muted-foreground">Tap to change photo</Text>
@@ -188,7 +197,9 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
               multiline
               numberOfLines={3}
             />
-            <Text className="text-[11px] text-muted-foreground mt-1 text-right">{bio.length}/160</Text>
+            <Text className="text-[11px] text-muted-foreground mt-1 text-right">
+              {bio.length}/160
+            </Text>
           </View>
 
           <Input
@@ -241,7 +252,6 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
             ))}
           </View>
         </View>
-
       </ScrollView>
     </View>
   );

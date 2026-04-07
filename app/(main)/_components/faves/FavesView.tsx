@@ -22,21 +22,24 @@ const MOCK_COLLECTIONS: Collection[] = [
     name: 'Date Night',
     emoji: '🕯️',
     count: 8,
-    coverImage: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=400&q=80',
+    coverImage:
+      'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=400&q=80',
   },
   {
     id: '2',
     name: 'Coffee Spots',
     emoji: '☕',
     count: 5,
-    coverImage: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=400&q=80',
+    coverImage:
+      'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=400&q=80',
   },
   {
     id: '3',
     name: 'LA Eats',
     emoji: '🍽️',
     count: 12,
-    coverImage: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=400&q=80',
+    coverImage:
+      'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=400&q=80',
   },
 ];
 
@@ -45,7 +48,8 @@ const SAVED_RECS: Recommendation[] = [
     id: '3',
     title: 'Chateau Marmont',
     description: 'Timeless Hollywood glamour. Worth every penny for the history alone.',
-    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
+    image:
+      'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
     categoryId: 'hotels-accommodation',
     category: 'Hotels',
     location: 'West Hollywood, CA',
@@ -63,7 +67,8 @@ const SAVED_RECS: Recommendation[] = [
     id: '4',
     title: 'Gjusta Bakery',
     description: 'The best sourdough in LA, hands down. Go early before they sell out.',
-    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80',
+    image:
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80',
     categoryId: 'cafes-coffee',
     category: 'Cafes',
     location: 'Venice, CA',
@@ -81,7 +86,8 @@ const SAVED_RECS: Recommendation[] = [
     id: '5',
     title: 'Griffith Observatory',
     description: 'The most stunning view of LA. Free entry, go at sunset for the magic hour.',
-    image: 'https://images.unsplash.com/photo-1530982011887-3cc11cc85693?auto=format&fit=crop&w=800&q=80',
+    image:
+      'https://images.unsplash.com/photo-1530982011887-3cc11cc85693?auto=format&fit=crop&w=800&q=80',
     categoryId: 'experiences',
     category: 'Experiences',
     location: 'Los Angeles, CA',
@@ -118,8 +124,12 @@ const GridCard: React.FC<{ rec: Recommendation }> = ({ rec }) => (
   >
     <Image source={{ uri: rec.image }} className="w-full aspect-square" resizeMode="cover" />
     <View className="p-2.5">
-      <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>{rec.title}</Text>
-      <Text className="text-[11px] text-muted-foreground mt-0.5" numberOfLines={1}>{rec.location}</Text>
+      <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>
+        {rec.title}
+      </Text>
+      <Text className="text-[11px] text-muted-foreground mt-0.5" numberOfLines={1}>
+        {rec.location}
+      </Text>
     </View>
   </TouchableOpacity>
 );
@@ -170,21 +180,25 @@ const FavesHeader: React.FC<FavesHeaderProps> = ({ viewMode, onViewModeChange })
     </View>
 
     <View className="flex-row items-center justify-between px-4 mb-3">
-      <Text className="text-sm font-semibold text-foreground">
-        Saved ({SAVED_RECS.length})
-      </Text>
+      <Text className="text-sm font-semibold text-foreground">Saved ({SAVED_RECS.length})</Text>
       <View className="flex-row gap-1">
         <TouchableOpacity
           onPress={() => onViewModeChange('list')}
           className={`p-1.5 rounded-md ${viewMode === 'list' ? 'bg-muted/30' : ''}`}
         >
-          <List size={16} color={viewMode === 'list' ? Theme.colors.foreground : Theme.colors.muted} />
+          <List
+            size={16}
+            color={viewMode === 'list' ? Theme.colors.foreground : Theme.colors.muted}
+          />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => onViewModeChange('grid')}
           className={`p-1.5 rounded-md ${viewMode === 'grid' ? 'bg-muted/30' : ''}`}
         >
-          <Grid2x2 size={16} color={viewMode === 'grid' ? Theme.colors.foreground : Theme.colors.muted} />
+          <Grid2x2
+            size={16}
+            color={viewMode === 'grid' ? Theme.colors.foreground : Theme.colors.muted}
+          />
         </TouchableOpacity>
       </View>
     </View>
@@ -221,7 +235,7 @@ const FavesView: React.FC = () => {
           <RecommendationCard recommendation={item} />
         </View>
       )}
-      ListEmptyComponent={() => viewMode === 'list' ? <EmptyState /> : null}
+      ListEmptyComponent={() => (viewMode === 'list' ? <EmptyState /> : null)}
     />
   );
 };

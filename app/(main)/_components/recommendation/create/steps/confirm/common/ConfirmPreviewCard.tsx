@@ -7,6 +7,9 @@ import {
   type ConfirmPreviewPlace,
 } from '~/utils/recommendation/confirmPreview';
 import { Theme } from '~/theme/Theme';
+import { cn } from '~/utils/general';
+
+const TAGS_PREVIEW_MAX = 5;
 
 type Props = {
   place: ConfirmPreviewPlace;
@@ -28,80 +31,84 @@ export function ConfirmPreviewCard({
   circleTitles,
 }: Props) {
   const category = getRexCategoryById(selectedCategoryId ?? '');
+  const sharingLine = circleTitles.length > 0 ? circleTitles.join(', ') : 'No one yet';
 
   return (
-    <View className="mt-5 rounded-[12px] border border-border bg-card overflow-hidden">
-      <View className="flex-row items-start gap-3 p-4 pb-3">
-        <View className="h-10 w-10 rounded-full border border-border bg-sand items-center justify-center">
-          <Text className="text-sm font-semibold text-sand-dark">
+    <View className="overflow-hidden rounded-2xl border border-border bg-card shadow-card">
+      <View className="flex-row items-center gap-3 p-4 pb-3">
+        <View className="h-9 w-9 items-center justify-center rounded-full border-2 border-border bg-sand">
+          <Text className="text-xs font-semibold text-sand-dark">
             {CONFIRM_PREVIEW_USER.initials}
           </Text>
         </View>
         <View className="min-w-0 flex-1">
           <Text className="text-sm font-semibold text-foreground">{CONFIRM_PREVIEW_USER.name}</Text>
-          <Text className="text-xs text-muted mt-0.5">
+          <Text className="mt-0.5 text-xs text-muted-foreground">
             {CONFIRM_PREVIEW_USER.handle} · just now
           </Text>
         </View>
-        {category && (
+        {category ? (
           <View className="max-w-[52%] shrink-0 rounded-full bg-muted px-2.5 py-1">
-            <Text className="text-xs font-medium text-foreground" numberOfLines={2}>
+            <Text className="text-xs font-medium text-muted-foreground" numberOfLines={2}>
               {category.emoji} {category.label}
             </Text>
           </View>
-        )}
+        ) : null}
       </View>
 
-      <View className="px-4 pb-3">
-        <Text className="text-lg font-bold text-foreground leading-6">{place.title}</Text>
+      <View className="px-4 pb-2">
+        <Text className="font-display text-lg font-bold text-foreground">{place.title}</Text>
         {place.addressLines.map((line) => (
-          <View key={line} className="mt-1.5 flex-row items-start gap-1.5">
-            <MapPin size={14} color={Theme.colors.muted} style={{ marginTop: 2 }} />
-            <Text className="flex-1 text-sm text-muted leading-5">{line}</Text>
+          <View key={line} className="mt-0.5 flex-row items-center gap-1">
+            <MapPin size={12} color={Theme.colors.secondaryText} />
+            <Text className="flex-1 text-xs text-muted-foreground">{line}</Text>
           </View>
         ))}
-        {ratingDisplay != null && (
-          <View className="mt-2 flex-row items-center gap-1">
-            <Star
-              size={16}
-              color={Theme.colors.accentForeground}
-              fill={Theme.colors.accentForeground}
-            />
-            <Text className="text-sm font-medium text-foreground">{ratingDisplay}</Text>
-          </View>
-        )}
       </View>
 
-      {appliesLabels.length > 0 && (
-        <View className="flex-row flex-wrap gap-1.5 px-4 pb-3">
-          {appliesLabels.map((label) => (
-            <View key={label} className="rounded-full bg-muted px-2.5 py-1">
-              <Text className="text-xs font-medium text-foreground">{label}</Text>
+      {tip.length > 0 ? (
+        <View className="mx-4 mb-3 rounded-lg border-l-4 border-primary bg-primary/5 p-3">
+          <Text className="text-sm italic text-foreground">&quot;{tip}&quot;</Text>
+        </View>
+      ) : null}
+
+      {ratingDisplay != null ? (
+        <View className="flex-row items-center gap-1.5 px-4 pb-2">
+          <Star
+            size={14}
+            color={Theme.colors.accentForeground}
+            fill={Theme.colors.accentForeground}
+          />
+          <Text className="text-sm font-semibold text-foreground">{ratingDisplay}</Text>
+        </View>
+      ) : null}
+
+      {appliesLabels.length > 0 ? (
+        <View className="flex-row flex-wrap gap-1.5 px-4 pb-2">
+          {appliesLabels.slice(0, TAGS_PREVIEW_MAX).map((label) => (
+            <View key={label} className="rounded-full bg-muted px-2 py-0.5">
+              <Text className="text-xs text-muted-foreground">{label}</Text>
             </View>
           ))}
+          {appliesLabels.length > TAGS_PREVIEW_MAX ? (
+            <View className="rounded-full bg-muted px-2 py-0.5">
+              <Text className="text-xs text-muted-foreground">
+                +{appliesLabels.length - TAGS_PREVIEW_MAX} more
+              </Text>
+            </View>
+          ) : null}
         </View>
-      )}
+      ) : null}
 
-      {(tip.length > 0 || review.length > 0) && (
-        <View className="px-4 pb-3 gap-2">
-          {tip.length > 0 && (
-            <Text className="text-sm text-foreground leading-5">
-              <Text className="font-semibold">Quick tip: </Text>
-              {tip}
-            </Text>
-          )}
-          {review.length > 0 && (
-            <Text className="text-sm text-foreground/90 leading-5" numberOfLines={6}>
-              {review}
-            </Text>
-          )}
-        </View>
-      )}
+      {review.length > 0 ? (
+        <Text className={cn('px-4 pb-3 text-sm leading-5 text-foreground opacity-85')}>
+          {review}
+        </Text>
+      ) : null}
 
-      <View className="border-t border-border bg-muted/10 px-4 py-3">
-        <Text className="text-xs leading-5 text-foreground">
-          <Text className="font-medium">Sharing to: </Text>
-          {circleTitles.length > 0 ? circleTitles.join(', ') : '—'}
+      <View className="border-t border-border bg-muted/30 px-4 py-3">
+        <Text className="text-xs leading-5 text-muted-foreground">
+          Sharing to: <Text className="font-medium text-foreground">{sharingLine}</Text>
         </Text>
       </View>
     </View>

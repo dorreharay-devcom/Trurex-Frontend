@@ -33,13 +33,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isGuest, setIsGuest] = useState(false);
 
   useEffect(() => {
-    // Initial session check
-    Auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session) setIsGuest(false);
-      setLoading(false);
-    });
+    Auth.getSession()
+      .then(({ data: { session }, error }) => {
+        if (error) console.warn('[Auth]', error.message);
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session) setIsGuest(false);
+        setLoading(false);
+      })
+      .catch((e) => {
+        console.warn('[Auth] getSession failed', e);
+        setLoading(false);
+      });
 
     // Listen for auth changes
     const {
