@@ -1,12 +1,23 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, useWindowDimensions } from 'react-native';
-import { LayoutGrid, Sparkles, Bookmark, UsersRound, MapPinned, UserCircle2 } from 'lucide-react-native';
+import {
+  LayoutGrid,
+  Sparkles,
+  Bookmark,
+  UsersRound,
+  MapPinned,
+  UserCircle2,
+} from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
 import { isWeb } from '~/utils';
 
 export type Tab = 'feed' | 'discover' | 'faves' | 'network' | 'map' | 'profile';
 
-export const NAV_ITEMS: { id: Tab; label: string; icon: React.ComponentType<{ size: number; color: string }> }[] = [
+export const NAV_ITEMS: {
+  id: Tab;
+  label: string;
+  icon: React.ComponentType<{ size: number; color: string }>;
+}[] = [
   { id: 'feed', label: 'Feed', icon: LayoutGrid },
   { id: 'discover', label: 'Discover', icon: Sparkles },
   { id: 'faves', label: 'My Faves', icon: Bookmark },
@@ -24,7 +35,7 @@ export const TabBar: React.FC<TabBarProps> = ({ currentTab, onTabChange }) => {
   const { width } = useWindowDimensions();
   const isDesktop = isWeb && width >= 640;
 
-  const renderItem = ({ id, label, icon: Icon }: typeof NAV_ITEMS[0]) => {
+  const renderItem = ({ id, label, icon: Icon }: (typeof NAV_ITEMS)[0]) => {
     const active = currentTab === id;
     return (
       <TouchableOpacity
@@ -47,10 +58,12 @@ export const TabBar: React.FC<TabBarProps> = ({ currentTab, onTabChange }) => {
           {NAV_ITEMS.map(renderItem)}
         </View>
       ) : (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="pl-4">
-          <View className="flex-row">
-            {NAV_ITEMS.map(renderItem)}
-          </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerClassName="pl-4"
+        >
+          <View className="flex-row">{NAV_ITEMS.map(renderItem)}</View>
         </ScrollView>
       )}
     </View>

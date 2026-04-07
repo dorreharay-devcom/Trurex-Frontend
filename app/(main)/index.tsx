@@ -5,72 +5,14 @@ import { Theme } from '~/theme/Theme';
 import { Header } from './_components/Header';
 import { TabBar, Tab } from './_components/TabBar';
 import CategoryPills, { Category } from './_components/CategoryPills';
-import RecommendationCard, { Recommendation } from './_components/RecommendationCard';
-
+import RecommendationCard from './_components/recommendation/RecommendationCard';
+import { CreateModal } from './_components/recommendation/create/CreateModal';
+import { REX_CATEGORIES } from '~/constants/recommendation/rexCategories';
+import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
 
 const CATEGORIES: Category[] = [
   { id: 'all', label: 'All', emoji: '🔥', color: '#9333ea' },
-  { id: 'restaurants', label: 'Restaurants', emoji: '🍽️', color: '#f04a1e' },
-  { id: 'cafes', label: 'Cafes', emoji: '☕', color: '#df7a11' },
-  { id: 'hotels', label: 'Hotels', emoji: '🏨', color: '#2e86de' },
-  { id: 'experiences', label: 'Experiences', emoji: '✨', color: '#df3b7e' },
-  { id: 'books', label: 'Books', emoji: '📚', color: '#2aa66b' },
-  { id: 'bars', label: 'Bars', emoji: '🍸', color: '#7a57d4' },
-  { id: 'places', label: 'Places', emoji: '📍', color: '#e6a611' },
-];
-
-const MOCK_RECS: Recommendation[] = [
-  {
-    id: '1',
-    title: 'Nobu Malibu',
-    description: 'Incredible omakase experience with ocean views. The black cod miso is life-changing.',
-    image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80',
-    category: 'Restaurants',
-    location: 'Malibu, CA',
-    rating: 4.9,
-    tags: ['sushi', 'omakase', 'oceanview'],
-    user: { name: 'Sarah Chen', handle: '@sarahchen', avatar: 'https://i.pravatar.cc/150?img=47' },
-    timeAgo: '2h',
-    likes: 84,
-    comments: 12,
-    saves: 31,
-    isLiked: false,
-    isSaved: false,
-  },
-  {
-    id: '2',
-    title: 'Alfred Coffee Melrose',
-    description: 'Best matcha latte in LA. The aesthetic is unmatched and the vibes are immaculate.',
-    image: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
-    category: 'Cafes',
-    location: 'Los Angeles, CA',
-    rating: 4.7,
-    tags: ['coffee', 'matcha', 'aesthetic'],
-    user: { name: 'James Rivera', handle: '@jrivera', avatar: 'https://i.pravatar.cc/150?img=12' },
-    timeAgo: '5h',
-    likes: 56,
-    comments: 8,
-    saves: 22,
-    isLiked: true,
-    isSaved: false,
-  },
-  {
-    id: '3',
-    title: 'Chateau Marmont',
-    description: 'Timeless Hollywood glamour. Worth every penny for the history alone.',
-    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
-    category: 'Hotels',
-    location: 'West Hollywood, CA',
-    rating: 4.5,
-    tags: ['luxury', 'iconic', 'hollywood'],
-    user: { name: 'Mia Torres', handle: '@mia.t', avatar: 'https://i.pravatar.cc/150?img=23' },
-    timeAgo: '1d',
-    likes: 120,
-    comments: 19,
-    saves: 67,
-    isLiked: false,
-    isSaved: true,
-  },
+  ...REX_CATEGORIES,
 ];
 
 const PlaceholderView = ({ title }: { title: string }) => (
@@ -86,12 +28,11 @@ const containerStyle = isWeb
   ? { maxWidth: 1280, width: '100%' as const, alignSelf: 'center' as const }
   : undefined;
 
-const FeedView = ({ onTapRec }: { onTapRec?: (rec: Recommendation) => void }) => {
+const FeedView = () => {
   const [activeCategory, setActiveCategory] = useState('all');
 
-  const filtered = activeCategory === 'all'
-    ? MOCK_RECS
-    : MOCK_RECS.filter((r) => r.category.toLowerCase() === activeCategory);
+  const filtered =
+    activeCategory === 'all' ? MOCK_RECS : MOCK_RECS.filter((r) => r.categoryId === activeCategory);
 
   return (
     <View className="flex-1">
@@ -113,9 +54,7 @@ const FeedView = ({ onTapRec }: { onTapRec?: (rec: Recommendation) => void }) =>
             <Text className="text-sm text-muted">No recs yet. Be the first to add one!</Text>
           </View>
         )}
-        renderItem={({ item }) => (
-          <RecommendationCard recommendation={item} onTap={onTapRec} />
-        )}
+        renderItem={({ item }) => <RecommendationCard recommendation={item} />}
       />
     </View>
   );
@@ -124,6 +63,7 @@ const FeedView = ({ onTapRec }: { onTapRec?: (rec: Recommendation) => void }) =>
 export default function HomeScreen() {
   const [currentTab, setCurrentTab] = useState<Tab>('feed');
   const [searchQuery, setSearchQuery] = useState('');
+  const [createRecommendationOpen, setCreateRecommendationOpen] = useState(false);
 
   return (
     <View className="flex-1 bg-background">
@@ -131,7 +71,7 @@ export default function HomeScreen() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onProfilePress={() => setCurrentTab('profile')}
-        onAddPress={() => {}}
+        onAddPress={() => setCreateRecommendationOpen(true)}
       />
 
       <TabBar currentTab={currentTab} onTabChange={setCurrentTab} />
@@ -145,12 +85,28 @@ export default function HomeScreen() {
         {currentTab === 'profile' && <PlaceholderView title="Profile" />}
       </View>
 
-      <TouchableOpacity
-        className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-primary items-center justify-center"
-        style={{ elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4 }}
-      >
-        <PlusCircle size={28} color={Theme.colors.primaryForeground} />
-      </TouchableOpacity>
+      {currentTab === 'feed' && (
+        <TouchableOpacity
+          onPress={() => setCreateRecommendationOpen(true)}
+          accessibilityRole="button"
+          accessibilityLabel="Add Rex"
+          className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-primary items-center justify-center"
+          style={{
+            elevation: 4,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+          }}
+        >
+          <PlusCircle size={28} color={Theme.colors.primaryForeground} />
+        </TouchableOpacity>
+      )}
+
+      <CreateModal
+        visible={createRecommendationOpen}
+        onClose={() => setCreateRecommendationOpen(false)}
+      />
     </View>
   );
 }
