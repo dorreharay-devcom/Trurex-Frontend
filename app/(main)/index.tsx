@@ -47,7 +47,7 @@ export default function HomeScreen() {
           onPress={() => setCreateRecommendationOpen(true)}
           accessibilityRole="button"
           accessibilityLabel="Add Rex"
-          className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-primary items-center justify-center"
+          className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-primary items-center justify-center hover:opacity-90 active:opacity-75 cursor-pointer"
           style={{
             elevation: 4,
             shadowColor: '#000',

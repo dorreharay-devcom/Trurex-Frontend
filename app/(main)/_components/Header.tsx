@@ -59,7 +59,7 @@ export const Header: React.FC<HeaderProps> = ({
             ) : (
               <TouchableOpacity
                 onPress={onAddPress}
-                className="flex-row items-center gap-1.5 px-4 py-2 rounded-lg bg-primary"
+                className="flex-row items-center gap-1.5 px-4 py-2 rounded-lg bg-primary hover:opacity-90 active:opacity-75 cursor-pointer"
               >
                 <PlusCircle size={16} color={Theme.colors.primaryForeground} />
                 <Text className="text-sm font-medium text-primary-foreground">Add Rex</Text>
