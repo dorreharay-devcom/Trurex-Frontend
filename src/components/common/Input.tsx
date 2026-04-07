@@ -27,7 +27,9 @@ const Input = ({ label, labelRight, secure, style, ...props }: InputProps) => {
   return (
     <View>
       <View className="flex-row items-center justify-between mb-1.5">
-        <Text className={`text-sm font-medium text-foreground ${labelClassName ?? ''}`}>{label}</Text>
+        <Text className={`text-sm font-medium text-foreground ${labelClassName ?? ''}`}>
+          {label}
+        </Text>
         {labelRight}
       </View>
 

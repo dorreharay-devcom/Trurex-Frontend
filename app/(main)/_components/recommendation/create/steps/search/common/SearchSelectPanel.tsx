@@ -38,9 +38,9 @@ export function SearchSelectPanel({
       contentContainerClassName={cn('items-center', SCROLL_PAD)}
     >
       <View className={CREATE_REC_STEP_INNER}>
-        <View className="items-center mb-5 px-1">
+        <View className="items-center space-y-2 px-1 pb-2">
           <CreateStepTitle>What are you recommending?</CreateStepTitle>
-          <Text className="mt-1.5 text-center text-sm font-normal text-foreground leading-5">
+          <Text className="text-center text-sm text-muted-foreground">
             Search for a place, person, or service
           </Text>
         </View>
@@ -48,7 +48,7 @@ export function SearchSelectPanel({
         <SearchQueryField value={searchQuery} onChangeText={onSearchQueryChange} />
 
         {showNoResults && (
-          <Text className="py-6 text-sm text-foreground text-center">No results found</Text>
+          <Text className="py-6 text-center text-sm text-muted-foreground">No results found</Text>
         )}
 
         {!showNoResults &&
@@ -63,12 +63,14 @@ export function SearchSelectPanel({
 
         <Pressable
           onPress={onOpenManual}
-          className="group mt-1 mb-2 w-full flex-row items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-border bg-transparent p-4 transition-colors hover:border-primary/40 active:opacity-90"
+          className="mt-2 w-full flex-row items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-transparent p-4 active:border-primary/40 active:opacity-90"
           accessibilityRole="button"
           accessibilityLabel="Add a new place manually"
         >
-          <Plus size={16} color={Theme.colors.foreground} />
-          <Text className="text-sm text-foreground">Add a new place manually</Text>
+          <Plus size={20} color={Theme.colors.secondaryText} />
+          <Text className="text-base font-medium text-muted-foreground">
+            Add a new place manually
+          </Text>
         </Pressable>
       </View>
     </ScrollView>

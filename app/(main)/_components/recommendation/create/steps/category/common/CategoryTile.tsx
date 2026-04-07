@@ -17,10 +17,9 @@ export function CategoryTile({
   grid,
   cat,
   selected,
-  primaryAutoSuggested,
+  primaryAutoSuggested: _primaryAutoSuggested,
   onSelect,
 }: CategoryTileProps) {
-  const accent = primaryAutoSuggested ? Theme.colors.primary : cat.color;
   return (
     <Pressable
       accessibilityRole="button"
@@ -29,36 +28,19 @@ export function CategoryTile({
       onPress={onSelect}
       android_ripple={{ color: `${Theme.colors.primary}26` }}
       className={cn(
-        'flex-1 min-w-0 rounded-xl items-center justify-center transition-transform duration-150 active:opacity-90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-        !selected && 'bg-muted/50',
+        'min-w-0 flex-1 flex-col items-center gap-1.5 rounded-xl border-2 bg-card p-3 transition-transform duration-150 active:scale-[0.95] active:opacity-90',
+        selected ? 'border-primary bg-primary/10 shadow-sm' : 'border-border bg-card',
       )}
       style={{
         minHeight: grid.tile.minHeight,
-        paddingHorizontal: grid.tile.paddingHorizontal,
-        paddingVertical: grid.tile.paddingVertical,
-        borderWidth: selected ? 2 : 1,
-        borderColor: selected ? accent : Theme.colors.border,
-        backgroundColor: selected ? `${accent}26` : undefined,
-        ...(selected
-          ? {
-              shadowColor: accent,
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: primaryAutoSuggested ? 0.28 : 0.22,
-              shadowRadius: primaryAutoSuggested ? 5 : 4,
-              elevation: 3,
-            }
-          : {}),
       }}
     >
+      <Text className="text-center text-2xl leading-none">{cat.emoji}</Text>
       <Text
-        className="leading-none text-center"
-        style={{ fontSize: grid.emoji.fontSize, marginBottom: grid.emoji.marginBottom }}
-      >
-        {cat.emoji}
-      </Text>
-      <Text
-        className="font-medium text-foreground text-center"
-        style={{ fontSize: grid.label.fontSize, lineHeight: grid.label.lineHeight }}
+        className={cn(
+          'text-center text-xs font-medium leading-tight',
+          selected ? 'text-foreground' : 'text-muted-foreground',
+        )}
         numberOfLines={grid.label.numberOfLines}
       >
         {cat.label}

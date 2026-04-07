@@ -19,8 +19,10 @@ const MOCK_RECS: Recommendation[] = [
   {
     id: '1',
     title: 'Nobu Malibu',
-    description: 'Incredible omakase experience with ocean views. The black cod miso is life-changing.',
-    image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80',
+    description:
+      'Incredible omakase experience with ocean views. The black cod miso is life-changing.',
+    image:
+      'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80',
     categoryId: 'restaurants',
     category: 'Restaurants',
     location: 'Malibu, CA',
@@ -37,8 +39,10 @@ const MOCK_RECS: Recommendation[] = [
   {
     id: '2',
     title: 'Alfred Coffee Melrose',
-    description: 'Best matcha latte in LA. The aesthetic is unmatched and the vibes are immaculate.',
-    image: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
+    description:
+      'Best matcha latte in LA. The aesthetic is unmatched and the vibes are immaculate.',
+    image:
+      'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
     categoryId: 'cafes-coffee',
     category: 'Cafes',
     location: 'Los Angeles, CA',
@@ -56,7 +60,8 @@ const MOCK_RECS: Recommendation[] = [
     id: '3',
     title: 'Chateau Marmont',
     description: 'Timeless Hollywood glamour. Worth every penny for the history alone.',
-    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
+    image:
+      'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
     categoryId: 'hotels-accommodation',
     category: 'Hotels',
     location: 'West Hollywood, CA',
@@ -75,9 +80,10 @@ const MOCK_RECS: Recommendation[] = [
 const FeedView = ({ onTapRec }: { onTapRec?: (rec: Recommendation) => void }) => {
   const [activeCategory, setActiveCategory] = useState('all');
 
-  const filtered = activeCategory === 'all'
-    ? MOCK_RECS
-    : MOCK_RECS.filter((r) => r.category.toLowerCase() === activeCategory);
+  const filtered =
+    activeCategory === 'all'
+      ? MOCK_RECS
+      : MOCK_RECS.filter((r) => r.category.toLowerCase() === activeCategory);
 
   return (
     <View className="flex-1">

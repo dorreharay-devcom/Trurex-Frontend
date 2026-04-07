@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { View, Text, Pressable, Alert, useWindowDimensions } from 'react-native';
 import * as Location from 'expo-location';
-import { ChevronRight } from 'lucide-react-native';
+import { ArrowLeft, ChevronRight } from 'lucide-react-native';
 import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';
 import { OverlayModal } from '~/components/common/OverlayModal';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
@@ -71,27 +71,26 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
       backdropBackground={layout.backdropBackground}
     >
       <View className="flex-1 min-h-0 flex-col">
-        <View className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-lg">
-          <View className="flex-row h-12 items-center bg-transparent px-4">
-            <Pressable
-              onPress={flow.stepIndex === 0 ? handleClose : flow.goBack}
-              hitSlop={12}
-              accessibilityRole="button"
-              accessibilityLabel={flow.stepIndex === 0 ? 'Cancel' : 'Back'}
-              className="rounded-lg px-1 py-0.5 -ml-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-card"
-            >
-              <View className="flex-row items-center">
-                <Text className="text-sm text-foreground" style={{ color: Theme.colors.black }}>
-                  ←{' '}
-                </Text>
-                <Text
-                  className="text-sm font-normal text-foreground"
-                  style={{ color: Theme.colors.black }}
-                >
+        <View className="sticky top-0 z-10 border-b border-border bg-card/95 backdrop-blur px-4 py-4 sm:px-6">
+          <View className="flex-row items-center">
+            <View className="w-[72px] items-start justify-center">
+              <Pressable
+                onPress={flow.stepIndex === 0 ? handleClose : flow.goBack}
+                hitSlop={12}
+                accessibilityRole="button"
+                accessibilityLabel={flow.stepIndex === 0 ? 'Cancel' : 'Back'}
+                className="flex-row items-center gap-1.5 rounded-lg py-0.5 active:opacity-80"
+              >
+                <ArrowLeft size={20} color={Theme.colors.secondaryText} />
+                <Text className="text-sm font-medium text-muted-foreground">
                   {flow.stepIndex === 0 ? 'Cancel' : 'Back'}
                 </Text>
-              </View>
-            </Pressable>
+              </Pressable>
+            </View>
+            <Text className="min-w-0 flex-1 text-center text-lg font-display font-semibold text-foreground">
+              New Rex
+            </Text>
+            <View className="w-[72px]" />
           </View>
 
           <CreateWizardStepper currentIndex={flow.stepIndex} />
@@ -104,9 +103,9 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
           onTagLocation={handleTagLocation}
         />
 
-        <View className="items-center border-t border-border bg-card/95 backdrop-blur-md">
+        <View className="sticky bottom-0 items-center border-t border-border bg-card/95 backdrop-blur px-4 py-4 sm:px-6">
           <View
-            className="w-full px-4 py-4 sm:px-6"
+            className="w-full"
             style={{
               maxWidth: CREATE_REC_MODAL_MAX_W,
               paddingBottom: layout.minSafeBottom,
@@ -117,9 +116,9 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
               disabled={!flow.canProceed}
               accessibilityRole="button"
               accessibilityLabel={flow.isLastStep ? 'Confirm and post' : 'Continue'}
-              className="inline-flex w-full h-12 flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-4 py-2 ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:bg-primary/90 hover:bg-primary/90 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+              className="inline-flex w-full h-12 flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-4 py-2 ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:bg-primary/90"
             >
-              <Text className="text-base font-normal text-primary-foreground">
+              <Text className="text-base font-semibold text-primary-foreground">
                 {flow.isLastStep ? 'Confirm & Post 🦖' : 'Continue'}
               </Text>
               {!flow.isLastStep && (

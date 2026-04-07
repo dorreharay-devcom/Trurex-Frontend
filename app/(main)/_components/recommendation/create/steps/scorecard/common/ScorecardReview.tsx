@@ -14,10 +14,10 @@ export function ScorecardReview({ value, onChangeText }: Props) {
   return (
     <View>
       <View className="mb-2 flex-row items-center justify-between">
-        <Text className="text-[10px] font-normal uppercase tracking-wide text-foreground">
+        <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Your review
         </Text>
-        <Text className="text-xs font-normal text-muted">
+        <Text className="text-[10px] text-muted-foreground opacity-60">
           {reviewLen}/{CREATE_REC_REVIEW_MAX}
         </Text>
       </View>
@@ -26,7 +26,7 @@ export function ScorecardReview({ value, onChangeText }: Props) {
         onChangeText={onChangeText}
         placeholder="Share your experience in your own words..."
         placeholderTextColor={Theme.colors.secondaryText}
-        className="flex w-full min-h-[90px] resize-none rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex min-h-[90px] w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground focus:outline-none focus:border-primary"
         style={[webNoOutline, textFieldCaretStyle]}
         multiline
         textAlignVertical="top"

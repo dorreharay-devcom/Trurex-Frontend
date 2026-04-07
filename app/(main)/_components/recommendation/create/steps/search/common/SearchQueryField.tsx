@@ -12,8 +12,8 @@ type Props = {
 export function SearchQueryField({ value, onChangeText }: Props) {
   return (
     <View className="relative mb-4 w-full">
-      <View className="pointer-events-none absolute left-4 top-0 bottom-0 z-10 justify-center">
-        <SearchIcon size={18} color={Theme.colors.secondaryText} />
+      <View className="pointer-events-none absolute left-3.5 top-0 bottom-0 z-10 justify-center">
+        <SearchIcon size={20} color={Theme.colors.secondaryText} />
       </View>
       <TextInput
         value={value}
