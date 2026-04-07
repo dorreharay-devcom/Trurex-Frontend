@@ -18,6 +18,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSearchChange,
   onProfilePress,
   onAddPress,
+  isProfileActive,
 }) => {
   const { width } = useWindowDimensions();
   const isMobile = !isWeb || width < 640;

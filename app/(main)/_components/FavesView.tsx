@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, Image, FlatList } from 'react
 import { Plus, List, Grid2x2, Bookmark } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
 import { Button } from '~/components/common/Button';
-import RecommendationCard, { Recommendation } from './RecommendationCard';
+import RecommendationCard, { Recommendation } from './recommendation/RecommendationCard';
 import { webContainerStyle } from '~/utils';
 
 type ViewMode = 'list' | 'grid';
