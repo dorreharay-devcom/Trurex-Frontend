@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, FlatList } from 'react-native';
 import { webContainerStyle } from '~/utils';
 import CategoryPills, { Category } from '../CategoryPills';
-import RecommendationCard, { Recommendation } from '../RecommendationCard';
+import RecommendationCard, { Recommendation } from '../recommendation/RecommendationCard';
 
 const CATEGORIES: Category[] = [
   { id: 'all', label: 'All', emoji: '🔥', color: '#9333ea' },
@@ -21,6 +21,7 @@ const MOCK_RECS: Recommendation[] = [
     title: 'Nobu Malibu',
     description: 'Incredible omakase experience with ocean views. The black cod miso is life-changing.',
     image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80',
+    categoryId: 'restaurants',
     category: 'Restaurants',
     location: 'Malibu, CA',
     rating: 4.9,
@@ -38,6 +39,7 @@ const MOCK_RECS: Recommendation[] = [
     title: 'Alfred Coffee Melrose',
     description: 'Best matcha latte in LA. The aesthetic is unmatched and the vibes are immaculate.',
     image: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
+    categoryId: 'cafes-coffee',
     category: 'Cafes',
     location: 'Los Angeles, CA',
     rating: 4.7,
@@ -55,6 +57,7 @@ const MOCK_RECS: Recommendation[] = [
     title: 'Chateau Marmont',
     description: 'Timeless Hollywood glamour. Worth every penny for the history alone.',
     image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
+    categoryId: 'hotels-accommodation',
     category: 'Hotels',
     location: 'West Hollywood, CA',
     rating: 4.5,

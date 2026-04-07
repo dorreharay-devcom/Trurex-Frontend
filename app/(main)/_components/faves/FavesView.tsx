@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, Image, FlatList } from 'react
 import { Plus, List, Grid2x2, Bookmark } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
 import { Button } from '~/components/common/Button';
-import RecommendationCard, { Recommendation } from '../RecommendationCard';
+import RecommendationCard, { Recommendation } from '../recommendation/RecommendationCard';
 import { webContainerStyle } from '~/utils';
 
 type ViewMode = 'list' | 'grid';
@@ -46,6 +46,7 @@ const SAVED_RECS: Recommendation[] = [
     title: 'Chateau Marmont',
     description: 'Timeless Hollywood glamour. Worth every penny for the history alone.',
     image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
+    categoryId: 'hotels-accommodation',
     category: 'Hotels',
     location: 'West Hollywood, CA',
     rating: 4.5,
@@ -63,6 +64,7 @@ const SAVED_RECS: Recommendation[] = [
     title: 'Gjusta Bakery',
     description: 'The best sourdough in LA, hands down. Go early before they sell out.',
     image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80',
+    categoryId: 'cafes-coffee',
     category: 'Cafes',
     location: 'Venice, CA',
     rating: 4.8,
@@ -80,6 +82,7 @@ const SAVED_RECS: Recommendation[] = [
     title: 'Griffith Observatory',
     description: 'The most stunning view of LA. Free entry, go at sunset for the magic hour.',
     image: 'https://images.unsplash.com/photo-1530982011887-3cc11cc85693?auto=format&fit=crop&w=800&q=80',
+    categoryId: 'experiences',
     category: 'Experiences',
     location: 'Los Angeles, CA',
     rating: 4.9,
