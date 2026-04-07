@@ -6,8 +6,8 @@ function clamp(n: number, min: number, max: number) {
 }
 
 export const categoryGridRules = {
-  contentHorizontalPadding: 24,
-  columnGap: 12,
+  contentHorizontalPadding: 16,
+  columnGap: 10,
   columns: { min: 2, max: 4, minTileWidthPx: 92 },
   tileMinHeight: { widthFactor: 0.88, minPx: 88, maxPx: 132 },
   emoji: { widthFactor: 0.2, minPx: 22, maxPx: 34 },

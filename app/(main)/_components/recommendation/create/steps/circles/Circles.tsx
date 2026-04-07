@@ -19,14 +19,14 @@ export const Circles: React.FC<Props> = ({ selectedIds, onToggle }) => (
     contentContainerClassName="items-center pb-36"
   >
     <View className={cn(CREATE_REC_STEP_INNER, 'gap-6')}>
-      <View>
+      <View className="items-center space-y-2">
         <CreateStepTitle>Choose your circles</CreateStepTitle>
-        <Text className="mt-1.5 text-center text-sm font-normal text-foreground leading-5">
+        <Text className="text-center text-sm text-muted-foreground">
           Pick who sees this recommendation
         </Text>
       </View>
 
-      <View className="gap-6">
+      <View className="gap-2">
         {CREATE_REC_CIRCLES.map((c) => (
           <CircleRow
             key={c.id}

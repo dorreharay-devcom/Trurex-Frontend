@@ -14,9 +14,9 @@ export function CategoryListHeader({
 }: CategoryListHeaderProps) {
   return (
     <>
-      <View className="items-center mb-5">
+      <View className="items-center space-y-2 px-1 pb-2">
         <CreateStepTitle className="px-1">Confirm the category</CreateStepTitle>
-        <Text className="mt-1.5 px-2 text-center text-sm font-normal text-foreground leading-5">
+        <Text className="px-2 text-center text-sm text-muted-foreground">
           {autoSuggestedCategoryId
             ? "We've suggested one — feel free to change it"
             : 'Choose the category that best fits your recommendation'}

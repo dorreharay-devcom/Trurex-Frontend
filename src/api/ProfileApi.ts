@@ -58,10 +58,12 @@ export const ProfileApi = {
     const ext = uri.split('.').pop() ?? 'jpg';
     const path = `${userId}/avatar.${ext}`;
     const blob = await fetch(uri).then((r) => r.blob());
-    unwrap(await Backend.storage.from('recommendation-images').upload(path, blob, {
-      upsert: true,
-      contentType: `image/${ext}`,
-    }));
+    unwrap(
+      await Backend.storage.from('recommendation-images').upload(path, blob, {
+        upsert: true,
+        contentType: `image/${ext}`,
+      }),
+    );
     const { data } = Backend.storage.from('recommendation-images').getPublicUrl(path);
     return `${data.publicUrl}?t=${Date.now()}`;
   },

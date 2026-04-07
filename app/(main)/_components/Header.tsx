@@ -1,5 +1,14 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  useWindowDimensions,
+  Platform,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Search, PlusCircle, LogOut, UserCircle2 } from 'lucide-react-native';
 import { Auth } from '~/services/AuthService';
 import { Theme, textFieldCaretStyle } from '~/theme/Theme';
@@ -21,60 +30,83 @@ export const Header: React.FC<HeaderProps> = ({
   isProfileActive,
 }) => {
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const isMobile = !isWeb || width < 640;
 
+  const topPad = Platform.OS === 'web' ? 12 : insets.top;
+
   return (
-    <View className="bg-card border-b border-border">
-      <View className={isWeb ? 'max-w-[1280px] w-full self-center pr-4' : 'pr-4'}>
-        <View className="h-16 flex-row items-center">
-          <Image
-            source={require('../../../assets/truRexLogo.png')}
-            style={{ width: 80, height: 28, resizeMode: 'contain' }}
-          />
+    <View
+      className="border-b border-border bg-card/95 backdrop-blur-md"
+      style={{ paddingTop: topPad }}
+    >
+      <View
+        className={`flex-row items-center gap-3 px-4 pb-3 sm:px-6 ${isWeb ? 'max-w-[1280px] w-full self-center' : ''}`}
+      >
+        <Image
+          source={require('../../../assets/truRexLogo.png')}
+          style={{ width: 80, height: 28, resizeMode: 'contain' }}
+          accessibilityIgnoresInvertColors
+        />
 
-          <View className="absolute inset-x-0 items-center" pointerEvents="box-none">
-            <View
-              className={`${isWeb && !isMobile ? 'w-[448px]' : 'w-[55%]'} relative justify-center`}
-            >
-              <View className="absolute left-3 z-10">
-                <Search size={16} color={Theme.colors.foreground} />
-              </View>
-              <TextInput
-                value={searchQuery}
-                onChangeText={onSearchChange}
-                placeholder="Search recommendations..."
-                placeholderTextColor={Theme.colors.muted}
-                className="rounded-lg border border-border bg-muted/20 py-2 pl-10 pr-4 text-sm text-foreground focus:outline-none focus:border-primary"
-                style={textFieldCaretStyle}
-                selectionColor={Theme.colors.foreground}
-              />
+        <View className="min-w-0 flex-1 flex-row items-center">
+          <View className="relative w-full justify-center">
+            <View className="pointer-events-none absolute left-3.5 top-0 bottom-0 z-10 justify-center">
+              <Search size={18} color={Theme.colors.secondaryText} />
             </View>
+            <TextInput
+              value={searchQuery}
+              onChangeText={onSearchChange}
+              placeholder="Search recommendations..."
+              placeholderTextColor={Theme.colors.muted}
+              className="w-full rounded-xl border border-border bg-muted/50 py-2.5 pl-10 pr-3.5 text-sm text-foreground focus:outline-none focus:border-primary"
+              style={textFieldCaretStyle}
+              selectionColor={Theme.colors.foreground}
+              returnKeyType="search"
+              underlineColorAndroid="transparent"
+            />
           </View>
+        </View>
 
-          <View className="flex-row items-center gap-2 ml-auto">
-            {isMobile ? (
-              <TouchableOpacity onPress={onAddPress} className="p-1">
-                <PlusCircle size={22} color={Theme.colors.primary} />
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                onPress={onAddPress}
-                className="flex-row items-center gap-1.5 px-4 py-2 rounded-lg bg-primary hover:opacity-90 active:opacity-75 cursor-pointer"
-              >
-                <PlusCircle size={16} color={Theme.colors.primaryForeground} />
-                <Text className="text-sm font-medium text-primary-foreground">Add Rex</Text>
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity onPress={() => Auth.signOut()} className="p-2">
-              <LogOut size={20} color={Theme.colors.foreground} strokeWidth={2.5} />
-            </TouchableOpacity>
+        <View className="shrink-0 flex-row items-center gap-1 sm:gap-2">
+          {isMobile ? (
             <TouchableOpacity
-              onPress={onProfilePress}
-              className={`w-9 h-9 rounded-full items-center justify-center border-2 ${isProfileActive ? 'border-primary' : 'border-transparent'}`}
+              onPress={onAddPress}
+              className="rounded-lg p-2 active:opacity-80"
+              accessibilityRole="button"
+              accessibilityLabel="Add Rex"
             >
-              <UserCircle2 size={20} color={Theme.colors.secondaryText} />
+              <PlusCircle size={22} color={Theme.colors.primary} />
             </TouchableOpacity>
-          </View>
+          ) : (
+            <TouchableOpacity
+              onPress={onAddPress}
+              className="flex-row items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 active:opacity-90"
+              accessibilityRole="button"
+              accessibilityLabel="Add Rex"
+            >
+              <PlusCircle size={16} color={Theme.colors.primaryForeground} />
+              <Text className="text-sm font-medium text-primary-foreground">Add Rex</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity
+            onPress={() => Auth.signOut()}
+            className="rounded-lg p-2 active:opacity-80"
+            accessibilityRole="button"
+            accessibilityLabel="Sign out"
+          >
+            <LogOut size={20} color={Theme.colors.secondaryText} strokeWidth={2} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={onProfilePress}
+            className={`h-9 w-9 items-center justify-center rounded-full border-2 ${
+              isProfileActive ? 'border-primary bg-primary/5' : 'border-border bg-muted/30'
+            }`}
+            accessibilityRole="button"
+            accessibilityLabel="Profile"
+          >
+            <UserCircle2 size={20} color={Theme.colors.secondaryText} />
+          </TouchableOpacity>
         </View>
       </View>
     </View>

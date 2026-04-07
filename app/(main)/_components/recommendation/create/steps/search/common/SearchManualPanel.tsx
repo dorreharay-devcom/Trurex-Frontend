@@ -36,9 +36,9 @@ export function SearchManualPanel({
       contentContainerClassName={cn('items-center', SCROLL_PAD)}
     >
       <View className={cn(CREATE_REC_STEP_INNER, 'gap-6')}>
-        <View className="items-center mb-2 px-1">
+        <View className="items-center space-y-2 px-1 pb-2">
           <CreateStepTitle>Add a new place</CreateStepTitle>
-          <Text className="mt-1.5 text-center text-sm font-normal text-foreground leading-5">
+          <Text className="text-center text-sm text-muted-foreground">
             Enter the name and address manually
           </Text>
         </View>

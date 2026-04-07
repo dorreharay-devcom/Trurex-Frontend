@@ -25,9 +25,6 @@ const styles = StyleSheet.create({
   },
 });
 
-/**
- * Transparent Modal + backdrop; sheet uses inset utilities (see className) instead of JS layout math.
- */
 export const OverlayModal: React.FC<OverlayModalProps> = ({
   visible,
   onRequestClose,

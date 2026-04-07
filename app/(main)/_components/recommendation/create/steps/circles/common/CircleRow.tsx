@@ -20,34 +20,24 @@ export function CircleRow({ circle: c, selected, onToggle }: Props) {
       accessibilityState={{ checked: selected }}
       accessibilityLabel={`${c.title}, ${c.subtitle}`}
       className={cn(
-        'flex-row items-center gap-3 rounded-[12px] border p-4 active:opacity-90',
-        selected ? 'border-primary bg-primary/5' : 'border-border bg-card',
+        'flex-row items-center gap-4 rounded-xl border-2 p-4 active:opacity-95',
+        selected ? 'border-primary bg-primary/10' : 'border-border bg-card',
       )}
     >
       <View
-        className="h-11 w-11 items-center justify-center rounded-full"
+        className="h-12 w-12 shrink-0 items-center justify-center rounded-full"
         style={{ backgroundColor: c.iconBg }}
       >
         {c.variant === 'globe' ? (
-          <Globe size={22} color={c.accent} />
+          <Globe size={24} color={c.accent} />
         ) : (
-          <View
-            className="h-4 w-4 rounded-full"
-            style={{
-              backgroundColor: c.accent,
-              shadowColor: c.accent,
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.35,
-              shadowRadius: 2,
-              elevation: 2,
-            }}
-          />
+          <View className="h-8 w-8 rounded-full" style={{ backgroundColor: c.accent }} />
         )}
       </View>
 
       <View className="min-w-0 flex-1">
-        <Text className="text-base font-medium text-foreground">{c.title}</Text>
-        <Text className="mt-0.5 text-sm font-normal text-foreground">{c.subtitle}</Text>
+        <Text className="font-semibold text-foreground">{c.title}</Text>
+        <Text className="mt-0.5 text-xs text-muted-foreground">{c.subtitle}</Text>
       </View>
 
       <CircleRadioIndicator selected={selected} />

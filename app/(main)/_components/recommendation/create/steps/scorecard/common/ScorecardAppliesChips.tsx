@@ -10,11 +10,11 @@ type Props = {
 
 export function ScorecardAppliesChips({ appliesSelected, onToggleApplies }: Props) {
   return (
-    <View>
-      <Text className="text-[10px] font-normal uppercase tracking-wide text-foreground">
+    <View className="space-y-3">
+      <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
         What applies?
       </Text>
-      <View className="mt-2 flex-row flex-wrap gap-2">
+      <View className="flex-row flex-wrap gap-2">
         {CREATE_REC_SCORE_CHIPS.map((chip) => {
           const on = appliesSelected[chip] === true;
           return (
@@ -22,7 +22,7 @@ export function ScorecardAppliesChips({ appliesSelected, onToggleApplies }: Prop
               key={chip}
               onPress={() => onToggleApplies(chip)}
               className={cn(
-                'rounded-[12px] border px-3 py-2 active:opacity-90',
+                'rounded-full border px-3 py-1.5 active:opacity-90',
                 on ? 'border-primary bg-primary' : 'border-border bg-muted/50',
               )}
               accessibilityRole="button"
@@ -30,8 +30,8 @@ export function ScorecardAppliesChips({ appliesSelected, onToggleApplies }: Prop
             >
               <Text
                 className={cn(
-                  'text-xs font-normal',
-                  on ? 'text-primary-foreground' : 'text-foreground',
+                  'text-sm font-medium',
+                  on ? 'text-primary-foreground' : 'text-muted-foreground',
                 )}
               >
                 {chip}
