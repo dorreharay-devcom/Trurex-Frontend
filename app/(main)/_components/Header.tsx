@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
 import { Search, PlusCircle, LogOut, UserCircle2 } from 'lucide-react-native';
 import { Auth } from '~/services/AuthService';
-import { Theme } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import { isWeb } from '~/utils';
 
 interface HeaderProps {
@@ -18,7 +18,6 @@ export const Header: React.FC<HeaderProps> = ({
   onSearchChange,
   onProfilePress,
   onAddPress,
-  isProfileActive,
 }) => {
   const { width } = useWindowDimensions();
   const isMobile = !isWeb || width < 640;
@@ -44,7 +43,9 @@ export const Header: React.FC<HeaderProps> = ({
                 onChangeText={onSearchChange}
                 placeholder="Search recommendations..."
                 placeholderTextColor={Theme.colors.muted}
-                className="pl-10 pr-4 py-2 rounded-lg bg-muted/20 border border-border text-sm text-foreground"
+                className="rounded-lg border border-border bg-muted/20 py-2 pl-10 pr-4 text-sm text-foreground focus:outline-none focus:border-primary"
+                style={textFieldCaretStyle}
+                selectionColor={Theme.colors.foreground}
               />
             </View>
           </View>

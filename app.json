@@ -33,7 +33,12 @@
       "expo-web-browser",
       "expo-router",
       "expo-secure-store",
-      "expo-font"
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow TruRex to use your location to tag recommendations."
+        }
+      ]
     ]
   }
 }

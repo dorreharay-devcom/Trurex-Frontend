@@ -1,6 +1,7 @@
 import '../global.css';
 import '~/i18n/config';
 import { Stack } from 'expo-router';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '~/services/AuthContext';
 import { useFonts } from 'expo-font';
 import {
@@ -25,8 +26,10 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <AuthProvider>
-      <Stack screenOptions={{ headerShown: false }} />
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <Stack screenOptions={{ headerShown: false }} />
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }

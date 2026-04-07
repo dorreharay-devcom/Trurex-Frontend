@@ -1,3 +1,5 @@
+import type { TextStyle } from 'react-native';
+
 export const FontFamily = {
   light: 'HankenGrotesk_300Light',
   regular: 'HankenGrotesk_400Regular',
@@ -32,6 +34,11 @@ export const Colors = {
   black: '#000000',
   transparent: 'transparent',
 } as const;
+
+/** TextInput caret color (black) — use in `style` */
+export const textFieldCaretStyle = {
+  caretColor: Colors.foreground,
+} as TextStyle;
 
 export const Size = {
   icon: {

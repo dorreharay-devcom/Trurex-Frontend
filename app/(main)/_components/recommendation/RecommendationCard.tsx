@@ -2,24 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { Heart, MessageCircle, Share2, Bookmark, Star, MapPin } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
+import type { Recommendation } from '~/types/recommendation/recommendation';
 
-export interface Recommendation {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  category: string;
-  location?: string;
-  rating?: number;
-  tags: string[];
-  user: { name: string; handle: string; avatar: string };
-  timeAgo: string;
-  likes: number;
-  comments: number;
-  saves: number;
-  isLiked: boolean;
-  isSaved: boolean;
-}
+export type { Recommendation };
 
 interface RecommendationCardProps {
   recommendation: Recommendation;
@@ -36,13 +21,13 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation:
     setLikes((v) => (liked ? v - 1 : v + 1));
   };
 
+  const Wrapper = onTap ? TouchableOpacity : View;
+
   return (
-    <TouchableOpacity
-      activeOpacity={0.95}
-      onPress={() => onTap?.(rec)}
+    <Wrapper
+      {...(onTap ? { activeOpacity: 0.95, onPress: () => onTap(rec) } : {})}
       className="bg-card border border-border rounded-xl overflow-hidden mb-4"
     >
-      {/* Header */}
       <View className="flex-row items-center gap-3 p-4 pb-2">
         <Image
           source={{ uri: rec.user.avatar }}
@@ -51,23 +36,18 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation:
         />
         <View className="flex-1">
           <Text className="text-sm font-semibold text-foreground">{rec.user.name}</Text>
-          <Text className="text-xs text-muted">{rec.user.handle} · {rec.timeAgo}</Text>
+          <Text className="text-xs text-muted">
+            {rec.user.handle} · {rec.timeAgo}
+          </Text>
         </View>
         <View className="px-2.5 py-1 rounded-full bg-muted/20">
           <Text className="text-xs font-medium text-muted capitalize">{rec.category}</Text>
         </View>
       </View>
 
-      {/* Image with gradient overlay */}
       <View className="mx-4 rounded-lg overflow-hidden">
-        <Image
-          source={{ uri: rec.image }}
-          className="w-full aspect-[4/3]"
-          resizeMode="cover"
-        />
-        <View
-          className="absolute bottom-0 left-0 right-0 p-3 bg-black/55"
-        >
+        <Image source={{ uri: rec.image }} className="w-full aspect-[4/3]" resizeMode="cover" />
+        <View className="absolute bottom-0 left-0 right-0 p-3 bg-black/55">
           <Text className="text-lg font-bold text-white">{rec.title}</Text>
           <View className="flex-row items-center gap-3 mt-1">
             {rec.location && (
@@ -78,7 +58,11 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation:
             )}
             {rec.rating && (
               <View className="flex-row items-center gap-1">
-                <Star size={12} color={Theme.colors.accentForeground} fill={Theme.colors.accentForeground} />
+                <Star
+                  size={12}
+                  color={Theme.colors.accentForeground}
+                  fill={Theme.colors.accentForeground}
+                />
                 <Text className="text-xs text-accent-foreground">{rec.rating}</Text>
               </View>
             )}
@@ -86,12 +70,10 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation:
         </View>
       </View>
 
-      {/* Description */}
       <Text className="px-4 pt-3 text-sm text-foreground opacity-[0.85]" numberOfLines={3}>
         {rec.description}
       </Text>
 
-      {/* Tags */}
       {rec.tags.length > 0 && (
         <View className="flex-row flex-wrap gap-1.5 px-4 pt-2">
           {rec.tags.map((tag) => (
@@ -102,7 +84,6 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation:
         </View>
       )}
 
-      {/* Actions */}
       <View className="flex-row items-center justify-between px-4 py-3 mt-1">
         <View className="flex-row items-center gap-5">
           <TouchableOpacity onPress={toggleLike} className="flex-row items-center gap-1.5">
@@ -132,7 +113,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation:
           />
         </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+    </Wrapper>
   );
 };
 
