@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { View, Text, Pressable, Alert, useWindowDimensions } from 'react-native';
 import * as Location from 'expo-location';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronRight } from 'lucide-react-native';
 import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';
 import { OverlayModal } from '~/components/common/OverlayModal';
@@ -20,8 +19,7 @@ type Props = {
 };
 
 export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
-  const insets = useSafeAreaInsets();
-  const { height: windowHeight, width: windowWidth } = useWindowDimensions();
+  const { height: windowHeight } = useWindowDimensions();
   const flow = useCreateRecWizard();
   const { reset, setManualGeotag } = flow;
 
@@ -64,32 +62,15 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
   }, [setManualGeotag]);
 
   const { layout } = modalConfig;
-  const safeBottom = Math.max(insets.bottom, layout.minSafeBottom);
-  const cardHeight = windowHeight - insets.top - insets.bottom - layout.edgePad * 2;
-  const cardWidth = windowWidth - layout.edgePad * 2;
 
   return (
     <OverlayModal
       visible={visible}
       onRequestClose={handleClose}
       contentTranslateY={sheetTranslateY}
-      cardWidth={cardWidth}
-      cardHeight={cardHeight}
-      borderRadius={layout.cardRadius}
       backdropBackground={layout.backdropBackground}
-      contentPadding={{
-        horizontal: layout.edgePad,
-        top: insets.top + layout.edgePad,
-        bottom: insets.bottom + layout.edgePad,
-      }}
     >
-      <View
-        className="flex-1 border-x border-b border-border bg-card"
-        style={{
-          borderRadius: layout.cardRadius,
-          overflow: 'hidden',
-        }}
-      >
+      <View className="flex-1 min-h-0 flex-col">
         <View className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-lg">
           <View className="flex-row h-12 items-center bg-transparent px-4">
             <Pressable
@@ -128,7 +109,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
             className="w-full px-4 py-4 sm:px-6"
             style={{
               maxWidth: CREATE_REC_MODAL_MAX_W,
-              paddingBottom: safeBottom,
+              paddingBottom: layout.minSafeBottom,
             }}
           >
             <Pressable

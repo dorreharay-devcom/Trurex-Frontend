@@ -8,21 +8,13 @@ import {
   Pressable,
   StyleSheet,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export type OverlayModalProps = {
   visible: boolean;
   onRequestClose: () => void;
   contentTranslateY: RNAnimated.Value;
-  cardWidth: number;
-  cardHeight: number;
-  borderRadius: number;
   backdropBackground: string;
-  /** Outer KeyboardAvoidingView padding (horizontal, top, bottom). */
-  contentPadding: {
-    horizontal: number;
-    top: number;
-    bottom: number;
-  };
   children: React.ReactNode;
 };
 
@@ -34,80 +26,65 @@ const styles = StyleSheet.create({
 });
 
 /**
- * Transparent RN Modal with backdrop dismiss and vertically animated content.
- * Sizes, colors, and padding are passed in by the caller.
+ * Transparent Modal + backdrop; sheet uses inset utilities (see className) instead of JS layout math.
  */
 export const OverlayModal: React.FC<OverlayModalProps> = ({
   visible,
   onRequestClose,
   contentTranslateY,
-  cardWidth,
-  cardHeight,
-  borderRadius,
   backdropBackground,
-  contentPadding,
   children,
-}) => (
-  <Modal
-    visible={visible}
-    transparent
-    animationType="none"
-    presentationStyle={Platform.OS === 'ios' ? 'overFullScreen' : undefined}
-    statusBarTranslucent={Platform.OS === 'android'}
-    onRequestClose={onRequestClose}
-  >
-    <View style={styles.overlayRoot}>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Close dialog"
-        onPress={onRequestClose}
-        style={[StyleSheet.absoluteFill, { zIndex: 60 }]}
-      >
-        <View
-          pointerEvents="none"
-          className={Platform.OS === 'web' ? 'backdrop-blur-sm' : ''}
-          style={[StyleSheet.absoluteFill, { backgroundColor: backdropBackground }]}
-        />
-      </Pressable>
+}) => {
+  const insets = useSafeAreaInsets();
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        pointerEvents="box-none"
-        style={[
-          StyleSheet.absoluteFillObject,
-          {
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-            paddingHorizontal: contentPadding.horizontal,
-            paddingTop: contentPadding.top,
-            paddingBottom: contentPadding.bottom,
-            zIndex: 61,
-          },
-        ]}
-      >
-        <RNAnimated.View
-          style={{
-            width: cardWidth,
-            maxWidth: '100%',
-            borderRadius,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 12 },
-            shadowOpacity: 0.25,
-            shadowRadius: 24,
-            elevation: 12,
-            transform: [{ translateY: contentTranslateY }],
-          }}
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="none"
+      presentationStyle={Platform.OS === 'ios' ? 'overFullScreen' : undefined}
+      statusBarTranslucent={Platform.OS === 'android'}
+      onRequestClose={onRequestClose}
+    >
+      <View style={styles.overlayRoot}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Close dialog"
+          onPress={onRequestClose}
+          style={[StyleSheet.absoluteFill, { zIndex: 60 }]}
         >
           <View
+            pointerEvents="none"
+            className={Platform.OS === 'web' ? 'backdrop-blur-sm' : ''}
+            style={[StyleSheet.absoluteFill, { backgroundColor: backdropBackground }]}
+          />
+        </Pressable>
+
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          pointerEvents="box-none"
+          style={[StyleSheet.absoluteFillObject, { zIndex: 61 }]}
+        >
+          <RNAnimated.View
             style={{
-              height: cardHeight,
-              borderRadius,
+              flex: 1,
+              width: '100%',
+              transform: [{ translateY: contentTranslateY }],
             }}
           >
-            {children}
-          </View>
-        </RNAnimated.View>
-      </KeyboardAvoidingView>
-    </View>
-  </Modal>
-);
+            <View
+              className="absolute inset-0 sm:inset-4 sm:top-8 flex flex-col overflow-hidden bg-card sm:rounded-2xl sm:shadow-elevated"
+              style={{
+                paddingTop: insets.top,
+                paddingBottom: insets.bottom,
+                ...(Platform.OS === 'android' ? { elevation: 12 } : null),
+              }}
+            >
+              {children}
+            </View>
+          </RNAnimated.View>
+        </KeyboardAvoidingView>
+      </View>
+    </Modal>
+  );
+};

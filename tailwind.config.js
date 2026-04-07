@@ -31,6 +31,9 @@ module.exports = {
         xl: '20px',
         '2xl': '24px',
       },
+      boxShadow: {
+        elevated: '0 12px 24px rgba(0, 0, 0, 0.25)',
+      },
     },
   },
   plugins: [],

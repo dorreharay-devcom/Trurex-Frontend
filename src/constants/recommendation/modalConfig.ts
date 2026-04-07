@@ -6,8 +6,6 @@ export const modalConfig = {
     sheetCloseMs: 280,
   },
   layout: {
-    edgePad: 10,
-    cardRadius: 16,
     backdropBackground: 'rgba(245, 245, 245, 0.8)' as const,
     minSafeBottom: 16,
   },
