@@ -1,5 +1,7 @@
 import { Platform, Dimensions } from 'react-native';
 
+export { cn, type ClassValue } from './general';
+
 export const isWeb = Platform.OS === 'web';
 export const { width, height } = Dimensions.get('window');
 
