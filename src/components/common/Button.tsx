@@ -26,13 +26,13 @@ interface ButtonProps {
 }
 
 const buttonVariants: Record<ButtonVariant, string> = {
-  [ButtonVariant.Primary]: 'py-2.5 px-6 bg-primary rounded-lg',
-  [ButtonVariant.Secondary]: 'py-2.5 px-6 bg-card border border-border rounded-lg',
-  [ButtonVariant.Muted]: 'py-2.5 px-6 bg-muted rounded-lg',
-  [ButtonVariant.Ghost]: 'py-2.5 px-6 bg-transparent rounded-lg',
-  [ButtonVariant.Danger]: 'py-2.5 px-6 bg-destructive rounded-lg',
-  [ButtonVariant.Outline]: 'py-2.5 px-6 bg-card border border-border rounded-lg',
-  [ButtonVariant.Link]: 'p-0 bg-transparent',
+  [ButtonVariant.Primary]: 'py-2.5 px-6 bg-primary rounded-lg hover:bg-primary/90',
+  [ButtonVariant.Secondary]: 'py-2.5 px-6 bg-card border border-border rounded-lg hover:bg-muted',
+  [ButtonVariant.Muted]: 'py-2.5 px-6 bg-muted rounded-lg hover:bg-muted/80',
+  [ButtonVariant.Ghost]: 'py-2.5 px-6 bg-transparent rounded-lg hover:bg-muted/10',
+  [ButtonVariant.Danger]: 'py-2.5 px-6 bg-destructive rounded-lg hover:bg-destructive/90',
+  [ButtonVariant.Outline]: 'py-2.5 px-6 bg-card border border-border rounded-lg hover:bg-muted',
+  [ButtonVariant.Link]: 'p-0 bg-transparent hover:underline',
 };
 
 const textVariants: Record<ButtonVariant, string> = {

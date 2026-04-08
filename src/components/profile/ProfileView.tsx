@@ -4,50 +4,12 @@ import { useAuth } from '~/services/AuthContext';
 // import { ProfileApi } from '~/api/ProfileApi'; // stashed with api layer
 import { Theme } from '~/theme/Theme';
 import type { ProfileData } from '~/types/profile';
-import { currentUser } from '~/data/mockData';
+import { currentUser, collections, recommendations } from '~/data/mockData';
 import { webContainerStyle } from '~/utils';
 import ProfileHeader from './ProfileHeader';
 import CurrentlySection from './CurrentlySection';
 import EditProfile from './EditProfile';
-
-const MOCK_RECS = [
-  {
-    id: '1',
-    title: 'Nobu Malibu',
-    image:
-      'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80',
-    location: 'Malibu, CA',
-    category: 'Restaurants',
-    rating: 4.9,
-  },
-  {
-    id: '2',
-    title: 'Alfred Coffee',
-    image:
-      'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
-    location: 'Los Angeles, CA',
-    category: 'Cafes',
-    rating: 4.7,
-  },
-  {
-    id: '3',
-    title: 'Chateau Marmont',
-    image:
-      'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
-    location: 'West Hollywood, CA',
-    category: 'Hotels',
-    rating: 4.5,
-  },
-  {
-    id: '4',
-    title: 'Attaboy',
-    image:
-      'https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=800&q=80',
-    location: 'New York, NY',
-    category: 'Bars',
-    rating: 4.8,
-  },
-];
+import CollectionCard from './CollectionCard';
 
 const ACTIVITY_ITEMS = [
   { emoji: '❤️', text: "Liked Mia's rec for Lilia", time: '2h ago' },
@@ -63,7 +25,7 @@ enum ProfileTab {
 }
 
 const TABS = [
-  { id: ProfileTab.Recs, label: `Rex's (${MOCK_RECS.length})` },
+  { id: ProfileTab.Recs, label: `Rex's (${recommendations.length})` },
   { id: ProfileTab.Collections, label: 'Collections' },
   { id: ProfileTab.Activity, label: 'Activity' },
 ];
@@ -81,7 +43,7 @@ const ProfileView = () => {
       setLoading(false);
       return;
     }
-    setProfile({ ...currentUser, rexCount: MOCK_RECS.length, followers: 142, following: 89 });
+    setProfile({ ...currentUser, rexCount: recommendations.length, followers: 142, following: 89 });
     setLoading(false);
   }, [user]);
 
@@ -151,26 +113,25 @@ const ProfileView = () => {
 
         <View className="pb-4">
           {activeTab === ProfileTab.Recs && (
-            <View className="flex-row flex-wrap px-3 pt-3 pb-1">
-              {MOCK_RECS.map((rec) => (
-                <View key={rec.id} className="w-1/4 p-1">
-                  <View className="rounded-xl overflow-hidden bg-background border border-border shadow-card">
-                    <Image
-                      source={{ uri: rec.image }}
-                      className="w-full aspect-square"
-                      resizeMode="cover"
-                    />
-                    <View className="p-2.5">
-                      <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>
-                        {rec.title}
-                      </Text>
-                      <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
-                        {rec.location || rec.category}
-                      </Text>
-                      <Text className="text-[10px] text-accent-foreground font-medium">
-                        ★ {rec.rating}
-                      </Text>
-                    </View>
+            <View className="flex-row flex-wrap p-4 gap-3">
+              {recommendations.map((rec) => (
+                <View
+                  key={rec.id}
+                  className="w-[48%] sm:w-[31.5%] lg:w-[23.8%] rounded-xl overflow-hidden shadow-card bg-background border border-border"
+                >
+                  <Image
+                    source={{ uri: rec.image }}
+                    className="w-full aspect-square"
+                    resizeMode="cover"
+                  />
+                  <View className="p-2.5">
+                    <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>
+                      {rec.title}
+                    </Text>
+                    <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
+                      {rec.location || rec.category}
+                    </Text>
+                    <Text className="text-[10px] text-accent font-medium">★ {rec.rating}</Text>
                   </View>
                 </View>
               ))}
@@ -178,9 +139,15 @@ const ProfileView = () => {
           )}
 
           {activeTab === ProfileTab.Collections && (
-            <View className="p-4 items-center">
-              <Text className="text-sm text-muted-foreground py-8">No collections yet</Text>
-            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerClassName="p-4 gap-3"
+            >
+              {collections.map((col) => (
+                <CollectionCard key={col.id} collection={col} />
+              ))}
+            </ScrollView>
           )}
 
           {activeTab === ProfileTab.Activity && (

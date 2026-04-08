@@ -12,6 +12,9 @@ import {
   HankenGrotesk_700Bold,
   HankenGrotesk_800ExtraBold,
 } from '@expo-google-fonts/hanken-grotesk';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -26,10 +29,12 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <SafeAreaProvider>
-      <AuthProvider>
-        <Stack screenOptions={{ headerShown: false }} />
-      </AuthProvider>
-    </SafeAreaProvider>
+    <QueryClientProvider client={queryClient}>
+      <SafeAreaProvider>
+        <AuthProvider>
+          <Stack screenOptions={{ headerShown: false }} />
+        </AuthProvider>
+      </SafeAreaProvider>
+    </QueryClientProvider>
   );
 }

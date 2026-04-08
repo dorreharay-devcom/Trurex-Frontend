@@ -45,7 +45,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
   const [handle, setHandle] = useState('');
   const [bio, setBio] = useState('');
   const [location, setLocation] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarUrl] = useState<string | null>(null);
   const [currently, setCurrently] = useState<CurrentlyData>({});
 
   useEffect(() => {
@@ -73,8 +73,9 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
     setUploading(true);
     try {
       // ProfileApi.uploadAvatar stashed with api layer
-    } catch (e: any) {
-      Alert.alert('Upload failed', e.message);
+    } catch (e) {
+      const error = e as Error;
+      Alert.alert('Upload failed', error.message);
     } finally {
       setUploading(false);
     }
@@ -86,8 +87,9 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
     try {
       // ProfileApi.update stashed with api layer
       onClose();
-    } catch (e: any) {
-      Alert.alert('Error saving profile', e.message);
+    } catch (e) {
+      const error = e as Error;
+      Alert.alert('Error saving profile', error.message);
     } finally {
       setSaving(false);
     }
