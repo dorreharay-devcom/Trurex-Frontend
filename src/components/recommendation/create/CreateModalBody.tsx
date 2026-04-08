@@ -13,10 +13,7 @@ type Props = {
 
 export const CreateModalBody: React.FC<Props> = ({ flow, stepOpacity, onTagLocation }) => (
   <View className="min-h-0 w-full flex-1">
-    <RNAnimated.View
-      key={flow.stepId}
-      style={{ flex: 1, width: '100%', opacity: stepOpacity }}
-    >
+    <RNAnimated.View key={flow.stepId} style={{ flex: 1, width: '100%', opacity: stepOpacity }}>
       {flow.stepId === 'search' && (
         <Search
           mode={flow.searchMode}

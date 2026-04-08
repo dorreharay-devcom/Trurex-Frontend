@@ -29,7 +29,9 @@ const FeedView = ({ onRecommendationPress, onTapRec }: FeedViewProps) => {
 
   const recs = data?.length ? data : MOCK_RECS;
   const filtered =
-    activeCategory === 'all' ? recs : recs.filter((r) => r.category.toLowerCase() === activeCategory);
+    activeCategory === 'all'
+      ? recs
+      : recs.filter((r) => r.category.toLowerCase() === activeCategory);
 
   if (isLoading) {
     return (

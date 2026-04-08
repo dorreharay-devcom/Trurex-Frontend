@@ -55,6 +55,8 @@ export const recommendations: Recommendation[] = [
     categoryId: 'restaurants',
     category: 'Restaurants',
     location: 'Malibu, CA',
+    latitude: 34.0029,
+    longitude: -118.8062,
     rating: 4.9,
     tags: ['sushi', 'view', 'upscale'],
     user: {
@@ -78,6 +80,8 @@ export const recommendations: Recommendation[] = [
     categoryId: 'cafes',
     category: 'Cafes',
     location: 'Los Angeles, CA',
+    latitude: 34.0834,
+    longitude: -118.353,
     rating: 4.7,
     tags: ['coffee', 'aesthetic', 'la'],
     user: {
@@ -101,6 +105,8 @@ export const recommendations: Recommendation[] = [
     categoryId: 'hotels',
     category: 'Hotels',
     location: 'West Hollywood, CA',
+    latitude: 34.098,
+    longitude: -118.3687,
     rating: 4.5,
     tags: ['hollywood', 'hotel', 'luxury'],
     user: {
@@ -124,6 +130,8 @@ export const recommendations: Recommendation[] = [
     categoryId: 'bars',
     category: 'Bars',
     location: 'New York, NY',
+    latitude: 40.7182,
+    longitude: -73.9884,
     rating: 4.8,
     tags: ['cocktails', 'speakeasy', 'ny'],
     user: {

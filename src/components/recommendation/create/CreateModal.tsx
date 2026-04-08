@@ -23,14 +23,13 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
   const flow = useCreateRecWizard();
   const { reset, setManualGeotag } = flow;
 
-  const { sheetTranslateY, stepOpacity, handleClose } =
-    useCreateRecommendationModalPresentation({
-      visible,
-      windowHeight,
-      stepIndex: flow.stepIndex,
-      onClose,
-      reset,
-    });
+  const { sheetTranslateY, stepOpacity, handleClose } = useCreateRecommendationModalPresentation({
+    visible,
+    windowHeight,
+    stepIndex: flow.stepIndex,
+    onClose,
+    reset,
+  });
 
   const handlePrimaryFooter = () => {
     if (flow.isLastStep) {
@@ -96,11 +95,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
           <CreateWizardStepper currentIndex={flow.stepIndex} />
         </View>
 
-        <CreateModalBody
-          flow={flow}
-          stepOpacity={stepOpacity}
-          onTagLocation={handleTagLocation}
-        />
+        <CreateModalBody flow={flow} stepOpacity={stepOpacity} onTagLocation={handleTagLocation} />
 
         <View className="sticky bottom-0 items-center border-t border-border bg-card/95 backdrop-blur px-4 py-4 sm:px-6">
           <View
