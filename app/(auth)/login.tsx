@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, Alert } from 'react-native';
+import { View, Text, Image, Alert, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
@@ -66,14 +66,14 @@ export default function LoginScreen() {
           title="Continue with Google"
           onPress={() => handleOAuth('google')}
           icon={<GoogleIcon size={16} color={Theme.colors.foreground} />}
-          className="w-full"
+          className="w-full bg-card"
         />
         <Button
           variant={ButtonVariant.Outline}
           title="Continue with Apple"
           onPress={() => handleOAuth('apple')}
           icon={<AppleIcon size={16} color={Theme.colors.foreground} />}
-          className="w-full"
+          className="w-full bg-card"
         />
       </View>
 
@@ -99,7 +99,7 @@ export default function LoginScreen() {
               variant={ButtonVariant.Link}
               onPress={() => router.push(Routes.ForgotPassword)}
               title="Forgot password?"
-              textClassName="text-xs text-accent-foreground font-normal"
+              textClassName="text-xs text-accent font-medium hover:underline"
             />
           }
           value={password}
@@ -127,12 +127,12 @@ export default function LoginScreen() {
         className="w-full"
       />
 
-      <Text className="text-center text-sm text-muted-foreground">
-        Don't have an account?{' '}
-        <Text className="text-foreground font-medium" onPress={() => router.push(Routes.Signup)}>
-          Sign up
-        </Text>
-      </Text>
+      <View className="flex-row items-center justify-center">
+        <Text className="text-sm text-muted-foreground mr-1">Don't have an account?</Text>
+        <TouchableOpacity onPress={() => router.push(Routes.Signup)}>
+          <Text className="text-sm text-foreground font-medium hover:underline">Sign up</Text>
+        </TouchableOpacity>
+      </View>
     </AuthLayout>
   );
 }

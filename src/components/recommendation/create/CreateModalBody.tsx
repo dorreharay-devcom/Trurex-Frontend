@@ -1,6 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
-import Animated from 'react-native-reanimated';
+import { View, Animated as RNAnimated } from 'react-native';
 import type { useCreateRecWizard } from '~/hooks/recommendation';
 import { Search, Category, Scorecard, Circles, Confirm } from './steps';
 
@@ -8,18 +7,15 @@ type Flow = ReturnType<typeof useCreateRecWizard>;
 
 type Props = {
   flow: Flow;
-  entering: NonNullable<React.ComponentProps<typeof Animated.View>['entering']>;
-  exiting: NonNullable<React.ComponentProps<typeof Animated.View>['exiting']>;
+  stepOpacity: RNAnimated.Value;
   onTagLocation: () => void;
 };
 
-export const CreateModalBody: React.FC<Props> = ({ flow, entering, exiting, onTagLocation }) => (
+export const CreateModalBody: React.FC<Props> = ({ flow, stepOpacity, onTagLocation }) => (
   <View className="min-h-0 w-full flex-1">
-    <Animated.View
+    <RNAnimated.View
       key={flow.stepId}
-      entering={entering}
-      exiting={exiting}
-      style={{ flex: 1, width: '100%' }}
+      style={{ flex: 1, width: '100%', opacity: stepOpacity }}
     >
       {flow.stepId === 'search' && (
         <Search
@@ -27,7 +23,7 @@ export const CreateModalBody: React.FC<Props> = ({ flow, entering, exiting, onTa
           searchQuery={flow.searchQuery}
           onSearchQueryChange={flow.setSearchQuery}
           selectedPlaceId={flow.selectedPlaceId}
-          onSelectPlace={(p) => flow.setSelectedPlaceId(p.id)}
+          onSelectPlace={(p: any) => flow.setSelectedPlaceId(p.id)}
           manualName={flow.manualName}
           onManualNameChange={flow.setManualName}
           manualAddress={flow.manualAddress}
@@ -76,6 +72,6 @@ export const CreateModalBody: React.FC<Props> = ({ flow, entering, exiting, onTa
           selectedCircleIds={flow.selectedCircleIds}
         />
       )}
-    </Animated.View>
+    </RNAnimated.View>
   </View>
 );

@@ -19,7 +19,15 @@ interface InputProps extends TextInputProps {
   secure?: boolean;
 }
 
-const Input = ({ label, labelRight, secure, style, ...props }: InputProps) => {
+const Input = ({
+  label,
+  labelRight,
+  labelClassName,
+  inputClassName,
+  secure,
+  style,
+  ...props
+}: InputProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const caretStyle: StyleProp<TextStyle> = [style, textFieldCaretStyle];
@@ -34,7 +42,9 @@ const Input = ({ label, labelRight, secure, style, ...props }: InputProps) => {
       </View>
 
       {secure ? (
-        <View className="flex-row items-center rounded-lg border border-border bg-card focus-within:border-primary">
+        <View
+          className={`flex-row items-center rounded-lg border border-border bg-card focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/20 transition-all ${inputClassName ?? ''}`}
+        >
           <TextInput
             className="flex-1 px-3 py-2.5 text-sm text-foreground"
             style={caretStyle}
@@ -54,7 +64,7 @@ const Input = ({ label, labelRight, secure, style, ...props }: InputProps) => {
         </View>
       ) : (
         <TextInput
-          className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary"
+          className={`w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-ring/20 transition-all ${inputClassName ?? ''}`}
           style={caretStyle}
           placeholderTextColor={Theme.colors.muted}
           autoCapitalize="none"

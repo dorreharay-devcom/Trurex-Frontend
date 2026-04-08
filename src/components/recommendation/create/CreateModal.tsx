@@ -23,7 +23,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
   const flow = useCreateRecWizard();
   const { reset, setManualGeotag } = flow;
 
-  const { sheetTranslateY, entering, exiting, handleClose } =
+  const { sheetTranslateY, stepOpacity, handleClose } =
     useCreateRecommendationModalPresentation({
       visible,
       windowHeight,
@@ -98,8 +98,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
 
         <CreateModalBody
           flow={flow}
-          entering={entering}
-          exiting={exiting}
+          stepOpacity={stepOpacity}
           onTagLocation={handleTagLocation}
         />
 

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { Animated as RNAnimated, Dimensions, Easing as RNEasing, Platform } from 'react-native';
-import { FadeInLeft, FadeInRight, FadeOutLeft, FadeOutRight } from 'react-native-reanimated';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
 
 const { timing } = modalConfig;
@@ -24,6 +23,7 @@ export function useCreateRecommendationModalPresentation({
   const sheetTranslateY = useRef(
     new RNAnimated.Value(Math.max(Dimensions.get('window').height, 1)),
   ).current;
+  const stepOpacity = useRef(new RNAnimated.Value(1)).current;
 
   useLayoutEffect(() => {
     if (visible) {
@@ -45,16 +45,16 @@ export function useCreateRecommendationModalPresentation({
   }, [visible, windowHeight, sheetTranslateY]);
 
   useLayoutEffect(() => {
+    if (stepIndex !== prevStepIndex.current && prevStepIndex.current !== -1) {
+      stepOpacity.setValue(0);
+      RNAnimated.timing(stepOpacity, {
+        toValue: 1,
+        duration: timing.stepEnterMs,
+        useNativeDriver: true,
+      }).start();
+    }
     prevStepIndex.current = stepIndex;
   }, [stepIndex]);
-
-  const stepForward = stepIndex > prevStepIndex.current;
-  const entering = stepForward
-    ? FadeInRight.duration(timing.stepEnterMs)
-    : FadeInLeft.duration(timing.stepEnterMs);
-  const exiting = stepForward
-    ? FadeOutLeft.duration(timing.stepExitMs)
-    : FadeOutRight.duration(timing.stepExitMs);
 
   const handleClose = useCallback(() => {
     const h = Math.max(windowHeight, Dimensions.get('window').height, 1);
@@ -72,8 +72,7 @@ export function useCreateRecommendationModalPresentation({
 
   return {
     sheetTranslateY,
-    entering,
-    exiting,
+    stepOpacity,
     handleClose,
   };
 }
