@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { webContainerStyle } from '~/utils';
-import CategoryPills, { Category } from '../CategoryPills';
-import RecommendationCard, { Recommendation } from '../recommendation/RecommendationCard';
+import CategoryPills, { Category } from '~/components/layout/CategoryPills';
+import RecommendationCard, { Recommendation } from '~/components/recommendation/RecommendationCard';
 import { useDiscoveryFeed } from '~/hooks/useDiscovery';
 import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
 

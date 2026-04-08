@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { PlusCircle } from 'lucide-react-native';
-import { Header } from './_components/Header';
-import { TabBar, Tab } from './_components/TabBar';
-import { CreateModal } from './_components/recommendation/create/CreateModal';
+import ProfileView from '~/components/profile/ProfileView';
+import FavesView from '~/components/faves/FavesView';
+import FeedView from '~/components/feed/FeedView';
+import { Header } from '~/components/layout/Header';
+import { TabBar, Tab } from '~/components/layout/TabBar';
+import { CreateModal } from '~/components/recommendation/create/CreateModal';
 import { Theme } from '~/theme/Theme';
-import ProfileView from './_components/profile/ProfileView';
-import FavesView from './_components/faves/FavesView';
-import FeedView from './_components/feed/FeedView';
 
 const PlaceholderView = ({ title }: { title: string }) => (
   <View className="flex-1 items-center justify-center">

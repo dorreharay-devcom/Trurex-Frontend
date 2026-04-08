@@ -3,11 +3,11 @@ import { View, Text, ScrollView, TouchableOpacity, Image, FlatList } from 'react
 import { Plus, List, Grid3x3 } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
 import { Button } from '~/components/common/Button';
-import RecommendationCard from '../recommendation/RecommendationCard';
+import RecommendationCard from '~/components/recommendation/RecommendationCard';
 import type { Recommendation, Collection } from '~/types/recommendation/recommendation';
 import { webContainerStyle } from '~/utils';
 import { collections as SHARED_COLLECTIONS, recommendations } from '~/data/mockData';
-import CollectionCard from '../profile/CollectionCard';
+import CollectionCard from '~/components/profile/CollectionCard';
 
 type ViewMode = 'list' | 'grid';
 
