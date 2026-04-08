@@ -7,23 +7,25 @@ import {
   Platform,
   Pressable,
   StyleSheet,
+  type ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export type OverlayModalProps = {
-  visible: boolean;
-  onRequestClose: () => void;
-  contentTranslateY: RNAnimated.Value;
-  backdropBackground: string;
-  children: React.ReactNode;
-};
+import type { OverlayModalProps } from '~/types/overlayModal';
+
+export type { OverlayModalProps } from '~/types/overlayModal';
 
 const styles = StyleSheet.create({
   overlayRoot: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: 'transparent',
   },
 });
+
+const webOverlayRoot: ViewStyle | undefined =
+  Platform.OS === 'web'
+    ? ({ width: '100%', height: '100%', minHeight: '100%' } as ViewStyle)
+    : undefined;
 
 export const OverlayModal: React.FC<OverlayModalProps> = ({
   visible,
@@ -43,7 +45,7 @@ export const OverlayModal: React.FC<OverlayModalProps> = ({
       statusBarTranslucent={Platform.OS === 'android'}
       onRequestClose={onRequestClose}
     >
-      <View style={styles.overlayRoot}>
+      <View style={[styles.overlayRoot, webOverlayRoot]}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Close dialog"
