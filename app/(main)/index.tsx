@@ -4,9 +4,11 @@ import { Header } from './_components/Header';
 import { TabBar, Tab } from './_components/TabBar';
 import CategoryPills, { Category } from './_components/CategoryPills';
 import RecommendationCard from './_components/recommendation/RecommendationCard';
+import { RecommendationDetailModal } from './_components/recommendation/RecommendationDetailModal';
 import { CreateModal } from './_components/recommendation/create/CreateModal';
 import { REX_CATEGORIES } from '~/constants/recommendation/rexCategories';
 import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
+import type { Recommendation } from '~/types/recommendation/recommendation';
 
 const CATEGORIES: Category[] = [
   { id: 'all', label: 'All', emoji: '🔥', color: '#9333ea' },
@@ -26,7 +28,11 @@ const containerStyle = isWeb
   ? { maxWidth: 1280, width: '100%' as const, alignSelf: 'center' as const }
   : undefined;
 
-const FeedView = () => {
+const FeedView = ({
+  onRecommendationPress,
+}: {
+  onRecommendationPress: (rec: Recommendation) => void;
+}) => {
   const [activeCategory, setActiveCategory] = useState('all');
 
   const filtered =
@@ -52,7 +58,9 @@ const FeedView = () => {
             <Text className="text-sm text-muted">No recs yet. Be the first to add one!</Text>
           </View>
         )}
-        renderItem={({ item }) => <RecommendationCard recommendation={item} />}
+        renderItem={({ item }) => (
+          <RecommendationCard recommendation={item} onTap={onRecommendationPress} />
+        )}
       />
     </View>
   );
@@ -62,6 +70,7 @@ export default function HomeScreen() {
   const [currentTab, setCurrentTab] = useState<Tab>('feed');
   const [searchQuery, setSearchQuery] = useState('');
   const [createRecommendationOpen, setCreateRecommendationOpen] = useState(false);
+  const [previewRecommendation, setPreviewRecommendation] = useState<Recommendation | null>(null);
 
   return (
     <View className="flex-1 bg-background">
@@ -75,7 +84,9 @@ export default function HomeScreen() {
       <TabBar currentTab={currentTab} onTabChange={setCurrentTab} />
 
       <View className="flex-1">
-        {currentTab === 'feed' && <FeedView />}
+        {currentTab === 'feed' && (
+          <FeedView onRecommendationPress={(rec) => setPreviewRecommendation(rec)} />
+        )}
         {currentTab === 'discover' && <PlaceholderView title="Discover" />}
         {currentTab === 'faves' && <PlaceholderView title="My Faves" />}
         {currentTab === 'network' && <PlaceholderView title="Network" />}
@@ -86,6 +97,12 @@ export default function HomeScreen() {
       <CreateModal
         visible={createRecommendationOpen}
         onClose={() => setCreateRecommendationOpen(false)}
+      />
+
+      <RecommendationDetailModal
+        visible={previewRecommendation != null}
+        recommendation={previewRecommendation}
+        onClose={() => setPreviewRecommendation(null)}
       />
     </View>
   );
