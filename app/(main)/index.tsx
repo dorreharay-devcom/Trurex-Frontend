@@ -1,22 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { PlusCircle } from 'lucide-react-native';
 import { Header } from './_components/Header';
 import { TabBar, Tab } from './_components/TabBar';
-import CategoryPills, { Category } from './_components/CategoryPills';
-import RecommendationCard from './_components/recommendation/RecommendationCard';
 import { CreateModal } from './_components/recommendation/create/CreateModal';
-import { REX_CATEGORIES } from '~/constants/recommendation/rexCategories';
-import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
-import { isWeb } from '~/utils';
 import { Theme } from '~/theme/Theme';
 import ProfileView from './_components/profile/ProfileView';
 import FavesView from './_components/faves/FavesView';
-
-const CATEGORIES: Category[] = [
-  { id: 'all', label: 'All', emoji: '🔥', color: '#9333ea' },
-  ...REX_CATEGORIES,
-];
+import FeedView from './_components/feed/FeedView';
 
 const PlaceholderView = ({ title }: { title: string }) => (
   <View className="flex-1 items-center justify-center">
@@ -24,42 +15,6 @@ const PlaceholderView = ({ title }: { title: string }) => (
     <Text className="text-sm text-muted mt-2">Coming soon</Text>
   </View>
 );
-
-const containerStyle = isWeb
-  ? { maxWidth: 1280, width: '100%' as const, alignSelf: 'center' as const }
-  : undefined;
-
-const FeedView = () => {
-  const [activeCategory, setActiveCategory] = useState('all');
-
-  const filtered =
-    activeCategory === 'all' ? MOCK_RECS : MOCK_RECS.filter((r) => r.categoryId === activeCategory);
-
-  return (
-    <View className="flex-1">
-      <View style={containerStyle} className="px-4 pt-8 pb-3">
-        <CategoryPills
-          categories={CATEGORIES}
-          activeCategory={activeCategory}
-          onSelect={setActiveCategory}
-        />
-      </View>
-      <FlatList
-        data={filtered}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[containerStyle, { paddingHorizontal: 16, paddingBottom: 96 }]}
-        ListEmptyComponent={() => (
-          <View className="items-center py-16">
-            <Text className="text-4xl mb-3">🦖</Text>
-            <Text className="text-sm text-muted">No recs yet. Be the first to add one!</Text>
-          </View>
-        )}
-        renderItem={({ item }) => <RecommendationCard recommendation={item} />}
-      />
-    </View>
-  );
-};
 
 export default function HomeScreen() {
   const [currentTab, setCurrentTab] = useState<Tab>('feed');
