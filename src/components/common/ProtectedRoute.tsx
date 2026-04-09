@@ -6,7 +6,7 @@ import { Routes } from '~/constants/routes';
 import { Theme } from '~/theme/Theme';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading, isGuest } = useAuth();
+  const { session, loading } = useAuth();
 
   if (loading) {
     return (
@@ -16,7 +16,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  if (!user && !isGuest) {
+  if (!session) {
     return <Redirect href={Routes.Login} />;
   }
 

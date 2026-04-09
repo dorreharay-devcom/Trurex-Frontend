@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { LogOut } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
 import type { ProfileData } from '~/types/profile';
 
@@ -10,9 +11,15 @@ interface ProfileHeaderProps {
   profile: ProfileData;
   isOwnProfile?: boolean;
   onEditProfile?: () => void;
+  onSignOut?: () => void;
 }
 
-const ProfileHeader = ({ profile, isOwnProfile = false, onEditProfile }: ProfileHeaderProps) => {
+const ProfileHeader = ({
+  profile,
+  isOwnProfile = false,
+  onEditProfile,
+  onSignOut,
+}: ProfileHeaderProps) => {
   return (
     <View className="overflow-hidden rounded-t-xl">
       <LinearGradient
@@ -85,13 +92,22 @@ const ProfileHeader = ({ profile, isOwnProfile = false, onEditProfile }: Profile
         </View>
 
         {isOwnProfile ? (
-          <TouchableOpacity
-            onPress={onEditProfile}
-            activeOpacity={0.7}
-            className="w-full mt-4 mb-2 py-2.5 rounded-lg border border-border items-center"
-          >
-            <Text className="text-sm font-medium text-foreground">Edit Profile</Text>
-          </TouchableOpacity>
+          <View className="flex-row gap-2 mt-4 mb-2">
+            <TouchableOpacity
+              onPress={onEditProfile}
+              activeOpacity={0.7}
+              className="flex-1 py-2.5 rounded-lg border border-border items-center"
+            >
+              <Text className="text-sm font-medium text-foreground">Edit Profile</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={onSignOut}
+              activeOpacity={0.7}
+              className="py-2.5 px-3 rounded-lg border border-border items-center justify-center"
+            >
+              <LogOut size={16} color={Theme.colors.muted} />
+            </TouchableOpacity>
+          </View>
         ) : (
           <TouchableOpacity
             activeOpacity={0.8}

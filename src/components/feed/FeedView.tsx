@@ -19,27 +19,19 @@ const CATEGORIES: Category[] = [
 
 const FeedView = ({ onTapRec }: { onTapRec?: (rec: Recommendation) => void }) => {
   const [activeCategory, setActiveCategory] = useState('all');
-  const { data, isLoading, error } = useDiscoveryFeed();
+  const { data, isLoading } = useDiscoveryFeed();
 
   const recs = data?.length ? data : MOCK_RECS;
   const filtered =
-    activeCategory === 'all' ? recs : recs.filter((r) => r.category.toLowerCase() === activeCategory);
+    activeCategory === 'all'
+      ? recs
+      : recs.filter((r) => r.category.toLowerCase() === activeCategory);
 
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
         <Text className="text-sm text-muted mt-3">Loading feed...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View className="flex-1 items-center justify-center px-6">
-        <Text className="text-2xl mb-3">❌</Text>
-        <Text className="text-sm font-semibold text-foreground mb-1">API Error</Text>
-        <Text className="text-xs text-muted text-center">{String(error)}</Text>
       </View>
     );
   }

@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import * as Linking from 'expo-linking';
-import { Auth } from '~/services/AuthService';
+import { AuthApi } from '~/api/AuthApi';
 import { Routes } from '~/constants/routes';
 import { Button } from '~/components/common/Button';
 import AuthLayout from '~/components/common/AuthLayout';
 import Input from '~/components/common/Input';
 import { Globe as GoogleIcon, Apple as AppleIcon } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
-import { isWeb } from '~/utils';
+import { isWeb, getRedirectUrl } from '~/utils';
+import { mapAuthError } from '~/utils/errors';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -19,41 +19,54 @@ export default function SignupScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [errors, setErrors] = useState<{
+    fullName?: string;
+    email?: string;
+    password?: string;
+    general?: string;
+  }>({});
   const [loading, setLoading] = useState(false);
 
-  const getRedirectUrl = () => (isWeb ? window.location.origin : Linking.createURL('/'));
+  const validate = () => {
+    const next: typeof errors = {};
+    if (!fullName.trim()) next.fullName = 'Full name is required';
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) next.email = 'Enter a valid email address';
+    if (password.length < 6) next.password = 'Password must be at least 6 characters';
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  };
 
   const handleSignup = async () => {
+    if (!validate()) return;
     setLoading(true);
-    const { error } = await Auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: getRedirectUrl(),
-        data: { full_name: fullName },
-      },
-    });
-    setLoading(false);
-    if (error) {
-      Alert.alert('Signup failed', error.message);
-    } else {
+    setErrors({});
+    try {
+      await AuthApi.signUp({
+        email,
+        password,
+        redirectTo: getRedirectUrl(),
+        displayName: fullName,
+      });
       Alert.alert('Check your email', 'We sent you a confirmation link to verify your account.');
       router.replace(Routes.Login);
+    } catch (error: unknown) {
+      mapAuthError(error, setErrors);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleOAuth = async (provider: 'google' | 'apple') => {
     const redirectUrl = getRedirectUrl();
-    const { data, error } = await Auth.signInWithOAuth({
-      provider,
-      options: { redirectTo: redirectUrl },
-    });
-    if (error) {
-      Alert.alert(`${provider} sign-up failed`, error.message);
-      return;
-    }
-    if (!isWeb && data.url) {
-      await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
+    try {
+      const data = await AuthApi.signInWithOAuth(provider, redirectUrl);
+      if (!isWeb && data?.url) {
+        await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
+      }
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      Alert.alert(`${provider} sign-up failed`, message);
     }
   };
 
@@ -95,25 +108,37 @@ export default function SignupScreen() {
         <Input
           label="Full name"
           value={fullName}
-          onChangeText={setFullName}
+          onChangeText={(v) => {
+            setFullName(v);
+            setErrors((e) => ({ ...e, fullName: undefined, general: undefined }));
+          }}
           placeholder="Jane Doe"
           autoCapitalize="words"
+          error={errors.fullName}
         />
 
         <Input
           label="Email"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(v) => {
+            setEmail(v);
+            setErrors((e) => ({ ...e, email: undefined, general: undefined }));
+          }}
           placeholder="you@example.com"
           keyboardType="email-address"
+          error={errors.email}
         />
 
         <Input
           label="Password"
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(v) => {
+            setPassword(v);
+            setErrors((e) => ({ ...e, password: undefined, general: undefined }));
+          }}
           placeholder="At least 6 characters"
           secure
+          error={errors.password}
         />
 
         <Button
@@ -123,6 +148,9 @@ export default function SignupScreen() {
           disabled={loading}
           className="w-full"
         />
+        {errors.general && (
+          <Text className="mt-1 text-xs text-destructive text-center">{errors.general}</Text>
+        )}
       </View>
 
       <Text className="text-center text-sm text-muted-foreground">

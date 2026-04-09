@@ -31,7 +31,7 @@ const TABS = [
 ];
 
 const ProfileView = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -86,7 +86,12 @@ const ProfileView = () => {
     >
       <View className="bg-card border border-border rounded-xl shadow-card">
         {profile && (
-          <ProfileHeader profile={profile} isOwnProfile onEditProfile={() => setIsEditing(true)} />
+          <ProfileHeader
+            profile={profile}
+            isOwnProfile
+            onEditProfile={() => setIsEditing(true)}
+            onSignOut={signOut}
+          />
         )}
 
         {profile?.currently && <CurrentlySection currently={profile.currently} />}

@@ -2,17 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Auth } from '~/services/AuthService';
+import { AuthApi } from '~/api/AuthApi';
 import { AuthEvent } from '~/services/AuthContext';
 import { Routes } from '~/constants/routes';
 import { Button } from '~/components/common/Button';
 import AuthLayout from '~/components/common/AuthLayout';
 import Input from '~/components/common/Input';
 import { isWeb } from '~/utils';
+import { mapAuthError } from '~/utils/errors';
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
     if (isWeb && typeof window !== 'undefined' && !window.location.hash.includes('type=recovery')) {
@@ -30,14 +33,20 @@ export default function ResetPasswordScreen() {
   }, [router]);
 
   const handleReset = async () => {
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
     setLoading(true);
-    const { error } = await Auth.updateUser({ password });
-    setLoading(false);
-    if (error) {
-      Alert.alert('Error', error.message);
-    } else {
+    setError(undefined);
+    try {
+      await AuthApi.updatePassword(password);
       Alert.alert('Password updated', 'You can now sign in with your new password.');
       router.replace(Routes.Main);
+    } catch (err: unknown) {
+      mapAuthError(err, (e) => setError(e.password || e.general));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,9 +64,13 @@ export default function ResetPasswordScreen() {
         <Input
           label="New password"
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(v) => {
+            setPassword(v);
+            setError(undefined);
+          }}
           placeholder="At least 6 characters"
           secure
+          error={error}
         />
 
         <Button
