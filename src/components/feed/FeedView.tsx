@@ -25,7 +25,7 @@ type FeedViewProps = {
 const FeedView = ({ onRecommendationPress, onTapRec }: FeedViewProps) => {
   const onOpenRec = onRecommendationPress ?? onTapRec;
   const [activeCategory, setActiveCategory] = useState('all');
-  const { data, isLoading, error } = useDiscoveryFeed();
+  const { data, isLoading } = useDiscoveryFeed();
 
   const recs = data?.length ? data : MOCK_RECS;
   const filtered =
@@ -38,16 +38,6 @@ const FeedView = ({ onRecommendationPress, onTapRec }: FeedViewProps) => {
       <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
         <Text className="text-sm text-muted mt-3">Loading feed...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View className="flex-1 items-center justify-center px-6">
-        <Text className="text-2xl mb-3">❌</Text>
-        <Text className="text-sm font-semibold text-foreground mb-1">API Error</Text>
-        <Text className="text-xs text-muted text-center">{String(error)}</Text>
       </View>
     );
   }

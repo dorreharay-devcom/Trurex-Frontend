@@ -20,7 +20,7 @@ const client = createClient(BACKEND_URL, BACKEND_KEY, {
 export const Auth = client.auth;
 export const Backend = client;
 
-export function unwrap<T>(response: { data: T | null; error: Error | null }): T {
+export function unwrap<T>(response: { data: unknown; error: unknown }): T {
   if (response.error) {
     console.error('Supabase Error:', response.error);
     throw response.error;

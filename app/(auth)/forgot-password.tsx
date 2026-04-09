@@ -1,33 +1,41 @@
 import React, { useState } from 'react';
-import { View, Text, Image, Alert } from 'react-native';
+import { View, Text, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import * as Linking from 'expo-linking';
-import { Auth } from '~/services/AuthService';
+import { AuthApi } from '~/api/AuthApi';
 import { Routes } from '~/constants/routes';
 import { Button, ButtonVariant } from '~/components/common/Button';
 import AuthLayout from '~/components/common/AuthLayout';
 import Input from '~/components/common/Input';
 import { ArrowLeft } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
-import { isWeb } from '~/utils';
+import { getRedirectUrl } from '~/utils';
+import { mapAuthError } from '~/utils/errors';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string>();
 
   const handleReset = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Enter a valid email address');
+      return;
+    }
+
     setLoading(true);
-    const redirectTo = isWeb
-      ? `${window.location.origin}/reset-password`
-      : Linking.createURL('/reset-password');
-    const { error } = await Auth.resetPasswordForEmail(email, { redirectTo });
-    setLoading(false);
-    if (error) {
-      Alert.alert('Error', error.message);
-    } else {
+    setError(undefined);
+    const redirectTo = `${getRedirectUrl()}/reset-password`;
+
+    try {
+      await AuthApi.resetPassword(email, redirectTo);
       setSent(true);
+    } catch (err: unknown) {
+      mapAuthError(err, (e) => setError(e.email || e.general));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,9 +76,13 @@ export default function ForgotPasswordScreen() {
             <Input
               label="Email"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(v) => {
+                setEmail(v);
+                setError(undefined);
+              }}
               placeholder="you@example.com"
               keyboardType="email-address"
+              error={error}
             />
 
             <Button

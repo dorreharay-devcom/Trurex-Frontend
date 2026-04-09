@@ -54,7 +54,7 @@ export function useCreateRecommendationModalPresentation({
       }).start();
     }
     prevStepIndex.current = stepIndex;
-  }, [stepIndex]);
+  }, [stepIndex, stepOpacity]);
 
   const handleClose = useCallback(() => {
     const h = Math.max(windowHeight, Dimensions.get('window').height, 1);

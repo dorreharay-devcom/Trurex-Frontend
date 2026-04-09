@@ -17,6 +17,7 @@ interface InputProps extends TextInputProps {
   labelClassName?: string;
   inputClassName?: string;
   secure?: boolean;
+  error?: string;
 }
 
 const Input = ({
@@ -25,6 +26,7 @@ const Input = ({
   labelClassName,
   inputClassName,
   secure,
+  error,
   style,
   ...props
 }: InputProps) => {
@@ -43,10 +45,10 @@ const Input = ({
 
       {secure ? (
         <View
-          className={`flex-row items-center rounded-lg border border-border bg-card focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/20 transition-all ${inputClassName ?? ''}`}
+          className={`flex-row items-center rounded-lg border bg-card transition-all ${error ? 'border-destructive' : 'border-border focus-within:border-primary'} ${inputClassName ?? ''}`}
         >
           <TextInput
-            className="flex-1 px-3 py-2.5 text-sm text-foreground"
+            className="flex-1 px-3 py-2.5 text-sm text-foreground focus:outline-none"
             style={caretStyle}
             secureTextEntry={!showPassword}
             placeholderTextColor={Theme.colors.muted}
@@ -64,7 +66,7 @@ const Input = ({
         </View>
       ) : (
         <TextInput
-          className={`w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-ring/20 transition-all ${inputClassName ?? ''}`}
+          className={`w-full rounded-lg border bg-card px-3 py-2.5 text-sm text-foreground focus:outline-none transition-all ${error ? 'border-destructive' : 'border-border focus:border-primary'} ${inputClassName ?? ''}`}
           style={caretStyle}
           placeholderTextColor={Theme.colors.muted}
           autoCapitalize="none"
@@ -72,6 +74,7 @@ const Input = ({
           {...props}
         />
       )}
+      {error ? <Text className="mt-1 text-xs text-destructive">{error}</Text> : null}
     </View>
   );
 };

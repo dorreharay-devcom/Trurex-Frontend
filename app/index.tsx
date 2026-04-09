@@ -4,12 +4,8 @@ import { View, ActivityIndicator } from 'react-native';
 import { Theme } from '~/theme/Theme';
 import { Routes } from '~/constants/routes';
 
-const DEV_BYPASS_AUTH = true;
-
 export default function InitialRoute() {
   const { session, loading } = useAuth();
-
-  if (DEV_BYPASS_AUTH) return <Redirect href={Routes.Main} />;
 
   if (loading) {
     return (

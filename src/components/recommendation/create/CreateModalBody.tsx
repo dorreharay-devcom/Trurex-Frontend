@@ -20,7 +20,7 @@ export const CreateModalBody: React.FC<Props> = ({ flow, stepOpacity, onTagLocat
           searchQuery={flow.searchQuery}
           onSearchQueryChange={flow.setSearchQuery}
           selectedPlaceId={flow.selectedPlaceId}
-          onSelectPlace={(p: any) => flow.setSelectedPlaceId(p.id)}
+          onSelectPlace={(p: { id: string }) => flow.setSelectedPlaceId(p.id)}
           manualName={flow.manualName}
           onManualNameChange={flow.setManualName}
           manualAddress={flow.manualAddress}

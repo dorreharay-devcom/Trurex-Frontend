@@ -1,3 +1,4 @@
+import * as Linking from 'expo-linking';
 import { Platform, Dimensions } from 'react-native';
 
 export { cn, type ClassValue } from './general';
@@ -17,3 +18,5 @@ export const formatCurrency = (amount: number, currency: string = 'USD') => {
     currency,
   }).format(amount);
 };
+
+export const getRedirectUrl = () => (isWeb ? window.location.origin : Linking.createURL('/'));
