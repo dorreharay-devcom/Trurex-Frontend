@@ -4,6 +4,7 @@ import { PlusCircle } from 'lucide-react-native';
 import ProfileView from '~/components/profile/ProfileView';
 import FavesView from '~/components/faves/FavesView';
 import FeedView from '~/components/feed/FeedView';
+import MapScreen from '~/components/map/MapScreen';
 import { Header } from '~/components/layout/Header';
 import { TabBar, Tab } from '~/components/layout/TabBar';
 import { CreateModal } from '~/components/recommendation/create/CreateModal';
@@ -40,9 +41,13 @@ export default function HomeScreen() {
           <FeedView onRecommendationPress={(rec) => setPreviewRecommendation(rec)} />
         )}
         {currentTab === 'discover' && <PlaceholderView title="Discover" />}
-        {currentTab === 'faves' && <FavesView />}
+        {currentTab === 'faves' && (
+          <FavesView onRecommendationPress={(rec) => setPreviewRecommendation(rec)} />
+        )}
         {currentTab === 'network' && <PlaceholderView title="Network" />}
-        {currentTab === 'map' && <PlaceholderView title="Map" />}
+        {currentTab === 'map' && (
+          <MapScreen onRecommendationPress={(rec) => setPreviewRecommendation(rec)} />
+        )}
         {currentTab === 'profile' && <ProfileView />}
       </View>
 

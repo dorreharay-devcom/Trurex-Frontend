@@ -13,9 +13,13 @@ type ViewMode = 'list' | 'grid';
 
 const SAVED_RECS: Recommendation[] = (recommendations as Recommendation[]).filter((r) => r.isSaved);
 
-const GridCard: React.FC<{ rec: Recommendation }> = ({ rec }) => (
+const GridCard: React.FC<{
+  rec: Recommendation;
+  onPress?: (rec: Recommendation) => void;
+}> = ({ rec, onPress }) => (
   <TouchableOpacity
     activeOpacity={0.85}
+    onPress={() => onPress?.(rec)}
     className="w-[48.2%] sm:w-[31.7%] lg:w-[23.8%] rounded-xl overflow-hidden bg-card border border-border shadow-card"
   >
     <Image source={{ uri: rec.image }} className="w-full aspect-square" resizeMode="cover" />
@@ -40,9 +44,14 @@ const EmptyState: React.FC = () => (
 interface FavesHeaderProps {
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
+  onRecommendationPress?: (rec: Recommendation) => void;
 }
 
-const FavesHeader: React.FC<FavesHeaderProps> = ({ viewMode, onViewModeChange }) => (
+const FavesHeader: React.FC<FavesHeaderProps> = ({
+  viewMode,
+  onViewModeChange,
+  onRecommendationPress,
+}) => (
   <View>
     <View className="flex-row items-center justify-between px-4 pt-6 mb-6">
       <Text className="text-lg font-display font-bold text-foreground">My Faves</Text>
@@ -110,7 +119,7 @@ const FavesHeader: React.FC<FavesHeaderProps> = ({ viewMode, onViewModeChange })
         ) : (
           <View className="flex-row flex-wrap gap-3">
             {SAVED_RECS.map((rec) => (
-              <GridCard key={rec.id} rec={rec} />
+              <GridCard key={rec.id} rec={rec} onPress={onRecommendationPress} />
             ))}
           </View>
         )}
@@ -119,7 +128,11 @@ const FavesHeader: React.FC<FavesHeaderProps> = ({ viewMode, onViewModeChange })
   </View>
 );
 
-const FavesView: React.FC = () => {
+type FavesViewProps = {
+  onRecommendationPress?: (rec: Recommendation) => void;
+};
+
+const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
 
   return (
@@ -129,10 +142,16 @@ const FavesView: React.FC = () => {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={webContainerStyle}
       contentContainerClassName="pb-24"
-      ListHeaderComponent={<FavesHeader viewMode={viewMode} onViewModeChange={setViewMode} />}
+      ListHeaderComponent={
+        <FavesHeader
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          onRecommendationPress={onRecommendationPress}
+        />
+      }
       renderItem={({ item }) => (
         <View className="px-4">
-          <RecommendationCard recommendation={item} />
+          <RecommendationCard recommendation={item} onTap={onRecommendationPress} />
         </View>
       )}
       ListEmptyComponent={() => (viewMode === 'list' ? <EmptyState /> : null)}

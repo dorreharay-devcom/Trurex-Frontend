@@ -6,6 +6,8 @@ export interface Recommendation {
   categoryId: string;
   category: string;
   location?: string;
+  latitude?: number;
+  longitude?: number;
   rating?: number;
   tags: string[];
   user: { name: string; handle: string; avatar: string };
