@@ -17,7 +17,13 @@ const CATEGORIES: Category[] = [
   { id: 'places', label: 'Places', emoji: '📍', color: '#e6a611' },
 ];
 
-const FeedView = ({ onTapRec }: { onTapRec?: (rec: Recommendation) => void }) => {
+type FeedViewProps = {
+  onRecommendationPress?: (rec: Recommendation) => void;
+  onTapRec?: (rec: Recommendation) => void;
+};
+
+const FeedView = ({ onRecommendationPress, onTapRec }: FeedViewProps) => {
+  const onOpenRec = onRecommendationPress ?? onTapRec;
   const [activeCategory, setActiveCategory] = useState('all');
   const { data, isLoading } = useDiscoveryFeed();
 
@@ -61,7 +67,7 @@ const FeedView = ({ onTapRec }: { onTapRec?: (rec: Recommendation) => void }) =>
         )}
         renderItem={({ item }) => (
           <View className="px-4">
-            <RecommendationCard recommendation={item} onTap={onTapRec} />
+            <RecommendationCard recommendation={item} onTap={onOpenRec} />
           </View>
         )}
       />
