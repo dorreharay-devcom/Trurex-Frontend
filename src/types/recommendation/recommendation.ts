@@ -1,16 +1,18 @@
 export interface Recommendation {
   id: string;
   title: string;
-  description: string;
-  image: string;
+  description?: string | null;
+  image?: string | null;
+  photoPath?: string | null;
   categoryId: string;
   category: string;
   location?: string;
   latitude?: number;
   longitude?: number;
-  rating?: number;
-  tags: string[];
-  user: { name: string; handle: string; avatar: string };
+  rating?: number | null;
+  scoreValueForMoney?: number | null;
+  tags?: string[] | null;
+  user?: { name: string; handle: string; avatar: string } | null;
   timeAgo: string;
   likes: number;
   comments: number;

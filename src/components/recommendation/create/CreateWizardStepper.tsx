@@ -1,24 +1,27 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { CREATE_REC_STEPS } from '~/types/recommendation/create';
+import type { CreateRecStepId } from '~/types/recommendation/create';
 import { cn } from '~/utils/general';
 
-const LABELS: Record<(typeof CREATE_REC_STEPS)[number], string> = {
+const LABELS: Record<CreateRecStepId, string> = {
   search: 'Search',
   category: 'Category',
+  type: 'Type',
   scorecard: 'Scorecard',
+  photos: 'Photos',
   circles: 'Circles',
   confirm: 'Confirm',
 };
 
 type Props = {
+  steps: CreateRecStepId[];
   currentIndex: number;
 };
 
-export const CreateWizardStepper: React.FC<Props> = ({ currentIndex }) => {
+export const CreateWizardStepper: React.FC<Props> = ({ steps, currentIndex }) => {
   return (
     <View className="mt-3 flex-row gap-1.5 bg-transparent">
-      {CREATE_REC_STEPS.map((id, index) => {
+      {steps.map((id, index) => {
         const reached = index <= currentIndex;
         return (
           <View key={id} className="min-w-0 flex-1 flex-col items-center gap-1">

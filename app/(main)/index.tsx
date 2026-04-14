@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { PlusCircle } from 'lucide-react-native';
 import ProfileView from '~/components/profile/ProfileView';
 import FavesView from '~/components/faves/FavesView';
-import FeedView from '~/components/feed/FeedView';
+import DiscoverView from '~/components/discover/DiscoverView';
 import MapScreen from '~/components/map/MapScreen';
 import { Header } from '~/components/layout/Header';
 import { TabBar, Tab } from '~/components/layout/TabBar';
@@ -20,10 +20,19 @@ const PlaceholderView = ({ title }: { title: string }) => (
 );
 
 export default function HomeScreen() {
-  const [currentTab, setCurrentTab] = useState<Tab>('feed');
+  const [currentTab, setCurrentTab] = useState<Tab>('discover');
   const [searchQuery, setSearchQuery] = useState('');
   const [createRecommendationOpen, setCreateRecommendationOpen] = useState(false);
   const [previewRecommendation, setPreviewRecommendation] = useState<Recommendation | null>(null);
+
+  const handleCloseCreate = useCallback(() => {
+    setCreateRecommendationOpen(false);
+  }, []);
+
+  const openCreateFromDetail = useCallback(() => {
+    setCreateRecommendationOpen(true);
+    setPreviewRecommendation(null);
+  }, []);
 
   return (
     <View className="flex-1 bg-background">
@@ -37,10 +46,12 @@ export default function HomeScreen() {
       <TabBar currentTab={currentTab} onTabChange={setCurrentTab} />
 
       <View className="flex-1">
-        {currentTab === 'feed' && (
-          <FeedView onRecommendationPress={(rec) => setPreviewRecommendation(rec)} />
+        {currentTab === 'discover' && (
+          <DiscoverView
+            searchQuery={searchQuery}
+            onRecommendationPress={(rec) => setPreviewRecommendation(rec)}
+          />
         )}
-        {currentTab === 'discover' && <PlaceholderView title="Discover" />}
         {currentTab === 'faves' && (
           <FavesView onRecommendationPress={(rec) => setPreviewRecommendation(rec)} />
         )}
@@ -51,7 +62,7 @@ export default function HomeScreen() {
         {currentTab === 'profile' && <ProfileView />}
       </View>
 
-      {currentTab === 'feed' && (
+      {currentTab === 'discover' && (
         <TouchableOpacity
           onPress={() => setCreateRecommendationOpen(true)}
           accessibilityRole="button"
@@ -69,15 +80,13 @@ export default function HomeScreen() {
         </TouchableOpacity>
       )}
 
-      <CreateModal
-        visible={createRecommendationOpen}
-        onClose={() => setCreateRecommendationOpen(false)}
-      />
+      <CreateModal visible={createRecommendationOpen} onClose={handleCloseCreate} />
 
       <RecommendationDetailModal
         visible={previewRecommendation != null}
         recommendation={previewRecommendation}
         onClose={() => setPreviewRecommendation(null)}
+        onAddYourOwn={openCreateFromDetail}
       />
     </View>
   );

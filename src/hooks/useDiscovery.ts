@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { DiscoveryApi, DiscoverFeedParams } from '~/api/DiscoveryApi';
+import { DiscoveryApi, DiscoverQueryParams } from '~/api/DiscoveryApi';
 import { recommendations as mockRecommendations } from '~/data/mockData';
 
-export const useDiscoveryFeed = (params?: DiscoverFeedParams) => {
+export const useDiscoverRecommendations = (params?: DiscoverQueryParams) => {
   return useQuery({
-    queryKey: ['discovery-feed', params],
+    queryKey: ['discover-recommendations', params],
     queryFn: async () => {
       try {
-        const data = await DiscoveryApi.getDiscoverFeed(params);
+        const data = await DiscoveryApi.getDiscoverRecommendations(params);
         if (!data || data.length === 0) {
           return mockRecommendations;
         }

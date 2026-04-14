@@ -1,6 +1,6 @@
 import { CREATE_REC_SEARCH_PLACES } from '~/constants/recommendation/mockSearchPlaces';
 import { CREATE_REC_CIRCLES } from '~/constants/recommendation/createCircles';
-import { CREATE_REC_SCORE_CHIPS } from '~/constants/recommendation/createScorecard';
+import type { CategoryTagOption } from '~/types/recommendation/rexCategoryCreateConfig';
 import type { SearchEntryMode } from '~/types/recommendation/create';
 
 export const CONFIRM_PREVIEW_USER = {
@@ -11,6 +11,13 @@ export const CONFIRM_PREVIEW_USER = {
 
 export function averageStarRating(ratings: number[]): string | null {
   const filled = ratings.filter((n) => n > 0);
+  if (filled.length === 0) return null;
+  const avg = filled.reduce((a, b) => a + b, 0) / filled.length;
+  return (Math.round(avg * 10) / 10).toFixed(1);
+}
+
+export function averageCategoryRatings(scores: Record<string, number | null>): string | null {
+  const filled = Object.values(scores).filter((n): n is number => n != null && n > 0);
   if (filled.length === 0) return null;
   const avg = filled.reduce((a, b) => a + b, 0) / filled.length;
   return (Math.round(avg * 10) / 10).toFixed(1);
@@ -45,8 +52,12 @@ export function getConfirmPreviewPlace(
   return { title: p.title, addressLines: [p.subtitle] };
 }
 
-export function getConfirmAppliesLabels(scoreAppliesSelected: Record<string, boolean>): string[] {
-  return CREATE_REC_SCORE_CHIPS.filter((c) => scoreAppliesSelected[c]);
+export function getConfirmTagLabels(
+  selectedSlugs: string[],
+  tagOptions: CategoryTagOption[],
+): string[] {
+  const map = new Map(tagOptions.map((t) => [t.slug, t.label]));
+  return selectedSlugs.map((s) => map.get(s) ?? s);
 }
 
 export function getConfirmCircleTitles(selectedCircleIds: Set<string>): string[] {

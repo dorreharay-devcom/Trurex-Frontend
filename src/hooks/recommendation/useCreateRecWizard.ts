@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CREATE_REC_SEARCH_PLACES } from '~/constants/recommendation/mockSearchPlaces';
+import { CREATE_REC_REVIEW_MAX } from '~/constants/recommendation/createScorecard';
 import {
-  CREATE_REC_REVIEW_MAX,
-  CREATE_REC_SCORE_COUNT,
-} from '~/constants/recommendation/createScorecard';
-import {
-  CREATE_REC_STEPS,
+  CREATE_REC_STEP_ORDER,
+  getActiveCreateRecSteps,
   type CreateRecStepId,
   type SearchEntryMode,
 } from '~/types/recommendation/create';
-
-const STEP_COUNT = CREATE_REC_STEPS.length;
+import type {
+  CategoryRatingDimension,
+  CategoryQuestion,
+} from '~/types/recommendation/rexCategoryCreateConfig';
 
 function suggestedCategoryFromSearch(
   searchMode: SearchEntryMode,
@@ -26,6 +26,7 @@ type CanProceedDeps = {
   selectedPlaceId: string | null;
   selectedCategoryId: string | null;
   selectedCircleIds: Set<string>;
+  selectedSubcategoryCode: string | null;
 };
 
 function canProceedForStep(stepId: CreateRecStepId, d: CanProceedDeps): boolean {
@@ -36,7 +37,11 @@ function canProceedForStep(stepId: CreateRecStepId, d: CanProceedDeps): boolean 
         : d.selectedPlaceId !== null;
     case 'category':
       return d.selectedCategoryId !== null;
+    case 'type':
+      return d.selectedSubcategoryCode !== null;
     case 'scorecard':
+      return true;
+    case 'photos':
       return true;
     case 'circles':
       return d.selectedCircleIds.size > 0;
@@ -45,8 +50,21 @@ function canProceedForStep(stepId: CreateRecStepId, d: CanProceedDeps): boolean 
   }
 }
 
+function resolveStepIdAfterStepsChange(
+  previous: CreateRecStepId,
+  activeSteps: CreateRecStepId[],
+): CreateRecStepId {
+  if (activeSteps.includes(previous)) return previous;
+  const start = CREATE_REC_STEP_ORDER.indexOf(previous);
+  for (let i = Math.max(0, start); i < CREATE_REC_STEP_ORDER.length; i++) {
+    const candidate = CREATE_REC_STEP_ORDER[i];
+    if (activeSteps.includes(candidate)) return candidate;
+  }
+  return activeSteps[0] ?? 'search';
+}
+
 export function useCreateRecWizard() {
-  const [stepIndex, setStepIndex] = useState(0);
+  const [stepId, setStepId] = useState<CreateRecStepId>('search');
   const [searchMode, setSearchMode] = useState<SearchEntryMode>('select');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
@@ -54,20 +72,34 @@ export function useCreateRecWizard() {
   const [manualAddress, setManualAddress] = useState('');
   const [manualGeotag, setManualGeotag] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
-  const [scoreStarRatings, setScoreStarRatings] = useState<number[]>(() =>
-    Array(CREATE_REC_SCORE_COUNT).fill(0),
-  );
-  const [scoreAppliesSelected, setScoreAppliesSelected] = useState<Record<string, boolean>>({});
+  const [selectedSubcategoryCode, setSelectedSubcategoryCode] = useState<string | null>(null);
+  const [photoStoragePaths, setPhotoStoragePaths] = useState<string[]>([]);
+  const [categoryRatings, setCategoryRatings] = useState<Record<string, number | null>>({});
+  const [questionAnswers, setQuestionAnswers] = useState<Record<string, string>>({});
+  const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>([]);
   const [scoreQuickTip, setScoreQuickTip] = useState('');
   const [scoreReview, setScoreReview] = useState('');
   const [selectedCircleIds, setSelectedCircleIds] = useState<Set<string>>(
     () => new Set(['public']),
   );
+  const activeSteps = useMemo(
+    () => getActiveCreateRecSteps(selectedCategoryId),
+    [selectedCategoryId],
+  );
 
-  const stepId = CREATE_REC_STEPS[stepIndex];
+  useEffect(() => {
+    setStepId((prev) => resolveStepIdAfterStepsChange(prev, activeSteps));
+  }, [activeSteps]);
 
-  const isFirstStep = stepIndex === 0;
-  const isLastStep = stepIndex === STEP_COUNT - 1;
+  useEffect(() => {
+    setSelectedSubcategoryCode(null);
+  }, [selectedCategoryId]);
+
+  const stepIndex = activeSteps.indexOf(stepId);
+  const safeStepIndex = stepIndex >= 0 ? stepIndex : 0;
+
+  const isFirstStep = stepId === 'search';
+  const isLastStep = activeSteps.length > 0 && stepId === activeSteps[activeSteps.length - 1];
 
   const autoSuggestedCategoryId = useMemo(
     () => suggestedCategoryFromSearch(searchMode, selectedPlaceId),
@@ -95,12 +127,44 @@ export function useCreateRecWizard() {
         selectedPlaceId,
         selectedCategoryId,
         selectedCircleIds,
+        selectedSubcategoryCode,
       }),
-    [stepId, searchMode, manualName, selectedPlaceId, selectedCategoryId, selectedCircleIds],
+    [
+      stepId,
+      searchMode,
+      manualName,
+      selectedPlaceId,
+      selectedCategoryId,
+      selectedCircleIds,
+      selectedSubcategoryCode,
+    ],
   );
 
+  const syncFormToConfig = useCallback(
+    (dimensions: CategoryRatingDimension[], _questions: CategoryQuestion[]) => {
+      setCategoryRatings(Object.fromEntries(dimensions.map((d) => [d.code, null])));
+      setQuestionAnswers({});
+      setSelectedTagSlugs([]);
+    },
+    [],
+  );
+
+  const setCategoryRating = useCallback((code: string, value: number) => {
+    setCategoryRatings((prev) => ({ ...prev, [code]: value === 0 ? null : value }));
+  }, []);
+
+  const setQuestionAnswer = useCallback((code: string, optionCode: string) => {
+    setQuestionAnswers((prev) => ({ ...prev, [code]: optionCode }));
+  }, []);
+
+  const toggleTagSlug = useCallback((slug: string) => {
+    setSelectedTagSlugs((prev) =>
+      prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug],
+    );
+  }, []);
+
   const reset = useCallback(() => {
-    setStepIndex(0);
+    setStepId('search');
     setSearchMode('select');
     setSearchQuery('');
     setSelectedPlaceId(null);
@@ -108,8 +172,11 @@ export function useCreateRecWizard() {
     setManualAddress('');
     setManualGeotag(null);
     setSelectedCategoryId(null);
-    setScoreStarRatings(Array(CREATE_REC_SCORE_COUNT).fill(0));
-    setScoreAppliesSelected({});
+    setSelectedSubcategoryCode(null);
+    setPhotoStoragePaths([]);
+    setCategoryRatings({});
+    setQuestionAnswers({});
+    setSelectedTagSlugs([]);
     setScoreQuickTip('');
     setScoreReview('');
     setSelectedCircleIds(new Set(['public']));
@@ -128,25 +195,17 @@ export function useCreateRecWizard() {
     setScoreReview(text.slice(0, CREATE_REC_REVIEW_MAX));
   }, []);
 
-  const setScoreStarAt = useCallback((index: number, value: number) => {
-    setScoreStarRatings((prev) => {
-      const next = [...prev];
-      next[index] = value;
-      return next;
-    });
-  }, []);
-
-  const toggleScoreApplies = useCallback((label: string) => {
-    setScoreAppliesSelected((prev) => ({ ...prev, [label]: !prev[label] }));
-  }, []);
-
   const goNext = useCallback(() => {
-    setStepIndex((i) => Math.min(i + 1, STEP_COUNT - 1));
-  }, []);
+    const idx = activeSteps.indexOf(stepId);
+    if (idx < 0 || idx >= activeSteps.length - 1) return;
+    setStepId(activeSteps[idx + 1]);
+  }, [activeSteps, stepId]);
 
   const goBack = useCallback(() => {
-    setStepIndex((i) => Math.max(i - 1, 0));
-  }, []);
+    const idx = activeSteps.indexOf(stepId);
+    if (idx <= 0) return;
+    setStepId(activeSteps[idx - 1]);
+  }, [activeSteps, stepId]);
 
   const openManual = useCallback(() => {
     setSearchMode('manual');
@@ -161,9 +220,9 @@ export function useCreateRecWizard() {
   }, []);
 
   return {
-    stepIndex,
     stepId,
-    stepIds: CREATE_REC_STEPS,
+    stepIndex: safeStepIndex,
+    activeSteps,
     searchMode,
     searchQuery,
     setSearchQuery,
@@ -187,11 +246,18 @@ export function useCreateRecWizard() {
     backToSearchSelect,
     selectedCategoryId,
     setSelectedCategoryId,
+    selectedSubcategoryCode,
+    setSelectedSubcategoryCode,
+    photoStoragePaths,
+    setPhotoStoragePaths,
     autoSuggestedCategoryId,
-    scoreStarRatings,
-    setScoreStarAt,
-    scoreAppliesSelected,
-    toggleScoreApplies,
+    categoryRatings,
+    setCategoryRating,
+    questionAnswers,
+    setQuestionAnswer,
+    selectedTagSlugs,
+    toggleTagSlug,
+    syncFormToConfig,
     scoreQuickTip,
     setScoreQuickTip,
     scoreReview,
