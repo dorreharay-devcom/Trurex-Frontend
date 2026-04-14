@@ -1,7 +1,10 @@
 import React, { useMemo } from 'react';
-import { View, Text, ScrollView, Pressable, Image, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, Pressable, useWindowDimensions } from 'react-native';
 import { ArrowLeft, Star, MapPin, Quote, Plus } from 'lucide-react-native';
+import { SignedStorageImage } from '~/components/common/SignedStorageImage';
+import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { OverlayModal } from '~/components/common/OverlayModal';
+import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
 import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
@@ -9,6 +12,10 @@ import { Theme } from '~/theme/Theme';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { buildDetailRatingRows } from '~/utils/recommendation/recommendationDetailRatings';
 import { cn } from '~/utils/general';
+import {
+  rexCoverRemoteHttpUrl,
+  rexCoverStoragePathFromRecommendation,
+} from '~/utils/recommendation/rexMediaPaths';
 
 type Props = {
   visible: boolean;
@@ -16,11 +23,6 @@ type Props = {
   onClose: () => void;
   onAddYourOwn?: () => void;
 };
-
-function isPlaceholderImage(uri: string): boolean {
-  const u = uri.toLowerCase();
-  return !u || u.includes('placeholder');
-}
 
 export const RecommendationDetailModal: React.FC<Props> = ({
   visible,
@@ -46,7 +48,10 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     return null;
   }
 
-  const showHero = !isPlaceholderImage(recommendation.image);
+  const user = recommendation.user ?? { name: 'Member', handle: '', avatar: '' };
+  const coverPath = rexCoverStoragePathFromRecommendation(recommendation);
+  const coverHttp = rexCoverRemoteHttpUrl(recommendation);
+  const showHero = !!(coverPath || coverHttp);
 
   return (
     <OverlayModal
@@ -85,10 +90,11 @@ export const RecommendationDetailModal: React.FC<Props> = ({
           <View className={cn(CREATE_REC_STEP_INNER, 'gap-6')}>
             {showHero ? (
               <View className="overflow-hidden rounded-xl">
-                <Image
-                  source={{ uri: recommendation.image }}
+                <SignedStorageImage
+                  bucket={REX_IMAGES_BUCKET}
+                  storagePath={coverPath}
+                  remoteUri={coverHttp}
                   className="aspect-[16/9] w-full"
-                  resizeMode="cover"
                   accessibilityLabel={recommendation.title}
                 />
               </View>
@@ -96,8 +102,8 @@ export const RecommendationDetailModal: React.FC<Props> = ({
 
             <View>
               <View className="mb-1 flex-row items-center gap-2">
-                <View className="rounded-full bg-muted px-2.5 py-1">
-                  <Text className="text-xs font-medium capitalize text-muted-foreground">
+                <View className="rounded-full border border-border/80 bg-border/40 px-2.5 py-1">
+                  <Text className="text-xs font-medium capitalize text-foreground">
                     {recommendation.category}
                   </Text>
                 </View>
@@ -114,15 +120,10 @@ export const RecommendationDetailModal: React.FC<Props> = ({
             </View>
 
             <View className="flex-row items-center gap-3 rounded-xl border border-border bg-muted/50 p-4">
-              <Image
-                source={{ uri: recommendation.user.avatar }}
-                className="h-10 w-10 rounded-full border-2 border-border"
-                resizeMode="cover"
-                accessibilityLabel={recommendation.user.name}
-              />
+              <SignedUserAvatar name={user.name} avatar={user.avatar} className="h-10 w-10" />
               <View>
                 <Text className="text-sm text-muted-foreground">Recommended by</Text>
-                <Text className="font-semibold text-foreground">{recommendation.user.name}</Text>
+                <Text className="font-semibold text-foreground">{user.name}</Text>
               </View>
             </View>
 
@@ -168,13 +169,13 @@ export const RecommendationDetailModal: React.FC<Props> = ({
               </View>
             </View>
 
-            {recommendation.tags.length > 0 ? (
+            {(recommendation.tags ?? []).length > 0 ? (
               <View className="gap-3">
                 <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Features
                 </Text>
                 <View className="flex-row flex-wrap gap-2">
-                  {recommendation.tags.map((tag) => (
+                  {(recommendation.tags ?? []).map((tag) => (
                     <View
                       key={tag}
                       className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5"
@@ -186,17 +187,19 @@ export const RecommendationDetailModal: React.FC<Props> = ({
               </View>
             ) : null}
 
-            <Pressable
-              onPress={() => onAddYourOwn?.()}
-              className="h-12 w-full flex-row items-center justify-center gap-2 rounded-xl bg-primary active:opacity-90"
-              accessibilityRole="button"
-              accessibilityLabel="Add your own rec for this place"
-            >
-              <Plus size={20} color={Theme.colors.primaryForeground} />
-              <Text className="text-base font-semibold text-primary-foreground">
-                Add your own rec for this place
-              </Text>
-            </Pressable>
+            {onAddYourOwn ? (
+              <Pressable
+                onPress={() => onAddYourOwn()}
+                accessibilityRole="button"
+                accessibilityLabel="Add your own rec for this place"
+                className="h-12 w-full flex-row items-center justify-center gap-2 rounded-xl bg-primary px-4 active:bg-primary/90"
+              >
+                <Plus size={20} color={Theme.colors.primaryForeground} />
+                <Text className="text-base font-semibold text-primary-foreground">
+                  Add your own rec for this place
+                </Text>
+              </Pressable>
+            ) : null}
 
             <View className="h-8" />
           </View>

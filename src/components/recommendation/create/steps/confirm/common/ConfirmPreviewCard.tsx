@@ -14,8 +14,10 @@ const TAGS_PREVIEW_MAX = 5;
 type Props = {
   place: ConfirmPreviewPlace;
   selectedCategoryId: string | null;
+  subcategoryLabel: string | null;
+  photoCount: number;
   ratingDisplay: string | null;
-  appliesLabels: string[];
+  tagLabels: string[];
   tip: string;
   review: string;
   circleTitles: string[];
@@ -24,8 +26,10 @@ type Props = {
 export function ConfirmPreviewCard({
   place,
   selectedCategoryId,
+  subcategoryLabel,
+  photoCount,
   ratingDisplay,
-  appliesLabels,
+  tagLabels,
   tip,
   review,
   circleTitles,
@@ -51,6 +55,7 @@ export function ConfirmPreviewCard({
           <View className="max-w-[52%] shrink-0 rounded-full bg-muted px-2.5 py-1">
             <Text className="text-xs font-medium text-muted-foreground" numberOfLines={2}>
               {category.emoji} {category.label}
+              {subcategoryLabel ? ` · ${subcategoryLabel}` : ''}
             </Text>
           </View>
         ) : null}
@@ -83,17 +88,17 @@ export function ConfirmPreviewCard({
         </View>
       ) : null}
 
-      {appliesLabels.length > 0 ? (
+      {tagLabels.length > 0 ? (
         <View className="flex-row flex-wrap gap-1.5 px-4 pb-2">
-          {appliesLabels.slice(0, TAGS_PREVIEW_MAX).map((label) => (
-            <View key={label} className="rounded-full bg-muted px-2 py-0.5">
+          {tagLabels.slice(0, TAGS_PREVIEW_MAX).map((label, i) => (
+            <View key={`${label}-${i}`} className="rounded-full bg-muted px-2 py-0.5">
               <Text className="text-xs text-muted-foreground">{label}</Text>
             </View>
           ))}
-          {appliesLabels.length > TAGS_PREVIEW_MAX ? (
+          {tagLabels.length > TAGS_PREVIEW_MAX ? (
             <View className="rounded-full bg-muted px-2 py-0.5">
               <Text className="text-xs text-muted-foreground">
-                +{appliesLabels.length - TAGS_PREVIEW_MAX} more
+                +{tagLabels.length - TAGS_PREVIEW_MAX} more
               </Text>
             </View>
           ) : null}
@@ -107,6 +112,11 @@ export function ConfirmPreviewCard({
       ) : null}
 
       <View className="border-t border-border bg-muted/30 px-4 py-3">
+        {photoCount > 0 ? (
+          <Text className="mb-1 text-xs leading-5 text-muted-foreground">
+            Photos: <Text className="font-medium text-foreground">{photoCount}</Text>
+          </Text>
+        ) : null}
         <Text className="text-xs leading-5 text-muted-foreground">
           Sharing to: <Text className="font-medium text-foreground">{sharingLine}</Text>
         </Text>

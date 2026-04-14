@@ -1,24 +1,16 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, useWindowDimensions } from 'react-native';
-import {
-  LayoutGrid,
-  Sparkles,
-  Bookmark,
-  UsersRound,
-  MapPinned,
-  UserCircle2,
-} from 'lucide-react-native';
+import { Sparkles, Bookmark, UsersRound, MapPinned, UserCircle2 } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
 import { isWeb } from '~/utils';
 
-export type Tab = 'feed' | 'discover' | 'faves' | 'network' | 'map' | 'profile';
+export type Tab = 'discover' | 'faves' | 'network' | 'map' | 'profile';
 
 export const NAV_ITEMS: {
   id: Tab;
   label: string;
   icon: React.ComponentType<{ size: number; color: string }>;
 }[] = [
-  { id: 'feed', label: 'Feed', icon: LayoutGrid },
   { id: 'discover', label: 'Discover', icon: Sparkles },
   { id: 'faves', label: 'My Faves', icon: Bookmark },
   { id: 'network', label: 'Network', icon: UsersRound },

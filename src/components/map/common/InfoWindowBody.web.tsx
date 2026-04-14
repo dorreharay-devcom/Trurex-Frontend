@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text } from 'react-native';
 import { Theme } from '~/theme/Theme';
 import { WEB_INFO_CARD_MAX_W, WEB_INFO_IMAGE_H } from '~/constants/map/mapUi';
 import type { MapMarkerItem } from '~/types/map/mapMarker';
+import { MarkerPreviewImage } from '~/components/map/common/MarkerPreviewImage';
 
 type Props = {
   marker: MapMarkerItem;
@@ -49,7 +50,7 @@ export const InfoWindowBody: React.FC<Props> = ({ marker: m }) => (
         </Text>
       ) : null}
     </View>
-    {m.imageUrl ? (
+    {m.imageUrl || m.imageStoragePath ? (
       <View
         style={{
           width: '100%',
@@ -61,11 +62,10 @@ export const InfoWindowBody: React.FC<Props> = ({ marker: m }) => (
           backgroundColor: Theme.colors.border,
         }}
       >
-        <Image
-          source={{ uri: m.imageUrl }}
-          style={{ width: '100%', height: WEB_INFO_IMAGE_H }}
-          resizeMode="cover"
-          accessibilityIgnoresInvertColors
+        <MarkerPreviewImage
+          imageUrl={m.imageUrl}
+          imageStoragePath={m.imageStoragePath}
+          variant="webCard"
         />
       </View>
     ) : null}

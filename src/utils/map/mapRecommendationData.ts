@@ -1,5 +1,9 @@
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import type { MapMarkerItem } from '~/types/map/mapMarker';
+import {
+  rexCoverRemoteHttpUrl,
+  rexCoverStoragePathFromRecommendation,
+} from '~/utils/recommendation/rexMediaPaths';
 
 export function filterLocatedRecommendations(recs: Recommendation[]): Recommendation[] {
   return recs.filter((r) => r.location);
@@ -16,8 +20,8 @@ export function filterRecommendationsBySearchQuery(
       r.title.toLowerCase().includes(q) ||
       r.location?.toLowerCase().includes(q) ||
       r.category.toLowerCase().includes(q) ||
-      r.tags.some((t) => t.toLowerCase().includes(q)) ||
-      r.description.toLowerCase().includes(q),
+      (r.tags ?? []).some((t) => t.toLowerCase().includes(q)) ||
+      (r.description ?? '').toLowerCase().includes(q),
   );
 }
 
@@ -32,13 +36,16 @@ export function filterRecommendationsByCategoryId(
 export function recommendationToMapMarker(
   r: Recommendation & { latitude: number; longitude: number },
 ): MapMarkerItem {
+  const http = rexCoverRemoteHttpUrl(r);
+  const storage = rexCoverStoragePathFromRecommendation(r);
   return {
     id: r.id,
     latitude: r.latitude,
     longitude: r.longitude,
     title: r.title,
     subtitle: r.location,
-    imageUrl: r.image,
+    imageUrl: http ?? undefined,
+    imageStoragePath: http ? undefined : (storage ?? undefined),
   };
 }
 

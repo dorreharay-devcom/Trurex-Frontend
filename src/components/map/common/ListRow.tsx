@@ -1,9 +1,15 @@
 import React from 'react';
-import { View, Text, Pressable, Image, Platform, type PressableProps } from 'react-native';
+import { View, Text, Pressable, Platform, type PressableProps } from 'react-native';
 import { MapPin } from 'lucide-react-native';
+import { SignedStorageImage } from '~/components/common/SignedStorageImage';
+import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { Theme } from '~/theme/Theme';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { cn } from '~/utils/general';
+import {
+  rexCoverRemoteHttpUrl,
+  rexCoverStoragePathFromRecommendation,
+} from '~/utils/recommendation/rexMediaPaths';
 
 type HoverProps = Pick<PressableProps, 'onHoverIn' | 'onHoverOut'>;
 
@@ -13,41 +19,52 @@ type Props = {
   onPress: () => void;
 } & Partial<HoverProps>;
 
-export const ListRow: React.FC<Props> = ({ rec, highlighted, onPress, ...hoverProps }) => (
-  <Pressable
-    {...hoverProps}
-    onPress={onPress}
-    className={cn(
-      'flex-row items-center gap-3 p-3 rounded-xl bg-card border border-border shadow-card active:opacity-90',
-      Platform.OS === 'web' && highlighted && 'border-primary ring-2 ring-primary/25',
-    )}
-  >
-    <Image source={{ uri: rec.image }} className="w-12 h-12 rounded-lg" resizeMode="cover" />
-    <View className="flex-1 min-w-0">
-      <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
-        {rec.title}
-      </Text>
-      <View className="flex-row items-center gap-1 mt-0.5">
-        <MapPin size={10} color={Theme.colors.secondaryText} />
-        <Text className="text-xs text-muted-foreground flex-1" numberOfLines={1}>
-          {rec.location}
+export const ListRow: React.FC<Props> = ({ rec, highlighted, onPress, ...hoverProps }) => {
+  const tags = rec.tags ?? [];
+  const coverPath = rexCoverStoragePathFromRecommendation(rec);
+  const coverHttp = rexCoverRemoteHttpUrl(rec);
+  return (
+    <Pressable
+      {...hoverProps}
+      onPress={onPress}
+      className={cn(
+        'flex-row items-center gap-3 p-3 rounded-xl bg-card border border-border shadow-card active:opacity-90',
+        Platform.OS === 'web' && highlighted && 'border-primary ring-2 ring-primary/25',
+      )}
+    >
+      <SignedStorageImage
+        bucket={REX_IMAGES_BUCKET}
+        storagePath={coverPath}
+        remoteUri={coverHttp}
+        className="h-12 w-12 rounded-lg"
+        accessibilityLabel={rec.title}
+      />
+      <View className="flex-1 min-w-0">
+        <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
+          {rec.title}
         </Text>
-      </View>
-      {rec.tags.length > 0 && (
-        <View className="flex-row gap-1 mt-1 flex-wrap">
-          {rec.tags.slice(0, 2).map((tag) => (
-            <View key={tag} className="px-1.5 py-0.5 rounded-md bg-muted/30">
-              <Text className="text-[10px] text-muted-foreground">{tag}</Text>
-            </View>
-          ))}
+        <View className="flex-row items-center gap-1 mt-0.5">
+          <MapPin size={10} color={Theme.colors.secondaryText} />
+          <Text className="text-xs text-muted-foreground flex-1" numberOfLines={1}>
+            {rec.location}
+          </Text>
         </View>
-      )}
-    </View>
-    <View className="items-end shrink-0">
-      {rec.rating != null && (
-        <Text className="text-xs text-accent-foreground font-medium">★ {rec.rating}</Text>
-      )}
-      <Text className="text-[10px] text-muted-foreground mt-0.5">{rec.category}</Text>
-    </View>
-  </Pressable>
-);
+        {tags.length > 0 && (
+          <View className="flex-row gap-1 mt-1 flex-wrap">
+            {tags.slice(0, 2).map((tag) => (
+              <View key={tag} className="px-1.5 py-0.5 rounded-md bg-muted/30">
+                <Text className="text-[10px] text-muted-foreground">{tag}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+      <View className="items-end shrink-0">
+        {rec.rating != null && (
+          <Text className="text-xs text-accent-foreground font-medium">★ {rec.rating}</Text>
+        )}
+        <Text className="text-[10px] text-muted-foreground mt-0.5">{rec.category}</Text>
+      </View>
+    </Pressable>
+  );
+};

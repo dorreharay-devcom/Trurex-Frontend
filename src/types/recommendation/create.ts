@@ -1,6 +1,16 @@
-export const CREATE_REC_STEPS = ['search', 'category', 'scorecard', 'circles', 'confirm'] as const;
+import { REAL_ESTATE_CATEGORY_ID } from '~/constants/recommendation/rexCategories';
 
-export type CreateRecStepId = (typeof CREATE_REC_STEPS)[number];
+export const CREATE_REC_STEP_ORDER = [
+  'search',
+  'category',
+  'type',
+  'scorecard',
+  'photos',
+  'circles',
+  'confirm',
+] as const;
+
+export type CreateRecStepId = (typeof CREATE_REC_STEP_ORDER)[number];
 
 export type SearchEntryMode = 'select' | 'manual';
 
@@ -11,3 +21,8 @@ export type CreateRecSearchPlace = {
   categoryLabel: string;
   categoryId: string;
 };
+
+export function getActiveCreateRecSteps(selectedCategoryId: string | null): CreateRecStepId[] {
+  const includeType = selectedCategoryId === REAL_ESTATE_CATEGORY_ID;
+  return CREATE_REC_STEP_ORDER.filter((id) => id !== 'type' || includeType);
+}

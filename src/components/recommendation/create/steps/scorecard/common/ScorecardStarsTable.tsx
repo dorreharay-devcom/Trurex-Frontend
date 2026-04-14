@@ -1,34 +1,40 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Star } from 'lucide-react-native';
-import { CREATE_REC_SCORE_ROWS } from '~/constants/recommendation/createScorecard';
+import type { CategoryRatingDimension } from '~/types/recommendation/rexCategoryCreateConfig';
 import { Theme } from '~/theme/Theme';
 import { cn } from '~/utils/general';
 
 type Props = {
-  starRatings: number[];
-  onStarChange: (index: number, value: number) => void;
+  dimensions: CategoryRatingDimension[];
+  scores: Record<string, number | null>;
+  onStarChange: (code: string, value: number) => void;
 };
 
-export function ScorecardStarsTable({ starRatings, onStarChange }: Props) {
+export function ScorecardStarsTable({ dimensions, scores, onStarChange }: Props) {
   return (
     <View className="space-y-1 rounded-xl border border-border bg-card p-4">
       <Text className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
         Star ratings
       </Text>
       <View>
-        {CREATE_REC_SCORE_ROWS.map((label, index) => {
-          const value = starRatings[index] ?? 0;
-          const isLast = index === CREATE_REC_SCORE_ROWS.length - 1;
+        {dimensions.map((dim, index) => {
+          const value = scores[dim.code] ?? 0;
+          const isLast = index === dimensions.length - 1;
           return (
             <View
-              key={label}
+              key={dim.code}
               className={cn(
                 'flex-row items-center justify-between gap-3 py-2',
                 !isLast && 'border-b border-border/50',
               )}
             >
-              <Text className="min-w-0 flex-1 text-sm text-foreground">{label}</Text>
+              <View className="min-w-0 flex-1">
+                <Text className="text-sm text-foreground">{dim.display_label}</Text>
+                {dim.description ? (
+                  <Text className="mt-0.5 text-xs text-muted-foreground">{dim.description}</Text>
+                ) : null}
+              </View>
               <View className="shrink-0 flex-row gap-0.5">
                 {[1, 2, 3, 4, 5].map((star) => {
                   const active = star <= value;
@@ -36,9 +42,9 @@ export function ScorecardStarsTable({ starRatings, onStarChange }: Props) {
                     <Pressable
                       key={star}
                       hitSlop={4}
-                      onPress={() => onStarChange(index, star === value ? 0 : star)}
+                      onPress={() => onStarChange(dim.code, star === value ? 0 : star)}
                       accessibilityRole="button"
-                      accessibilityLabel={`${label}: ${active ? star : 'zero'} of 5 stars`}
+                      accessibilityLabel={`${dim.display_label}: ${active ? star : 'zero'} of 5 stars`}
                       className="p-0.5 active:opacity-90"
                     >
                       <Star

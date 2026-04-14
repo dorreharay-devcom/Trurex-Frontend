@@ -1,11 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { SignedStorageImage } from '~/components/common/SignedStorageImage';
+import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { useAuth } from '~/services/AuthContext';
 // import { ProfileApi } from '~/api/ProfileApi'; // stashed with api layer
 import { Theme } from '~/theme/Theme';
 import type { ProfileData } from '~/types/profile';
 import { currentUser, collections, recommendations } from '~/data/mockData';
 import { webContainerStyle } from '~/utils';
+import {
+  rexCoverRemoteHttpUrl,
+  rexCoverStoragePathFromRecommendation,
+} from '~/utils/recommendation/rexMediaPaths';
 import ProfileHeader from './ProfileHeader';
 import CurrentlySection from './CurrentlySection';
 import EditProfile from './EditProfile';
@@ -124,10 +130,12 @@ const ProfileView = () => {
                   key={rec.id}
                   className="w-[48%] sm:w-[31.5%] lg:w-[23.8%] rounded-xl overflow-hidden shadow-card bg-background border border-border"
                 >
-                  <Image
-                    source={{ uri: rec.image }}
-                    className="w-full aspect-square"
-                    resizeMode="cover"
+                  <SignedStorageImage
+                    bucket={REX_IMAGES_BUCKET}
+                    storagePath={rexCoverStoragePathFromRecommendation(rec)}
+                    remoteUri={rexCoverRemoteHttpUrl(rec)}
+                    className="aspect-square w-full"
+                    accessibilityLabel={rec.title}
                   />
                   <View className="p-2.5">
                     <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>

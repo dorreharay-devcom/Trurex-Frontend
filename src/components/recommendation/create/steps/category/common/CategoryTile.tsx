@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, Pressable } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import type { RexCategory } from '~/constants/recommendation/rexCategories';
 import type { CategoryGridConfig } from '~/types/recommendation/categoryGrid';
 import { Theme } from '~/theme/Theme';
@@ -28,23 +28,25 @@ export function CategoryTile({
       onPress={onSelect}
       android_ripple={{ color: `${Theme.colors.primary}26` }}
       className={cn(
-        'min-w-0 flex-1 flex-col items-center gap-1.5 rounded-xl border-2 bg-card p-3 transition-transform duration-150 active:scale-[0.95] active:opacity-90',
+        'min-w-0 flex-1 flex-col items-center justify-center rounded-xl border-2 bg-card p-3 transition-transform duration-150 active:scale-[0.95] active:opacity-90',
         selected ? 'border-primary bg-primary/10 shadow-sm' : 'border-border bg-card',
       )}
       style={{
         minHeight: grid.tile.minHeight,
       }}
     >
-      <Text className="text-center text-2xl leading-none">{cat.emoji}</Text>
-      <Text
-        className={cn(
-          'text-center text-xs font-medium leading-tight',
-          selected ? 'text-foreground' : 'text-muted-foreground',
-        )}
-        numberOfLines={grid.label.numberOfLines}
-      >
-        {cat.label}
-      </Text>
+      <View className="w-full items-center gap-1.5">
+        <Text className="text-center text-2xl leading-none">{cat.emoji}</Text>
+        <Text
+          className={cn(
+            'w-full text-center text-xs font-medium leading-tight',
+            selected ? 'text-foreground' : 'text-muted-foreground',
+          )}
+          numberOfLines={grid.label.numberOfLines}
+        >
+          {cat.label}
+        </Text>
+      </View>
     </Pressable>
   );
 }

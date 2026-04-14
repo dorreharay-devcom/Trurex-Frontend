@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, Pressable, Image } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { Marker } from 'react-native-maps';
 import { MapPin } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
 import type { MapMarkerItem } from '~/types/map/mapMarker';
 import { nativeMarkerStyles as styles } from '~/components/map/common/nativeMarkerStyles';
+import { MarkerPreviewImage } from '~/components/map/common/MarkerPreviewImage';
 
 type Props = {
   marker: MapMarkerItem;
@@ -40,12 +41,11 @@ export const NativeMarker: React.FC<Props> = ({
               </Text>
             ) : null}
           </View>
-          {m.imageUrl ? (
-            <Image
-              source={{ uri: m.imageUrl }}
-              style={styles.tooltipImage}
-              resizeMode="cover"
-              accessibilityIgnoresInvertColors
+          {m.imageUrl || m.imageStoragePath ? (
+            <MarkerPreviewImage
+              imageUrl={m.imageUrl}
+              imageStoragePath={m.imageStoragePath}
+              variant="nativeTooltip"
             />
           ) : null}
         </View>

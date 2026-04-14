@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, FlatList } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, FlatList } from 'react-native';
 import { Plus, List, Grid3x3 } from 'lucide-react-native';
+import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { Theme } from '~/theme/Theme';
 import { Button } from '~/components/common/Button';
 import RecommendationCard from '~/components/recommendation/RecommendationCard';
+import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import type { Recommendation, Collection } from '~/types/recommendation/recommendation';
 import { webContainerStyle } from '~/utils';
+import {
+  rexCoverRemoteHttpUrl,
+  rexCoverStoragePathFromRecommendation,
+} from '~/utils/recommendation/rexMediaPaths';
 import { collections as SHARED_COLLECTIONS, recommendations } from '~/data/mockData';
 import CollectionCard from '~/components/profile/CollectionCard';
 
@@ -16,23 +22,33 @@ const SAVED_RECS: Recommendation[] = (recommendations as Recommendation[]).filte
 const GridCard: React.FC<{
   rec: Recommendation;
   onPress?: (rec: Recommendation) => void;
-}> = ({ rec, onPress }) => (
-  <TouchableOpacity
-    activeOpacity={0.85}
-    onPress={() => onPress?.(rec)}
-    className="w-[48.2%] sm:w-[31.7%] lg:w-[23.8%] rounded-xl overflow-hidden bg-card border border-border shadow-card"
-  >
-    <Image source={{ uri: rec.image }} className="w-full aspect-square" resizeMode="cover" />
-    <View className="p-2.5">
-      <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>
-        {rec.title}
-      </Text>
-      <Text className="text-[11px] text-muted-foreground mt-0.5" numberOfLines={1}>
-        {rec.location}
-      </Text>
-    </View>
-  </TouchableOpacity>
-);
+}> = ({ rec, onPress }) => {
+  const coverPath = rexCoverStoragePathFromRecommendation(rec);
+  const coverHttp = rexCoverRemoteHttpUrl(rec);
+  return (
+    <TouchableOpacity
+      activeOpacity={0.85}
+      onPress={() => onPress?.(rec)}
+      className="w-[48.2%] sm:w-[31.7%] lg:w-[23.8%] rounded-xl overflow-hidden bg-card border border-border shadow-card"
+    >
+      <SignedStorageImage
+        bucket={REX_IMAGES_BUCKET}
+        storagePath={coverPath}
+        remoteUri={coverHttp}
+        className="aspect-square w-full"
+        accessibilityLabel={rec.title}
+      />
+      <View className="p-2.5">
+        <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>
+          {rec.title}
+        </Text>
+        <Text className="text-[11px] text-muted-foreground mt-0.5" numberOfLines={1}>
+          {rec.location}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const EmptyState: React.FC = () => (
   <View className="items-center py-16">

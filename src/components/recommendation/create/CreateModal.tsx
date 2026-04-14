@@ -1,8 +1,13 @@
-import React, { useCallback } from 'react';
-import { View, Text, Pressable, Alert, useWindowDimensions } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { View, Text, Pressable, useWindowDimensions, ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
+import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, ChevronRight } from 'lucide-react-native';
 import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';
+import {
+  REAL_ESTATE_CATEGORY_ID,
+  getRexCategoryApiCode,
+} from '~/constants/recommendation/rexCategories';
 import { OverlayModal } from '~/components/common/OverlayModal';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
 import { Theme } from '~/theme/Theme';
@@ -10,6 +15,24 @@ import {
   useCreateRecWizard,
   useCreateRecommendationModalPresentation,
 } from '~/hooks/recommendation';
+import {
+  fetchAllCategoryCreateConfigs,
+  fetchCategoryCreateConfig,
+  createRex,
+} from '~/api/rexCreateApi';
+import {
+  mergeRatingDimensions,
+  mergeQuestions,
+  mergeTagOptions,
+} from '~/utils/recommendation/mergeCategoryConfig';
+import {
+  buildCategoryRatingsPayload,
+  getLinkedPlaceId,
+  getPlaceNameForRex,
+  hasNonPublicMockCircleSelection,
+  resolveVisibilityAndCircles,
+} from '~/utils/recommendation/createRexPayload';
+import { toastError, toastInfo, toastSuccess } from '~/utils/appToast';
 import { CreateWizardStepper } from './CreateWizardStepper';
 import { CreateModalBody } from './CreateModalBody';
 
@@ -21,7 +44,8 @@ type Props = {
 export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
   const { height: windowHeight } = useWindowDimensions();
   const flow = useCreateRecWizard();
-  const { reset, setManualGeotag } = flow;
+  const { reset, setManualGeotag, syncFormToConfig } = flow;
+  const [submitting, setSubmitting] = useState(false);
 
   const { sheetTranslateY, stepOpacity, handleClose } = useCreateRecommendationModalPresentation({
     visible,
@@ -31,20 +55,174 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
     reset,
   });
 
-  const handlePrimaryFooter = () => {
-    if (flow.isLastStep) {
-      Alert.alert('Rex saved (demo)', 'Connect your API when ready.');
-      handleClose();
+  const categoryApiCode = getRexCategoryApiCode(flow.selectedCategoryId);
+
+  const {
+    data: configsByCode,
+    isLoading: configsLoading,
+    isFetched: configsFetched,
+  } = useQuery({
+    queryKey: ['rexAllCategoryCreateConfigs'],
+    queryFn: async () => {
+      const list = await fetchAllCategoryCreateConfigs();
+      return new Map(list.map((c) => [c.code, c]));
+    },
+    enabled: visible,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const needsSingleConfig =
+    visible &&
+    !!categoryApiCode &&
+    configsFetched &&
+    configsByCode !== undefined &&
+    !configsByCode.has(categoryApiCode);
+
+  const { data: fetchedSingleConfig } = useQuery({
+    queryKey: ['rexCategoryCreateConfig', categoryApiCode],
+    queryFn: () => fetchCategoryCreateConfig(categoryApiCode!),
+    enabled: needsSingleConfig,
+  });
+
+  const activeCreateConfig = useMemo(() => {
+    if (!categoryApiCode) return null;
+    if (configsByCode?.has(categoryApiCode)) return configsByCode.get(categoryApiCode)!;
+    return fetchedSingleConfig ?? null;
+  }, [categoryApiCode, configsByCode, fetchedSingleConfig]);
+
+  const subcategoryCodeForMerge = useMemo(() => {
+    if (flow.selectedCategoryId !== REAL_ESTATE_CATEGORY_ID) return null;
+    return flow.selectedSubcategoryCode;
+  }, [flow.selectedCategoryId, flow.selectedSubcategoryCode]);
+
+  const mergedRatingDimensions = useMemo(
+    () =>
+      activeCreateConfig ? mergeRatingDimensions(activeCreateConfig, subcategoryCodeForMerge) : [],
+    [activeCreateConfig, subcategoryCodeForMerge],
+  );
+
+  const mergedQuestions = useMemo(
+    () => (activeCreateConfig ? mergeQuestions(activeCreateConfig, subcategoryCodeForMerge) : []),
+    [activeCreateConfig, subcategoryCodeForMerge],
+  );
+
+  const mergedTagOptions = useMemo(
+    () => (activeCreateConfig ? mergeTagOptions(activeCreateConfig, subcategoryCodeForMerge) : []),
+    [activeCreateConfig, subcategoryCodeForMerge],
+  );
+
+  const ratingDimCodesKey = mergedRatingDimensions.map((d) => d.code).join('|');
+  const questionCodesKey = mergedQuestions.map((q) => q.code).join('|');
+
+  /* eslint-disable react-hooks/exhaustive-deps */
+  useEffect(() => {
+    if (!activeCreateConfig) return;
+    const dims = mergeRatingDimensions(activeCreateConfig, subcategoryCodeForMerge);
+    const qs = mergeQuestions(activeCreateConfig, subcategoryCodeForMerge);
+    syncFormToConfig(dims, qs);
+  }, [
+    activeCreateConfig?.code,
+    subcategoryCodeForMerge,
+    ratingDimCodesKey,
+    questionCodesKey,
+    syncFormToConfig,
+  ]);
+  /* eslint-enable react-hooks/exhaustive-deps */
+
+  const subcategoryLabelForConfirm = useMemo(() => {
+    if (!flow.selectedSubcategoryCode || !activeCreateConfig) return null;
+    return (
+      activeCreateConfig.subcategories.find((s) => s.code === flow.selectedSubcategoryCode)
+        ?.display_name ?? null
+    );
+  }, [activeCreateConfig, flow.selectedSubcategoryCode]);
+
+  const configLoading =
+    Boolean(visible && flow.selectedCategoryId && categoryApiCode) &&
+    (configsLoading || (needsSingleConfig && fetchedSingleConfig === undefined));
+
+  const handlePrimaryFooter = useCallback(async () => {
+    if (!flow.isLastStep) {
+      flow.goNext();
       return;
     }
-    flow.goNext();
-  };
+    if (!categoryApiCode || !activeCreateConfig) {
+      toastError(
+        'Category unavailable',
+        'Could not load category configuration. Check your connection and try again, or pick another category.',
+      );
+      return;
+    }
+    if (flow.photoStoragePaths.length < 1) {
+      toastError('Photos required', 'Add at least one photo before posting.');
+      return;
+    }
+    for (const q of mergedQuestions) {
+      if (q.is_required) {
+        const v = flow.questionAnswers[q.code];
+        if (v == null || v === '') {
+          toastInfo('Almost there', `Please answer: ${q.display_label}`);
+          return;
+        }
+      }
+    }
+    if (hasNonPublicMockCircleSelection(flow.selectedCircleIds)) {
+      toastInfo(
+        'Circles',
+        'Sharing to named circles requires account circle IDs from the server. Select Public only for now, or wire circle loading.',
+      );
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const vis = resolveVisibilityAndCircles(flow.selectedCircleIds);
+      const p_question_answers: Record<string, string> = {};
+      for (const q of mergedQuestions) {
+        const v = flow.questionAnswers[q.code];
+        if (v != null && v !== '') p_question_answers[q.code] = v;
+        else if (q.is_required) {
+          throw new Error(`Please answer: ${q.display_label}`);
+        }
+      }
+
+      const params = {
+        p_category_code: categoryApiCode,
+        p_place_name: getPlaceNameForRex(flow.searchMode, flow.selectedPlaceId, flow.manualName),
+        p_review: flow.scoreReview.trim() || null,
+        p_quick_tip: flow.scoreQuickTip.trim() || null,
+        p_visibility: vis.p_visibility,
+        circle_ids: vis.circle_ids ?? undefined,
+        tag_names: flow.selectedTagSlugs,
+        photo_paths: flow.photoStoragePaths,
+        p_linked_place_id: getLinkedPlaceId(flow.selectedPlaceId) ?? undefined,
+        p_category_ratings: buildCategoryRatingsPayload(flow.categoryRatings),
+        p_question_answers: p_question_answers,
+        ...(subcategoryCodeForMerge ? { p_subcategory_code: subcategoryCodeForMerge } : {}),
+      };
+
+      await createRex(params);
+      toastSuccess('Posted', 'Your recommendation is live.');
+      handleClose();
+    } catch (e) {
+      const err = e as Error;
+      toastError('Could not post', err.message || 'Something went wrong.');
+    } finally {
+      setSubmitting(false);
+    }
+  }, [
+    flow,
+    categoryApiCode,
+    activeCreateConfig,
+    mergedQuestions,
+    subcategoryCodeForMerge,
+    handleClose,
+  ]);
 
   const handleTagLocation = useCallback(async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Location', 'Permission is required to tag your current location.');
+        toastError('Location', 'Permission is required to tag your current location.');
         return;
       }
       const pos = await Location.getCurrentPositionAsync({
@@ -53,7 +231,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
       const { latitude, longitude } = pos.coords;
       setManualGeotag({ lat: latitude, lng: longitude });
     } catch {
-      Alert.alert(
+      toastError(
         'Location',
         'Could not read your location. Try again or enter an address manually.',
       );
@@ -61,6 +239,9 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
   }, [setManualGeotag]);
 
   const { layout } = modalConfig;
+
+  const primaryDisabled =
+    submitting || (!flow.isLastStep && !flow.canProceed) || (flow.isLastStep && submitting);
 
   return (
     <OverlayModal
@@ -74,15 +255,15 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
           <View className="flex-row items-center">
             <View className="w-[72px] items-start justify-center">
               <Pressable
-                onPress={flow.stepIndex === 0 ? handleClose : flow.goBack}
+                onPress={flow.isFirstStep ? handleClose : flow.goBack}
                 hitSlop={12}
                 accessibilityRole="button"
-                accessibilityLabel={flow.stepIndex === 0 ? 'Cancel' : 'Back'}
+                accessibilityLabel={flow.isFirstStep ? 'Cancel' : 'Back'}
                 className="flex-row items-center gap-1.5 rounded-lg py-0.5 active:opacity-80"
               >
                 <ArrowLeft size={20} color={Theme.colors.secondaryText} />
                 <Text className="text-sm font-medium text-muted-foreground">
-                  {flow.stepIndex === 0 ? 'Cancel' : 'Back'}
+                  {flow.isFirstStep ? 'Cancel' : 'Back'}
                 </Text>
               </Pressable>
             </View>
@@ -92,10 +273,26 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
             <View className="w-[72px]" />
           </View>
 
-          <CreateWizardStepper currentIndex={flow.stepIndex} />
+          <CreateWizardStepper steps={flow.activeSteps} currentIndex={flow.stepIndex} />
         </View>
 
-        <CreateModalBody flow={flow} stepOpacity={stepOpacity} onTagLocation={handleTagLocation} />
+        {configLoading && flow.selectedCategoryId ? (
+          <View className="absolute left-0 right-0 top-24 z-20 items-center py-2">
+            <ActivityIndicator color={Theme.colors.primary} />
+          </View>
+        ) : null}
+
+        <CreateModalBody
+          flow={flow}
+          stepOpacity={stepOpacity}
+          onTagLocation={handleTagLocation}
+          activeCreateConfig={activeCreateConfig}
+          configLoading={configLoading}
+          mergedRatingDimensions={mergedRatingDimensions}
+          mergedQuestions={mergedQuestions}
+          mergedTagOptions={mergedTagOptions}
+          subcategoryLabelForConfirm={subcategoryLabelForConfirm}
+        />
 
         <View className="sticky bottom-0 items-center border-t border-border bg-card/95 backdrop-blur px-4 py-4 sm:px-6">
           <View
@@ -106,17 +303,23 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
             }}
           >
             <Pressable
-              onPress={handlePrimaryFooter}
-              disabled={!flow.canProceed}
+              onPress={() => void handlePrimaryFooter()}
+              disabled={primaryDisabled}
               accessibilityRole="button"
               accessibilityLabel={flow.isLastStep ? 'Confirm and post' : 'Continue'}
               className="inline-flex w-full h-12 flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-4 py-2 ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:bg-primary/90"
             >
-              <Text className="text-base font-semibold text-primary-foreground">
-                {flow.isLastStep ? 'Confirm & Post 🦖' : 'Continue'}
-              </Text>
-              {!flow.isLastStep && (
-                <ChevronRight size={16} color={Theme.colors.primaryForeground} />
+              {submitting ? (
+                <ActivityIndicator color={Theme.colors.primaryForeground} />
+              ) : (
+                <>
+                  <Text className="text-base font-semibold text-primary-foreground">
+                    {flow.isLastStep ? 'Confirm & Post 🦖' : 'Continue'}
+                  </Text>
+                  {!flow.isLastStep && (
+                    <ChevronRight size={16} color={Theme.colors.primaryForeground} />
+                  )}
+                </>
               )}
             </Pressable>
           </View>

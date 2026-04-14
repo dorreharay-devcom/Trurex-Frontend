@@ -3,12 +3,13 @@ import { View, Text, ScrollView } from 'react-native';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { CreateStepTitle } from '../../CreateStepTitle';
 import {
-  averageStarRating,
-  getConfirmAppliesLabels,
-  getConfirmCircleTitles,
+  averageCategoryRatings,
   getConfirmPreviewPlace,
+  getConfirmCircleTitles,
+  getConfirmTagLabels,
 } from '~/utils/recommendation/confirmPreview';
 import type { SearchEntryMode } from '~/types/recommendation/create';
+import type { CategoryTagOption } from '~/types/recommendation/rexCategoryCreateConfig';
 import { ConfirmPreviewCard } from './common';
 
 type Props = {
@@ -18,11 +19,14 @@ type Props = {
   manualAddress: string;
   manualGeotag: { lat: number; lng: number } | null;
   selectedCategoryId: string | null;
-  scoreStarRatings: number[];
-  scoreAppliesSelected: Record<string, boolean>;
+  categoryRatings: Record<string, number | null>;
   scoreQuickTip: string;
   scoreReview: string;
   selectedCircleIds: Set<string>;
+  subcategoryLabel: string | null;
+  photoCount: number;
+  selectedTagSlugs: string[];
+  tagOptions: CategoryTagOption[];
 };
 
 export const Confirm: React.FC<Props> = ({
@@ -32,11 +36,14 @@ export const Confirm: React.FC<Props> = ({
   manualAddress,
   manualGeotag,
   selectedCategoryId,
-  scoreStarRatings,
-  scoreAppliesSelected,
+  categoryRatings,
   scoreQuickTip,
   scoreReview,
   selectedCircleIds,
+  subcategoryLabel,
+  photoCount,
+  selectedTagSlugs,
+  tagOptions,
 }) => {
   const place = useMemo(
     () =>
@@ -44,10 +51,10 @@ export const Confirm: React.FC<Props> = ({
     [searchMode, selectedPlaceId, manualName, manualAddress, manualGeotag],
   );
 
-  const ratingDisplay = useMemo(() => averageStarRating(scoreStarRatings), [scoreStarRatings]);
-  const appliesLabels = useMemo(
-    () => getConfirmAppliesLabels(scoreAppliesSelected),
-    [scoreAppliesSelected],
+  const ratingDisplay = useMemo(() => averageCategoryRatings(categoryRatings), [categoryRatings]);
+  const tagLabels = useMemo(
+    () => getConfirmTagLabels(selectedTagSlugs, tagOptions),
+    [selectedTagSlugs, tagOptions],
   );
   const circleTitles = useMemo(
     () => getConfirmCircleTitles(selectedCircleIds),
@@ -67,15 +74,17 @@ export const Confirm: React.FC<Props> = ({
         <View className="items-center space-y-2">
           <CreateStepTitle>Looking good! 🦖</CreateStepTitle>
           <Text className="text-center text-sm text-muted-foreground">
-            Here's how your recommendation will appear
+            Here&apos;s how your recommendation will appear
           </Text>
         </View>
 
         <ConfirmPreviewCard
           place={place}
           selectedCategoryId={selectedCategoryId}
+          subcategoryLabel={subcategoryLabel}
+          photoCount={photoCount}
           ratingDisplay={ratingDisplay}
-          appliesLabels={appliesLabels}
+          tagLabels={tagLabels}
           tip={tip}
           review={review}
           circleTitles={circleTitles}
