@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, Pressable, useWindowDimensions, ActivityIndicator } from 'react-native';
-import * as Location from 'expo-location';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, ChevronRight } from 'lucide-react-native';
 import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';
@@ -15,6 +14,10 @@ import {
   useCreateRecWizard,
   useCreateRecommendationModalPresentation,
 } from '~/hooks/recommendation';
+import {
+  useManualPlaceGeotag,
+  type ManualPlaceGeotagResult,
+} from '~/hooks/location/useManualPlaceGeotag';
 import {
   fetchAllCategoryCreateConfigs,
   fetchCategoryCreateConfig,
@@ -44,8 +47,20 @@ type Props = {
 export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
   const { height: windowHeight } = useWindowDimensions();
   const flow = useCreateRecWizard();
-  const { reset, setManualGeotag, syncFormToConfig } = flow;
+  const { reset, setManualGeotag, setManualAddress, syncFormToConfig } = flow;
   const [submitting, setSubmitting] = useState(false);
+
+  const applyManualGeotag = useCallback(
+    (result: ManualPlaceGeotagResult) => {
+      setManualGeotag({ lat: result.lat, lng: result.lng });
+      setManualAddress(result.addressLabel);
+    },
+    [setManualGeotag, setManualAddress],
+  );
+
+  const { isGeotagging, geotag: handleTagLocation } = useManualPlaceGeotag({
+    onSuccess: applyManualGeotag,
+  });
 
   const { sheetTranslateY, stepOpacity, handleClose } = useCreateRecommendationModalPresentation({
     visible,
@@ -218,30 +233,13 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
     handleClose,
   ]);
 
-  const handleTagLocation = useCallback(async () => {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        toastError('Location', 'Permission is required to tag your current location.');
-        return;
-      }
-      const pos = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
-      const { latitude, longitude } = pos.coords;
-      setManualGeotag({ lat: latitude, lng: longitude });
-    } catch {
-      toastError(
-        'Location',
-        'Could not read your location. Try again or enter an address manually.',
-      );
-    }
-  }, [setManualGeotag]);
-
   const { layout } = modalConfig;
 
   const primaryDisabled =
-    submitting || (!flow.isLastStep && !flow.canProceed) || (flow.isLastStep && submitting);
+    submitting ||
+    isGeotagging ||
+    (!flow.isLastStep && !flow.canProceed) ||
+    (flow.isLastStep && submitting);
 
   return (
     <OverlayModal
@@ -286,6 +284,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
           flow={flow}
           stepOpacity={stepOpacity}
           onTagLocation={handleTagLocation}
+          tagLocationLoading={isGeotagging}
           activeCreateConfig={activeCreateConfig}
           configLoading={configLoading}
           mergedRatingDimensions={mergedRatingDimensions}

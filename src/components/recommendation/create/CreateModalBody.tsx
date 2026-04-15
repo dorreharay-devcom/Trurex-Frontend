@@ -23,6 +23,7 @@ type Props = {
   flow: Flow;
   stepOpacity: RNAnimated.Value;
   onTagLocation: () => void;
+  tagLocationLoading: boolean;
   activeCreateConfig: CategoryCreateConfig | null;
   configLoading: boolean;
   mergedRatingDimensions: CategoryRatingDimension[];
@@ -35,6 +36,7 @@ export const CreateModalBody: React.FC<Props> = ({
   flow,
   stepOpacity,
   onTagLocation,
+  tagLocationLoading,
   activeCreateConfig,
   configLoading,
   mergedRatingDimensions,
@@ -74,6 +76,7 @@ export const CreateModalBody: React.FC<Props> = ({
             onOpenManual={flow.openManual}
             onBackToSearchSelect={flow.backToSearchSelect}
             onTagLocationPress={onTagLocation}
+            tagLocationLoading={tagLocationLoading}
           />
         )}
         {flow.stepId === 'category' && (
