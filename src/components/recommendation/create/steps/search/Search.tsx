@@ -17,6 +17,7 @@ type Props = {
   onOpenManual: () => void;
   onBackToSearchSelect: () => void;
   onTagLocationPress: () => void;
+  tagLocationLoading: boolean;
 };
 
 export const Search: React.FC<Props> = ({
@@ -33,6 +34,7 @@ export const Search: React.FC<Props> = ({
   onOpenManual,
   onBackToSearchSelect,
   onTagLocationPress,
+  tagLocationLoading,
 }) => {
   const { results, showNoResults } = useMemo(
     () => getSearchStepSelectState(searchQuery),
@@ -49,6 +51,7 @@ export const Search: React.FC<Props> = ({
         manualGeotag={manualGeotag}
         onTagLocationPress={onTagLocationPress}
         onBackToSearchSelect={onBackToSearchSelect}
+        tagLocationLoading={tagLocationLoading}
       />
     );
   }
