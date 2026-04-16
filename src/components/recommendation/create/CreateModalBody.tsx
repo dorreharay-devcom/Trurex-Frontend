@@ -66,8 +66,8 @@ export const CreateModalBody: React.FC<Props> = ({
             mode={flow.searchMode}
             searchQuery={flow.searchQuery}
             onSearchQueryChange={flow.setSearchQuery}
-            selectedPlaceId={flow.selectedPlaceId}
-            onSelectPlace={(p: { id: string }) => flow.setSelectedPlaceId(p.id)}
+            selectedSearchPlace={flow.selectedSearchPlace}
+            onSelectPlace={flow.selectSearchPlace}
             manualName={flow.manualName}
             onManualNameChange={flow.setManualName}
             manualAddress={flow.manualAddress}
@@ -125,7 +125,7 @@ export const CreateModalBody: React.FC<Props> = ({
         {flow.stepId === 'confirm' && (
           <Confirm
             searchMode={flow.searchMode}
-            selectedPlaceId={flow.selectedPlaceId}
+            selectedSearchPlace={flow.selectedSearchPlace}
             manualName={flow.manualName}
             manualAddress={flow.manualAddress}
             manualGeotag={flow.manualGeotag}

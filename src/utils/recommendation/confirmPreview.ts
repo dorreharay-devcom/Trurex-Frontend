@@ -1,7 +1,6 @@
-import { CREATE_REC_SEARCH_PLACES } from '~/constants/recommendation/mockSearchPlaces';
 import { CREATE_REC_CIRCLES } from '~/constants/recommendation/createCircles';
 import type { CategoryTagOption } from '~/types/recommendation/rexCategoryCreateConfig';
-import type { SearchEntryMode } from '~/types/recommendation/create';
+import type { CreateRecSearchPlace, SearchEntryMode } from '~/types/recommendation/create';
 
 export const CONFIRM_PREVIEW_USER = {
   name: 'Alex Morgan',
@@ -30,7 +29,7 @@ export type ConfirmPreviewPlace = {
 
 export function getConfirmPreviewPlace(
   searchMode: SearchEntryMode,
-  selectedPlaceId: string | null,
+  selectedSearchPlace: CreateRecSearchPlace | null,
   manualName: string,
   manualAddress: string,
   manualGeotag: { lat: number; lng: number } | null,
@@ -45,11 +44,9 @@ export function getConfirmPreviewPlace(
       addressLines: [manualAddress.trim() || null, geo].filter(Boolean) as string[],
     };
   }
-  const p = selectedPlaceId
-    ? CREATE_REC_SEARCH_PLACES.find((x) => x.id === selectedPlaceId)
-    : undefined;
-  if (!p) return { title: '—', addressLines: [] };
-  return { title: p.title, addressLines: [p.subtitle] };
+  if (!selectedSearchPlace) return { title: '—', addressLines: [] };
+  const sub = selectedSearchPlace.subtitle.trim();
+  return { title: selectedSearchPlace.title, addressLines: sub ? [sub] : [] };
 }
 
 export function getConfirmTagLabels(

@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CREATE_REC_SEARCH_PLACES } from '~/constants/recommendation/mockSearchPlaces';
+import { createManualPlace, upsertGooglePlace } from '~/api/rexPlacesApi';
 import { CREATE_REC_REVIEW_MAX } from '~/constants/recommendation/createScorecard';
 import {
   CREATE_REC_STEP_ORDER,
   getActiveCreateRecSteps,
   type CreateRecStepId,
+  type CreateRecSearchPlace,
   type SearchEntryMode,
 } from '~/types/recommendation/create';
 import type {
@@ -14,16 +15,16 @@ import type {
 
 function suggestedCategoryFromSearch(
   searchMode: SearchEntryMode,
-  selectedPlaceId: string | null,
+  selectedSearchPlace: CreateRecSearchPlace | null,
 ): string | null {
-  if (searchMode !== 'select' || !selectedPlaceId) return null;
-  return CREATE_REC_SEARCH_PLACES.find((p) => p.id === selectedPlaceId)?.categoryId ?? null;
+  if (searchMode !== 'select' || !selectedSearchPlace?.categoryId) return null;
+  return selectedSearchPlace.categoryId;
 }
 
 type CanProceedDeps = {
   searchMode: SearchEntryMode;
   manualName: string;
-  selectedPlaceId: string | null;
+  selectedSearchPlace: CreateRecSearchPlace | null;
   selectedCategoryId: string | null;
   selectedCircleIds: Set<string>;
   selectedSubcategoryCode: string | null;
@@ -34,7 +35,7 @@ function canProceedForStep(stepId: CreateRecStepId, d: CanProceedDeps): boolean 
     case 'search':
       return d.searchMode === 'manual'
         ? d.manualName.trim().length > 0
-        : d.selectedPlaceId !== null;
+        : d.selectedSearchPlace !== null;
     case 'category':
       return d.selectedCategoryId !== null;
     case 'type':
@@ -67,7 +68,8 @@ export function useCreateRecWizard() {
   const [stepId, setStepId] = useState<CreateRecStepId>('search');
   const [searchMode, setSearchMode] = useState<SearchEntryMode>('select');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
+  const [selectedSearchPlace, setSelectedSearchPlace] = useState<CreateRecSearchPlace | null>(null);
+  const [linkedPlaceId, setLinkedPlaceId] = useState<string | null>(null);
   const [manualName, setManualName] = useState('');
   const [manualAddress, setManualAddress] = useState('');
   const [manualGeotag, setManualGeotag] = useState<{ lat: number; lng: number } | null>(null);
@@ -102,8 +104,8 @@ export function useCreateRecWizard() {
   const isLastStep = activeSteps.length > 0 && stepId === activeSteps[activeSteps.length - 1];
 
   const autoSuggestedCategoryId = useMemo(
-    () => suggestedCategoryFromSearch(searchMode, selectedPlaceId),
-    [searchMode, selectedPlaceId],
+    () => suggestedCategoryFromSearch(searchMode, selectedSearchPlace),
+    [searchMode, selectedSearchPlace],
   );
 
   useEffect(() => {
@@ -115,16 +117,16 @@ export function useCreateRecWizard() {
   useEffect(() => {
     if (stepId !== 'category') return;
     if (selectedCategoryId !== null) return;
-    const sug = suggestedCategoryFromSearch(searchMode, selectedPlaceId);
+    const sug = suggestedCategoryFromSearch(searchMode, selectedSearchPlace);
     if (sug) setSelectedCategoryId(sug);
-  }, [stepId, selectedCategoryId, searchMode, selectedPlaceId]);
+  }, [stepId, selectedCategoryId, searchMode, selectedSearchPlace]);
 
   const canProceed = useMemo(
     () =>
       canProceedForStep(stepId, {
         searchMode,
         manualName,
-        selectedPlaceId,
+        selectedSearchPlace,
         selectedCategoryId,
         selectedCircleIds,
         selectedSubcategoryCode,
@@ -133,7 +135,7 @@ export function useCreateRecWizard() {
       stepId,
       searchMode,
       manualName,
-      selectedPlaceId,
+      selectedSearchPlace,
       selectedCategoryId,
       selectedCircleIds,
       selectedSubcategoryCode,
@@ -163,11 +165,58 @@ export function useCreateRecWizard() {
     );
   }, []);
 
+  const selectSearchPlace = useCallback((place: CreateRecSearchPlace) => {
+    setSelectedSearchPlace(place);
+    if (place.source === 'database') {
+      setLinkedPlaceId(place.id);
+    } else {
+      setLinkedPlaceId(null);
+    }
+  }, []);
+
+  const resolveSearchStepPlace = useCallback(async () => {
+    if (searchMode === 'manual') {
+      const name = manualName.trim();
+      if (!name) {
+        throw new Error('Enter a place name.');
+      }
+      const row = await createManualPlace({
+        p_name: name,
+        p_normalized_address: manualAddress.trim() || null,
+        p_latitude: manualGeotag?.lat ?? null,
+        p_longitude: manualGeotag?.lng ?? null,
+      });
+      setLinkedPlaceId(row.id);
+      return;
+    }
+    const sel = selectedSearchPlace;
+    if (!sel) {
+      throw new Error('Select a place.');
+    }
+    if (sel.source === 'database') {
+      setLinkedPlaceId(sel.id);
+      return;
+    }
+    const pid = sel.providerPlaceId;
+    if (!pid) {
+      throw new Error('Missing Google place id.');
+    }
+    const row = await upsertGooglePlace({
+      p_provider_place_id: pid,
+      p_name: sel.title,
+      p_normalized_address: sel.fullText ?? sel.subtitle ?? null,
+      p_latitude: sel.latitude ?? null,
+      p_longitude: sel.longitude ?? null,
+    });
+    setLinkedPlaceId(row.id);
+  }, [searchMode, manualName, manualAddress, manualGeotag, selectedSearchPlace]);
+
   const reset = useCallback(() => {
     setStepId('search');
     setSearchMode('select');
     setSearchQuery('');
-    setSelectedPlaceId(null);
+    setSelectedSearchPlace(null);
+    setLinkedPlaceId(null);
     setManualName('');
     setManualAddress('');
     setManualGeotag(null);
@@ -209,7 +258,8 @@ export function useCreateRecWizard() {
 
   const openManual = useCallback(() => {
     setSearchMode('manual');
-    setSelectedPlaceId(null);
+    setSelectedSearchPlace(null);
+    setLinkedPlaceId(null);
   }, []);
 
   const backToSearchSelect = useCallback(() => {
@@ -226,8 +276,10 @@ export function useCreateRecWizard() {
     searchMode,
     searchQuery,
     setSearchQuery,
-    selectedPlaceId,
-    setSelectedPlaceId,
+    selectedSearchPlace,
+    selectSearchPlace,
+    linkedPlaceId,
+    resolveSearchStepPlace,
     manualName,
     setManualName,
     manualAddress,

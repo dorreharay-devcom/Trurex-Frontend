@@ -158,6 +158,19 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
 
   const handlePrimaryFooter = useCallback(async () => {
     if (!flow.isLastStep) {
+      if (flow.stepId === 'search') {
+        setSubmitting(true);
+        try {
+          await flow.resolveSearchStepPlace();
+          flow.goNext();
+        } catch (e) {
+          const err = e as Error;
+          toastError('Place', err.message || 'Could not save this place. Try again.');
+        } finally {
+          setSubmitting(false);
+        }
+        return;
+      }
       flow.goNext();
       return;
     }
@@ -202,14 +215,18 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
 
       const params = {
         p_category_code: categoryApiCode,
-        p_place_name: getPlaceNameForRex(flow.searchMode, flow.selectedPlaceId, flow.manualName),
+        p_place_name: getPlaceNameForRex(
+          flow.searchMode,
+          flow.selectedSearchPlace,
+          flow.manualName,
+        ),
         p_review: flow.scoreReview.trim() || null,
         p_quick_tip: flow.scoreQuickTip.trim() || null,
         p_visibility: vis.p_visibility,
         circle_ids: vis.circle_ids ?? undefined,
         tag_names: flow.selectedTagSlugs,
         photo_paths: flow.photoStoragePaths,
-        p_linked_place_id: getLinkedPlaceId(flow.selectedPlaceId) ?? undefined,
+        p_linked_place_id: getLinkedPlaceId(flow.linkedPlaceId) ?? undefined,
         p_category_ratings: buildCategoryRatingsPayload(flow.categoryRatings),
         p_question_answers: p_question_answers,
         ...(subcategoryCodeForMerge ? { p_subcategory_code: subcategoryCodeForMerge } : {}),

@@ -1,13 +1,13 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import type { CreateRecSearchPlace, SearchEntryMode } from '~/types/recommendation/create';
-import { getSearchStepSelectState } from '~/utils/recommendation/searchPlacesFilter';
+import { useRexPlaceSearch } from '~/hooks/recommendation';
 import { SearchManualPanel, SearchSelectPanel } from './common';
 
 type Props = {
   mode: SearchEntryMode;
   searchQuery: string;
   onSearchQueryChange: (q: string) => void;
-  selectedPlaceId: string | null;
+  selectedSearchPlace: CreateRecSearchPlace | null;
   onSelectPlace: (place: CreateRecSearchPlace) => void;
   manualName: string;
   onManualNameChange: (v: string) => void;
@@ -24,7 +24,7 @@ export const Search: React.FC<Props> = ({
   mode,
   searchQuery,
   onSearchQueryChange,
-  selectedPlaceId,
+  selectedSearchPlace,
   onSelectPlace,
   manualName,
   onManualNameChange,
@@ -36,10 +36,11 @@ export const Search: React.FC<Props> = ({
   onTagLocationPress,
   tagLocationLoading,
 }) => {
-  const { results, showNoResults } = useMemo(
-    () => getSearchStepSelectState(searchQuery),
-    [searchQuery],
-  );
+  const selectMode = mode === 'select';
+  const placeSearch = useRexPlaceSearch({
+    searchQuery,
+    enabled: selectMode,
+  });
 
   if (mode === 'manual') {
     return (
@@ -60,10 +61,13 @@ export const Search: React.FC<Props> = ({
     <SearchSelectPanel
       searchQuery={searchQuery}
       onSearchQueryChange={onSearchQueryChange}
-      selectedPlaceId={selectedPlaceId}
+      selectedSearchPlace={selectedSearchPlace}
       onSelectPlace={onSelectPlace}
-      results={results}
-      showNoResults={showNoResults}
+      results={placeSearch.results}
+      showNoResults={placeSearch.showNoResults}
+      isSearching={placeSearch.isSearching}
+      canSearch={placeSearch.canSearch}
+      searchErrorMessage={placeSearch.searchErrorMessage}
       onOpenManual={onOpenManual}
     />
   );

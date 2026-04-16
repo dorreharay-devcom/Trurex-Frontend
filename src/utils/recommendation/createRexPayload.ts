@@ -1,6 +1,5 @@
-import type { SearchEntryMode } from '~/types/recommendation/create';
+import type { CreateRecSearchPlace, SearchEntryMode } from '~/types/recommendation/create';
 import type { CreateRexRpcParams } from '~/types/recommendation/rexCategoryCreateConfig';
-import { CREATE_REC_SEARCH_PLACES } from '~/constants/recommendation/mockSearchPlaces';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -21,21 +20,18 @@ export function resolveVisibilityAndCircles(
 
 export function getPlaceNameForRex(
   searchMode: SearchEntryMode,
-  selectedPlaceId: string | null,
+  selectedSearchPlace: CreateRecSearchPlace | null,
   manualName: string,
 ): string {
   if (searchMode === 'manual') {
     return manualName.trim() || 'Place';
   }
-  const p = selectedPlaceId
-    ? CREATE_REC_SEARCH_PLACES.find((x) => x.id === selectedPlaceId)
-    : undefined;
-  return p?.title.trim() || 'Place';
+  return selectedSearchPlace?.title.trim() || 'Place';
 }
 
-export function getLinkedPlaceId(selectedPlaceId: string | null): string | undefined {
-  if (!selectedPlaceId || !isUuid(selectedPlaceId)) return undefined;
-  return selectedPlaceId;
+export function getLinkedPlaceId(linkedPlaceId: string | null): string | undefined {
+  if (!linkedPlaceId || !isUuid(linkedPlaceId)) return undefined;
+  return linkedPlaceId;
 }
 
 export function buildCategoryRatingsPayload(
