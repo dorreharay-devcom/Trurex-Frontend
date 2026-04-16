@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { MapPin, Star } from 'lucide-react-native';
-import { getRexCategoryById } from '~/constants/recommendation/rexCategories';
+import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
 import {
   CONFIRM_PREVIEW_USER,
   type ConfirmPreviewPlace,
@@ -14,6 +14,7 @@ const TAGS_PREVIEW_MAX = 5;
 type Props = {
   place: ConfirmPreviewPlace;
   selectedCategoryId: string | null;
+  categoryDisplayName: string | null;
   subcategoryLabel: string | null;
   photoCount: number;
   ratingDisplay: string | null;
@@ -26,6 +27,7 @@ type Props = {
 export function ConfirmPreviewCard({
   place,
   selectedCategoryId,
+  categoryDisplayName,
   subcategoryLabel,
   photoCount,
   ratingDisplay,
@@ -34,7 +36,8 @@ export function ConfirmPreviewCard({
   review,
   circleTitles,
 }: Props) {
-  const category = getRexCategoryById(selectedCategoryId ?? '');
+  const categoryEmoji = selectedCategoryId ? getCategoryEmoji(selectedCategoryId) : '📍';
+  const categoryLabel = categoryDisplayName?.trim() || 'Category';
   const sharingLine = circleTitles.length > 0 ? circleTitles.join(', ') : 'No one yet';
 
   return (
@@ -51,10 +54,10 @@ export function ConfirmPreviewCard({
             {CONFIRM_PREVIEW_USER.handle} · just now
           </Text>
         </View>
-        {category ? (
+        {selectedCategoryId ? (
           <View className="max-w-[52%] shrink-0 rounded-full bg-muted px-2.5 py-1">
-            <Text className="text-xs font-medium text-muted-foreground" numberOfLines={2}>
-              {category.emoji} {category.label}
+            <Text className="text-xs font-medium text-foreground" numberOfLines={2}>
+              {categoryEmoji} {categoryLabel}
               {subcategoryLabel ? ` · ${subcategoryLabel}` : ''}
             </Text>
           </View>

@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import type { RexCategory } from '~/constants/recommendation/rexCategories';
+import type { CategoryPickerTile } from '~/constants/recommendation/rexCategories';
 import { CreateStepTitle } from '../../../CreateStepTitle';
 
 export type CategoryListHeaderProps = {
   autoSuggestedCategoryId: string | null;
-  autoSuggestedCat: RexCategory | undefined;
+  autoSuggestedCat: CategoryPickerTile | undefined;
 };
 
 export function CategoryListHeader({

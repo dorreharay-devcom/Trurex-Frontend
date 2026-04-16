@@ -4,18 +4,24 @@ import type { CategoryQuestion } from '~/types/recommendation/rexCategoryCreateC
 import { cn } from '~/utils/general';
 
 type Props = {
+  sectionTitle?: string;
   questions: CategoryQuestion[];
   answers: Record<string, string>;
   onSelectOption: (questionCode: string, optionCode: string) => void;
 };
 
-export function ScorecardQuestions({ questions, answers, onSelectOption }: Props) {
+export function ScorecardQuestions({
+  sectionTitle = 'Questions',
+  questions,
+  answers,
+  onSelectOption,
+}: Props) {
   if (questions.length === 0) return null;
 
   return (
     <View className="space-y-4">
       <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        Questions
+        {sectionTitle}
       </Text>
       {questions.map((q) => (
         <View key={q.code} className="space-y-2">

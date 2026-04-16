@@ -5,3 +5,4 @@ export {
   type UseRexPlaceSearchOptions,
   type UseRexPlaceSearchResult,
 } from './useRexPlaceSearch';
+export { useActiveCategories } from '../useActiveCategories';

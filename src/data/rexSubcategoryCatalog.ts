@@ -1,4 +1,3 @@
-import { REAL_ESTATE_CATEGORY_ID } from '~/constants/recommendation/rexCategories';
 import type { CategorySubcategoryConfig } from '~/types/recommendation/rexCategoryCreateConfig';
 
 export type RexSubcategoryOption = {
@@ -63,14 +62,6 @@ export function resolveSubcategoryIcon(code: string, displayName?: string): stri
   return '';
 }
 
-export const REAL_ESTATE_SUBCATEGORIES: RexSubcategoryOption[] = [
-  { code: 'buyers_agent', label: "Buyer's Agent", ratingCount: 3, questionCount: 1 },
-  { code: 'selling_agent', label: 'Selling Agent', ratingCount: 3, questionCount: 1 },
-  { code: 'property_manager', label: 'Property Manager', ratingCount: 4, questionCount: 0 },
-  { code: 'tenant', label: 'Tenant Experience', ratingCount: 3, questionCount: 0 },
-  { code: 'agency', label: 'Agency', ratingCount: 3, questionCount: 0 },
-];
-
 export function mapSubcategoriesFromConfig(
   subcategories: CategorySubcategoryConfig[],
 ): RexSubcategoryOption[] {
@@ -80,19 +71,4 @@ export function mapSubcategoriesFromConfig(
     ratingCount: s.rating_dimensions.length,
     questionCount: s.questions.length,
   }));
-}
-
-export function getSubcategoriesForCategory(categoryId: string | null): RexSubcategoryOption[] {
-  if (categoryId === REAL_ESTATE_CATEGORY_ID) return REAL_ESTATE_SUBCATEGORIES;
-  return [];
-}
-
-export function getSubcategoryLabel(
-  categoryId: string | null,
-  subcategoryCode: string | null,
-): string | null {
-  if (!subcategoryCode) return null;
-  return (
-    getSubcategoriesForCategory(categoryId).find((s) => s.code === subcategoryCode)?.label ?? null
-  );
 }

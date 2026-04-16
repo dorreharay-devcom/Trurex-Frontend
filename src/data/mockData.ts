@@ -77,7 +77,7 @@ export const recommendations: Recommendation[] = [
     description: 'But first, coffee. The best vanilla latte in town.',
     image:
       'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
-    categoryId: 'cafes',
+    categoryId: 'cafes_coffee_shops',
     category: 'Cafes',
     location: 'Los Angeles, CA',
     latitude: 34.0834,
@@ -102,7 +102,7 @@ export const recommendations: Recommendation[] = [
     description: 'Old Hollywood glamour at its finest.',
     image:
       'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
-    categoryId: 'hotels',
+    categoryId: 'hotels_accommodation',
     category: 'Hotels',
     location: 'West Hollywood, CA',
     latitude: 34.098,
@@ -127,7 +127,7 @@ export const recommendations: Recommendation[] = [
     description: 'No menu, just great cocktails tailored to your taste.',
     image:
       'https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=800&q=80',
-    categoryId: 'bars',
+    categoryId: 'bars_nightlife',
     category: 'Bars',
     location: 'New York, NY',
     latitude: 40.7182,

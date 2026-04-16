@@ -9,6 +9,7 @@ import {
   type SearchEntryMode,
 } from '~/types/recommendation/create';
 import type {
+  CategoryCreateConfig,
   CategoryRatingDimension,
   CategoryQuestion,
 } from '~/types/recommendation/rexCategoryCreateConfig';
@@ -80,13 +81,20 @@ export function useCreateRecWizard() {
   const [questionAnswers, setQuestionAnswers] = useState<Record<string, string>>({});
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>([]);
   const [scoreQuickTip, setScoreQuickTip] = useState('');
+  const [scoreValueForMoney, setScoreValueForMoney] = useState<number | null>(null);
   const [scoreReview, setScoreReview] = useState('');
   const [selectedCircleIds, setSelectedCircleIds] = useState<Set<string>>(
     () => new Set(['public']),
   );
+  const [categoryHasSubcategoryStep, setCategoryHasSubcategoryStep] = useState(false);
+
+  const syncCategoryCreateShape = useCallback((config: CategoryCreateConfig | null) => {
+    setCategoryHasSubcategoryStep((config?.subcategories?.length ?? 0) > 0);
+  }, []);
+
   const activeSteps = useMemo(
-    () => getActiveCreateRecSteps(selectedCategoryId),
-    [selectedCategoryId],
+    () => getActiveCreateRecSteps(selectedCategoryId, categoryHasSubcategoryStep),
+    [selectedCategoryId, categoryHasSubcategoryStep],
   );
 
   useEffect(() => {
@@ -95,6 +103,7 @@ export function useCreateRecWizard() {
 
   useEffect(() => {
     setSelectedSubcategoryCode(null);
+    setCategoryHasSubcategoryStep(false);
   }, [selectedCategoryId]);
 
   const stepIndex = activeSteps.indexOf(stepId);
@@ -147,6 +156,7 @@ export function useCreateRecWizard() {
       setCategoryRatings(Object.fromEntries(dimensions.map((d) => [d.code, null])));
       setQuestionAnswers({});
       setSelectedTagSlugs([]);
+      setScoreValueForMoney(null);
     },
     [],
   );
@@ -227,8 +237,10 @@ export function useCreateRecWizard() {
     setQuestionAnswers({});
     setSelectedTagSlugs([]);
     setScoreQuickTip('');
+    setScoreValueForMoney(null);
     setScoreReview('');
     setSelectedCircleIds(new Set(['public']));
+    setCategoryHasSubcategoryStep(false);
   }, []);
 
   const toggleCircleId = useCallback((id: string) => {
@@ -312,9 +324,12 @@ export function useCreateRecWizard() {
     syncFormToConfig,
     scoreQuickTip,
     setScoreQuickTip,
+    scoreValueForMoney,
+    setScoreValueForMoney,
     scoreReview,
     setScoreReview: setScoreReviewClamped,
     selectedCircleIds,
     toggleCircleId,
+    syncCategoryCreateShape,
   };
 }

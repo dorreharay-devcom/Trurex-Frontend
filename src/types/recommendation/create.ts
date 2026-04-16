@@ -1,5 +1,3 @@
-import { REAL_ESTATE_CATEGORY_ID } from '~/constants/recommendation/rexCategories';
-
 export const CREATE_REC_STEP_ORDER = [
   'search',
   'category',
@@ -32,7 +30,13 @@ export type CreateRecSearchPlace = {
   longitude?: number | null;
 };
 
-export function getActiveCreateRecSteps(selectedCategoryId: string | null): CreateRecStepId[] {
-  const includeType = selectedCategoryId === REAL_ESTATE_CATEGORY_ID;
+/**
+ * @param includeSubcategoryStep — true when the loaded category config has a non-empty `subcategories` array.
+ */
+export function getActiveCreateRecSteps(
+  selectedCategoryId: string | null,
+  includeSubcategoryStep: boolean,
+): CreateRecStepId[] {
+  const includeType = selectedCategoryId != null && includeSubcategoryStep;
   return CREATE_REC_STEP_ORDER.filter((id) => id !== 'type' || includeType);
 }

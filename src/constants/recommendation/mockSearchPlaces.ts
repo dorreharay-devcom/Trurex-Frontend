@@ -7,7 +7,7 @@ export const CREATE_REC_SEARCH_PLACES: CreateRecSearchPlace[] = [
     title: 'Luna — Energy Healer',
     subtitle: 'Remote / Online',
     categoryLabel: 'Spiritual & Holistic',
-    categoryId: 'spiritual-holistic',
+    categoryId: 'spiritual_holistic',
   },
   {
     id: 'tokyo-tina',
@@ -31,7 +31,7 @@ export const CREATE_REC_SEARCH_PLACES: CreateRecSearchPlace[] = [
     title: 'Alfred Coffee Melrose',
     subtitle: 'Los Angeles, CA',
     categoryLabel: 'Cafes',
-    categoryId: 'cafes-coffee',
+    categoryId: 'cafes_coffee_shops',
   },
   {
     id: 'lune-fitzroy',
@@ -39,7 +39,7 @@ export const CREATE_REC_SEARCH_PLACES: CreateRecSearchPlace[] = [
     title: 'Lune Croissanterie',
     subtitle: '119 Rose St, Fitzroy VIC',
     categoryLabel: 'Cafes & Coffee Shops',
-    categoryId: 'cafes-coffee',
+    categoryId: 'cafes_coffee_shops',
   },
   {
     id: 'marmont',
@@ -47,7 +47,7 @@ export const CREATE_REC_SEARCH_PLACES: CreateRecSearchPlace[] = [
     title: 'Chateau Marmont',
     subtitle: 'West Hollywood, CA',
     categoryLabel: 'Hotels & Stays',
-    categoryId: 'hotels-accommodation',
+    categoryId: 'hotels_accommodation',
   },
   {
     id: 'yoga',
@@ -55,6 +55,6 @@ export const CREATE_REC_SEARCH_PLACES: CreateRecSearchPlace[] = [
     title: 'Rise Yoga Studio',
     subtitle: 'Silver Lake, CA',
     categoryLabel: 'Activities',
-    categoryId: 'fitness-sports',
+    categoryId: 'fitness_movement',
   },
 ];

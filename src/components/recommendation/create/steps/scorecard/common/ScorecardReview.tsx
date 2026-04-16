@@ -5,17 +5,24 @@ import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import { webNoOutline } from '../../search/common/webInputOutline';
 
 type Props = {
+  title?: string;
+  placeholder?: string;
   value: string;
   onChangeText: (v: string) => void;
 };
 
-export function ScorecardReview({ value, onChangeText }: Props) {
+export function ScorecardReview({
+  title = 'Your review',
+  placeholder = 'Share your experience in your own words...',
+  value,
+  onChangeText,
+}: Props) {
   const reviewLen = value.length;
   return (
     <View>
       <View className="mb-2 flex-row items-center justify-between">
         <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Your review
+          {title}
         </Text>
         <Text className="text-[10px] text-muted-foreground opacity-60">
           {reviewLen}/{CREATE_REC_REVIEW_MAX}
@@ -24,7 +31,7 @@ export function ScorecardReview({ value, onChangeText }: Props) {
       <TextInput
         value={value}
         onChangeText={onChangeText}
-        placeholder="Share your experience in your own words..."
+        placeholder={placeholder}
         placeholderTextColor={Theme.colors.secondaryText}
         className="flex min-h-[90px] w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground focus:outline-none focus:border-primary"
         style={[webNoOutline, textFieldCaretStyle]}

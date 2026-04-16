@@ -19,7 +19,9 @@ type Props = {
   manualAddress: string;
   manualGeotag: { lat: number; lng: number } | null;
   selectedCategoryId: string | null;
+  categoryDisplayName: string | null;
   categoryRatings: Record<string, number | null>;
+  scoreValueForMoney: number | null;
   scoreQuickTip: string;
   scoreReview: string;
   selectedCircleIds: Set<string>;
@@ -36,7 +38,9 @@ export const Confirm: React.FC<Props> = ({
   manualAddress,
   manualGeotag,
   selectedCategoryId,
+  categoryDisplayName,
   categoryRatings,
+  scoreValueForMoney,
   scoreQuickTip,
   scoreReview,
   selectedCircleIds,
@@ -57,7 +61,10 @@ export const Confirm: React.FC<Props> = ({
     [searchMode, selectedSearchPlace, manualName, manualAddress, manualGeotag],
   );
 
-  const ratingDisplay = useMemo(() => averageCategoryRatings(categoryRatings), [categoryRatings]);
+  const ratingDisplay = useMemo(
+    () => averageCategoryRatings(categoryRatings, scoreValueForMoney),
+    [categoryRatings, scoreValueForMoney],
+  );
   const tagLabels = useMemo(
     () => getConfirmTagLabels(selectedTagSlugs, tagOptions),
     [selectedTagSlugs, tagOptions],
@@ -87,6 +94,7 @@ export const Confirm: React.FC<Props> = ({
         <ConfirmPreviewCard
           place={place}
           selectedCategoryId={selectedCategoryId}
+          categoryDisplayName={categoryDisplayName}
           subcategoryLabel={subcategoryLabel}
           photoCount={photoCount}
           ratingDisplay={ratingDisplay}

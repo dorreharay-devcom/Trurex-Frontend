@@ -1,14 +1,8 @@
 import React from 'react';
 import { View, Animated as RNAnimated } from 'react-native';
 import type { useCreateRecWizard } from '~/hooks/recommendation';
-import {
-  REAL_ESTATE_CATEGORY_ID,
-  getRexCategoryApiCode,
-} from '~/constants/recommendation/rexCategories';
-import {
-  mapSubcategoriesFromConfig,
-  REAL_ESTATE_SUBCATEGORIES,
-} from '~/data/rexSubcategoryCatalog';
+import { getRexCategoryApiCode } from '~/constants/recommendation/rexCategories';
+import { mapSubcategoriesFromConfig } from '~/data/rexSubcategoryCatalog';
 import type {
   CategoryCreateConfig,
   CategoryQuestion,
@@ -26,9 +20,15 @@ type Props = {
   tagLocationLoading: boolean;
   activeCreateConfig: CategoryCreateConfig | null;
   configLoading: boolean;
-  mergedRatingDimensions: CategoryRatingDimension[];
-  mergedQuestions: CategoryQuestion[];
   mergedTagOptions: CategoryTagOption[];
+  categoryDimsOnly: CategoryRatingDimension[];
+  subDimsOnly: CategoryRatingDimension[];
+  categoryQsOnly: CategoryQuestion[];
+  subQsOnly: CategoryQuestion[];
+  categoryStarTitle: string;
+  subcategoryStarTitle: string | null;
+  showQuickTip: boolean;
+  useExperienceReviewCopy: boolean;
   subcategoryLabelForConfirm: string | null;
 };
 
@@ -39,9 +39,15 @@ export const CreateModalBody: React.FC<Props> = ({
   tagLocationLoading,
   activeCreateConfig,
   configLoading,
-  mergedRatingDimensions,
-  mergedQuestions,
   mergedTagOptions,
+  categoryDimsOnly,
+  subDimsOnly,
+  categoryQsOnly,
+  subQsOnly,
+  categoryStarTitle,
+  subcategoryStarTitle,
+  showQuickTip,
+  useExperienceReviewCopy,
   subcategoryLabelForConfirm,
 }) => {
   const categoryApiCode = getRexCategoryApiCode(flow.selectedCategoryId);
@@ -50,13 +56,9 @@ export const CreateModalBody: React.FC<Props> = ({
   const configReady =
     !flow.selectedCategoryId || (!!categoryApiCode && !!activeCreateConfig && !configLoadError);
 
-  const typeStepSubcategories = (() => {
-    if (flow.selectedCategoryId !== REAL_ESTATE_CATEGORY_ID) return [];
-    if (activeCreateConfig?.subcategories?.length) {
-      return mapSubcategoriesFromConfig(activeCreateConfig.subcategories);
-    }
-    return REAL_ESTATE_SUBCATEGORIES;
-  })();
+  const typeStepSubcategories = activeCreateConfig?.subcategories?.length
+    ? mapSubcategoriesFromConfig(activeCreateConfig.subcategories)
+    : [];
 
   return (
     <View className="min-h-0 w-full flex-1">
@@ -96,10 +98,16 @@ export const CreateModalBody: React.FC<Props> = ({
         {flow.stepId === 'scorecard' && (
           <Scorecard
             selectedCategoryId={flow.selectedCategoryId}
-            ratingDimensions={mergedRatingDimensions}
+            showQuickTip={showQuickTip}
+            useExperienceReviewCopy={useExperienceReviewCopy}
+            categoryStarTitle={categoryStarTitle}
+            subcategoryStarTitle={subcategoryStarTitle}
+            categoryRatingDimensions={categoryDimsOnly}
+            subcategoryRatingDimensions={subDimsOnly}
             categoryRatings={flow.categoryRatings}
             onCategoryRatingChange={flow.setCategoryRating}
-            questions={mergedQuestions}
+            categoryQuestions={categoryQsOnly}
+            subcategoryQuestions={subQsOnly}
             questionAnswers={flow.questionAnswers}
             onQuestionAnswer={flow.setQuestionAnswer}
             tagOptions={mergedTagOptions}
@@ -107,6 +115,8 @@ export const CreateModalBody: React.FC<Props> = ({
             onToggleTag={flow.toggleTagSlug}
             configReady={configReady && !configLoading}
             configLoadError={configLoadError}
+            scoreValueForMoney={flow.scoreValueForMoney}
+            onScoreValueForMoneyChange={flow.setScoreValueForMoney}
             quickTip={flow.scoreQuickTip}
             onQuickTipChange={flow.setScoreQuickTip}
             reviewText={flow.scoreReview}
@@ -130,7 +140,9 @@ export const CreateModalBody: React.FC<Props> = ({
             manualAddress={flow.manualAddress}
             manualGeotag={flow.manualGeotag}
             selectedCategoryId={flow.selectedCategoryId}
+            categoryDisplayName={activeCreateConfig?.display_name ?? null}
             categoryRatings={flow.categoryRatings}
+            scoreValueForMoney={flow.scoreValueForMoney}
             scoreQuickTip={flow.scoreQuickTip}
             scoreReview={flow.scoreReview}
             selectedCircleIds={flow.selectedCircleIds}

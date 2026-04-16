@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { getRexCategoryByApiCode } from '~/constants/recommendation/rexCategories';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { averageScoreFromCategoryRatings } from '~/utils/recommendation/rexFeedDisplay';
 
@@ -97,11 +96,9 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
   const created = o.created_at ?? o.createdAt;
 
   const categoryCode = optStr(o, 'category_code', 'category_id') ?? '';
-  const cat = categoryCode ? getRexCategoryByApiCode(categoryCode) : undefined;
   const categoryLabel =
     (
       optStr(o, 'category_name', 'category_display_name', 'category') ??
-      cat?.label ??
       (categoryCode ? categoryCode.replace(/_/g, ' ') : '')
     ).trim() || 'Uncategorized';
 
@@ -122,7 +119,7 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
     description: bodyText,
     image,
     photoPath,
-    categoryId: (cat?.id ?? categoryCode) || 'all',
+    categoryId: categoryCode || 'all',
     category: categoryLabel,
     location: optStr(o, 'location', 'place_address') ?? undefined,
     latitude: typeof o.latitude === 'number' ? o.latitude : undefined,
