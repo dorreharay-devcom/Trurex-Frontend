@@ -7,12 +7,35 @@ export interface DiscoverQueryParams {
   result_offset?: number;
 }
 
+export interface SearchRexesParams {
+  search_term: string | null;
+  category_filter: string | null;
+  result_limit?: number;
+  result_offset?: number;
+}
+
 export const DiscoveryApi = {
   getDiscoverRecommendations: async (
     params: DiscoverQueryParams = {},
   ): Promise<Recommendation[]> => {
     const raw = unwrap(
       await Backend.rpc('discover_feed', {
+        result_limit: params.result_limit ?? 20,
+        result_offset: params.result_offset ?? 0,
+      }),
+    );
+    if (!Array.isArray(raw)) return [];
+    return raw.flatMap((row) => {
+      const rec = mapDiscoverFeedRowSafe(row);
+      return rec ? [rec] : [];
+    });
+  },
+
+  searchRexes: async (params: SearchRexesParams): Promise<Recommendation[]> => {
+    const raw = unwrap(
+      await Backend.rpc('search_rexes', {
+        search_term: params.search_term,
+        category_filter: params.category_filter,
         result_limit: params.result_limit ?? 20,
         result_offset: params.result_offset ?? 0,
       }),
