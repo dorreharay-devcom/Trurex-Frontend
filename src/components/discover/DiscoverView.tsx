@@ -3,7 +3,7 @@ import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { webContainerStyle } from '~/utils';
 import CategoryPills, { Category } from '~/components/layout/CategoryPills';
 import RecommendationCard, { Recommendation } from '~/components/recommendation/RecommendationCard';
-import { useDiscoverRecommendations } from '~/hooks/useDiscovery';
+import { useDiscoverRecommendations, useSearchRexes } from '~/hooks/useDiscovery';
 import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
 
 const CATEGORIES: Category[] = [
@@ -26,26 +26,26 @@ type DiscoverViewProps = {
 const DiscoverView = ({ searchQuery = '', onRecommendationPress, onTapRec }: DiscoverViewProps) => {
   const onOpenRec = onRecommendationPress ?? onTapRec;
   const [activeCategory, setActiveCategory] = useState('all');
-  const { data, isLoading } = useDiscoverRecommendations();
+  const hasSearch = searchQuery.trim().length > 0;
 
-  const recs = data?.length ? data : MOCK_RECS;
+  const { data: discoverData, isLoading: discoverLoading } = useDiscoverRecommendations(undefined, {
+    enabled: !hasSearch,
+  });
+  const { data: searchData, isLoading: searchLoading } = useSearchRexes(
+    { searchTerm: searchQuery, categoryId: activeCategory },
+    { enabled: hasSearch },
+  );
+
+  const recs = hasSearch ? (searchData ?? []) : discoverData?.length ? discoverData : MOCK_RECS;
 
   const filtered = useMemo(() => {
+    if (hasSearch) return recs;
     const byCategory =
       activeCategory === 'all' ? recs : recs.filter((r) => r.categoryId === activeCategory);
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return byCategory;
-    return byCategory.filter((r) => {
-      const tags = r.tags ?? [];
-      return (
-        r.title.toLowerCase().includes(q) ||
-        (r.description?.toLowerCase() ?? '').includes(q) ||
-        (r.location?.toLowerCase() ?? '').includes(q) ||
-        r.category.toLowerCase().includes(q) ||
-        tags.some((t) => t.toLowerCase().includes(q))
-      );
-    });
-  }, [recs, activeCategory, searchQuery]);
+    return byCategory;
+  }, [recs, activeCategory, hasSearch]);
+
+  const isLoading = hasSearch ? searchLoading : discoverLoading;
 
   if (isLoading) {
     return (
@@ -76,7 +76,11 @@ const DiscoverView = ({ searchQuery = '', onRecommendationPress, onTapRec }: Dis
         ListEmptyComponent={() => (
           <View className="items-center py-16">
             <Text className="text-4xl mb-3">🦖</Text>
-            <Text className="text-sm text-muted">No recs yet. Be the first to add one!</Text>
+            <Text className="text-sm text-muted">
+              {hasSearch
+                ? 'No matching recommendations. Try different words or filters.'
+                : 'No recs yet. Be the first to add one!'}
+            </Text>
           </View>
         )}
         renderItem={({ item }) => (
