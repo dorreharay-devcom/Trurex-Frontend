@@ -3,6 +3,7 @@ import type { CreateRecSearchPlace } from '~/types/recommendation/create';
 export const CREATE_REC_SEARCH_PLACES: CreateRecSearchPlace[] = [
   {
     id: 'luna',
+    source: 'database',
     title: 'Luna — Energy Healer',
     subtitle: 'Remote / Online',
     categoryLabel: 'Spiritual & Holistic',
@@ -10,6 +11,7 @@ export const CREATE_REC_SEARCH_PLACES: CreateRecSearchPlace[] = [
   },
   {
     id: 'tokyo-tina',
+    source: 'database',
     title: 'Tokyo Tina',
     subtitle: '66a Chapel St, Windsor VIC',
     categoryLabel: 'Restaurants',
@@ -17,6 +19,7 @@ export const CREATE_REC_SEARCH_PLACES: CreateRecSearchPlace[] = [
   },
   {
     id: 'nobu',
+    source: 'database',
     title: 'Nobu Malibu',
     subtitle: 'Malibu, CA',
     categoryLabel: 'Restaurants',
@@ -24,6 +27,7 @@ export const CREATE_REC_SEARCH_PLACES: CreateRecSearchPlace[] = [
   },
   {
     id: 'alfred',
+    source: 'database',
     title: 'Alfred Coffee Melrose',
     subtitle: 'Los Angeles, CA',
     categoryLabel: 'Cafes',
@@ -31,6 +35,7 @@ export const CREATE_REC_SEARCH_PLACES: CreateRecSearchPlace[] = [
   },
   {
     id: 'lune-fitzroy',
+    source: 'database',
     title: 'Lune Croissanterie',
     subtitle: '119 Rose St, Fitzroy VIC',
     categoryLabel: 'Cafes & Coffee Shops',
@@ -38,6 +43,7 @@ export const CREATE_REC_SEARCH_PLACES: CreateRecSearchPlace[] = [
   },
   {
     id: 'marmont',
+    source: 'database',
     title: 'Chateau Marmont',
     subtitle: 'West Hollywood, CA',
     categoryLabel: 'Hotels & Stays',
@@ -45,6 +51,7 @@ export const CREATE_REC_SEARCH_PLACES: CreateRecSearchPlace[] = [
   },
   {
     id: 'yoga',
+    source: 'database',
     title: 'Rise Yoga Studio',
     subtitle: 'Silver Lake, CA',
     categoryLabel: 'Activities',

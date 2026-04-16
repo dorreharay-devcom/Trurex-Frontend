@@ -13,7 +13,7 @@ type Props = {
 };
 
 export function SearchPlaceRow({ place, selected, onSelect }: Props) {
-  const cat = getRexCategoryById(place.categoryId);
+  const cat = place.categoryId != null ? getRexCategoryById(place.categoryId) : undefined;
   const categoryLabel = cat?.label ?? place.categoryLabel;
   const categoryEmoji = cat?.emoji ?? '📍';
   const categoryLine = `${categoryEmoji}\u00A0${categoryLabel}`;

@@ -8,13 +8,13 @@ import {
   getConfirmCircleTitles,
   getConfirmTagLabels,
 } from '~/utils/recommendation/confirmPreview';
-import type { SearchEntryMode } from '~/types/recommendation/create';
+import type { CreateRecSearchPlace, SearchEntryMode } from '~/types/recommendation/create';
 import type { CategoryTagOption } from '~/types/recommendation/rexCategoryCreateConfig';
 import { ConfirmPreviewCard } from './common';
 
 type Props = {
   searchMode: SearchEntryMode;
-  selectedPlaceId: string | null;
+  selectedSearchPlace: CreateRecSearchPlace | null;
   manualName: string;
   manualAddress: string;
   manualGeotag: { lat: number; lng: number } | null;
@@ -31,7 +31,7 @@ type Props = {
 
 export const Confirm: React.FC<Props> = ({
   searchMode,
-  selectedPlaceId,
+  selectedSearchPlace,
   manualName,
   manualAddress,
   manualGeotag,
@@ -47,8 +47,14 @@ export const Confirm: React.FC<Props> = ({
 }) => {
   const place = useMemo(
     () =>
-      getConfirmPreviewPlace(searchMode, selectedPlaceId, manualName, manualAddress, manualGeotag),
-    [searchMode, selectedPlaceId, manualName, manualAddress, manualGeotag],
+      getConfirmPreviewPlace(
+        searchMode,
+        selectedSearchPlace,
+        manualName,
+        manualAddress,
+        manualGeotag,
+      ),
+    [searchMode, selectedSearchPlace, manualName, manualAddress, manualGeotag],
   );
 
   const ratingDisplay = useMemo(() => averageCategoryRatings(categoryRatings), [categoryRatings]);

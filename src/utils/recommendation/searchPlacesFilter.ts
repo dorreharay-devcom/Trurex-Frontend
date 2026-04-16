@@ -11,7 +11,7 @@ export function filterCreateRecSearchPlaces(
     return [...places];
   }
   return places.filter((p) => {
-    const meta = getRexCategoryById(p.categoryId);
+    const meta = p.categoryId != null ? getRexCategoryById(p.categoryId) : undefined;
     return (
       p.title.toLowerCase().includes(q) ||
       p.subtitle.toLowerCase().includes(q) ||

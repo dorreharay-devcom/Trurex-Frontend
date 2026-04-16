@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, Pressable } from 'react-native';
+import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { Plus } from 'lucide-react-native';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { CreateStepTitle } from '../../../CreateStepTitle';
@@ -14,20 +14,26 @@ const SCROLL_PAD = 'pb-36';
 type Props = {
   searchQuery: string;
   onSearchQueryChange: (q: string) => void;
-  selectedPlaceId: string | null;
+  selectedSearchPlace: CreateRecSearchPlace | null;
   onSelectPlace: (place: CreateRecSearchPlace) => void;
   results: CreateRecSearchPlace[];
   showNoResults: boolean;
+  isSearching: boolean;
+  canSearch: boolean;
+  searchErrorMessage: string | null;
   onOpenManual: () => void;
 };
 
 export function SearchSelectPanel({
   searchQuery,
   onSearchQueryChange,
-  selectedPlaceId,
+  selectedSearchPlace,
   onSelectPlace,
   results,
   showNoResults,
+  isSearching,
+  canSearch,
+  searchErrorMessage,
   onOpenManual,
 }: Props) {
   return (
@@ -47,16 +53,28 @@ export function SearchSelectPanel({
 
         <SearchQueryField value={searchQuery} onChangeText={onSearchQueryChange} />
 
-        {showNoResults && (
+        {searchErrorMessage ? (
+          <Text className="py-4 text-center text-sm text-destructive">{searchErrorMessage}</Text>
+        ) : null}
+
+        {canSearch && isSearching ? (
+          <View className="items-center py-8">
+            <ActivityIndicator color={Theme.colors.primary} />
+          </View>
+        ) : null}
+
+        {canSearch && !isSearching && showNoResults && (
           <Text className="py-6 text-center text-sm text-muted-foreground">No results found</Text>
         )}
 
-        {!showNoResults &&
+        {canSearch &&
+          !isSearching &&
+          !showNoResults &&
           results.map((place) => (
             <SearchPlaceRow
               key={place.id}
               place={place}
-              selected={selectedPlaceId === place.id}
+              selected={selectedSearchPlace?.id === place.id}
               onSelect={onSelectPlace}
             />
           ))}
