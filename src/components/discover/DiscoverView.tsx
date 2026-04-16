@@ -3,19 +3,40 @@ import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { webContainerStyle } from '~/utils';
 import CategoryPills, { Category } from '~/components/layout/CategoryPills';
 import RecommendationCard, { Recommendation } from '~/components/recommendation/RecommendationCard';
-import { useDiscoverRecommendations, useSearchRexes } from '~/hooks/useDiscovery';
+import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
 import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
+import { useActiveCategories } from '~/hooks/useActiveCategories';
+import { useDiscoverRecommendations, useSearchRexes } from '~/hooks/useDiscovery';
+import { categoryPillColor } from '~/utils/recommendation/categoryPillColor';
 
-const CATEGORIES: Category[] = [
-  { id: 'all', label: 'All', emoji: '🔥', color: '#9333ea' },
-  { id: 'restaurants', label: 'Restaurants', emoji: '🍽️', color: '#f04a1e' },
-  { id: 'cafes-coffee', label: 'Cafes', emoji: '☕', color: '#df7a11' },
-  { id: 'hotels-accommodation', label: 'Hotels', emoji: '🏨', color: '#2e86de' },
-  { id: 'experiences-tours', label: 'Experiences', emoji: '✨', color: '#df3b7e' },
-  { id: 'growth-learning', label: 'Books', emoji: '📚', color: '#2aa66b' },
-  { id: 'bars-nightlife', label: 'Bars', emoji: '🍸', color: '#7a57d4' },
-  { id: 'real-estate', label: 'Real Estate', emoji: '🏠', color: '#0d9488' },
+const ALL_PILL: Category = {
+  id: 'all',
+  label: 'All',
+  emoji: '🔥',
+  color: '#9333ea',
+};
+
+const FALLBACK_CATEGORY_CODES: { code: string; label: string }[] = [
+  { code: 'restaurants', label: 'Restaurants' },
+  { code: 'cafes_coffee_shops', label: 'Cafes' },
+  { code: 'hotels_accommodation', label: 'Hotels' },
+  { code: 'experiences_tour_guides', label: 'Experiences' },
+  { code: 'growth_learning', label: 'Learning' },
+  { code: 'bars_nightlife', label: 'Bars' },
+  { code: 'real_estate', label: 'Real estate' },
 ];
+
+function buildFallbackPills(): Category[] {
+  return [
+    ALL_PILL,
+    ...FALLBACK_CATEGORY_CODES.map(({ code, label }) => ({
+      id: code,
+      label,
+      emoji: getCategoryEmoji(code),
+      color: categoryPillColor(code),
+    })),
+  ];
+}
 
 type DiscoverViewProps = {
   searchQuery?: string;
@@ -27,6 +48,23 @@ const DiscoverView = ({ searchQuery = '', onRecommendationPress, onTapRec }: Dis
   const onOpenRec = onRecommendationPress ?? onTapRec;
   const [activeCategory, setActiveCategory] = useState('all');
   const hasSearch = searchQuery.trim().length > 0;
+
+  const { data: activeCategoryRows } = useActiveCategories(true);
+
+  const categories = useMemo((): Category[] => {
+    if (activeCategoryRows?.length) {
+      return [
+        ALL_PILL,
+        ...activeCategoryRows.map((row) => ({
+          id: row.code,
+          label: row.display_name,
+          emoji: getCategoryEmoji(row.code),
+          color: categoryPillColor(row.code),
+        })),
+      ];
+    }
+    return buildFallbackPills();
+  }, [activeCategoryRows]);
 
   const { data: discoverData, isLoading: discoverLoading } = useDiscoverRecommendations(undefined, {
     enabled: !hasSearch,
@@ -67,7 +105,7 @@ const DiscoverView = ({ searchQuery = '', onRecommendationPress, onTapRec }: Dis
         ListHeaderComponent={() => (
           <View style={webContainerStyle} className="px-4 pt-8 pb-3">
             <CategoryPills
-              categories={CATEGORIES}
+              categories={categories}
               activeCategory={activeCategory}
               onSelect={setActiveCategory}
             />

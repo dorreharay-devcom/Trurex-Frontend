@@ -3,10 +3,7 @@ import { View, Text, Pressable, useWindowDimensions, ActivityIndicator } from 'r
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, ChevronRight } from 'lucide-react-native';
 import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';
-import {
-  REAL_ESTATE_CATEGORY_ID,
-  getRexCategoryApiCode,
-} from '~/constants/recommendation/rexCategories';
+import { getRexCategoryApiCode } from '~/constants/recommendation/rexCategories';
 import { OverlayModal } from '~/components/common/OverlayModal';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
 import { Theme } from '~/theme/Theme';
@@ -27,6 +24,10 @@ import {
   mergeRatingDimensions,
   mergeQuestions,
   mergeTagOptions,
+  categoryRatingDimensionsOnly,
+  subcategoryRatingDimensionsOnly,
+  categoryQuestionsOnly,
+  subcategoryQuestionsOnly,
 } from '~/utils/recommendation/mergeCategoryConfig';
 import {
   buildCategoryRatingsPayload,
@@ -47,7 +48,8 @@ type Props = {
 export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
   const { height: windowHeight } = useWindowDimensions();
   const flow = useCreateRecWizard();
-  const { reset, setManualGeotag, setManualAddress, syncFormToConfig } = flow;
+  const { reset, setManualGeotag, setManualAddress, syncFormToConfig, syncCategoryCreateShape } =
+    flow;
   const [submitting, setSubmitting] = useState(false);
 
   const applyManualGeotag = useCallback(
@@ -105,10 +107,12 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
     return fetchedSingleConfig ?? null;
   }, [categoryApiCode, configsByCode, fetchedSingleConfig]);
 
+  const categoryDefinesSubcategories = Boolean(activeCreateConfig?.subcategories?.length);
+
   const subcategoryCodeForMerge = useMemo(() => {
-    if (flow.selectedCategoryId !== REAL_ESTATE_CATEGORY_ID) return null;
+    if (!categoryDefinesSubcategories) return null;
     return flow.selectedSubcategoryCode;
-  }, [flow.selectedCategoryId, flow.selectedSubcategoryCode]);
+  }, [categoryDefinesSubcategories, flow.selectedSubcategoryCode]);
 
   const mergedRatingDimensions = useMemo(
     () =>
@@ -125,6 +129,45 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
     () => (activeCreateConfig ? mergeTagOptions(activeCreateConfig, subcategoryCodeForMerge) : []),
     [activeCreateConfig, subcategoryCodeForMerge],
   );
+
+  const categoryDimsOnly = useMemo(
+    () => (activeCreateConfig ? categoryRatingDimensionsOnly(activeCreateConfig) : []),
+    [activeCreateConfig],
+  );
+
+  const subDimsOnly = useMemo(
+    () =>
+      activeCreateConfig
+        ? subcategoryRatingDimensionsOnly(activeCreateConfig, subcategoryCodeForMerge)
+        : [],
+    [activeCreateConfig, subcategoryCodeForMerge],
+  );
+
+  const categoryQsOnly = useMemo(
+    () => (activeCreateConfig ? categoryQuestionsOnly(activeCreateConfig) : []),
+    [activeCreateConfig],
+  );
+
+  const subQsOnly = useMemo(
+    () =>
+      activeCreateConfig
+        ? subcategoryQuestionsOnly(activeCreateConfig, subcategoryCodeForMerge)
+        : [],
+    [activeCreateConfig, subcategoryCodeForMerge],
+  );
+
+  const subcategoryLabelForConfirm = useMemo(() => {
+    if (!flow.selectedSubcategoryCode || !activeCreateConfig) return null;
+    return (
+      activeCreateConfig.subcategories.find((s) => s.code === flow.selectedSubcategoryCode)
+        ?.display_name ?? null
+    );
+  }, [activeCreateConfig, flow.selectedSubcategoryCode]);
+
+  const categoryStarTitle = activeCreateConfig?.display_name ?? 'Category';
+
+  const showQuickTip = mergedTagOptions.length > 0;
+  const useExperienceReviewCopy = categoryDefinesSubcategories;
 
   const ratingDimCodesKey = mergedRatingDimensions.map((d) => d.code).join('|');
   const questionCodesKey = mergedQuestions.map((q) => q.code).join('|');
@@ -144,13 +187,9 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
   ]);
   /* eslint-enable react-hooks/exhaustive-deps */
 
-  const subcategoryLabelForConfirm = useMemo(() => {
-    if (!flow.selectedSubcategoryCode || !activeCreateConfig) return null;
-    return (
-      activeCreateConfig.subcategories.find((s) => s.code === flow.selectedSubcategoryCode)
-        ?.display_name ?? null
-    );
-  }, [activeCreateConfig, flow.selectedSubcategoryCode]);
+  useEffect(() => {
+    syncCategoryCreateShape(activeCreateConfig);
+  }, [activeCreateConfig, syncCategoryCreateShape]);
 
   const configLoading =
     Boolean(visible && flow.selectedCategoryId && categoryApiCode) &&
@@ -221,7 +260,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
           flow.manualName,
         ),
         p_review: flow.scoreReview.trim() || null,
-        p_quick_tip: flow.scoreQuickTip.trim() || null,
+        p_quick_tip: showQuickTip ? flow.scoreQuickTip.trim() || null : null,
         p_visibility: vis.p_visibility,
         circle_ids: vis.circle_ids ?? undefined,
         tag_names: flow.selectedTagSlugs,
@@ -229,6 +268,10 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
         p_linked_place_id: getLinkedPlaceId(flow.linkedPlaceId) ?? undefined,
         p_category_ratings: buildCategoryRatingsPayload(flow.categoryRatings),
         p_question_answers: p_question_answers,
+        p_score_value_for_money:
+          flow.scoreValueForMoney != null && flow.scoreValueForMoney > 0
+            ? flow.scoreValueForMoney
+            : null,
         ...(subcategoryCodeForMerge ? { p_subcategory_code: subcategoryCodeForMerge } : {}),
       };
 
@@ -248,6 +291,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
     mergedQuestions,
     subcategoryCodeForMerge,
     handleClose,
+    showQuickTip,
   ]);
 
   const { layout } = modalConfig;
@@ -277,7 +321,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
                 className="flex-row items-center gap-1.5 rounded-lg py-0.5 active:opacity-80"
               >
                 <ArrowLeft size={20} color={Theme.colors.secondaryText} />
-                <Text className="text-sm font-medium text-muted-foreground">
+                <Text className="text-sm font-medium text-foreground">
                   {flow.isFirstStep ? 'Cancel' : 'Back'}
                 </Text>
               </Pressable>
@@ -304,9 +348,15 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
           tagLocationLoading={isGeotagging}
           activeCreateConfig={activeCreateConfig}
           configLoading={configLoading}
-          mergedRatingDimensions={mergedRatingDimensions}
-          mergedQuestions={mergedQuestions}
           mergedTagOptions={mergedTagOptions}
+          categoryDimsOnly={categoryDimsOnly}
+          subDimsOnly={subDimsOnly}
+          categoryQsOnly={categoryQsOnly}
+          subQsOnly={subQsOnly}
+          categoryStarTitle={categoryStarTitle}
+          subcategoryStarTitle={subcategoryLabelForConfirm}
+          showQuickTip={showQuickTip}
+          useExperienceReviewCopy={useExperienceReviewCopy}
           subcategoryLabelForConfirm={subcategoryLabelForConfirm}
         />
 

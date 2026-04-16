@@ -6,16 +6,22 @@ import { Theme } from '~/theme/Theme';
 import { cn } from '~/utils/general';
 
 type Props = {
+  sectionTitle?: string;
   dimensions: CategoryRatingDimension[];
   scores: Record<string, number | null>;
   onStarChange: (code: string, value: number) => void;
 };
 
-export function ScorecardStarsTable({ dimensions, scores, onStarChange }: Props) {
+export function ScorecardStarsTable({
+  sectionTitle = 'Star ratings',
+  dimensions,
+  scores,
+  onStarChange,
+}: Props) {
   return (
     <View className="space-y-1 rounded-xl border border-border bg-card p-4">
       <Text className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        Star ratings
+        {sectionTitle}
       </Text>
       <View>
         {dimensions.map((dim, index) => {

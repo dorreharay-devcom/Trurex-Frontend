@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { MapPin } from 'lucide-react-native';
-import { getRexCategoryById } from '~/constants/recommendation/rexCategories';
+import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
 import { Theme } from '~/theme/Theme';
 import type { CreateRecSearchPlace } from '~/types/recommendation/create';
 import { cn } from '~/utils/general';
@@ -13,9 +13,8 @@ type Props = {
 };
 
 export function SearchPlaceRow({ place, selected, onSelect }: Props) {
-  const cat = place.categoryId != null ? getRexCategoryById(place.categoryId) : undefined;
-  const categoryLabel = cat?.label ?? place.categoryLabel;
-  const categoryEmoji = cat?.emoji ?? '📍';
+  const categoryLabel = place.categoryLabel;
+  const categoryEmoji = place.categoryId != null ? getCategoryEmoji(place.categoryId) : '📍';
   const categoryLine = `${categoryEmoji}\u00A0${categoryLabel}`;
 
   return (

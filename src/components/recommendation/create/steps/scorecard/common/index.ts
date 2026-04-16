@@ -5,3 +5,4 @@ export { ScorecardTagOptions } from './ScorecardTagOptions';
 export { ScorecardAppliesChips } from './ScorecardAppliesChips';
 export { ScorecardQuickTip } from './ScorecardQuickTip';
 export { ScorecardReview } from './ScorecardReview';
+export { ScorecardValueForMoney } from './ScorecardValueForMoney';

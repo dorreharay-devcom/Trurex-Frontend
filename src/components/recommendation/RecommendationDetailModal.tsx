@@ -40,7 +40,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   });
 
   const mockRatings = useMemo(
-    () => (recommendation ? buildDetailRatingRows(recommendation.rating) : []),
+    () => (recommendation ? buildDetailRatingRows(recommendation.rating ?? undefined) : []),
     [recommendation],
   );
 
@@ -71,7 +71,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                 accessibilityLabel="Back"
               >
                 <ArrowLeft size={20} color={Theme.colors.secondaryText} />
-                <Text className="text-sm font-medium text-muted-foreground">Back</Text>
+                <Text className="text-sm font-medium text-foreground">Back</Text>
               </Pressable>
             </View>
             <Text className="min-w-0 flex-1 text-center text-lg font-display font-semibold text-foreground">

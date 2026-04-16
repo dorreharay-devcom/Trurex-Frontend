@@ -1,5 +1,4 @@
 import { CREATE_REC_SEARCH_PLACES } from '~/constants/recommendation/mockSearchPlaces';
-import { getRexCategoryById } from '~/constants/recommendation/rexCategories';
 import type { CreateRecSearchPlace } from '~/types/recommendation/create';
 
 export function filterCreateRecSearchPlaces(
@@ -11,12 +10,10 @@ export function filterCreateRecSearchPlaces(
     return [...places];
   }
   return places.filter((p) => {
-    const meta = p.categoryId != null ? getRexCategoryById(p.categoryId) : undefined;
     return (
       p.title.toLowerCase().includes(q) ||
       p.subtitle.toLowerCase().includes(q) ||
-      p.categoryLabel.toLowerCase().includes(q) ||
-      (meta?.label.toLowerCase().includes(q) ?? false)
+      p.categoryLabel.toLowerCase().includes(q)
     );
   });
 }

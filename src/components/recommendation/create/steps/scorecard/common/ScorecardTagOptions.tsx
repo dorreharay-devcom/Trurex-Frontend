@@ -14,9 +14,7 @@ export function ScorecardTagOptions({ tagOptions, selectedSlugs, onToggle }: Pro
 
   return (
     <View className="space-y-3">
-      <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        Tags
-      </Text>
+      <Text className="text-xs font-medium uppercase tracking-wider text-foreground">Tags</Text>
       <View className="flex-row flex-wrap gap-2">
         {tagOptions.map((t) => {
           const on = selectedSlugs.includes(t.slug);

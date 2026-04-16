@@ -15,10 +15,15 @@ export function averageStarRating(ratings: number[]): string | null {
   return (Math.round(avg * 10) / 10).toFixed(1);
 }
 
-export function averageCategoryRatings(scores: Record<string, number | null>): string | null {
+export function averageCategoryRatings(
+  scores: Record<string, number | null>,
+  valueForMoney?: number | null,
+): string | null {
   const filled = Object.values(scores).filter((n): n is number => n != null && n > 0);
-  if (filled.length === 0) return null;
-  const avg = filled.reduce((a, b) => a + b, 0) / filled.length;
+  const nums = [...filled];
+  if (valueForMoney != null && valueForMoney > 0) nums.push(valueForMoney);
+  if (nums.length === 0) return null;
+  const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
   return (Math.round(avg * 10) / 10).toFixed(1);
 }
 

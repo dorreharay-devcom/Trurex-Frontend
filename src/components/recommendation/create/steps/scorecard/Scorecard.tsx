@@ -1,8 +1,11 @@
 import React, { useMemo } from 'react';
 import { ScrollView, View, Text } from 'react-native';
-import { getRexCategoryById } from '~/constants/recommendation/rexCategories';
+import {
+  getCategoryEmoji,
+  REAL_ESTATE_CATEGORY_ID,
+} from '~/constants/recommendation/rexCategories';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
-import { countFilledCategoryRatings } from '~/utils/recommendation/scorecardStep';
+import { countScorecardFilledSlots } from '~/utils/recommendation/scorecardStep';
 import { cn } from '~/utils/general';
 import type {
   CategoryQuestion,
@@ -16,14 +19,21 @@ import {
   ScorecardTagOptions,
   ScorecardQuickTip,
   ScorecardReview,
+  ScorecardValueForMoney,
 } from './common';
 
 type Props = {
   selectedCategoryId: string | null;
-  ratingDimensions: CategoryRatingDimension[];
+  showQuickTip: boolean;
+  useExperienceReviewCopy: boolean;
+  categoryStarTitle: string;
+  subcategoryStarTitle: string | null;
+  categoryRatingDimensions: CategoryRatingDimension[];
+  subcategoryRatingDimensions: CategoryRatingDimension[];
   categoryRatings: Record<string, number | null>;
   onCategoryRatingChange: (code: string, value: number) => void;
-  questions: CategoryQuestion[];
+  categoryQuestions: CategoryQuestion[];
+  subcategoryQuestions: CategoryQuestion[];
   questionAnswers: Record<string, string>;
   onQuestionAnswer: (questionCode: string, optionCode: string) => void;
   tagOptions: CategoryTagOption[];
@@ -31,6 +41,8 @@ type Props = {
   onToggleTag: (slug: string) => void;
   configReady: boolean;
   configLoadError: boolean;
+  scoreValueForMoney: number | null;
+  onScoreValueForMoneyChange: (v: number | null) => void;
   quickTip: string;
   onQuickTipChange: (v: string) => void;
   reviewText: string;
@@ -39,10 +51,16 @@ type Props = {
 
 export const Scorecard: React.FC<Props> = ({
   selectedCategoryId,
-  ratingDimensions,
+  showQuickTip,
+  useExperienceReviewCopy,
+  categoryStarTitle,
+  subcategoryStarTitle,
+  categoryRatingDimensions,
+  subcategoryRatingDimensions,
   categoryRatings,
   onCategoryRatingChange,
-  questions,
+  categoryQuestions,
+  subcategoryQuestions,
   questionAnswers,
   onQuestionAnswer,
   tagOptions,
@@ -50,13 +68,24 @@ export const Scorecard: React.FC<Props> = ({
   onToggleTag,
   configReady,
   configLoadError,
+  scoreValueForMoney,
+  onScoreValueForMoneyChange,
   quickTip,
   onQuickTipChange,
   reviewText,
   onReviewChange,
 }) => {
-  const categoryEmoji = getRexCategoryById(selectedCategoryId ?? '')?.emoji ?? '📍';
-  const filledCount = useMemo(() => countFilledCategoryRatings(categoryRatings), [categoryRatings]);
+  const categoryEmoji = getCategoryEmoji(selectedCategoryId ?? '');
+  const totalSlots = useMemo(() => {
+    return categoryRatingDimensions.length + subcategoryRatingDimensions.length + 1;
+  }, [categoryRatingDimensions.length, subcategoryRatingDimensions.length]);
+
+  const filledCount = useMemo(
+    () => countScorecardFilledSlots(categoryRatings, scoreValueForMoney),
+    [categoryRatings, scoreValueForMoney],
+  );
+
+  const hasAnyStars = categoryRatingDimensions.length > 0 || subcategoryRatingDimensions.length > 0;
 
   return (
     <ScrollView
@@ -66,7 +95,11 @@ export const Scorecard: React.FC<Props> = ({
       contentContainerClassName="items-center pb-36"
     >
       <View className={cn(CREATE_REC_STEP_INNER, 'gap-6')}>
-        <ScorecardIntro categoryEmoji={categoryEmoji} filledCount={filledCount} />
+        <ScorecardIntro
+          categoryEmoji={categoryEmoji}
+          filledCount={filledCount}
+          totalSlots={totalSlots}
+        />
 
         {configLoadError ? (
           <Text className="text-center text-sm text-destructive">
@@ -78,34 +111,76 @@ export const Scorecard: React.FC<Props> = ({
           </Text>
         ) : (
           <>
-            {ratingDimensions.length > 0 ? (
+            {categoryRatingDimensions.length > 0 ? (
               <ScorecardStarsTable
-                dimensions={ratingDimensions}
+                sectionTitle={`${categoryEmoji} ${categoryStarTitle}`}
+                dimensions={categoryRatingDimensions}
                 scores={categoryRatings}
                 onStarChange={onCategoryRatingChange}
               />
-            ) : (
+            ) : null}
+
+            {subcategoryRatingDimensions.length > 0 ? (
+              <ScorecardStarsTable
+                sectionTitle={subcategoryStarTitle ?? 'More detail'}
+                dimensions={subcategoryRatingDimensions}
+                scores={categoryRatings}
+                onStarChange={onCategoryRatingChange}
+              />
+            ) : null}
+
+            {!hasAnyStars ? (
               <Text className="text-center text-sm text-muted-foreground">
                 No star ratings for this category.
               </Text>
-            )}
+            ) : null}
 
-            <ScorecardQuestions
-              questions={questions}
-              answers={questionAnswers}
-              onSelectOption={onQuestionAnswer}
-            />
+            {categoryQuestions.length > 0 ? (
+              <ScorecardQuestions
+                sectionTitle="Questions"
+                questions={categoryQuestions}
+                answers={questionAnswers}
+                onSelectOption={onQuestionAnswer}
+              />
+            ) : null}
+
+            {subcategoryQuestions.length > 0 ? (
+              <ScorecardQuestions
+                sectionTitle={
+                  subcategoryStarTitle ? `${subcategoryStarTitle} · more` : 'More questions'
+                }
+                questions={subcategoryQuestions}
+                answers={questionAnswers}
+                onSelectOption={onQuestionAnswer}
+              />
+            ) : null}
 
             <ScorecardTagOptions
               tagOptions={tagOptions}
               selectedSlugs={selectedTagSlugs}
               onToggle={onToggleTag}
             />
+
+            <ScorecardValueForMoney
+              value={scoreValueForMoney}
+              onChange={onScoreValueForMoneyChange}
+              useRipOffLabels={selectedCategoryId === REAL_ESTATE_CATEGORY_ID}
+            />
           </>
         )}
 
-        <ScorecardQuickTip value={quickTip} onChangeText={onQuickTipChange} />
-        <ScorecardReview value={reviewText} onChangeText={onReviewChange} />
+        {showQuickTip ? (
+          <ScorecardQuickTip value={quickTip} onChangeText={onQuickTipChange} />
+        ) : null}
+
+        <ScorecardReview
+          title={useExperienceReviewCopy ? 'Your experience' : 'Your review'}
+          placeholder={
+            useExperienceReviewCopy ? 'How was your experience? What stood out?' : undefined
+          }
+          value={reviewText}
+          onChangeText={onReviewChange}
+        />
       </View>
     </ScrollView>
   );

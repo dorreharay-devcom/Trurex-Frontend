@@ -28,7 +28,7 @@ export const MOCK_RECS: Recommendation[] = [
       'Best matcha latte in LA. The aesthetic is unmatched and the vibes are immaculate.',
     image:
       'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
-    categoryId: 'cafes-coffee',
+    categoryId: 'cafes_coffee_shops',
     category: 'Cafes',
     location: 'Los Angeles, CA',
     rating: 4.7,
@@ -47,7 +47,7 @@ export const MOCK_RECS: Recommendation[] = [
     description: 'Timeless Hollywood glamour. Worth every penny for the history alone.',
     image:
       'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
-    categoryId: 'hotels-accommodation',
+    categoryId: 'hotels_accommodation',
     category: 'Hotels',
     location: 'West Hollywood, CA',
     rating: 4.5,

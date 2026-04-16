@@ -6,7 +6,7 @@ import type {
   CategoryTagOption,
 } from '~/types/recommendation/rexCategoryCreateConfig';
 
-function getSubcategoryConfigForMerge(
+export function resolveSubcategoryForMerge(
   config: CategoryCreateConfig,
   subcategoryCode: string | null,
 ): CategorySubcategoryConfig | null {
@@ -50,7 +50,7 @@ export function mergeRatingDimensions(
   config: CategoryCreateConfig,
   subcategoryCode: string | null,
 ): CategoryRatingDimension[] {
-  const sub = getSubcategoryConfigForMerge(config, subcategoryCode);
+  const sub = resolveSubcategoryForMerge(config, subcategoryCode);
   return mergeKeyed(config.rating_dimensions, sub?.rating_dimensions ?? []);
 }
 
@@ -58,7 +58,7 @@ export function mergeQuestions(
   config: CategoryCreateConfig,
   subcategoryCode: string | null,
 ): CategoryQuestion[] {
-  const sub = getSubcategoryConfigForMerge(config, subcategoryCode);
+  const sub = resolveSubcategoryForMerge(config, subcategoryCode);
   return mergeKeyed(config.questions, sub?.questions ?? []);
 }
 
@@ -66,7 +66,7 @@ export function mergeTagOptions(
   config: CategoryCreateConfig,
   subcategoryCode: string | null,
 ): CategoryTagOption[] {
-  const sub = getSubcategoryConfigForMerge(config, subcategoryCode);
+  const sub = resolveSubcategoryForMerge(config, subcategoryCode);
   const combined = [...config.tag_options, ...(sub?.tag_options ?? [])];
   const seen = new Set<string>();
   const out: CategoryTagOption[] = [];
@@ -76,4 +76,32 @@ export function mergeTagOptions(
     out.push(t);
   }
   return out;
+}
+
+export function categoryRatingDimensionsOnly(
+  config: CategoryCreateConfig,
+): CategoryRatingDimension[] {
+  return sortByOrder(config.rating_dimensions);
+}
+
+export function subcategoryRatingDimensionsOnly(
+  config: CategoryCreateConfig,
+  subcategoryCode: string | null,
+): CategoryRatingDimension[] {
+  if (!subcategoryCode) return [];
+  const sub = config.subcategories.find((s) => s.code === subcategoryCode) ?? null;
+  return sub ? sortByOrder(sub.rating_dimensions) : [];
+}
+
+export function categoryQuestionsOnly(config: CategoryCreateConfig): CategoryQuestion[] {
+  return sortByOrder(config.questions);
+}
+
+export function subcategoryQuestionsOnly(
+  config: CategoryCreateConfig,
+  subcategoryCode: string | null,
+): CategoryQuestion[] {
+  if (!subcategoryCode) return [];
+  const sub = config.subcategories.find((s) => s.code === subcategoryCode) ?? null;
+  return sub ? sortByOrder(sub.questions) : [];
 }
