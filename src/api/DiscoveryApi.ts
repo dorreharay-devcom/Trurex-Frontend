@@ -7,7 +7,6 @@ export interface DiscoverQueryParams {
   result_offset?: number;
 }
 
-/** Matches Supabase RPC `search_rexes` (response: FeedListCardRow[]). */
 export interface SearchRexesParams {
   search_term: string | null;
   category_filter: string | null;
