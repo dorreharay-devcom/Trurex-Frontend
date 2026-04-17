@@ -1,85 +1,223 @@
-import { useCallback, useMemo, useState } from 'react';
-import { LayoutAnimation, Platform, UIManager } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Platform } from 'react-native';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import * as Location from 'expo-location';
 import type { Recommendation } from '~/types/recommendation/recommendation';
-import type { MapMarkerItem } from '~/types/map/mapMarker';
+import type { MapMarkerItem, MapRecenterTarget } from '~/types/map/mapMarker';
+import type { LatLngBounds } from '~/utils/map/mapRecommendationData';
 import {
+  DEFAULT_MAP_BOUNDS,
   filterLocatedRecommendations,
-  filterRecommendationsByCategoryId,
-  filterRecommendationsBySearchQuery,
-  recommendationsToMapMarkers,
+  filterRecommendationsByPinLayers,
+  filterRecommendationsByRexTitle,
+  recommendationToMapMarker,
 } from '~/utils/map/mapRecommendationData';
-
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
+import { MapApi } from '~/api/MapApi';
+import { useAuth } from '~/services/AuthContext';
+import type { PinVisibility } from '~/types/map/mapPin';
+import { DEFAULT_PIN_VISIBILITY } from '~/types/map/mapPin';
 
 type Params = {
-  recommendations: Recommendation[];
   onRecommendationPress?: (rec: Recommendation) => void;
 };
 
-/** Map tab state: search, category filters, marker list, highlighted recommendation. */
-export function useMapScreen({ recommendations, onRecommendationPress }: Params) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [showFilters, setShowFilters] = useState(false);
-  const [highlightedRecId, setHighlightedRecId] = useState<string | null>(null);
+const BOUNDS_DEBOUNCE_MS = 450;
 
-  const locatedRecs = useMemo(
-    () => filterLocatedRecommendations(recommendations),
-    [recommendations],
+export function useMapScreen({ onRecommendationPress }: Params) {
+  const { user } = useAuth();
+  const userId = user?.id ?? null;
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [bounds, setBounds] = useState<LatLngBounds>(DEFAULT_MAP_BOUNDS);
+  const [debouncedBounds, setDebouncedBounds] = useState<LatLngBounds>(DEFAULT_MAP_BOUNDS);
+
+  const [layers, setLayers] = useState<PinVisibility>(DEFAULT_PIN_VISIBILITY);
+  const [selectedRecId, setSelectedRecId] = useState<string | null>(null);
+  const [listView, setListView] = useState(false);
+  const [userCoords, setUserCoords] = useState<{ latitude: number; longitude: number } | null>(
+    null,
+  );
+  const userCoordsRef = useRef(userCoords);
+  userCoordsRef.current = userCoords;
+
+  const [recenterTo, setRecenterTo] = useState<MapRecenterTarget | null>(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedBounds(bounds), BOUNDS_DEBOUNCE_MS);
+    return () => clearTimeout(t);
+  }, [bounds]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted' || cancelled) return;
+      const pos = await Location.getCurrentPositionAsync({});
+      if (!cancelled) {
+        setUserCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const applyLocatedCoords = useCallback((latitude: number, longitude: number) => {
+    setUserCoords({ latitude, longitude });
+    setRecenterTo({ latitude, longitude, nonce: Date.now() });
+  }, []);
+
+  const locateMe = useCallback(async () => {
+    const fallbackCached = () => {
+      const c = userCoordsRef.current;
+      if (c) applyLocatedCoords(c.latitude, c.longitude);
+    };
+
+    const tryExpo = async (): Promise<boolean> => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') return false;
+        const pos = await Location.getCurrentPositionAsync({});
+        applyLocatedCoords(pos.coords.latitude, pos.coords.longitude);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.geolocation) {
+      const ok = await new Promise<boolean>((resolve) => {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            applyLocatedCoords(pos.coords.latitude, pos.coords.longitude);
+            resolve(true);
+          },
+          () => resolve(false),
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 },
+        );
+      });
+      if (ok) return;
+      if (await tryExpo()) return;
+      fallbackCached();
+      return;
+    }
+
+    if (await tryExpo()) return;
+    fallbackCached();
+  }, [applyLocatedCoords]);
+
+  const {
+    data: fetchedRecs = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: [
+      'mapRexesInBounds',
+      debouncedBounds.min_lat,
+      debouncedBounds.max_lat,
+      debouncedBounds.min_lng,
+      debouncedBounds.max_lng,
+    ],
+    queryFn: () => MapApi.mapRexesInBounds(debouncedBounds),
+    placeholderData: keepPreviousData,
+  });
+
+  const locatedRecs = useMemo(() => filterLocatedRecommendations(fetchedRecs), [fetchedRecs]);
+
+  const layerFiltered = useMemo(
+    () => filterRecommendationsByPinLayers(locatedRecs, layers, userId),
+    [locatedRecs, layers, userId],
   );
 
-  const filtered = useMemo(() => {
-    let results = locatedRecs;
-    results = filterRecommendationsBySearchQuery(results, searchQuery);
-    results = filterRecommendationsByCategoryId(results, selectedCategory);
-    return results;
-  }, [locatedRecs, searchQuery, selectedCategory]);
+  const titleFiltered = useMemo(
+    () => filterRecommendationsByRexTitle(layerFiltered, searchQuery),
+    [layerFiltered, searchQuery],
+  );
 
   const mapMarkers: MapMarkerItem[] = useMemo(
-    () => recommendationsToMapMarkers(filtered),
-    [filtered],
+    () =>
+      titleFiltered
+        .map((r) => recommendationToMapMarker(r, userId))
+        .filter((m): m is MapMarkerItem => m != null),
+    [titleFiltered, userId],
   );
 
-  const toggleFilters = useCallback(() => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setShowFilters((v) => !v);
-  }, []);
+  const [debouncedSearchSuggest, setDebouncedSearchSuggest] = useState('');
+
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (q.length < 2) {
+      setDebouncedSearchSuggest(searchQuery);
+      return;
+    }
+    const t = setTimeout(() => setDebouncedSearchSuggest(searchQuery), 160);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
+  const suggestions = useMemo(() => {
+    const q = debouncedSearchSuggest.trim().toLowerCase();
+    if (q.length < 2) return [];
+    const titles = locatedRecs.filter((r) => r.title.toLowerCase().includes(q)).map((r) => r.title);
+    return [...new Set(titles)].slice(0, 5);
+  }, [locatedRecs, debouncedSearchSuggest]);
+
+  const selectedRec = useMemo(
+    () => (selectedRecId ? (layerFiltered.find((r) => r.id === selectedRecId) ?? null) : null),
+    [selectedRecId, layerFiltered],
+  );
 
   const openRec = useCallback(
     (rec: Recommendation) => {
-      setHighlightedRecId(rec.id);
       onRecommendationPress?.(rec);
     },
     [onRecommendationPress],
   );
 
-  const webHoverProps = useCallback(
-    (recId: string) =>
-      Platform.OS === 'web'
-        ? {
-            onHoverIn: () => setHighlightedRecId(recId),
-            onHoverOut: () => setHighlightedRecId(null),
-          }
-        : {},
-    [],
-  );
+  const focusOnRecommendation = useCallback((rec: Recommendation) => {
+    setListView(false);
+    setSelectedRecId(rec.id);
+    if (rec.latitude != null && rec.longitude != null) {
+      setRecenterTo({ latitude: rec.latitude, longitude: rec.longitude, nonce: Date.now() });
+    }
+  }, []);
+
+  const onBoundsChange = useCallback((next: LatLngBounds) => {
+    setBounds(next);
+  }, []);
+
+  const selectMarker = useCallback((id: string) => {
+    setSelectedRecId(id);
+  }, []);
+
+  const clearSelection = useCallback(() => setSelectedRecId(null), []);
+
+  const locatedRexCount = locatedRecs.length;
 
   return {
     searchQuery,
     setSearchQuery,
-    selectedCategory,
-    setSelectedCategory,
-    showFilters,
-    setShowFilters,
-    toggleFilters,
-    highlightedRecId,
-    setHighlightedRecId,
-    locatedRecs,
-    filtered,
+    layers,
+    setLayers,
     mapMarkers,
+    locatedRexCount,
+    selectedRecId,
+    selectedRec,
+    selectMarker,
+    clearSelection,
+    listView,
+    setListView,
+    onBoundsChange,
     openRec,
-    webHoverProps,
+    suggestions,
+    isLoading,
+    isError,
+    refetch,
+    userId,
+    userCoords,
+    recenterTo,
+    locateMe,
+    focusOnRecommendation,
+    locatedRecsForList: titleFiltered,
   };
 }

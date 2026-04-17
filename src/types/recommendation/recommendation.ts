@@ -6,6 +6,7 @@ export interface Recommendation {
   photoPath?: string | null;
   categoryId: string;
   category: string;
+  authorId?: string;
   location?: string;
   latitude?: number;
   longitude?: number;
