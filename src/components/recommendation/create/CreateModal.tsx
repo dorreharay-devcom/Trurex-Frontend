@@ -342,6 +342,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
         ) : null}
 
         <CreateModalBody
+          visible={visible}
           flow={flow}
           stepOpacity={stepOpacity}
           onTagLocation={handleTagLocation}

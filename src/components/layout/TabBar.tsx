@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, useWindowDimensions } from 'react-native';
-import { Sparkles, Bookmark, UsersRound, MapPinned, UserCircle2 } from 'lucide-react-native';
+import { Sparkles, Bookmark, Orbit, MapPinned, UserCircle2 } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
 import { isWeb } from '~/utils';
 
-export type Tab = 'discover' | 'faves' | 'network' | 'map' | 'profile';
+export type Tab = 'discover' | 'faves' | 'circles' | 'map' | 'profile';
 
 export const NAV_ITEMS: {
   id: Tab;
@@ -13,7 +13,7 @@ export const NAV_ITEMS: {
 }[] = [
   { id: 'discover', label: 'Discover', icon: Sparkles },
   { id: 'faves', label: 'My Faves', icon: Bookmark },
-  { id: 'network', label: 'Network', icon: UsersRound },
+  { id: 'circles', label: 'Circles', icon: Orbit },
   { id: 'map', label: 'Map', icon: MapPinned },
   { id: 'profile', label: 'Profile', icon: UserCircle2 },
 ];

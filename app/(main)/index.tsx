@@ -1,23 +1,17 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { PlusCircle } from 'lucide-react-native';
 import ProfileView from '~/components/profile/ProfileView';
 import FavesView from '~/components/faves/FavesView';
 import DiscoverView from '~/components/discover/DiscoverView';
 import MapScreen from '~/components/map/MapScreen';
+import CirclesView from '~/components/circles/CirclesView';
 import { Header } from '~/components/layout/Header';
 import { TabBar, Tab } from '~/components/layout/TabBar';
 import { CreateModal } from '~/components/recommendation/create/CreateModal';
 import { RecommendationDetailModal } from '~/components/recommendation/RecommendationDetailModal';
 import { Theme } from '~/theme/Theme';
 import type { Recommendation } from '~/types/recommendation/recommendation';
-
-const PlaceholderView = ({ title }: { title: string }) => (
-  <View className="flex-1 items-center justify-center">
-    <Text className="text-2xl font-bold text-foreground">{title}</Text>
-    <Text className="text-sm text-muted mt-2">Coming soon</Text>
-  </View>
-);
 
 export default function HomeScreen() {
   const [currentTab, setCurrentTab] = useState<Tab>('discover');
@@ -55,7 +49,7 @@ export default function HomeScreen() {
         {currentTab === 'faves' && (
           <FavesView onRecommendationPress={(rec) => setPreviewRecommendation(rec)} />
         )}
-        {currentTab === 'network' && <PlaceholderView title="Network" />}
+        {currentTab === 'circles' && <CirclesView isActive={currentTab === 'circles'} />}
         {currentTab === 'map' && (
           <MapScreen onRecommendationPress={(rec) => setPreviewRecommendation(rec)} />
         )}

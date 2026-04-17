@@ -6,3 +6,4 @@ export {
   type UseRexPlaceSearchResult,
 } from './useRexPlaceSearch';
 export { useActiveCategories } from '../useActiveCategories';
+export { useMyCircles } from '../useMyCircles';

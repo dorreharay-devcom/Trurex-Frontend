@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Animated as RNAnimated } from 'react-native';
 import type { useCreateRecWizard } from '~/hooks/recommendation';
+import { useMyCircles } from '~/hooks/useMyCircles';
+import { PUBLIC_CIRCLE_ROW } from '~/constants/recommendation/createCircles';
+import { isSensitiveRexSubcategory } from '~/constants/recommendation/sensitiveRexSubcategories';
 import { getRexCategoryApiCode } from '~/constants/recommendation/rexCategories';
+import { mapApiCirclesToDisplayRows } from '~/utils/recommendation/circlePresentation';
 import { mapSubcategoriesFromConfig } from '~/data/rexSubcategoryCatalog';
 import type {
   CategoryCreateConfig,
@@ -14,6 +18,7 @@ import { Search, Category, SubCategory, Scorecard, Photos, Circles, Confirm } fr
 type Flow = ReturnType<typeof useCreateRecWizard>;
 
 type Props = {
+  visible: boolean;
   flow: Flow;
   stepOpacity: RNAnimated.Value;
   onTagLocation: () => void;
@@ -33,6 +38,7 @@ type Props = {
 };
 
 export const CreateModalBody: React.FC<Props> = ({
+  visible,
   flow,
   stepOpacity,
   onTagLocation,
@@ -59,6 +65,27 @@ export const CreateModalBody: React.FC<Props> = ({
   const typeStepSubcategories = activeCreateConfig?.subcategories?.length
     ? mapSubcategoriesFromConfig(activeCreateConfig.subcategories)
     : [];
+
+  const {
+    data: apiCircles,
+    isLoading: circlesLoading,
+    isError: circlesError,
+    refetch: refetchCircles,
+  } = useMyCircles(visible);
+
+  const displayCircles = useMemo(() => {
+    const mapped = apiCircles?.length ? mapApiCirclesToDisplayRows(apiCircles) : [];
+    return [PUBLIC_CIRCLE_ROW, ...mapped];
+  }, [apiCircles]);
+
+  const circleTitleLookup = useMemo(
+    () => displayCircles.map((c) => ({ id: c.id, title: c.title })),
+    [displayCircles],
+  );
+
+  const showCirclesFetchSpinner = Boolean(
+    visible && circlesLoading && apiCircles === undefined && !circlesError,
+  );
 
   return (
     <View className="min-h-0 w-full flex-1">
@@ -130,7 +157,15 @@ export const CreateModalBody: React.FC<Props> = ({
           />
         )}
         {flow.stepId === 'circles' && (
-          <Circles selectedIds={flow.selectedCircleIds} onToggle={flow.toggleCircleId} />
+          <Circles
+            circles={displayCircles}
+            showFetchSpinner={showCirclesFetchSpinner}
+            loadError={circlesError}
+            onRetry={() => void refetchCircles()}
+            selectedIds={flow.selectedCircleIds}
+            onToggle={flow.toggleCircleId}
+            showSensitiveNudge={isSensitiveRexSubcategory(flow.selectedSubcategoryCode)}
+          />
         )}
         {flow.stepId === 'confirm' && (
           <Confirm
@@ -146,6 +181,7 @@ export const CreateModalBody: React.FC<Props> = ({
             scoreQuickTip={flow.scoreQuickTip}
             scoreReview={flow.scoreReview}
             selectedCircleIds={flow.selectedCircleIds}
+            circleTitleLookup={circleTitleLookup}
             subcategoryLabel={subcategoryLabelForConfirm}
             photoCount={flow.photoStoragePaths.length}
             selectedTagSlugs={flow.selectedTagSlugs}
