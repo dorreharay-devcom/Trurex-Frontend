@@ -20,7 +20,6 @@ export type CreateRecSearchPlace = {
   title: string;
   subtitle: string;
   categoryLabel: string;
-  /** Mock / catalog hints only; API results use `null`. */
   categoryId: string | null;
   provider?: string | null;
   providerPlaceId?: string | null;
@@ -30,9 +29,6 @@ export type CreateRecSearchPlace = {
   longitude?: number | null;
 };
 
-/**
- * @param includeSubcategoryStep — true when the loaded category config has a non-empty `subcategories` array.
- */
 export function getActiveCreateRecSteps(
   selectedCategoryId: string | null,
   includeSubcategoryStep: boolean,

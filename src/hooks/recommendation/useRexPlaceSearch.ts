@@ -12,7 +12,6 @@ const QUERY_KEY_ROOT = 'rexPlaceSearch' as const;
 
 export type UseRexPlaceSearchOptions = {
   searchQuery: string;
-  /** When false, no network request runs (e.g. another step or mode is active). */
   enabled: boolean;
   debounceMs?: number;
   minQueryLength?: number;
@@ -26,9 +25,6 @@ export type UseRexPlaceSearchResult = {
   searchErrorMessage: string | null;
 };
 
-/**
- * Debounced TruRex place search (saved + Google) for create-Rex and similar flows.
- */
 export function useRexPlaceSearch({
   searchQuery,
   enabled,

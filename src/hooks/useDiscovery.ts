@@ -31,7 +31,6 @@ export const useDiscoverRecommendations = (
 
 type UseSearchRexesArgs = Omit<SearchRexesParams, 'search_term' | 'category_filter'> & {
   searchTerm: string;
-  /** Discover category pill id, or `'all'`. */
   categoryId: string;
 };
 

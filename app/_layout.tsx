@@ -13,9 +13,31 @@ import {
   HankenGrotesk_800ExtraBold,
 } from '@expo-google-fonts/hanken-grotesk';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Toast from 'react-native-toast-message';
+import type { ComponentProps } from 'react';
+import Toast, {
+  ErrorToast,
+  InfoToast,
+  SuccessToast,
+} from 'react-native-toast-message';
+
+type ToastRowProps = ComponentProps<typeof SuccessToast>;
 
 const queryClient = new QueryClient();
+
+/** Bottom-right: library container centers; alignSelf pulls each toast to the trailing edge. */
+const toastTrailing = { alignSelf: 'flex-end' as const, marginRight: 16 };
+
+const toastConfig = {
+  success: (props: ToastRowProps) => (
+    <SuccessToast {...props} style={[toastTrailing, props.style]} />
+  ),
+  error: (props: ComponentProps<typeof ErrorToast>) => (
+    <ErrorToast {...props} style={[toastTrailing, props.style]} />
+  ),
+  info: (props: ComponentProps<typeof InfoToast>) => (
+    <InfoToast {...props} style={[toastTrailing, props.style]} />
+  ),
+};
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -34,7 +56,7 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <AuthProvider>
           <Stack screenOptions={{ headerShown: false }} />
-          <Toast />
+          <Toast config={toastConfig} />
         </AuthProvider>
       </SafeAreaProvider>
     </QueryClientProvider>

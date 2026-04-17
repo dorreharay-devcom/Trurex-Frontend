@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { cn } from '~/utils/general';
 
-/** Aligned with professional / subcategory flows (e.g. real estate). */
 const VALUE_LABELS_RIP_OFF = [
   'Total Rip-Off',
   'Poor Value',
@@ -11,7 +10,6 @@ const VALUE_LABELS_RIP_OFF = [
   'Exceptional Value',
 ] as const;
 
-/** Default hospitality & lifestyle framing. */
 const VALUE_LABELS_DEFAULT = [
   'Total Steal',
   'Budget-Friendly',
@@ -23,7 +21,6 @@ const VALUE_LABELS_DEFAULT = [
 type Props = {
   value: number | null;
   onChange: (v: number | null) => void;
-  /** When true, use the “rip-off → exceptional” copy; otherwise the “steal → splurge” set. */
   useRipOffLabels: boolean;
 };
 

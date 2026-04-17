@@ -1,9 +1,25 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import { Globe } from 'lucide-react-native';
+import { Globe, Heart, Lock, Users } from 'lucide-react-native';
 import type { CreateRecCircle } from '~/constants/recommendation/createCircles';
 import { cn } from '~/utils/general';
 import { CircleRadioIndicator } from './CircleRadioIndicator';
+
+const GLYPH_SIZE = 24;
+
+function CircleGlyph({ circle: c }: { circle: CreateRecCircle }) {
+  const color = c.accent;
+  switch (c.iconKind) {
+    case 'lock':
+      return <Lock size={GLYPH_SIZE} color={color} />;
+    case 'heart':
+      return <Heart size={GLYPH_SIZE} color={color} />;
+    case 'users':
+      return <Users size={GLYPH_SIZE} color={color} />;
+    case 'globe':
+      return <Globe size={GLYPH_SIZE} color={color} />;
+  }
+}
 
 type Props = {
   circle: CreateRecCircle;
@@ -20,18 +36,16 @@ export function CircleRow({ circle: c, selected, onToggle }: Props) {
       accessibilityLabel={`${c.title}, ${c.subtitle}`}
       className={cn(
         'flex-row items-center gap-4 rounded-xl border-2 p-4 active:opacity-95',
-        selected ? 'border-primary bg-primary/10' : 'border-border bg-card',
+        selected
+          ? 'border-primary bg-primary/10'
+          : 'border-border bg-card active:border-primary/30',
       )}
     >
       <View
         className="h-12 w-12 shrink-0 items-center justify-center rounded-full"
         style={{ backgroundColor: c.iconBg }}
       >
-        {c.variant === 'globe' ? (
-          <Globe size={24} color={c.accent} />
-        ) : (
-          <View className="h-8 w-8 rounded-full" style={{ backgroundColor: c.accent }} />
-        )}
+        <CircleGlyph circle={c} />
       </View>
 
       <View className="min-w-0 flex-1">

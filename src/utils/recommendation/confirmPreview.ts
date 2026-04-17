@@ -1,4 +1,3 @@
-import { CREATE_REC_CIRCLES } from '~/constants/recommendation/createCircles';
 import type { CategoryTagOption } from '~/types/recommendation/rexCategoryCreateConfig';
 import type { CreateRecSearchPlace, SearchEntryMode } from '~/types/recommendation/create';
 
@@ -62,6 +61,10 @@ export function getConfirmTagLabels(
   return selectedSlugs.map((s) => map.get(s) ?? s);
 }
 
-export function getConfirmCircleTitles(selectedCircleIds: Set<string>): string[] {
-  return CREATE_REC_CIRCLES.filter((c) => selectedCircleIds.has(c.id)).map((c) => c.title);
+export function getConfirmCircleTitles(
+  selectedCircleIds: Set<string>,
+  lookup: readonly { id: string; title: string }[],
+): string[] {
+  const map = new Map(lookup.map((c) => [c.id, c.title]));
+  return [...selectedCircleIds].map((id) => map.get(id)).filter((t): t is string => Boolean(t));
 }
