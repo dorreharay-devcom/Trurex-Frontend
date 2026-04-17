@@ -89,6 +89,7 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
   const imageField = optStr(o, 'image', 'photo_url');
   const image = imageField && /^https?:\/\//i.test(imageField) ? imageField : null;
 
+  const authorId = optStr(o, 'user_id', 'author_id', 'author_user_id') ?? undefined;
   const authorName = optStr(o, 'author_display_name', 'author_name', 'user_name') ?? 'Member';
   const authorHandle = normalizeHandle(optStr(o, 'author_handle', 'handle') ?? '');
   const avatarRaw = optStr(o, 'author_avatar_url', 'author_avatar', 'avatar_url', 'avatar');
@@ -115,6 +116,7 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
 
   return {
     id,
+    authorId,
     title: optStr(o, 'place_name', 'title') ?? 'Place',
     description: bodyText,
     image,

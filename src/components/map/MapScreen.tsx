@@ -1,95 +1,290 @@
-import React from 'react';
-import { View, ScrollView, Text } from 'react-native';
-import { recommendations } from '~/data/mockData';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { View, ScrollView, Text, Pressable, Platform, StyleSheet } from 'react-native';
+import * as Location from 'expo-location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import MarkerMap from '~/components/map/MarkerMap';
 import { useMapScreen } from '~/hooks/map/useMapScreen';
-import { SearchBar } from '~/components/map/common/SearchBar';
-import { CategoryFilters } from '~/components/map/common/CategoryFilters';
-import { EmptyOverlay } from '~/components/map/common/EmptyOverlay';
-import { ResultsHeader } from '~/components/map/common/ResultsHeader';
+import { MapSearchBar } from '~/components/map/MapSearchBar';
+import { MapLegend } from '~/components/map/MapLegend';
+import { MapLayerToggle } from '~/components/map/MapLayerToggle';
+import { MapPinDetailSheet } from '~/components/map/MapPinDetailSheet';
+import { MapLocationPermissionModal } from '~/components/map/MapLocationPermissionModal';
 import { ListRow } from '~/components/map/common/ListRow';
+import { Theme } from '~/theme/Theme';
+import { MapPin, List, LocateFixed } from 'lucide-react-native';
+import { MAP_ACTION_INSET } from '~/constants/map/mapUi';
+import { deriveMapPinType, formatDistanceKm, haversineKm } from '~/utils/map/mapRecommendationData';
+
+const MAP_LOCATION_PROMPT_DISMISSED_KEY = 'mapLocationPromptDismissed';
 
 type Props = {
   onRecommendationPress?: (rec: Recommendation) => void;
 };
 
 const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
-  const {
-    searchQuery,
-    setSearchQuery,
-    selectedCategory,
-    setSelectedCategory,
-    showFilters,
-    toggleFilters,
-    highlightedRecId,
-    setHighlightedRecId,
-    locatedRecs,
-    filtered,
-    mapMarkers,
-    openRec,
-    webHoverProps,
-  } = useMapScreen({ recommendations, onRecommendationPress });
+  const flow = useMapScreen({ onRecommendationPress });
+  const { locateMe } = flow;
+  const [locationPromptVisible, setLocationPromptVisible] = useState(false);
 
-  const filtersActive = selectedCategory !== 'all';
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const dismissed = await AsyncStorage.getItem(MAP_LOCATION_PROMPT_DISMISSED_KEY);
+        if (cancelled || dismissed === '1') return;
+        const { status } = await Location.getForegroundPermissionsAsync();
+        if (cancelled) return;
+        if (status === 'granted') return;
+        setLocationPromptVisible(true);
+      } catch {
+        if (!cancelled) setLocationPromptVisible(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const onLocationNotNow = useCallback(async () => {
+    await AsyncStorage.setItem(MAP_LOCATION_PROMPT_DISMISSED_KEY, '1');
+    setLocationPromptVisible(false);
+  }, []);
+
+  const onLocationAllow = useCallback(async () => {
+    setLocationPromptVisible(false);
+    await Location.requestForegroundPermissionsAsync();
+    void locateMe();
+  }, [locateMe]);
+
+  const distanceLabel = useMemo(() => {
+    if (!flow.selectedRec?.latitude || flow.selectedRec.longitude == null || !flow.userCoords) {
+      return undefined;
+    }
+    const km = haversineKm(flow.userCoords, {
+      latitude: flow.selectedRec.latitude,
+      longitude: flow.selectedRec.longitude,
+    });
+    return formatDistanceKm(km);
+  }, [flow.selectedRec, flow.userCoords]);
+
+  const pinType = flow.selectedRec ? deriveMapPinType(flow.selectedRec, flow.userId) : 'network';
+
+  const sortedList = useMemo(() => {
+    const rows = flow.locatedRecsForList;
+    if (!flow.userCoords) return rows;
+    return [...rows].sort((a, b) => {
+      if (a.latitude == null || a.longitude == null) return 1;
+      if (b.latitude == null || b.longitude == null) return -1;
+      const dA = haversineKm(flow.userCoords!, {
+        latitude: a.latitude,
+        longitude: a.longitude,
+      });
+      const dB = haversineKm(flow.userCoords!, {
+        latitude: b.latitude,
+        longitude: b.longitude,
+      });
+      return dA - dB;
+    });
+  }, [flow.locatedRecsForList, flow.userCoords]);
+
+  const searchTrailing = (
+    <Pressable
+      onPress={() => flow.setListView(!flow.listView)}
+      className="h-10 w-10 items-center justify-center rounded-xl border border-border bg-card/95 shadow-md"
+      accessibilityRole="button"
+      accessibilityLabel={flow.listView ? 'Show map' : 'Show list'}
+    >
+      {flow.listView ? (
+        <MapPin size={16} color={Theme.colors.foreground} />
+      ) : (
+        <List size={16} color={Theme.colors.foreground} />
+      )}
+    </Pressable>
+  );
+
+  const actionBannerBottom = MAP_ACTION_INSET + 112;
 
   return (
-    <ScrollView
-      className="flex-1 bg-background"
-      contentContainerClassName="px-4 pt-4 pb-28"
-      keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={false}
-    >
-      <SearchBar
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-        showFilters={showFilters}
-        filtersActive={filtersActive}
-        onToggleFilters={toggleFilters}
+    <View className="relative min-h-0 w-full flex-1 bg-background pt-4">
+      <MapLocationPermissionModal
+        visible={locationPromptVisible}
+        onAllow={onLocationAllow}
+        onNotNow={onLocationNotNow}
       />
 
-      {showFilters && (
-        <CategoryFilters
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
-        />
-      )}
+      <View className="relative min-h-0 w-full flex-1 px-4 pb-5">
+        {!flow.listView ? (
+          <View className="relative min-h-0 w-full flex-1">
+            <View
+              style={[
+                StyleSheet.absoluteFillObject,
+                { zIndex: 0 },
+                Platform.OS === 'web' ? ({ isolation: 'isolate' } as const) : {},
+              ]}
+            >
+              <View className="h-full w-full flex-1">
+                <MarkerMap
+                  markers={flow.mapMarkers}
+                  selectedId={flow.selectedRecId}
+                  onMarkerPress={flow.selectMarker}
+                  onRegionChangeComplete={flow.onBoundsChange}
+                  recenterTo={flow.recenterTo}
+                />
+              </View>
+            </View>
 
-      <View className="relative mb-5">
-        <MarkerMap
-          markers={mapMarkers}
-          highlightedId={highlightedRecId}
-          onMarkerHoverIn={setHighlightedRecId}
-          onMarkerHoverOut={() => setHighlightedRecId(null)}
-          onMarkerPress={(id) => {
-            const rec = filtered.find((r) => r.id === id);
-            if (rec) openRec(rec);
-          }}
-        />
-        {filtered.length === 0 && <EmptyOverlay />}
-      </View>
+            <View
+              pointerEvents="box-none"
+              style={[
+                StyleSheet.absoluteFillObject,
+                Platform.select({
+                  web: { zIndex: 1100 },
+                  default: { zIndex: 1100, elevation: 0 },
+                }),
+              ]}
+            >
+              <MapLegend />
+              <MapLayerToggle visibility={flow.layers} onChange={flow.setLayers} />
 
-      <ResultsHeader searchQuery={searchQuery} resultCount={filtered.length} />
+              <Pressable
+                onPress={() => void flow.locateMe()}
+                className="absolute z-[1100] h-10 w-10 items-center justify-center rounded-xl border border-border bg-card shadow-md"
+                style={[
+                  {
+                    position: 'absolute',
+                    right: MAP_ACTION_INSET,
+                    bottom: MAP_ACTION_INSET,
+                    zIndex: 1100,
+                    elevation: Platform.OS === 'android' ? 12 : 0,
+                  },
+                  Platform.OS === 'web' ? ({ cursor: 'pointer' } as const) : null,
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel="Center map on your location"
+              >
+                <LocateFixed size={16} color={Theme.colors.foreground} />
+              </Pressable>
 
-      <View className="gap-2.5">
-        {filtered.map((rec) => (
-          <ListRow
-            key={rec.id}
-            rec={rec}
-            highlighted={highlightedRecId === rec.id}
-            onPress={() => openRec(rec)}
-            {...webHoverProps(rec.id)}
-          />
-        ))}
-        {filtered.length === 0 && locatedRecs.length > 0 && (
-          <View className="items-center py-8">
-            <Text className="text-sm text-muted-foreground text-center">
-              No recommendations match your search.
-            </Text>
+              {flow.isError ? (
+                <View
+                  className="absolute z-[1000]"
+                  style={{
+                    position: 'absolute',
+                    left: MAP_ACTION_INSET,
+                    right: MAP_ACTION_INSET,
+                    bottom: actionBannerBottom,
+                  }}
+                >
+                  <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
+                    <Text className="text-sm font-medium text-foreground">
+                      Couldn&apos;t load map data
+                    </Text>
+                    <Pressable
+                      onPress={() => void flow.refetch()}
+                      className="mt-2 self-center rounded-xl bg-primary px-4 py-2"
+                    >
+                      <Text className="text-xs font-medium text-primary-foreground">Retry</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              ) : null}
+
+              {!flow.isLoading &&
+              !flow.isError &&
+              flow.locatedRexCount === 0 &&
+              !flow.searchQuery.trim() ? (
+                <View
+                  className="absolute z-[1000]"
+                  style={{
+                    position: 'absolute',
+                    left: MAP_ACTION_INSET,
+                    right: MAP_ACTION_INSET,
+                    bottom: actionBannerBottom,
+                  }}
+                >
+                  <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
+                    <Text className="text-sm font-medium text-foreground">
+                      Nothing in this area yet
+                    </Text>
+                    <Text className="mt-1 text-xs text-muted-foreground">
+                      Pan the map or zoom out to load more Rex.
+                    </Text>
+                  </View>
+                </View>
+              ) : null}
+
+              {flow.mapMarkers.length === 0 && flow.searchQuery.trim() ? (
+                <View
+                  className="absolute z-[1000]"
+                  style={{
+                    position: 'absolute',
+                    left: MAP_ACTION_INSET,
+                    right: MAP_ACTION_INSET,
+                    bottom: actionBannerBottom,
+                  }}
+                >
+                  <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
+                    <Text className="text-sm font-medium text-foreground">No Rex match that name</Text>
+                    <Text className="mt-1 text-xs text-muted-foreground">
+                      Try another title or clear the search.
+                    </Text>
+                  </View>
+                </View>
+              ) : null}
+            </View>
+
+            {flow.selectedRec && (
+              <MapPinDetailSheet
+                recommendation={flow.selectedRec}
+                pinType={pinType}
+                distanceLabel={distanceLabel}
+                onClose={flow.clearSelection}
+                onViewFullRex={() => {
+                  flow.openRec(flow.selectedRec!);
+                  flow.clearSelection();
+                }}
+              />
+            )}
           </View>
+        ) : (
+          <ScrollView
+            className="flex-1 pt-32"
+            keyboardShouldPersistTaps="handled"
+            contentContainerClassName="pb-28"
+          >
+          {sortedList.length === 0 ? (
+            <View className="items-center py-12">
+              <MapPin size={32} color={Theme.colors.secondaryText} style={{ opacity: 0.4 }} />
+              <Text className="mt-2 text-sm font-medium text-muted-foreground">No Rex found</Text>
+              <Text className="mt-1 text-center text-xs text-muted-foreground">
+                Adjust search or map filters
+              </Text>
+            </View>
+          ) : (
+            <View className="gap-2.5">
+              {sortedList.map((rec) => (
+                <ListRow
+                  key={rec.id}
+                  rec={rec}
+                  highlighted={flow.selectedRecId === rec.id}
+                  onPress={() => flow.focusOnRecommendation(rec)}
+                />
+              ))}
+            </View>
+          )}
+        </ScrollView>
         )}
+
+        <MapSearchBar
+          value={flow.searchQuery}
+          onChangeText={flow.setSearchQuery}
+          suggestions={flow.suggestions}
+          onSelectSuggestion={flow.setSearchQuery}
+          trailing={searchTrailing}
+        />
       </View>
-    </ScrollView>
+    </View>
   );
 };
 

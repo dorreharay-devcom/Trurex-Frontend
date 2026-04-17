@@ -1,11 +1,20 @@
+import type { MapPinType } from '~/types/map/mapPin';
+
 export type MapMarkerItem = {
   id: string;
   latitude: number;
   longitude: number;
   title: string;
   subtitle?: string;
-  /** Direct HTTPS image (optional) */
+  pinType: MapPinType;
+  glyph: string;
+  pinColor: string;
   imageUrl?: string;
-  /** rex-images key when {@link imageUrl} is not set */
   imageStoragePath?: string;
+};
+
+export type MapRecenterTarget = {
+  latitude: number;
+  longitude: number;
+  nonce: number;
 };

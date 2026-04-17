@@ -9,7 +9,6 @@ type Props = {
   marker: MapMarkerItem;
 };
 
-/** Matches native marker tooltip: title/subtitle, then image. */
 export const InfoWindowBody: React.FC<Props> = ({ marker: m }) => (
   <View
     style={{

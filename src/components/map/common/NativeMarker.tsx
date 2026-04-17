@@ -1,65 +1,38 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Marker } from 'react-native-maps';
-import { MapPin } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
 import type { MapMarkerItem } from '~/types/map/mapMarker';
 import { nativeMarkerStyles as styles } from '~/components/map/common/nativeMarkerStyles';
-import { MarkerPreviewImage } from '~/components/map/common/MarkerPreviewImage';
 
 type Props = {
   marker: MapMarkerItem;
-  active: boolean;
-  onHoverIn: (id: string) => void;
-  onHoverOut: () => void;
+  selected: boolean;
   onPress: (id: string) => void;
 };
 
-export const NativeMarker: React.FC<Props> = ({
-  marker: m,
-  active,
-  onHoverIn,
-  onHoverOut,
-  onPress,
-}) => (
+export const NativeMarker: React.FC<Props> = ({ marker: m, selected, onPress }) => (
   <Marker
     coordinate={{ latitude: m.latitude, longitude: m.longitude }}
     anchor={{ x: 0.5, y: 1 }}
     onPress={() => onPress(m.id)}
     tracksViewChanges={false}
+    zIndex={selected ? 10 : 1}
   >
-    <Pressable onHoverIn={() => onHoverIn(m.id)} onHoverOut={onHoverOut} style={styles.markerHit}>
-      {active ? (
-        <View style={[styles.tooltip, { borderColor: Theme.colors.border }]}>
-          <View style={styles.tooltipTextBlock}>
-            <Text style={styles.tooltipTitle} numberOfLines={1}>
-              {m.title}
-            </Text>
-            {m.subtitle ? (
-              <Text style={styles.tooltipSub} numberOfLines={1}>
-                {m.subtitle}
-              </Text>
-            ) : null}
-          </View>
-          {m.imageUrl || m.imageStoragePath ? (
-            <MarkerPreviewImage
-              imageUrl={m.imageUrl}
-              imageStoragePath={m.imageStoragePath}
-              variant="nativeTooltip"
-            />
-          ) : null}
-        </View>
-      ) : null}
+    <Pressable style={styles.markerHit} accessibilityLabel={m.title}>
       <View
         style={[
           styles.pin,
-          active && {
-            transform: [{ scale: 1.06 }],
-            borderColor: Theme.colors.accentForeground,
+          {
+            backgroundColor: m.pinColor,
+            borderColor: Theme.colors.card,
+            transform: selected ? [{ scale: 1.08 }] : undefined,
           },
         ]}
       >
-        <MapPin size={16} color={Theme.colors.primaryForeground} />
+        <Text style={styles.glyph} numberOfLines={1}>
+          {m.glyph}
+        </Text>
       </View>
     </Pressable>
   </Marker>
