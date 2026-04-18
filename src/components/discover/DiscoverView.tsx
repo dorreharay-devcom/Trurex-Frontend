@@ -3,6 +3,7 @@ import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { webContainerStyle } from '~/utils';
 import CategoryPills, { Category } from '~/components/layout/CategoryPills';
 import RecommendationCard, { Recommendation } from '~/components/recommendation/RecommendationCard';
+import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
 import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
 import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
 import { useActiveCategories } from '~/hooks/useActiveCategories';
@@ -40,11 +41,17 @@ function buildFallbackPills(): Category[] {
 
 type DiscoverViewProps = {
   searchQuery?: string;
-  onRecommendationPress?: (rec: Recommendation) => void;
-  onTapRec?: (rec: Recommendation) => void;
+  commentCountByRexId?: Record<string, number>;
+  onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
+  onTapRec?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
 };
 
-const DiscoverView = ({ searchQuery = '', onRecommendationPress, onTapRec }: DiscoverViewProps) => {
+const DiscoverView = ({
+  searchQuery = '',
+  commentCountByRexId,
+  onRecommendationPress,
+  onTapRec,
+}: DiscoverViewProps) => {
   const onOpenRec = onRecommendationPress ?? onTapRec;
   const [activeCategory, setActiveCategory] = useState('all');
   const hasSearch = searchQuery.trim().length > 0;
@@ -121,11 +128,15 @@ const DiscoverView = ({ searchQuery = '', onRecommendationPress, onTapRec }: Dis
             </Text>
           </View>
         )}
-        renderItem={({ item }) => (
-          <View className="px-4">
-            <RecommendationCard recommendation={item} onTap={onOpenRec} />
-          </View>
-        )}
+        renderItem={({ item }) => {
+          const n = commentCountByRexId?.[item.id];
+          const rec = n !== undefined ? { ...item, comments: n } : item;
+          return (
+            <View className="px-4">
+              <RecommendationCard recommendation={rec} onTap={onOpenRec} />
+            </View>
+          );
+        }}
       />
     </View>
   );

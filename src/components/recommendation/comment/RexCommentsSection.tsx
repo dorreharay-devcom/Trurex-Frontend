@@ -1,0 +1,118 @@
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { View, Text, TextInput, ActivityIndicator, Platform } from 'react-native';
+import { MessageCircle } from 'lucide-react-native';
+import { useRexComments } from '~/hooks/recommendation/useRexComments';
+import { useAuth } from '~/services/AuthContext';
+import { Theme } from '~/theme/Theme';
+import { toastError } from '~/utils/appToast';
+import { CommentComposer } from './common/CommentComposer';
+import { CommentThread } from './common/CommentThread';
+import { totalCommentCount } from './utils/totalCommentCount';
+
+export type RexCommentsSectionProps = {
+  rexId: string;
+  rexOwnerId?: string;
+  onCommentTotalChange?: (total: number) => void;
+  composerAnchorRef?: React.RefObject<View | null>;
+  autoFocusComposer?: boolean;
+};
+
+export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
+  rexId,
+  rexOwnerId,
+  onCommentTotalChange,
+  composerAnchorRef,
+  autoFocusComposer,
+}) => {
+  const { user } = useAuth();
+  const { comments, loading, addComment, deleteComment } = useRexComments(rexId);
+  const [text, setText] = useState('');
+  const [replyTo, setReplyTo] = useState<string | null>(null);
+  const inputRef = useRef<TextInput | null>(null);
+
+  const total = useMemo(() => totalCommentCount(comments), [comments]);
+
+  useEffect(() => {
+    onCommentTotalChange?.(total);
+  }, [total, onCommentTotalChange]);
+
+  useEffect(() => {
+    if (!autoFocusComposer || !user) return;
+    const delay = Platform.OS === 'web' ? 780 : 600;
+    const t = setTimeout(() => inputRef.current?.focus(), delay);
+    return () => clearTimeout(t);
+  }, [autoFocusComposer, user, rexId]);
+
+  const handlePost = useCallback(async () => {
+    if (!text.trim()) return;
+    try {
+      await addComment(text, replyTo);
+      setText('');
+      setReplyTo(null);
+    } catch (e) {
+      toastError('Comment failed', e instanceof Error ? e.message : undefined);
+    }
+  }, [addComment, replyTo, text]);
+
+  const handleDelete = useCallback(
+    async (id: string) => {
+      try {
+        await deleteComment(id);
+      } catch (e) {
+        toastError('Delete failed', e instanceof Error ? e.message : undefined);
+      }
+    },
+    [deleteComment],
+  );
+
+  const startReply = useCallback((id: string) => {
+    setReplyTo(id);
+    inputRef.current?.focus();
+  }, []);
+
+  return (
+    <View className="gap-4 pt-2">
+      <View className="flex-row items-center gap-1.5">
+        <MessageCircle size={14} color={Theme.colors.secondaryText} />
+        <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          Comments & Questions ({total})
+        </Text>
+      </View>
+
+      {loading ? (
+        <View className="items-center py-6">
+          <ActivityIndicator color={Theme.colors.primary} />
+        </View>
+      ) : comments.length === 0 ? (
+        <Text className="py-4 text-center text-sm text-muted-foreground">
+          No comments yet. Be the first to ask a question!
+        </Text>
+      ) : (
+        <View className="gap-4">
+          {comments.map((c) => (
+            <CommentThread
+              key={c.id}
+              root={c}
+              currentUserId={user?.id}
+              rexOwnerId={rexOwnerId}
+              onReply={startReply}
+              onDelete={handleDelete}
+            />
+          ))}
+        </View>
+      )}
+
+      {user ? (
+        <CommentComposer
+          composerAnchorRef={composerAnchorRef}
+          inputRef={inputRef}
+          text={text}
+          onChangeText={setText}
+          onSubmit={handlePost}
+          replyToId={replyTo}
+          onCancelReply={() => setReplyTo(null)}
+        />
+      ) : null}
+    </View>
+  );
+};

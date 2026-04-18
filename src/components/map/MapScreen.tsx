@@ -225,7 +225,9 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
                   }}
                 >
                   <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
-                    <Text className="text-sm font-medium text-foreground">No Rex match that name</Text>
+                    <Text className="text-sm font-medium text-foreground">
+                      No Rex match that name
+                    </Text>
                     <Text className="mt-1 text-xs text-muted-foreground">
                       Try another title or clear the search.
                     </Text>
@@ -253,27 +255,27 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
             keyboardShouldPersistTaps="handled"
             contentContainerClassName="pb-28"
           >
-          {sortedList.length === 0 ? (
-            <View className="items-center py-12">
-              <MapPin size={32} color={Theme.colors.secondaryText} style={{ opacity: 0.4 }} />
-              <Text className="mt-2 text-sm font-medium text-muted-foreground">No Rex found</Text>
-              <Text className="mt-1 text-center text-xs text-muted-foreground">
-                Adjust search or map filters
-              </Text>
-            </View>
-          ) : (
-            <View className="gap-2.5">
-              {sortedList.map((rec) => (
-                <ListRow
-                  key={rec.id}
-                  rec={rec}
-                  highlighted={flow.selectedRecId === rec.id}
-                  onPress={() => flow.focusOnRecommendation(rec)}
-                />
-              ))}
-            </View>
-          )}
-        </ScrollView>
+            {sortedList.length === 0 ? (
+              <View className="items-center py-12">
+                <MapPin size={32} color={Theme.colors.secondaryText} style={{ opacity: 0.4 }} />
+                <Text className="mt-2 text-sm font-medium text-muted-foreground">No Rex found</Text>
+                <Text className="mt-1 text-center text-xs text-muted-foreground">
+                  Adjust search or map filters
+                </Text>
+              </View>
+            ) : (
+              <View className="gap-2.5">
+                {sortedList.map((rec) => (
+                  <ListRow
+                    key={rec.id}
+                    rec={rec}
+                    highlighted={flow.selectedRecId === rec.id}
+                    onPress={() => flow.focusOnRecommendation(rec)}
+                  />
+                ))}
+              </View>
+            )}
+          </ScrollView>
         )}
 
         <MapSearchBar

@@ -14,11 +14,7 @@ import {
 } from '@expo-google-fonts/hanken-grotesk';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ComponentProps } from 'react';
-import Toast, {
-  ErrorToast,
-  InfoToast,
-  SuccessToast,
-} from 'react-native-toast-message';
+import Toast, { ErrorToast, InfoToast, SuccessToast } from 'react-native-toast-message';
 
 type ToastRowProps = ComponentProps<typeof SuccessToast>;
 

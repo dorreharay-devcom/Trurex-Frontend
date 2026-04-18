@@ -52,12 +52,12 @@ export const AuthApi = {
   },
 
   getSession: async (): Promise<Session | null> => {
-    const data = unwrap(await Auth.getSession());
+    const data = unwrap<{ session: Session | null }>(await Auth.getSession());
     return data.session;
   },
 
   getUser: async (): Promise<User | null> => {
-    const data = unwrap(await Auth.getUser());
+    const data = unwrap<{ user: User | null }>(await Auth.getUser());
     return data.user;
   },
 

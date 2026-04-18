@@ -46,7 +46,9 @@ export const MapLegend: React.FC = () => {
               >
                 <Text className="text-[9px] text-white">{item.icon}</Text>
               </View>
-              <Text className="min-w-0 flex-1 text-[11px] leading-snug text-foreground">{item.label}</Text>
+              <Text className="min-w-0 flex-1 text-[11px] leading-snug text-foreground">
+                {item.label}
+              </Text>
             </View>
           ))}
         </View>

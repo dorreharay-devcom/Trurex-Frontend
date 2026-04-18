@@ -2,10 +2,7 @@ import type { MapMarkerItem } from '~/types/map/mapMarker';
 
 export function isValidMapCoordinate(lat: number, lng: number): boolean {
   return (
-    Number.isFinite(lat) &&
-    Number.isFinite(lng) &&
-    Math.abs(lat) <= 90 &&
-    Math.abs(lng) <= 180
+    Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180
   );
 }
 

@@ -1,6 +1,15 @@
-import React, { useMemo } from 'react';
-import { View, Text, ScrollView, Pressable, useWindowDimensions } from 'react-native';
+import React, { useEffect, useMemo, useRef } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  Pressable,
+  useWindowDimensions,
+  findNodeHandle,
+  Platform,
+} from 'react-native';
 import { ArrowLeft, Star, MapPin, Quote, Plus } from 'lucide-react-native';
+import { RexCommentsSection } from '~/components/recommendation/comment';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { OverlayModal } from '~/components/common/OverlayModal';
@@ -22,6 +31,8 @@ type Props = {
   recommendation: Recommendation | null;
   onClose: () => void;
   onAddYourOwn?: () => void;
+  onCommentCountChange?: (total: number) => void;
+  scrollToComments?: boolean;
 };
 
 export const RecommendationDetailModal: React.FC<Props> = ({
@@ -29,15 +40,71 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   recommendation,
   onClose,
   onAddYourOwn,
+  onCommentCountChange,
+  scrollToComments,
 }) => {
   const { height: windowHeight } = useWindowDimensions();
   const { layout } = modalConfig;
+  const scrollRef = useRef<ScrollView>(null);
+  const commentsSectionWrapRef = useRef<View>(null);
+  const composerAnchorRef = useRef<View>(null);
 
   const { sheetTranslateY, handleClose } = useOverlaySheetPresentation({
     visible: visible && recommendation != null,
     windowHeight,
     onClose,
   });
+
+  useEffect(() => {
+    if (!visible || !recommendation || !scrollToComments) return;
+
+    let cancelled = false;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    const scrollToTarget = () => {
+      try {
+        const targetEl = composerAnchorRef.current ?? commentsSectionWrapRef.current;
+        if (!targetEl) return;
+
+        if (Platform.OS === 'web') {
+          const el = targetEl as unknown as {
+            scrollIntoView?: (o: { behavior?: string; block?: string; inline?: string }) => void;
+          };
+          el?.scrollIntoView?.({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+          return;
+        }
+
+        const scrollNode = findNodeHandle(scrollRef.current);
+        if (!scrollNode) return;
+        targetEl.measureLayout(
+          scrollNode,
+          (_x, y) => {
+            const pad = 32;
+            scrollRef.current?.scrollTo({ y: Math.max(0, y - pad), animated: true });
+          },
+          () => {},
+        );
+      } catch {}
+    };
+
+    timeoutId = setTimeout(
+      () => {
+        if (cancelled) return;
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (cancelled) return;
+            scrollToTarget();
+          });
+        });
+      },
+      Platform.OS === 'web' ? 420 : 380,
+    );
+
+    return () => {
+      cancelled = true;
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+    };
+  }, [visible, scrollToComments, recommendation?.id]);
 
   const mockRatings = useMemo(
     () => (recommendation ? buildDetailRatingRows(recommendation.rating ?? undefined) : []),
@@ -82,6 +149,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
         </View>
 
         <ScrollView
+          ref={scrollRef}
           className="flex-1"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
@@ -200,6 +268,16 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                 </Text>
               </Pressable>
             ) : null}
+
+            <View ref={commentsSectionWrapRef} collapsable={false}>
+              <RexCommentsSection
+                rexId={recommendation.id}
+                rexOwnerId={recommendation.authorId}
+                onCommentTotalChange={onCommentCountChange}
+                composerAnchorRef={composerAnchorRef}
+                autoFocusComposer={scrollToComments === true}
+              />
+            </View>
 
             <View className="h-8" />
           </View>

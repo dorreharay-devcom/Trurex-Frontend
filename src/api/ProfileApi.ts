@@ -46,7 +46,7 @@ function toProfileData(row: UserRow, email?: string): ProfileData {
 
 export const ProfileApi = {
   getById: async (userId: string, email?: string): Promise<ProfileData> => {
-    const row = unwrap(await Backend.from('users').select('*').eq('id', userId).single<UserRow>());
+    const row = unwrap<UserRow>(await Backend.from('users').select('*').eq('id', userId).single());
     return toProfileData(row, email);
   },
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollView, TouchableOpacity, Text } from 'react-native';
 import { Theme } from '~/theme/Theme';
+import { categoryPillActiveSurface } from '~/utils/recommendation/categoryPillColor';
 
 export interface Category {
   id: string;
@@ -30,7 +31,7 @@ const CategoryPills: React.FC<CategoryPillsProps> = ({ categories, activeCategor
           className="items-center min-w-[64px] px-3 py-2.5 rounded-2xl border"
           style={
             active
-              ? { backgroundColor: `${cat.color}1F`, borderColor: `${cat.color}66` }
+              ? categoryPillActiveSurface(cat.color)
               : { backgroundColor: 'transparent', borderColor: Theme.colors.border }
           }
         >

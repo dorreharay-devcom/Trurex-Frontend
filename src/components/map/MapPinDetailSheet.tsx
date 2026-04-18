@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, Pressable, Linking, Platform, ScrollView, Share } from 'react-native';
+import { View, Text, Pressable, Linking, Platform, ScrollView } from 'react-native';
 import { X, ExternalLink, Bookmark, Navigation, Share2 } from 'lucide-react-native';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import type { MapPinType } from '~/types/map/mapPin';
 import { Theme } from '~/theme/Theme';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
+import { useShareRex } from '~/hooks/recommendation/useShareRex';
 
 type Props = {
   recommendation: Recommendation;
@@ -30,6 +31,7 @@ export const MapPinDetailSheet: React.FC<Props> = ({
   onViewFullRex,
   onSave,
 }) => {
+  const { shareRecommendation } = useShareRex();
   const label = pinTypeCopy[pinType];
   const showNetworkLine = (pinType === 'network' || pinType === 'overlap') && pin.user != null;
 
@@ -43,17 +45,6 @@ export const MapPinDetailSheet: React.FC<Props> = ({
             android: `geo:0,0?q=${encodeURIComponent(q)}`,
           }) ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`);
     void Linking.openURL(url);
-  };
-
-  const share = async () => {
-    try {
-      await Share.share({
-        message: `Check out ${pin.title} on TruRex`,
-        title: pin.title,
-      });
-    } catch {
-      /* ignore */
-    }
   };
 
   return (
@@ -141,8 +132,10 @@ export const MapPinDetailSheet: React.FC<Props> = ({
             <Navigation size={16} color={Theme.colors.foreground} />
           </Pressable>
           <Pressable
-            onPress={share}
+            onPress={() => void shareRecommendation(pin)}
             className="rounded-xl border border-border p-2.5 active:bg-muted/30"
+            accessibilityRole="button"
+            accessibilityLabel="Share this recommendation"
           >
             <Share2 size={16} color={Theme.colors.foreground} />
           </Pressable>
