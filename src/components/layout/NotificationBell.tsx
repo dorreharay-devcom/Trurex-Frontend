@@ -1,0 +1,254 @@
+import React, { useCallback, useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  Pressable,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Dimensions,
+  Platform,
+  type ViewStyle,
+} from 'react-native';
+import { Bell, CheckCheck, ShieldCheck } from 'lucide-react-native';
+import { useNotifications } from '~/hooks/useNotifications';
+import { Theme } from '~/theme/Theme';
+import { formatCompactRelativeTime } from '~/utils/date';
+import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
+
+function formatNotificationTime(iso: string): string {
+  const c = formatCompactRelativeTime(iso);
+  if (!c) return '';
+  if (c === 'now') return 'just now';
+  return `${c} ago`;
+}
+
+const BELL_ICON_SIZE = 20;
+const UNREAD_DOT_SIZE = 12;
+const UNREAD_DOT_OFFSET = -4;
+
+const typeConfig: Record<string, { verb: string }> = {
+  reaction: { verb: 'hearted your Rex' },
+  comment: { verb: 'commented on your Rex' },
+  reply: { verb: 'replied to your comment on' },
+  save: { verb: 'saved your Rex' },
+  follow: { verb: 'started following you' },
+  new_follower: { verb: 'started following you' },
+  follow_request: { verb: 'wants to follow you' },
+  follow_request_accepted: { verb: 'accepted your follow request' },
+  trusted: { verb: 'is now Trusted' },
+  message: { verb: 'sent you a message' },
+};
+
+export const NotificationBell: React.FC = () => {
+  const { notifications, unreadCount, loading, markAllAsRead } = useNotifications();
+  const [open, setOpen] = useState(false);
+  const [anchor, setAnchor] = useState<{ top: number; right: number } | null>(null);
+  const bellWrapRef = useRef<View>(null);
+
+  const close = useCallback(() => setOpen(false), []);
+
+  const openPanel = useCallback(() => {
+    bellWrapRef.current?.measureInWindow((x, y, w, h) => {
+      const winW = Dimensions.get('window').width;
+      setAnchor({ top: y + h + 8, right: winW - x - w });
+      setOpen(true);
+      void markAllAsRead();
+    });
+  }, [markAllAsRead]);
+
+  const toggle = useCallback(() => {
+    if (open) {
+      setOpen(false);
+    } else {
+      openPanel();
+    }
+  }, [open, openPanel]);
+
+  const hasUnread = unreadCount > 0;
+
+  return (
+    <>
+      <Pressable
+        onPress={toggle}
+        className="rounded-lg p-2 active:opacity-80"
+        accessibilityRole="button"
+        accessibilityLabel={hasUnread ? 'Notifications, unread' : 'Notifications'}
+      >
+        <View
+          ref={bellWrapRef}
+          collapsable={false}
+          style={{
+            width: BELL_ICON_SIZE,
+            height: BELL_ICON_SIZE,
+            position: 'relative',
+          }}
+        >
+          <Bell size={BELL_ICON_SIZE} color={Theme.colors.secondaryText} strokeWidth={2} />
+          {hasUnread ? (
+            <View
+              pointerEvents="none"
+              style={[
+                {
+                  position: 'absolute',
+                  top: UNREAD_DOT_OFFSET,
+                  right: UNREAD_DOT_OFFSET,
+                  width: UNREAD_DOT_SIZE,
+                  height: UNREAD_DOT_SIZE,
+                  borderRadius: UNREAD_DOT_SIZE / 2,
+                  backgroundColor: Theme.colors.primary,
+                  borderWidth: 2,
+                  borderColor: Theme.colors.card,
+                },
+                Platform.OS === 'ios'
+                  ? {
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 0.5 },
+                      shadowOpacity: 0.12,
+                      shadowRadius: 1.5,
+                    }
+                  : null,
+                Platform.OS === 'android' ? { elevation: 2 } : null,
+                Platform.OS === 'web'
+                  ? ({
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.14)',
+                    } as ViewStyle)
+                  : null,
+              ]}
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+            />
+          ) : null}
+        </View>
+      </Pressable>
+
+      <Modal
+        visible={open}
+        transparent
+        animationType="fade"
+        onRequestClose={close}
+        statusBarTranslucent
+      >
+        <View className="flex-1" style={StyleSheet.absoluteFillObject}>
+          <Pressable
+            style={[StyleSheet.absoluteFillObject, { backgroundColor: 'transparent' }]}
+            onPress={close}
+            accessibilityRole="button"
+            accessibilityLabel="Close notifications"
+          />
+          {anchor ? (
+            <View
+              pointerEvents="box-none"
+              style={{
+                position: 'absolute',
+                top: anchor.top,
+                right: anchor.right,
+                width: Math.min(384, Dimensions.get('window').width - 16),
+                maxHeight: Dimensions.get('window').height * 0.7,
+                zIndex: 10,
+              }}
+            >
+              <View className="overflow-hidden rounded-xl border border-border bg-card shadow-lg">
+                <View className="flex-row items-center justify-between border-b border-border px-4 py-3">
+                  <Text className="text-sm font-semibold text-foreground">Notifications</Text>
+                  <Pressable
+                    onPress={() => void markAllAsRead()}
+                    className="flex-row items-center gap-1 active:opacity-70"
+                    accessibilityRole="button"
+                    accessibilityLabel="Mark all notifications as read"
+                  >
+                    <CheckCheck size={14} color={Theme.colors.secondaryText} />
+                    <Text className="text-xs text-muted-foreground">Mark all read</Text>
+                  </Pressable>
+                </View>
+
+                <ScrollView
+                  className="max-h-[420px]"
+                  keyboardShouldPersistTaps="handled"
+                  nestedScrollEnabled
+                >
+                  {loading ? (
+                    <View className="p-6">
+                      <Text className="text-center text-sm text-muted-foreground">Loading…</Text>
+                    </View>
+                  ) : notifications.length === 0 ? (
+                    <View className="items-center px-8 py-8">
+                      <Bell size={32} color={Theme.colors.secondaryText} style={{ opacity: 0.4 }} />
+                      <Text className="mt-2 text-center text-sm text-muted-foreground">
+                        No notifications yet
+                      </Text>
+                    </View>
+                  ) : (
+                    notifications.map((n) => {
+                      const cfg = typeConfig[n.type] ?? typeConfig.reaction;
+                      const actorName =
+                        n.actor_profile?.display_name?.trim() ||
+                        (n.actor_profile?.handle
+                          ? `@${n.actor_profile.handle.replace(/^@/, '')}`
+                          : null) ||
+                        'Someone';
+                      const data = n.data;
+                      const recTitle =
+                        data && typeof data.recommendation_title === 'string'
+                          ? data.recommendation_title
+                          : '';
+                      const isTrusted = n.type === 'trusted';
+
+                      const description = isTrusted
+                        ? `${actorName} is now Trusted`
+                        : recTitle
+                          ? `${actorName} ${cfg.verb} — ${recTitle}`
+                          : `${actorName} ${cfg.verb}`;
+
+                      return (
+                        <View
+                          key={n.id}
+                          className={`flex-row items-start gap-3 border-b border-border/60 px-4 py-3 ${
+                            !n.is_read ? 'bg-primary/5' : ''
+                          }`}
+                        >
+                          <View
+                            className={`h-9 w-9 shrink-0 overflow-hidden rounded-full ${
+                              isTrusted ? 'bg-primary/10 ring-2 ring-primary/20' : ''
+                            }`}
+                          >
+                            <SignedUserAvatar
+                              name={actorName}
+                              avatar={n.actor_profile?.avatar_url ?? undefined}
+                              className="h-9 w-9 border-0"
+                            />
+                          </View>
+                          <View className="min-w-0 flex-1">
+                            <Text className="text-sm text-foreground" numberOfLines={3}>
+                              {description}
+                            </Text>
+                            {isTrusted ? (
+                              <View className="mt-1 flex-row items-center gap-1 self-start rounded-full border border-primary/25 bg-primary/10 px-2 py-0.5">
+                                <ShieldCheck size={10} color={Theme.colors.primary} />
+                                <Text className="text-[10px] font-semibold text-primary">
+                                  Trusted
+                                </Text>
+                              </View>
+                            ) : null}
+                            <Text className="mt-0.5 text-xs text-muted-foreground">
+                              {formatNotificationTime(n.created_at)}
+                            </Text>
+                          </View>
+                          {!n.is_read ? (
+                            <View className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                          ) : (
+                            <View className="w-2 shrink-0" />
+                          )}
+                        </View>
+                      );
+                    })
+                  )}
+                </ScrollView>
+              </View>
+            </View>
+          ) : null}
+        </View>
+      </Modal>
+    </>
+  );
+};

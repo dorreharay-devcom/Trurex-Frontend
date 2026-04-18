@@ -10,6 +10,8 @@ export const MAP_VIEW_HEIGHT = 440;
 export const MAP_VIEW_MIN_HEIGHT = 360;
 
 export const MAP_ACTION_INSET = 20;
+/** Search row (input + list toggle) sits at `MAP_ACTION_INSET`; banner sits below it. */
+export const MAP_LOCATION_PROMPT_TOP = MAP_ACTION_INSET + 56 + 8;
 export const MAP_LAYER_ABOVE_LOCATE = 52;
 
 export const WEB_INFO_CARD_MAX_W = 320;
