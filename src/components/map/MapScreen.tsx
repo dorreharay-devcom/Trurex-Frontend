@@ -9,7 +9,7 @@ import { MapSearchBar } from '~/components/map/MapSearchBar';
 import { MapLegend } from '~/components/map/MapLegend';
 import { MapLayerToggle } from '~/components/map/MapLayerToggle';
 import { MapPinDetailSheet } from '~/components/map/MapPinDetailSheet';
-import { MapLocationPermissionModal } from '~/components/map/MapLocationPermissionModal';
+import { MapLocationPromptBanner } from '~/components/map/MapLocationPromptBanner';
 import { ListRow } from '~/components/map/common/ListRow';
 import { Theme } from '~/theme/Theme';
 import { MapPin, List, LocateFixed } from 'lucide-react-native';
@@ -107,12 +107,6 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
 
   return (
     <View className="relative min-h-0 w-full flex-1 bg-background pt-4">
-      <MapLocationPermissionModal
-        visible={locationPromptVisible}
-        onAllow={onLocationAllow}
-        onNotNow={onLocationNotNow}
-      />
-
       <View className="relative min-h-0 w-full flex-1 px-4 pb-5">
         {!flow.listView ? (
           <View className="relative min-h-0 w-full flex-1">
@@ -144,6 +138,11 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
                 }),
               ]}
             >
+              <MapLocationPromptBanner
+                visible={locationPromptVisible}
+                onAllow={onLocationAllow}
+                onNotNow={onLocationNotNow}
+              />
               <MapLegend />
               <MapLayerToggle visibility={flow.layers} onChange={flow.setLayers} />
 
