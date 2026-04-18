@@ -7,3 +7,10 @@ export {
 } from './useRexPlaceSearch';
 export { useActiveCategories } from '../useActiveCategories';
 export { useMyCircles } from '../useMyCircles';
+export { useRexComments } from './useRexComments';
+export {
+  useShareRex,
+  buildRexShareContent,
+  getRexShareUrl,
+  type RexShareInput,
+} from './useShareRex';

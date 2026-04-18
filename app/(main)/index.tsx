@@ -11,13 +11,18 @@ import { TabBar, Tab } from '~/components/layout/TabBar';
 import { CreateModal } from '~/components/recommendation/create/CreateModal';
 import { RecommendationDetailModal } from '~/components/recommendation/RecommendationDetailModal';
 import { Theme } from '~/theme/Theme';
-import type { Recommendation } from '~/types/recommendation/recommendation';
+import type {
+  Recommendation,
+  RecommendationOpenOptions,
+} from '~/types/recommendation/recommendation';
 
 export default function HomeScreen() {
   const [currentTab, setCurrentTab] = useState<Tab>('discover');
   const [searchQuery, setSearchQuery] = useState('');
   const [createRecommendationOpen, setCreateRecommendationOpen] = useState(false);
   const [previewRecommendation, setPreviewRecommendation] = useState<Recommendation | null>(null);
+  const [previewOptions, setPreviewOptions] = useState<RecommendationOpenOptions>({});
+  const [commentCountByRexId, setCommentCountByRexId] = useState<Record<string, number>>({});
 
   const handleCloseCreate = useCallback(() => {
     setCreateRecommendationOpen(false);
@@ -26,7 +31,26 @@ export default function HomeScreen() {
   const openCreateFromDetail = useCallback(() => {
     setCreateRecommendationOpen(true);
     setPreviewRecommendation(null);
+    setPreviewOptions({});
   }, []);
+
+  const openPreview = useCallback((rec: Recommendation, options?: RecommendationOpenOptions) => {
+    setPreviewOptions(options ?? {});
+    setPreviewRecommendation(rec);
+  }, []);
+
+  const closePreview = useCallback(() => {
+    setPreviewRecommendation(null);
+    setPreviewOptions({});
+  }, []);
+
+  const handleCommentCountChange = useCallback(
+    (total: number) => {
+      const id = previewRecommendation?.id;
+      if (id) setCommentCountByRexId((prev) => ({ ...prev, [id]: total }));
+    },
+    [previewRecommendation?.id],
+  );
 
   return (
     <View className="flex-1 bg-background">
@@ -43,16 +67,18 @@ export default function HomeScreen() {
         {currentTab === 'discover' && (
           <DiscoverView
             searchQuery={searchQuery}
-            onRecommendationPress={(rec) => setPreviewRecommendation(rec)}
+            commentCountByRexId={commentCountByRexId}
+            onRecommendationPress={openPreview}
           />
         )}
         {currentTab === 'faves' && (
-          <FavesView onRecommendationPress={(rec) => setPreviewRecommendation(rec)} />
+          <FavesView
+            commentCountByRexId={commentCountByRexId}
+            onRecommendationPress={openPreview}
+          />
         )}
         {currentTab === 'circles' && <CirclesView isActive={currentTab === 'circles'} />}
-        {currentTab === 'map' && (
-          <MapScreen onRecommendationPress={(rec) => setPreviewRecommendation(rec)} />
-        )}
+        {currentTab === 'map' && <MapScreen onRecommendationPress={openPreview} />}
         {currentTab === 'profile' && <ProfileView />}
       </View>
 
@@ -79,8 +105,10 @@ export default function HomeScreen() {
       <RecommendationDetailModal
         visible={previewRecommendation != null}
         recommendation={previewRecommendation}
-        onClose={() => setPreviewRecommendation(null)}
+        onClose={closePreview}
         onAddYourOwn={openCreateFromDetail}
+        onCommentCountChange={handleCommentCountChange}
+        scrollToComments={previewOptions.scrollToComments === true}
       />
     </View>
   );

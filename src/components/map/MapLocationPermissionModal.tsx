@@ -13,7 +13,6 @@ type Props = {
 export const MapLocationPermissionModal: React.FC<Props> = ({ visible, onAllow, onNotNow }) => {
   const insets = useSafeAreaInsets();
 
-  /** Push the sheet down so it clears status bar / app chrome. PaddingTop on a justify-end parent does not move the child. */
   const sheetTopNudge = Math.max(insets.top, 12) + (Platform.OS === 'web' ? 64 : 16);
   const bottomBase = Math.max(insets.bottom, 16) + 20;
   const paddingBottom = bottomBase + sheetTopNudge;
@@ -34,9 +33,7 @@ export const MapLocationPermissionModal: React.FC<Props> = ({ visible, onAllow, 
           {
             justifyContent: 'flex-end',
             paddingBottom,
-            ...(Platform.OS === 'web'
-              ? ({ zIndex: 20_000, isolation: 'isolate' } as const)
-              : null),
+            ...(Platform.OS === 'web' ? ({ zIndex: 20_000, isolation: 'isolate' } as const) : null),
           },
         ]}
       >
@@ -48,7 +45,10 @@ export const MapLocationPermissionModal: React.FC<Props> = ({ visible, onAllow, 
             <MapPin size={22} color={Theme.colors.destructive} />
             <Text className="text-base font-semibold text-foreground">Enable Location</Text>
           </View>
-          <Text className="mb-6 text-sm leading-relaxed" style={{ color: Theme.colors.secondaryText }}>
+          <Text
+            className="mb-6 text-sm leading-relaxed"
+            style={{ color: Theme.colors.secondaryText }}
+          >
             TruRex uses your location to show recommendations near you. Allow location access to get
             the most from the map.
           </Text>

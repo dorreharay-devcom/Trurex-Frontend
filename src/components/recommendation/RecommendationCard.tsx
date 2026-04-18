@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import {
   Heart,
@@ -12,27 +12,42 @@ import {
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
+import { likeRex, unlikeRex } from '~/api/rexLikesApi';
+import { useAuth } from '~/services/AuthContext';
 import { Theme } from '~/theme/Theme';
-import type { Recommendation } from '~/types/recommendation/recommendation';
+import type {
+  Recommendation,
+  RecommendationOpenOptions,
+} from '~/types/recommendation/recommendation';
+import { toastError } from '~/utils/appToast';
 import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
 } from '~/utils/recommendation/rexMediaPaths';
 import { valueForMoneyLabel } from '~/utils/recommendation/rexFeedDisplay';
+import { useShareRex } from '~/hooks/recommendation/useShareRex';
 
-export type { Recommendation };
+export type { Recommendation, RecommendationOpenOptions };
 
 interface RecommendationCardProps {
   recommendation: Recommendation;
-  onTap?: (rec: Recommendation) => void;
+  onTap?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
 }
 
 const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation: rec, onTap }) => {
+  const { user: currentUser } = useAuth();
+  const { shareRecommendation } = useShareRex();
   const [liked, setLiked] = useState(rec.isLiked);
   const [likes, setLikes] = useState(rec.likes);
   const [saved, setSaved] = useState(rec.isSaved);
+  const likeBusy = useRef(false);
 
-  const user = rec.user ?? { name: 'Member', handle: '', avatar: '' };
+  useEffect(() => {
+    setLiked(rec.isLiked);
+    setLikes(rec.likes);
+  }, [rec.id, rec.isLiked, rec.likes]);
+
+  const author = rec.user ?? { name: 'Member', handle: '', avatar: '' };
   const tags = rec.tags ?? [];
   const coverPath = rexCoverStoragePathFromRecommendation(rec);
   const coverHttp = rexCoverRemoteHttpUrl(rec);
@@ -40,9 +55,32 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation:
     rec.scoreValueForMoney != null ? valueForMoneyLabel(rec.scoreValueForMoney) : null;
   const showStarRating = rec.rating != null && rec.rating > 0;
 
-  const toggleLike = () => {
-    setLiked((v) => !v);
-    setLikes((v) => (liked ? v - 1 : v + 1));
+  const toggleLike = async () => {
+    if (!currentUser) {
+      toastError('Sign in required', 'Please sign in to like recommendations.');
+      return;
+    }
+    if (likeBusy.current) return;
+    likeBusy.current = true;
+
+    const wasLiked = liked;
+    const nextLiked = !wasLiked;
+    setLiked(nextLiked);
+    setLikes((n) => (nextLiked ? n + 1 : n - 1));
+
+    try {
+      if (nextLiked) {
+        await likeRex(rec.id);
+      } else {
+        await unlikeRex(rec.id);
+      }
+    } catch (e) {
+      setLiked(wasLiked);
+      setLikes((n) => (nextLiked ? n - 1 : n + 1));
+      toastError("Couldn't update like", e instanceof Error ? e.message : undefined);
+    } finally {
+      likeBusy.current = false;
+    }
   };
 
   const Wrapper = onTap ? TouchableOpacity : View;
@@ -53,11 +91,11 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation:
       className="bg-card border border-border rounded-xl overflow-hidden mb-4"
     >
       <View className="flex-row items-center gap-3 p-4 pb-2">
-        <SignedUserAvatar name={user.name} avatar={user.avatar} />
+        <SignedUserAvatar name={author.name} avatar={author.avatar} />
         <View className="flex-1">
-          <Text className="text-sm font-semibold text-foreground">{user.name}</Text>
+          <Text className="text-sm font-semibold text-foreground">{author.name}</Text>
           <Text className="text-xs text-muted">
-            {user.handle ? `${user.handle} · ` : ''}
+            {author.handle ? `${author.handle} · ` : ''}
             {rec.timeAgo}
           </Text>
         </View>
@@ -132,12 +170,22 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation:
             <Text className="text-xs text-muted">{likes}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="flex-row items-center gap-1.5">
+          <TouchableOpacity
+            onPress={() => onTap?.(rec, { scrollToComments: true })}
+            disabled={!onTap}
+            accessibilityRole="button"
+            accessibilityLabel="View comments"
+            className="flex-row items-center gap-1.5"
+          >
             <MessageCircle size={20} color={Theme.colors.muted} />
             <Text className="text-xs text-muted">{rec.comments}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => void shareRecommendation(rec)}
+            accessibilityRole="button"
+            accessibilityLabel="Share recommendation"
+          >
             <Share2 size={20} color={Theme.colors.muted} />
           </TouchableOpacity>
         </View>

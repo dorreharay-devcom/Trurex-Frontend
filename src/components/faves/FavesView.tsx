@@ -6,7 +6,11 @@ import { Theme } from '~/theme/Theme';
 import { Button } from '~/components/common/Button';
 import RecommendationCard from '~/components/recommendation/RecommendationCard';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
-import type { Recommendation, Collection } from '~/types/recommendation/recommendation';
+import type {
+  Recommendation,
+  Collection,
+  RecommendationOpenOptions,
+} from '~/types/recommendation/recommendation';
 import { webContainerStyle } from '~/utils';
 import {
   rexCoverRemoteHttpUrl,
@@ -60,7 +64,7 @@ const EmptyState: React.FC = () => (
 interface FavesHeaderProps {
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
-  onRecommendationPress?: (rec: Recommendation) => void;
+  onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
 }
 
 const FavesHeader: React.FC<FavesHeaderProps> = ({
@@ -145,10 +149,11 @@ const FavesHeader: React.FC<FavesHeaderProps> = ({
 );
 
 type FavesViewProps = {
-  onRecommendationPress?: (rec: Recommendation) => void;
+  commentCountByRexId?: Record<string, number>;
+  onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
 };
 
-const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
+const FavesView: React.FC<FavesViewProps> = ({ commentCountByRexId, onRecommendationPress }) => {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
 
   return (
@@ -165,11 +170,15 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
           onRecommendationPress={onRecommendationPress}
         />
       }
-      renderItem={({ item }) => (
-        <View className="px-4">
-          <RecommendationCard recommendation={item} onTap={onRecommendationPress} />
-        </View>
-      )}
+      renderItem={({ item }) => {
+        const n = commentCountByRexId?.[item.id];
+        const rec = n !== undefined ? { ...item, comments: n } : item;
+        return (
+          <View className="px-4">
+            <RecommendationCard recommendation={rec} onTap={onRecommendationPress} />
+          </View>
+        );
+      }}
       ListEmptyComponent={() => (viewMode === 'list' ? <EmptyState /> : null)}
     />
   );

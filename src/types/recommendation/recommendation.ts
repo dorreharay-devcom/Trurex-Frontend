@@ -1,3 +1,7 @@
+export type RecommendationOpenOptions = {
+  scrollToComments?: boolean;
+};
+
 export interface Recommendation {
   id: string;
   title: string;
