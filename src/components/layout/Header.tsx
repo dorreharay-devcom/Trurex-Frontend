@@ -13,6 +13,7 @@ import { Search, PlusCircle, LogOut, UserCircle2 } from 'lucide-react-native';
 import { Auth } from '~/services/AuthService';
 import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import { isWeb } from '~/utils';
+import { NotificationBell } from '~/components/layout/NotificationBell';
 
 interface HeaderProps {
   searchQuery: string;
@@ -89,6 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
               <Text className="text-sm font-medium text-primary-foreground">Add Rex</Text>
             </TouchableOpacity>
           )}
+          <NotificationBell />
           <TouchableOpacity
             onPress={() => Auth.signOut()}
             className="rounded-lg p-2 active:opacity-80"
