@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { MapPin, Star } from 'lucide-react-native';
 import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
-import {
-  CONFIRM_PREVIEW_USER,
-  type ConfirmPreviewPlace,
+import type {
+  ConfirmAuthorPreview,
+  ConfirmPreviewPlace,
 } from '~/utils/recommendation/confirmPreview';
 import { Theme } from '~/theme/Theme';
 import { cn } from '~/utils/general';
@@ -25,6 +25,7 @@ type Props = {
 };
 
 export function ConfirmPreviewCard({
+  author,
   place,
   selectedCategoryId,
   categoryDisplayName,
@@ -44,14 +45,12 @@ export function ConfirmPreviewCard({
     <View className="overflow-hidden rounded-2xl border border-border bg-card shadow-card">
       <View className="flex-row items-center gap-3 p-4 pb-3">
         <View className="h-9 w-9 items-center justify-center rounded-full border-2 border-border bg-sand">
-          <Text className="text-xs font-semibold text-sand-dark">
-            {CONFIRM_PREVIEW_USER.initials}
-          </Text>
+          <Text className="text-xs font-semibold text-sand-dark">{author.initials}</Text>
         </View>
         <View className="min-w-0 flex-1">
-          <Text className="text-sm font-semibold text-foreground">{CONFIRM_PREVIEW_USER.name}</Text>
+          <Text className="text-sm font-semibold text-foreground">{author.name}</Text>
           <Text className="mt-0.5 text-xs text-muted-foreground">
-            {CONFIRM_PREVIEW_USER.handle} · just now
+            {author.handle ? `${author.handle} · ` : ''}just now
           </Text>
         </View>
         {selectedCategoryId ? (

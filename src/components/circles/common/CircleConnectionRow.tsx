@@ -1,0 +1,52 @@
+import React from 'react';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { UserPlus } from 'lucide-react-native';
+import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
+import { Theme } from '~/theme/Theme';
+import type { NetworkUserRow } from '~/types/network';
+
+type Props = {
+  row: NetworkUserRow;
+  onAdd: () => void;
+  isMember: boolean;
+  isAdding: boolean;
+};
+
+export function CircleConnectionRow({ row, onAdd, isMember, isAdding }: Props) {
+  const label = row.display_name || 'Member';
+  return (
+    <View className="flex-row items-center gap-3 rounded-xl border border-border bg-card p-3">
+      <SignedUserAvatar name={label} avatar={row.avatar_url} className="h-10 w-10" />
+      <View className="min-w-0 flex-1">
+        <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
+          {label}
+        </Text>
+        {row.handle ? (
+          <Text className="text-xs text-muted-foreground" numberOfLines={1}>
+            @{row.handle}
+          </Text>
+        ) : null}
+      </View>
+      <Pressable
+        onPress={onAdd}
+        disabled={isMember || isAdding}
+        className={`flex-row items-center gap-1 rounded-lg border px-3 py-2 ${
+          isMember
+            ? 'border-border bg-muted opacity-70'
+            : 'border-border bg-background active:opacity-90'
+        }`}
+      >
+        {isAdding ? (
+          <ActivityIndicator size="small" color={Theme.colors.primary} />
+        ) : isMember ? (
+          <Text className="text-xs font-medium text-muted-foreground">In circle</Text>
+        ) : (
+          <>
+            <UserPlus size={14} color={Theme.colors.foreground} />
+            <Text className="text-xs font-medium text-foreground">Add</Text>
+          </>
+        )}
+      </Pressable>
+    </View>
+  );
+}

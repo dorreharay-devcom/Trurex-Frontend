@@ -20,6 +20,7 @@ type CircleRowFromDb = {
   name: string;
   description: string | null;
   icon_url: string | null;
+  color: string | null;
   system_kind: string | null;
   is_active: boolean;
   created_at: string;
@@ -29,7 +30,7 @@ type CircleRowFromDb = {
 async function fetchMyCirclesViaPostgrest(): Promise<CircleApiRow[]> {
   const { data, error } = await Backend.from('circles')
     .select(
-      'id, owner_id, name, description, icon_url, system_kind, is_active, created_at, updated_at',
+      'id, owner_id, name, description, icon_url, color, system_kind, is_active, created_at, updated_at',
     )
     .order('created_at', { ascending: false });
   if (error) throw error;
@@ -86,8 +87,13 @@ export async function invokeCirclesMemberAction(
   return data;
 }
 
-export function addCircleMember(circleId: string, userId: string) {
-  return invokeCirclesMemberAction({ action: 'add_member', circleId, userId });
+export async function addCircleMember(circleId: string, userId: string): Promise<unknown> {
+  const { data, error } = await Backend.rpc('add_user_to_circle', {
+    input_circle_id: circleId,
+    input_user_id: userId,
+  });
+  if (error) throw error;
+  return data;
 }
 
 export function removeCircleMember(circleId: string, userId: string) {
@@ -105,7 +111,8 @@ export async function createCircle(params: CreateCircleParams): Promise<CircleAp
   const { data, error } = await Backend.rpc('create_circle', {
     input_name: params.input_name,
     input_description: params.input_description ?? null,
-    input_icon_url: params.input_icon_url ?? params.input_color ?? null,
+    input_icon_url: params.input_icon_url ?? null,
+    input_color: params.input_color ?? null,
   });
   if (error) throw error;
   return data as CircleApiRow;
@@ -120,15 +127,13 @@ export type UpdateCircleParams = {
 };
 
 export async function updateCircle(params: UpdateCircleParams): Promise<CircleApiRow> {
-  const icon =
-    params.input_icon_url !== undefined ? params.input_icon_url : (params.input_color ?? undefined);
-
   const body: Record<string, unknown> = {
     input_circle_id: params.input_circle_id,
   };
   if (params.input_name !== undefined) body.input_name = params.input_name;
   if (params.input_description !== undefined) body.input_description = params.input_description;
-  if (icon !== undefined) body.input_icon_url = icon;
+  if (params.input_icon_url !== undefined) body.input_icon_url = params.input_icon_url;
+  if (params.input_color !== undefined) body.input_color = params.input_color;
 
   const { data, error } = await Backend.rpc('update_circle', body);
   if (error) throw error;
