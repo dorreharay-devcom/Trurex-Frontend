@@ -23,46 +23,62 @@ function isTrustedUsersRpcUnavailable(error: { code?: string; message?: string }
   );
 }
 
+function coerceId(v: unknown): string {
+  if (v == null) return '';
+  return typeof v === 'string' ? v : String(v);
+}
+
+function optStr(v: unknown): string | null {
+  return typeof v === 'string' ? v : null;
+}
+
+function optStrUndef(v: unknown): string | undefined {
+  return typeof v === 'string' ? v : undefined;
+}
+
+function finiteNum(v: unknown, fallback = 0): number {
+  return typeof v === 'number' && Number.isFinite(v) ? v : fallback;
+}
+
+type RelTriplet = 'follows_you' | 'following' | 'trusted';
+
+function relTriplet(v: unknown): RelTriplet | null {
+  return v === 'follows_you' || v === 'following' || v === 'trusted' ? v : null;
+}
+
 function normalizeNetworkRow(r: Record<string, unknown>): NetworkUserRow {
-  const base: NetworkUserRow = {
-    user_id: String(r.user_id ?? ''),
-    display_name: typeof r.display_name === 'string' ? r.display_name : 'Member',
-    handle: typeof r.handle === 'string' ? r.handle : null,
-    avatar_url: typeof r.avatar_url === 'string' ? r.avatar_url : null,
-    trust_score: typeof r.trust_score === 'number' ? r.trust_score : 0,
-    relationship_status:
-      r.relationship_status === 'follows_you' ||
-      r.relationship_status === 'following' ||
-      r.relationship_status === 'trusted'
-        ? r.relationship_status
-        : null,
-    followed_at: typeof r.followed_at === 'string' ? r.followed_at : undefined,
-    bio: typeof r.bio === 'string' ? r.bio : null,
+  const row: NetworkUserRow = {
+    user_id: coerceId(r.user_id),
+    display_name: optStr(r.display_name) ?? 'Member',
+    handle: optStr(r.handle),
+    avatar_url: optStr(r.avatar_url),
+    trust_score: finiteNum(r.trust_score),
+    relationship_status: relTriplet(r.relationship_status),
+    followed_at: optStrUndef(r.followed_at),
+    bio: optStr(r.bio),
   };
-  if (typeof r.followers_count === 'number') base.followers_count = r.followers_count;
-  if (typeof r.following_count === 'number') base.following_count = r.following_count;
-  if (typeof r.rexes_created_count === 'number') base.rexes_created_count = r.rexes_created_count;
-  return base;
+  if (typeof r.followers_count === 'number') row.followers_count = r.followers_count;
+  if (typeof r.following_count === 'number') row.following_count = r.following_count;
+  if (typeof r.rexes_created_count === 'number') row.rexes_created_count = r.rexes_created_count;
+  return row;
 }
 
 function normalizeUserProfileRow(r: Record<string, unknown>): UserProfileRow {
-  const rs = r.relationship_status;
   return {
-    user_id: String(r.user_id ?? ''),
-    display_name: typeof r.display_name === 'string' ? r.display_name : '',
-    handle: typeof r.handle === 'string' ? r.handle : null,
-    avatar_url: typeof r.avatar_url === 'string' ? r.avatar_url : null,
-    location: typeof r.location === 'string' ? r.location : null,
-    bio: typeof r.bio === 'string' ? r.bio : null,
-    currently_binging: typeof r.currently_binging === 'string' ? r.currently_binging : null,
-    currently_listening_to:
-      typeof r.currently_listening_to === 'string' ? r.currently_listening_to : null,
-    currently_reading: typeof r.currently_reading === 'string' ? r.currently_reading : null,
-    trust_score: typeof r.trust_score === 'number' ? r.trust_score : 0,
-    followers_count: typeof r.followers_count === 'number' ? r.followers_count : 0,
-    following_count: typeof r.following_count === 'number' ? r.following_count : 0,
-    rexes_created_count: typeof r.rexes_created_count === 'number' ? r.rexes_created_count : 0,
-    relationship_status: rs === 'follows_you' || rs === 'following' || rs === 'trusted' ? rs : null,
+    user_id: coerceId(r.user_id),
+    display_name: optStr(r.display_name) ?? '',
+    handle: optStr(r.handle),
+    avatar_url: optStr(r.avatar_url),
+    location: optStr(r.location),
+    bio: optStr(r.bio),
+    currently_binging: optStr(r.currently_binging),
+    currently_listening_to: optStr(r.currently_listening_to),
+    currently_reading: optStr(r.currently_reading),
+    trust_score: finiteNum(r.trust_score),
+    followers_count: finiteNum(r.followers_count),
+    following_count: finiteNum(r.following_count),
+    rexes_created_count: finiteNum(r.rexes_created_count),
+    relationship_status: relTriplet(r.relationship_status),
   };
 }
 
