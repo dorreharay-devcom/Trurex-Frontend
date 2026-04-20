@@ -75,6 +75,7 @@ export async function searchPlacesForRex(
 export async function upsertGooglePlace(params: {
   p_provider_place_id: string;
   p_name: string;
+  p_category_code?: string | null;
   p_normalized_address: string | null;
   p_latitude: number | null;
   p_longitude: number | null;
@@ -86,6 +87,7 @@ export async function upsertGooglePlace(params: {
 
 export async function createManualPlace(params: {
   p_name: string;
+  p_category_code?: string | null;
   p_normalized_address: string | null;
   p_latitude: number | null;
   p_longitude: number | null;

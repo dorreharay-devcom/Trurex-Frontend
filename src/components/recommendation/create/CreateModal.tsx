@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, Pressable, useWindowDimensions, ActivityIndicator } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, ChevronRight } from 'lucide-react-native';
@@ -19,6 +19,7 @@ import {
   fetchAllCategoryCreateConfigs,
   fetchCategoryCreateConfig,
   createRex,
+  discardDraftRexData,
 } from '~/api/rexCreateApi';
 import {
   mergeRatingDimensions,
@@ -51,6 +52,11 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
   const { reset, setManualGeotag, setManualAddress, syncFormToConfig, syncCategoryCreateShape } =
     flow;
   const [submitting, setSubmitting] = useState(false);
+  const postedSuccessfullyRef = useRef(false);
+
+  useEffect(() => {
+    if (visible) postedSuccessfullyRef.current = false;
+  }, [visible]);
 
   const applyManualGeotag = useCallback(
     (result: ManualPlaceGeotagResult) => {
@@ -71,6 +77,18 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
     onClose,
     reset,
   });
+
+  const abandonDraftAndClose = useCallback(() => {
+    void (async () => {
+      if (!postedSuccessfullyRef.current) {
+        try {
+          await discardDraftRexData();
+        } catch {
+        }
+      }
+      handleClose();
+    })();
+  }, [handleClose]);
 
   const categoryApiCode = getRexCategoryApiCode(flow.selectedCategoryId);
 
@@ -198,9 +216,18 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
   const handlePrimaryFooter = useCallback(async () => {
     if (!flow.isLastStep) {
       if (flow.stepId === 'search') {
+        flow.goNext();
+        return;
+      }
+      if (flow.stepId === 'category') {
+        const code = getRexCategoryApiCode(flow.selectedCategoryId);
+        if (!code) {
+          toastError('Category', 'Choose a category to continue.');
+          return;
+        }
         setSubmitting(true);
         try {
-          await flow.resolveSearchStepPlace();
+          await flow.persistPlaceForCategory(code);
           flow.goNext();
         } catch (e) {
           const err = e as Error;
@@ -276,6 +303,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
       };
 
       await createRex(params);
+      postedSuccessfullyRef.current = true;
       toastSuccess('Posted', 'Your recommendation is live.');
       handleClose();
     } catch (e) {
@@ -305,7 +333,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
   return (
     <OverlayModal
       visible={visible}
-      onRequestClose={handleClose}
+      onRequestClose={abandonDraftAndClose}
       contentTranslateY={sheetTranslateY}
       backdropBackground={layout.backdropBackground}
     >
@@ -314,7 +342,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
           <View className="flex-row items-center">
             <View className="w-[72px] items-start justify-center">
               <Pressable
-                onPress={flow.isFirstStep ? handleClose : flow.goBack}
+                onPress={flow.isFirstStep ? abandonDraftAndClose : flow.goBack}
                 hitSlop={12}
                 accessibilityRole="button"
                 accessibilityLabel={flow.isFirstStep ? 'Cancel' : 'Back'}
