@@ -32,9 +32,10 @@ export type { Recommendation, RecommendationOpenOptions };
 interface RecommendationCardProps {
   recommendation: Recommendation;
   onTap?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
+  onSave?: (rec: Recommendation) => void;
 }
 
-const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation: rec, onTap }) => {
+const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation: rec, onTap, onSave }) => {
   const { user: currentUser } = useAuth();
   const { shareRecommendation } = useShareRex();
   const [liked, setLiked] = useState(rec.isLiked);
@@ -190,7 +191,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation:
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity onPress={() => setSaved((v) => !v)}>
+        <TouchableOpacity onPress={() => onSave ? onSave(rec) : setSaved((v) => !v)}>
           <Bookmark
             size={20}
             color={saved ? Theme.colors.foreground : Theme.colors.muted}

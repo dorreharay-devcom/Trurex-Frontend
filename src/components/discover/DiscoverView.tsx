@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator } from 'react-native';
+import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import { webContainerStyle } from '~/utils';
 import CategoryPills, { Category } from '~/components/layout/CategoryPills';
 import RecommendationCard, { Recommendation } from '~/components/recommendation/RecommendationCard';
@@ -54,6 +55,7 @@ const DiscoverView = ({
 }: DiscoverViewProps) => {
   const onOpenRec = onRecommendationPress ?? onTapRec;
   const [activeCategory, setActiveCategory] = useState('all');
+  const [saveTarget, setSaveTarget] = useState<RecSummary | null>(null);
   const hasSearch = searchQuery.trim().length > 0;
 
   const { data: activeCategoryRows } = useActiveCategories(true);
@@ -133,10 +135,20 @@ const DiscoverView = ({
           const rec = n !== undefined ? { ...item, comments: n } : item;
           return (
             <View className="px-4">
-              <RecommendationCard recommendation={rec} onTap={onOpenRec} />
+              <RecommendationCard
+                recommendation={rec}
+                onTap={onOpenRec}
+                onSave={(r) => setSaveTarget({ id: r.id, place_name: r.title, category_code: r.category, location: r.location })}
+              />
             </View>
           );
         }}
+      />
+
+      <AddToCollectionSheet
+        open={!!saveTarget}
+        rec={saveTarget}
+        onClose={() => setSaveTarget(null)}
       />
     </View>
   );

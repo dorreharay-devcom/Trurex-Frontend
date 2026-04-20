@@ -8,8 +8,11 @@ export interface DiscoverQueryParams {
 }
 
 export interface SearchRexesParams {
-  search_term: string | null;
-  category_filter: string | null;
+  search_term?: string | null;
+  category_filter?: string | null;
+  value_for_money_filter?: number | null;
+  created_from?: string | null;
+  created_to?: string | null;
   result_limit?: number;
   result_offset?: number;
 }
@@ -34,8 +37,11 @@ export const DiscoveryApi = {
   searchRexes: async (params: SearchRexesParams): Promise<Recommendation[]> => {
     const raw = unwrap(
       await Backend.rpc('search_rexes', {
-        search_term: params.search_term,
-        category_filter: params.category_filter,
+        search_term: params.search_term ?? null,
+        category_filter: params.category_filter ?? null,
+        value_for_money_filter: params.value_for_money_filter ?? null,
+        created_from: params.created_from ?? null,
+        created_to: params.created_to ?? null,
         result_limit: params.result_limit ?? 20,
         result_offset: params.result_offset ?? 0,
       }),
