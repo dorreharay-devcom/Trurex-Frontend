@@ -1,11 +1,62 @@
+import type { User } from '@supabase/supabase-js';
 import type { CategoryTagOption } from '~/types/recommendation/rexCategoryCreateConfig';
 import type { CreateRecSearchPlace, SearchEntryMode } from '~/types/recommendation/create';
+import type { UserProfileRow } from '~/types/network';
 
-export const CONFIRM_PREVIEW_USER = {
-  name: 'Alex Morgan',
-  handle: '@alexmorgan',
-  initials: 'AM',
-} as const;
+export type ConfirmAuthorPreview = {
+  name: string;
+  handle: string;
+  initials: string;
+};
+
+function initialsFromDisplayName(displayName: string, email: string | undefined): string {
+  const parts = displayName.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0]![0] ?? ''}${parts[1]![0] ?? ''}`.toUpperCase();
+  }
+  const compact = displayName.replace(/\s/g, '');
+  if (compact.length >= 2) return compact.slice(0, 2).toUpperCase();
+  if (compact.length === 1)
+    return `${compact[0]!.toUpperCase()}${email?.[1]?.toUpperCase() ?? ''}`.slice(0, 2);
+  return email?.[0]?.toUpperCase() ?? '?';
+}
+
+export function authorFromAuthUser(user: User | null | undefined): ConfirmAuthorPreview {
+  if (!user) {
+    return { name: 'You', handle: '', initials: '?' };
+  }
+  const meta = user.user_metadata as Record<string, unknown> | undefined;
+  const displayName =
+    (typeof meta?.display_name === 'string' && meta.display_name.trim()) ||
+    user.email?.split('@')[0] ||
+    'You';
+  const handleRaw =
+    (typeof meta?.handle === 'string' && meta.handle.trim().replace(/^@/, '')) ||
+    user.email?.split('@')[0] ||
+    '';
+  const handle = handleRaw ? `@${handleRaw}` : '';
+  return {
+    name: displayName,
+    handle,
+    initials: initialsFromDisplayName(displayName, user.email),
+  };
+}
+
+export function authorForConfirmPreview(
+  user: User | null | undefined,
+  profile: UserProfileRow | null | undefined,
+): ConfirmAuthorPreview {
+  if (!profile) return authorFromAuthUser(user);
+  const fallback = authorFromAuthUser(user);
+  const name = profile.display_name?.trim() || fallback.name;
+  const raw = profile.handle?.replace(/^@/, '').trim();
+  const handle = raw ? `@${raw}` : fallback.handle;
+  return {
+    name,
+    handle,
+    initials: initialsFromDisplayName(name, user?.email),
+  };
+}
 
 export function averageStarRating(ratings: number[]): string | null {
   const filled = ratings.filter((n) => n > 0);
@@ -36,16 +87,13 @@ export function getConfirmPreviewPlace(
   selectedSearchPlace: CreateRecSearchPlace | null,
   manualName: string,
   manualAddress: string,
-  manualGeotag: { lat: number; lng: number } | null,
+  _manualGeotag: { lat: number; lng: number } | null,
 ): ConfirmPreviewPlace {
   if (searchMode === 'manual') {
-    const geo =
-      manualGeotag != null
-        ? `Geotagged (${manualGeotag.lat.toFixed(4)}, ${manualGeotag.lng.toFixed(4)})`
-        : null;
+    const addr = manualAddress.trim();
     return {
       title: manualName.trim() || '—',
-      addressLines: [manualAddress.trim() || null, geo].filter(Boolean) as string[],
+      addressLines: addr ? [addr] : [],
     };
   }
   if (!selectedSearchPlace) return { title: '—', addressLines: [] };

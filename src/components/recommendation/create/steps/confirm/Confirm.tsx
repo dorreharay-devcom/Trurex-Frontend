@@ -1,8 +1,12 @@
 import React, { useMemo } from 'react';
 import { View, Text, ScrollView } from 'react-native';
+import { useQuery } from '@tanstack/react-query';
+import { getUserProfile } from '~/api/usersApi';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { CreateStepTitle } from '../../CreateStepTitle';
+import { useAuth } from '~/services/AuthContext';
 import {
+  authorForConfirmPreview,
   averageCategoryRatings,
   getConfirmPreviewPlace,
   getConfirmCircleTitles,
@@ -51,6 +55,17 @@ export const Confirm: React.FC<Props> = ({
   selectedTagSlugs,
   tagOptions,
 }) => {
+  const { user } = useAuth();
+  const { data: meProfile } = useQuery({
+    queryKey: ['getUserProfile', 'confirmPreview', user?.id],
+    queryFn: () => getUserProfile({ input_user_id: user!.id }),
+    enabled: !!user?.id,
+  });
+  const author = useMemo(
+    () => authorForConfirmPreview(user, meProfile ?? undefined),
+    [user, meProfile],
+  );
+
   const place = useMemo(
     () =>
       getConfirmPreviewPlace(
@@ -94,6 +109,7 @@ export const Confirm: React.FC<Props> = ({
         </View>
 
         <ConfirmPreviewCard
+          author={author}
           place={place}
           selectedCategoryId={selectedCategoryId}
           categoryDisplayName={categoryDisplayName}

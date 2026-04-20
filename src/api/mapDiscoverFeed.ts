@@ -75,7 +75,7 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
   const o = row as Record<string, unknown>;
   const id = optStr(o, 'id', 'rex_id', 'rexId');
   if (!id) {
-    throw new Error('discover_feed row missing id');
+    throw new Error('feed row missing id');
   }
 
   const photoPath =
