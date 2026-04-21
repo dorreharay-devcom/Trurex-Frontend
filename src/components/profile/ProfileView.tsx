@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { useAuth } from '~/services/AuthContext';
-// import { ProfileApi } from '~/api/ProfileApi'; // stashed with api layer
+import { ProfileApi } from '~/api/ProfileApi';
 import { Theme } from '~/theme/Theme';
 import type { ProfileData } from '~/types/profile';
-import { currentUser, collections, recommendations } from '~/data/mockData';
+import { currentUser } from '~/data/mockData';
 import { webContainerStyle } from '~/utils';
 import {
   rexCoverRemoteHttpUrl,
@@ -16,42 +17,83 @@ import ProfileHeader from './ProfileHeader';
 import CurrentlySection from './CurrentlySection';
 import EditProfile from './EditProfile';
 import CollectionCard from './CollectionCard';
-
-const ACTIVITY_ITEMS = [
-  { emoji: '❤️', text: "Liked Mia's rec for Lilia", time: '2h ago' },
-  { emoji: '💾', text: 'Saved Devoción to Cafés collection', time: '5h ago' },
-  { emoji: '🤝', text: 'Started trusting Jake Rivers', time: '1d ago' },
-  { emoji: '📝', text: 'Added Attaboy to Bars', time: '2d ago' },
-];
+import { useMyCollections } from '~/hooks/useCollections';
+import { useMyRexes } from '~/hooks/useDiscovery';
 
 enum ProfileTab {
   Recs = 'recs',
   Collections = 'collections',
-  Activity = 'activity',
 }
 
 const TABS = [
-  { id: ProfileTab.Recs, label: `Rex's (${recommendations.length})` },
+  { id: ProfileTab.Recs, label: "Rex's" },
   { id: ProfileTab.Collections, label: 'Collections' },
-  { id: ProfileTab.Activity, label: 'Activity' },
 ];
 
-const ProfileView = () => {
-  const { user, signOut } = useAuth();
+interface ProfileViewProps {
+  userId?: string;
+}
+
+const ProfileView = ({ userId: propUserId }: ProfileViewProps) => {
+  const { user: authUser, signOut } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState<ProfileTab>(ProfileTab.Recs);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+
+  const targetUserId = propUserId || authUser?.id;
+  const { data: myRexes = [], isLoading: rexesLoading } = useMyRexes(targetUserId);
+  const { data: myCollections = [], isLoading: collectionsLoading } = useMyCollections();
 
   const fetchProfile = useCallback(async () => {
-    if (!user) {
+    const targetUserId = propUserId || authUser?.id;
+
+    if (!targetUserId) {
       setProfile(currentUser);
       setLoading(false);
       return;
     }
-    setProfile({ ...currentUser, rexCount: recommendations.length, followers: 142, following: 89 });
-    setLoading(false);
-  }, [user]);
+    try {
+      const data = await ProfileApi.getProfile({ userId: targetUserId });
+      setProfile(data);
+    } catch (e) {
+      console.error('[ProfileView] Failed to fetch profile:', e);
+      setProfile({
+        ...currentUser,
+        rexCount: 0,
+        followers: 142,
+        following: 89,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [propUserId, authUser?.id]);
+
+  const handleAvatarPress = useCallback(async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission required', 'Allow photo access to change your avatar.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: 'images',
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (result.canceled || !result.assets[0]) return;
+    if (!authUser?.id) return;
+    try {
+      setAvatarUploading(true);
+      await ProfileApi.uploadAvatar(authUser.id, result.assets[0].uri);
+      await fetchProfile();
+    } catch {
+      Alert.alert('Upload failed', 'Could not update avatar. Please try again.');
+    } finally {
+      setAvatarUploading(false);
+    }
+  }, [authUser?.id, fetchProfile]);
 
   useEffect(() => {
     fetchProfile();
@@ -94,89 +136,95 @@ const ProfileView = () => {
         {profile && (
           <ProfileHeader
             profile={profile}
-            isOwnProfile
+            isOwnProfile={!propUserId || propUserId === authUser?.id}
             onEditProfile={() => setIsEditing(true)}
             onSignOut={signOut}
+            onAvatarPress={handleAvatarPress}
+            avatarUploading={avatarUploading}
           />
         )}
 
         {profile?.currently && <CurrentlySection currently={profile.currently} />}
 
         <View className="flex-row border-b border-border">
-          {TABS.map((tab) => (
-            <TouchableOpacity
-              key={tab.id}
-              onPress={() => setActiveTab(tab.id)}
-              className="flex-1 py-3 items-center"
-              activeOpacity={0.7}
-            >
-              <Text
-                className={`text-xs font-medium ${activeTab === tab.id ? 'text-foreground' : 'text-muted-foreground'}`}
+          {TABS.map((tab) => {
+            const label = tab.id === ProfileTab.Recs ? `Rex's (${myRexes.length})` : tab.label;
+            return (
+              <TouchableOpacity
+                key={tab.id}
+                onPress={() => setActiveTab(tab.id)}
+                className="flex-1 py-3 items-center"
+                activeOpacity={0.7}
               >
-                {tab.label}
-              </Text>
-              {activeTab === tab.id && (
-                <View className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
-              )}
-            </TouchableOpacity>
-          ))}
+                <Text
+                  className={`text-xs font-medium ${activeTab === tab.id ? 'text-foreground' : 'text-muted-foreground'}`}
+                >
+                  {label}
+                </Text>
+                {activeTab === tab.id && (
+                  <View className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         <View className="pb-4">
-          {activeTab === ProfileTab.Recs && (
-            <View className="flex-row flex-wrap p-4 gap-3">
-              {recommendations.map((rec) => (
-                <View
-                  key={rec.id}
-                  className="w-[48%] sm:w-[31.5%] lg:w-[23.8%] rounded-xl overflow-hidden shadow-card bg-background border border-border"
-                >
-                  <SignedStorageImage
-                    bucket={REX_IMAGES_BUCKET}
-                    storagePath={rexCoverStoragePathFromRecommendation(rec)}
-                    remoteUri={rexCoverRemoteHttpUrl(rec)}
-                    className="aspect-square w-full"
-                    accessibilityLabel={rec.title}
-                  />
-                  <View className="p-2.5">
-                    <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>
-                      {rec.title}
-                    </Text>
-                    <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
-                      {rec.location || rec.category}
-                    </Text>
-                    <Text className="text-[10px] text-accent font-medium">★ {rec.rating}</Text>
+          {activeTab === ProfileTab.Recs &&
+            (rexesLoading ? (
+              <View className="items-center py-8">
+                <ActivityIndicator color={Theme.colors.primary} />
+              </View>
+            ) : myRexes.length === 0 ? (
+              <Text className="text-sm text-muted-foreground text-center py-8">No rexes yet</Text>
+            ) : (
+              <View className="flex-row flex-wrap p-4 gap-3">
+                {myRexes.map((rec) => (
+                  <View
+                    key={rec.id}
+                    className="w-[22%] rounded-xl overflow-hidden shadow-card bg-background border border-border"
+                  >
+                    <SignedStorageImage
+                      bucket={REX_IMAGES_BUCKET}
+                      storagePath={rexCoverStoragePathFromRecommendation(rec)}
+                      remoteUri={rexCoverRemoteHttpUrl(rec)}
+                      className="aspect-square w-full"
+                      accessibilityLabel={rec.title}
+                    />
+                    <View className="p-2.5">
+                      <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>
+                        {rec.title}
+                      </Text>
+                      <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
+                        {rec.location || rec.category}
+                      </Text>
+                      <Text className="text-[10px] text-accent font-medium">★ {rec.rating}</Text>
+                    </View>
                   </View>
-                </View>
-              ))}
-            </View>
-          )}
+                ))}
+              </View>
+            ))}
 
-          {activeTab === ProfileTab.Collections && (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerClassName="p-4 gap-3"
-            >
-              {collections.map((col) => (
-                <CollectionCard key={col.id} collection={col} />
-              ))}
-            </ScrollView>
-          )}
-
-          {activeTab === ProfileTab.Activity && (
-            <View className="gap-3 p-4">
-              {ACTIVITY_ITEMS.map((item, i) => (
-                <View
-                  key={i}
-                  className="flex-row items-center gap-3 p-3 rounded-xl bg-background border border-border"
-                >
-                  <Text className="text-lg">{item.emoji}</Text>
-                  <Text className="text-sm text-foreground flex-1">{item.text}</Text>
-                  <Text className="text-xs text-muted-foreground">{item.time}</Text>
-                </View>
-              ))}
-            </View>
-          )}
+          {activeTab === ProfileTab.Collections &&
+            (collectionsLoading ? (
+              <View className="items-center py-8">
+                <ActivityIndicator color={Theme.colors.primary} />
+              </View>
+            ) : myCollections.length === 0 ? (
+              <Text className="text-sm text-muted-foreground text-center py-8">
+                No collections yet
+              </Text>
+            ) : (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerClassName="gap-3 px-4 py-4"
+              >
+                {myCollections.map((col) => (
+                  <CollectionCard key={col.id} collection={col} />
+                ))}
+              </ScrollView>
+            ))}
         </View>
       </View>
     </ScrollView>

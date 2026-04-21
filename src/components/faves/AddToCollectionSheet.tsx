@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -12,8 +12,9 @@ import {
   KeyboardAvoidingView,
   StyleSheet,
   useWindowDimensions,
+  Animated,
 } from 'react-native';
-import { Plus, Check, AlertCircle, MapPin, Image as ImageIcon } from 'lucide-react-native';
+import { Bookmark, Plus, X, Check, Image as ImageIcon } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { Backend } from '~/services/AuthService';
 import { CollectionsApi, UserCollection } from '~/api/CollectionsApi';
@@ -30,9 +31,8 @@ export interface RecSummary {
   location?: string;
 }
 
-interface CollectionWithStatus extends UserCollection {
+interface CollectionWithCount extends UserCollection {
   item_count: number;
-  alreadyHasRec: boolean;
 }
 
 export interface AddToCollectionSheetProps {
@@ -41,20 +41,28 @@ export interface AddToCollectionSheetProps {
   onClose: () => void;
 }
 
+const Checkbox = ({ checked }: { checked: boolean }) => (
+  <View
+    className={`w-5 h-5 rounded border-2 items-center justify-center ${
+      checked ? 'bg-primary border-primary' : 'border-border bg-transparent'
+    }`}
+  >
+    {checked && <Check size={12} color={Theme.colors.primaryForeground} strokeWidth={3} />}
+  </View>
+);
+
 const CollectionRow: React.FC<{
-  col: CollectionWithStatus;
-  isJustAdded: boolean;
+  col: CollectionWithCount;
+  checked: boolean;
   onPress: () => void;
-}> = ({ col, isJustAdded, onPress }) => {
+}> = ({ col, checked, onPress }) => {
   const { uri: coverUri } = useSignedStorageUrl(REX_IMAGES_BUCKET, col.cover_image_path ?? '');
-  const isAdded = col.alreadyHasRec || isJustAdded;
 
   return (
     <TouchableOpacity
-      onPress={isAdded ? undefined : onPress}
-      disabled={isAdded}
+      onPress={onPress}
       activeOpacity={0.7}
-      className={`flex-row items-center gap-3 p-3 rounded-xl ${isAdded ? 'opacity-60' : ''}`}
+      className="w-full flex-row items-center gap-3 p-3 rounded-xl"
     >
       <View className="w-10 h-10 rounded-lg bg-muted overflow-hidden items-center justify-center shrink-0">
         {coverUri ? (
@@ -63,19 +71,15 @@ const CollectionRow: React.FC<{
           <ImageIcon size={16} color={Theme.colors.muted} />
         )}
       </View>
-
-      <View className="flex-1">
+      <View className="flex-1 min-w-0">
         <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
           {col.display_name}
         </Text>
         <Text className="text-xs text-muted-foreground">
-          {isAdded && !isJustAdded
-            ? 'Already added'
-            : `${col.item_count} rec${col.item_count !== 1 ? 's' : ''}`}
+          {col.item_count} item{col.item_count !== 1 ? 's' : ''}
         </Text>
       </View>
-
-      {isAdded && <Check size={18} color={Theme.colors.primary} />}
+      <Checkbox checked={checked} />
     </TouchableOpacity>
   );
 };
@@ -84,22 +88,42 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
   const { user } = useAuth();
   const { height } = useWindowDimensions();
 
-  const [collections, setCollections] = useState<CollectionWithStatus[]>([]);
+  const [visible, setVisible] = useState(false);
+  const [collections, setCollections] = useState<CollectionWithCount[]>([]);
+  const [savedIn, setSavedIn] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [addedTo, setAddedTo] = useState<string | null>(null);
   const [showNewCollection, setShowNewCollection] = useState(false);
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
 
+  const backdropOpacity = useRef(new Animated.Value(0)).current;
+  const sheetTranslateY = useRef(new Animated.Value(600)).current;
+
+  useEffect(() => {
+    if (open && rec) {
+      setVisible(true);
+      Animated.parallel([
+        Animated.timing(backdropOpacity, { toValue: 1, duration: 250, useNativeDriver: true }),
+        Animated.spring(sheetTranslateY, {
+          toValue: 0,
+          damping: 20,
+          stiffness: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else if (!open) {
+      Animated.parallel([
+        Animated.timing(backdropOpacity, { toValue: 0, duration: 200, useNativeDriver: true }),
+        Animated.timing(sheetTranslateY, { toValue: 600, duration: 220, useNativeDriver: true }),
+      ]).start(() => setVisible(false));
+    }
+  }, [open, rec]);
+
   const loadCollections = useCallback(async () => {
     if (!user || !rec) return;
     setLoading(true);
-    setError(null);
-
     try {
       const cols = await CollectionsApi.myCollections();
-
       if (!cols.length) {
         setCollections([]);
         setLoading(false);
@@ -107,7 +131,6 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
       }
 
       const colIds = cols.map((c) => c.id);
-
       const [{ data: allItems }, { data: existing }] = await Promise.all([
         Backend.from('user_collection_rexes').select('collection_id').in('collection_id', colIds),
         Backend.from('user_collection_rexes')
@@ -117,209 +140,223 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
       ]);
 
       const countMap = new Map<string, number>();
-      (allItems || []).forEach((i: any) => {
-        countMap.set(i.collection_id, (countMap.get(i.collection_id) || 0) + 1);
-      });
-
-      const existingSet = new Set((existing || []).map((e: any) => e.collection_id));
-
-      setCollections(
-        cols.map((c) => ({
-          ...c,
-          item_count: countMap.get(c.id) || 0,
-          alreadyHasRec: existingSet.has(c.id),
-        })),
+      (allItems || []).forEach((i: any) =>
+        countMap.set(i.collection_id, (countMap.get(i.collection_id) || 0) + 1),
       );
-    } catch {
-      setError('Failed to load collections');
-    }
 
+      setSavedIn(new Set((existing || []).map((e: any) => e.collection_id)));
+      setCollections(cols.map((c) => ({ ...c, item_count: countMap.get(c.id) || 0 })));
+    } catch {
+      toastError('Failed to load collections');
+    }
     setLoading(false);
   }, [user, rec]);
 
   useEffect(() => {
     if (open && rec) {
-      setAddedTo(null);
       setShowNewCollection(false);
       setNewName('');
-      setError(null);
       loadCollections();
     }
   }, [open, rec, loadCollections]);
 
-  const handleAdd = async (collectionId: string, collectionTitle: string) => {
+  const toggleCollection = async (collectionId: string, collectionTitle: string) => {
     if (!user || !rec) return;
+    const isCurrentlySaved = savedIn.has(collectionId);
+
+    setSavedIn((prev) => {
+      const next = new Set(prev);
+      isCurrentlySaved ? next.delete(collectionId) : next.add(collectionId);
+      return next;
+    });
+
     try {
-      await CollectionsApi.addRexToCollection({ collection_id: collectionId, rex_id: rec.id });
-      setAddedTo(collectionId);
-      toastSuccess(`Added to ${collectionTitle}`);
-      setTimeout(onClose, 800);
-    } catch (e: any) {
-      toastError('Failed to add', e?.message);
+      if (isCurrentlySaved) {
+        const { error } = await Backend.from('user_collection_rexes')
+          .delete()
+          .eq('collection_id', collectionId)
+          .eq('rex_id', rec.id);
+        if (error) throw error;
+        toastSuccess(`Removed from ${collectionTitle}`);
+      } else {
+        await CollectionsApi.addRexToCollection({ collection_id: collectionId, rex_id: rec.id });
+        toastSuccess(`Saved to ${collectionTitle}`);
+      }
+    } catch {
+      setSavedIn((prev) => {
+        const next = new Set(prev);
+        isCurrentlySaved ? next.add(collectionId) : next.delete(collectionId);
+        return next;
+      });
+      toastError(isCurrentlySaved ? 'Failed to remove' : 'Failed to save');
     }
   };
 
   const handleCreateAndAdd = async () => {
     if (!user || !rec || !newName.trim()) return;
     setCreating(true);
-    setError(null);
     try {
       const collection = await CollectionsApi.createCollection({ display_name: newName.trim() });
       await CollectionsApi.addRexToCollection({ collection_id: collection.id, rex_id: rec.id });
-      toastSuccess(`Added to ${collection.display_name}`);
-      setCreating(false);
-      setTimeout(onClose, 800);
-    } catch (e: any) {
-      setError('Failed to create collection');
-      setCreating(false);
+      setCollections((prev) => [{ ...collection, item_count: 1 }, ...prev]);
+      setSavedIn((prev) => new Set(prev).add(collection.id));
+      toastSuccess(`Saved to ${collection.display_name}`);
+      setNewName('');
+      setShowNewCollection(false);
+    } catch {
+      toastError('Failed to create collection');
     }
+    setCreating(false);
   };
 
   return (
     <Modal
-      visible={open && !!rec}
+      visible={visible}
       transparent
-      animationType="slide"
+      animationType="none"
       presentationStyle={Platform.OS === 'ios' ? 'overFullScreen' : undefined}
       statusBarTranslucent={Platform.OS === 'android'}
       onRequestClose={onClose}
     >
-      <Pressable style={[StyleSheet.absoluteFill, styles.backdrop]} onPress={onClose} />
-
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.outer}
+      <Animated.View
+        style={[StyleSheet.absoluteFill, styles.backdrop, { opacity: backdropOpacity }]}
         pointerEvents="box-none"
       >
-        <View
-          style={{ maxHeight: height * 0.75 }}
-          className="bg-card rounded-t-2xl border-t border-border flex flex-col"
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+      </Animated.View>
+
+      <View style={styles.outer} pointerEvents="box-none">
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          pointerEvents="box-none"
+          style={{ width: '100%' }}
         >
-          {/* Handle */}
-          <View className="items-center py-3">
-            <View className="w-10 h-1 rounded-full bg-muted-foreground/30" />
-          </View>
-
-          {/* Title */}
-          <View className="px-4 pb-3">
-            <Text className="text-base font-display font-medium text-foreground">
-              Add to collection
-            </Text>
-          </View>
-
-          {/* Rex pill */}
-          {rec && (
-            <View className="px-4 pb-3 flex-row items-center flex-wrap gap-2">
-              <Text className="text-sm font-semibold text-foreground">{rec.place_name}</Text>
-              <View className="bg-muted rounded-full px-2 py-0.5">
-                <Text className="text-[10px] font-medium text-muted-foreground capitalize">
-                  {rec.category_code}
-                </Text>
-              </View>
-              {rec.location && (
-                <View className="flex-row items-center gap-0.5">
-                  <MapPin size={10} color={Theme.colors.muted} />
-                  <Text className="text-[11px] text-muted-foreground">{rec.location}</Text>
+          <Animated.View style={{ transform: [{ translateY: sheetTranslateY }] }}>
+            <View
+              style={{ maxHeight: height * 0.7 }}
+              className="bg-card rounded-t-2xl border-t border-border flex flex-col"
+            >
+              {/* Header */}
+              <View className="flex-row items-center justify-between p-4 border-b border-border">
+                <View className="flex-row items-center gap-2">
+                  <Bookmark size={18} color={Theme.colors.primary} />
+                  <Text className="font-display font-bold text-foreground text-base">
+                    Save to Gems
+                  </Text>
                 </View>
-              )}
-            </View>
-          )}
-
-          <View className="h-px bg-border mx-4" />
-
-          {/* List */}
-          <ScrollView
-            style={styles.list}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            {error && (
-              <TouchableOpacity
-                onPress={loadCollections}
-                className="flex-row items-center gap-2 p-3 m-3 rounded-xl bg-destructive/10"
-              >
-                <AlertCircle size={16} color={Theme.colors.destructive} />
-                <Text className="flex-1 text-sm text-destructive">{error}</Text>
-                <Text className="text-xs font-medium text-destructive">Retry</Text>
-              </TouchableOpacity>
-            )}
-
-            {loading ? (
-              <View className="px-4 py-3 gap-2">
-                {[1, 2, 3].map((i) => (
-                  <View key={i} className="flex-row items-center gap-3 p-3">
-                    <View className="w-10 h-10 rounded-lg bg-muted" />
-                    <View className="flex-1 gap-1.5">
-                      <View className="h-3.5 w-28 bg-muted rounded" />
-                      <View className="h-3 w-16 bg-muted rounded" />
-                    </View>
-                  </View>
-                ))}
-              </View>
-            ) : collections.length === 0 && !error ? (
-              <Text className="text-sm text-muted-foreground text-center py-6">
-                You have no collections yet
-              </Text>
-            ) : (
-              <View className="px-4 py-3 gap-1">
-                {collections.map((c) => (
-                  <CollectionRow
-                    key={c.id}
-                    col={c}
-                    isJustAdded={addedTo === c.id}
-                    onPress={() => handleAdd(c.id, c.display_name)}
-                  />
-                ))}
-              </View>
-            )}
-          </ScrollView>
-
-          {/* Footer */}
-          <View className="px-4 pb-4 pt-2 border-t border-border">
-            {showNewCollection ? (
-              <View className="flex-row gap-2">
-                <TextInput
-                  value={newName}
-                  onChangeText={(v) => setNewName(v.slice(0, 60))}
-                  placeholder="Collection name…"
-                  placeholderTextColor={Theme.colors.muted}
-                  autoFocus
-                  returnKeyType="done"
-                  onSubmitEditing={handleCreateAndAdd}
-                  className="flex-1 px-3 py-2.5 rounded-lg bg-muted border border-border text-sm text-foreground"
-                />
-                <TouchableOpacity
-                  onPress={handleCreateAndAdd}
-                  disabled={!newName.trim() || creating}
-                  className={`px-4 py-2.5 rounded-lg bg-primary items-center justify-center ${!newName.trim() || creating ? 'opacity-50' : ''}`}
-                >
-                  {creating ? (
-                    <ActivityIndicator size="small" color={Theme.colors.primaryForeground} />
-                  ) : (
-                    <Text className="text-primary-foreground text-sm font-medium">Create & add</Text>
-                  )}
+                <TouchableOpacity onPress={onClose} className="p-1">
+                  <X size={18} color={Theme.colors.muted} />
                 </TouchableOpacity>
               </View>
-            ) : (
-              <TouchableOpacity
-                onPress={() => setShowNewCollection(true)}
-                activeOpacity={0.7}
-                className="w-full flex-row items-center justify-center gap-1.5 py-2.5 rounded-lg border border-border"
+
+              {/* Scrollable content */}
+              <ScrollView
+                style={styles.list}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                contentContainerClassName="p-4 gap-1"
               >
-                <Plus size={14} color={Theme.colors.foreground} />
-                <Text className="text-sm font-medium text-foreground">Create new collection</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-      </KeyboardAvoidingView>
+                {/* Create new collection */}
+                {showNewCollection ? (
+                  <View className="flex-row gap-2 p-2">
+                    <TextInput
+                      value={newName}
+                      onChangeText={(v) => setNewName(v.slice(0, 60))}
+                      placeholder="Collection name…"
+                      placeholderTextColor={Theme.colors.muted}
+                      autoFocus
+                      returnKeyType="done"
+                      onSubmitEditing={handleCreateAndAdd}
+                      className="flex-1 px-3 py-2.5 rounded-lg bg-muted border border-border text-sm text-foreground"
+                    />
+                    <TouchableOpacity
+                      onPress={handleCreateAndAdd}
+                      disabled={!newName.trim() || creating}
+                      className={`w-10 rounded-lg bg-primary items-center justify-center ${!newName.trim() || creating ? 'opacity-50' : ''}`}
+                    >
+                      {creating ? (
+                        <ActivityIndicator size="small" color={Theme.colors.primaryForeground} />
+                      ) : (
+                        <Check size={16} color={Theme.colors.primaryForeground} />
+                      )}
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setShowNewCollection(false);
+                        setNewName('');
+                      }}
+                      className="w-10 rounded-lg items-center justify-center"
+                    >
+                      <X size={16} color={Theme.colors.muted} />
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    onPress={() => setShowNewCollection(true)}
+                    activeOpacity={0.7}
+                    className="w-full flex-row items-center gap-3 p-3 rounded-xl"
+                  >
+                    <View className="w-10 h-10 rounded-lg bg-muted items-center justify-center border border-dashed border-border">
+                      <Plus size={18} color={Theme.colors.muted} />
+                    </View>
+                    <Text className="text-sm font-semibold text-foreground">
+                      + Create new collection
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                {/* Divider */}
+                {collections.length > 0 && (
+                  <View className="flex-row items-center gap-2 py-2 px-1">
+                    <View className="flex-1 h-px bg-border" />
+                    <Text className="text-[10px] text-muted-foreground font-medium">
+                      YOUR COLLECTIONS
+                    </Text>
+                    <View className="flex-1 h-px bg-border" />
+                  </View>
+                )}
+
+                {loading ? (
+                  <View className="items-center justify-center py-8">
+                    <ActivityIndicator color={Theme.colors.muted} />
+                  </View>
+                ) : collections.length === 0 ? (
+                  <Text className="text-sm text-muted-foreground text-center py-6">
+                    No collections yet. Create one above!
+                  </Text>
+                ) : (
+                  collections.map((c) => (
+                    <CollectionRow
+                      key={c.id}
+                      col={c}
+                      checked={savedIn.has(c.id)}
+                      onPress={() => toggleCollection(c.id, c.display_name)}
+                    />
+                  ))
+                )}
+              </ScrollView>
+
+              {/* Done button */}
+              <View className="p-4 border-t border-border">
+                <TouchableOpacity
+                  onPress={onClose}
+                  activeOpacity={0.8}
+                  className="w-full py-3 rounded-xl bg-primary items-center"
+                >
+                  <Text className="text-primary-foreground font-semibold text-sm">Done</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Animated.View>
+        </KeyboardAvoidingView>
+      </View>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
   backdrop: { backgroundColor: 'rgba(0,0,0,0.4)' },
-  outer: { flex: 1, justifyContent: 'flex-end' },
+  outer: { flex: 1, justifyContent: 'flex-end', alignItems: 'center' },
   list: { flex: 1 },
 });
 

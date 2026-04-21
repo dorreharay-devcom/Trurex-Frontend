@@ -2,6 +2,7 @@ import type { ProfileData } from '~/types/profile';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 
 export const currentUser: ProfileData = {
+  userId: 'mock-user-id',
   displayName: 'Alex Morgan',
   handle: '@alexmorgan',
   bio: 'Curator of good taste. Restaurants, books, travel — I rex it all.',
@@ -11,6 +12,7 @@ export const currentUser: ProfileData = {
   rexCount: 73,
   followers: 312,
   following: 156,
+  relationshipStatus: null,
   currently: {
     binging: 'The Bear',
     listening: 'Mk.gee',

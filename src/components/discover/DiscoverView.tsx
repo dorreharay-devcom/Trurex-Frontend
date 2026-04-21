@@ -1,24 +1,38 @@
-import React, { useMemo, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator } from 'react-native';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import { View, Text, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TrendingUp, Star, DollarSign, Clock, Users, Tag, PlusCircle } from 'lucide-react-native';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import { webContainerStyle } from '~/utils';
-import CategoryPills, { Category } from '~/components/layout/CategoryPills';
 import RecommendationCard, { Recommendation } from '~/components/recommendation/RecommendationCard';
-import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
-import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
-import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
-import { useActiveCategories } from '~/hooks/useActiveCategories';
 import { useDiscoverRecommendations, useSearchRexes } from '~/hooks/useDiscovery';
+import { useActiveCategories } from '~/hooks/useActiveCategories';
 import { categoryPillColor } from '~/utils/recommendation/categoryPillColor';
+import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
+import { Theme } from '~/theme/Theme';
+import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
+import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
 
-const ALL_PILL: Category = {
-  id: 'all',
-  label: 'All',
-  emoji: '🔥',
-  color: '#9333ea',
-};
+const STORAGE_KEY = 'trurex-fav-categories';
+const VALUE_LABELS = ['Total Steal', 'Budget-Friendly', 'Good Value', 'Worth It', 'Splurge'];
+const OCCASION_OPTIONS = [
+  'Date night',
+  'Family',
+  'Solo',
+  'Work',
+  'Celebration',
+  'Groups',
+  'First timers',
+];
+const RECENCY_OPTIONS = [
+  { label: 'Today', days: 1 },
+  { label: 'This week', days: 7 },
+  { label: 'This month', days: 30 },
+  { label: 'All time', days: 9999 },
+];
+const TRENDING_TAGS = ['pasta', 'speakeasy', 'santorini', 'memoir'];
 
-const FALLBACK_CATEGORY_CODES: { code: string; label: string }[] = [
+const FALLBACK_CATEGORY_CODES = [
   { code: 'restaurants', label: 'Restaurants' },
   { code: 'cafes_coffee_shops', label: 'Cafes' },
   { code: 'hotels_accommodation', label: 'Hotels' },
@@ -28,52 +42,95 @@ const FALLBACK_CATEGORY_CODES: { code: string; label: string }[] = [
   { code: 'real_estate', label: 'Real estate' },
 ];
 
-function buildFallbackPills(): Category[] {
-  return [
-    ALL_PILL,
-    ...FALLBACK_CATEGORY_CODES.map(({ code, label }) => ({
-      id: code,
-      label,
-      emoji: getCategoryEmoji(code),
-      color: categoryPillColor(code),
-    })),
-  ];
+type Category = { id: string; label: string; emoji: string; color: string };
+
+function buildFallbackCategories(): Category[] {
+  return FALLBACK_CATEGORY_CODES.map(({ code, label }) => ({
+    id: code,
+    label,
+    emoji: getCategoryEmoji(code),
+    color: categoryPillColor(code),
+  }));
+}
+
+async function loadFavourites(): Promise<string[]> {
+  try {
+    const stored = await AsyncStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
+async function saveFavourites(ids: string[]) {
+  try {
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+  } catch {}
 }
 
 type DiscoverViewProps = {
   searchQuery?: string;
-  commentCountByRexId?: Record<string, number>;
+
   onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
   onTapRec?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
+  onCreateRex?: () => void;
 };
 
 const DiscoverView = ({
   searchQuery = '',
-  commentCountByRexId,
   onRecommendationPress,
   onTapRec,
+  onCreateRex,
 }: DiscoverViewProps) => {
   const onOpenRec = onRecommendationPress ?? onTapRec;
+
   const [activeCategory, setActiveCategory] = useState('all');
   const [saveTarget, setSaveTarget] = useState<RecSummary | null>(null);
+  const [favourites, setFavourites] = useState<string[]>([]);
+  const [editingFavourites, setEditingFavourites] = useState(false);
+  const [showAllCategories, setShowAllCategories] = useState(false);
+
+  const [budgetRange, setBudgetRange] = useState<[number, number]>([1, 5]);
+  const [filterCategory, setFilterCategory] = useState<string | null>(null);
+  const [filterOccasion, setFilterOccasion] = useState<string | null>(null);
+  const [filterRecency, setFilterRecency] = useState<number>(9999);
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+
   const hasSearch = searchQuery.trim().length > 0;
+  const hasActiveFilters =
+    budgetRange[0] !== 1 ||
+    budgetRange[1] !== 5 ||
+    filterCategory ||
+    filterOccasion ||
+    filterRecency !== 9999;
+
+  useEffect(() => {
+    loadFavourites().then(setFavourites);
+  }, []);
+
+  const toggleFavourite = useCallback((id: string) => {
+    setFavourites((prev) => {
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+      saveFavourites(next);
+      return next;
+    });
+  }, []);
 
   const { data: activeCategoryRows } = useActiveCategories(true);
-
-  const categories = useMemo((): Category[] => {
+  const allCats = useMemo((): Category[] => {
     if (activeCategoryRows?.length) {
-      return [
-        ALL_PILL,
-        ...activeCategoryRows.map((row) => ({
-          id: row.code,
-          label: row.display_name,
-          emoji: getCategoryEmoji(row.code),
-          color: categoryPillColor(row.code),
-        })),
-      ];
+      return activeCategoryRows.map((row) => ({
+        id: row.code,
+        label: row.display_name,
+        emoji: row.icon || '', // No more hardcoded fallback
+        color: categoryPillColor(row.code),
+      }));
     }
-    return buildFallbackPills();
+    return []; // No more fallback categories
   }, [activeCategoryRows]);
+
+  const favouriteCats = allCats.filter((c) => favourites.includes(c.id));
+  const activeCat = allCats.find((c) => c.id === activeCategory);
 
   const { data: discoverData, isLoading: discoverLoading } = useDiscoverRecommendations(undefined, {
     enabled: !hasSearch,
@@ -83,72 +140,369 @@ const DiscoverView = ({
     { enabled: hasSearch },
   );
 
-  const recs = hasSearch ? (searchData ?? []) : discoverData?.length ? discoverData : MOCK_RECS;
+  const rawRecs = hasSearch ? (searchData ?? []) : discoverData?.length ? discoverData : MOCK_RECS;
 
   const filtered = useMemo(() => {
-    if (hasSearch) return recs;
-    const byCategory =
-      activeCategory === 'all' ? recs : recs.filter((r) => r.categoryId === activeCategory);
-    return byCategory;
-  }, [recs, activeCategory, hasSearch]);
+    let results = [...rawRecs];
+    if (!hasSearch && activeCategory !== 'all') {
+      results = results.filter((r) => r.categoryId === activeCategory);
+    }
+    if (filterCategory) {
+      results = results.filter(
+        (r) => r.category === filterCategory || r.categoryId === filterCategory,
+      );
+    }
+    if (budgetRange[0] !== 1 || budgetRange[1] !== 5) {
+      results = results.filter((r) => {
+        if (!r.scoreValueForMoney) return true;
+        return r.scoreValueForMoney >= budgetRange[0] && r.scoreValueForMoney <= budgetRange[1];
+      });
+    }
+    if (filterOccasion) {
+      const occ = filterOccasion.toLowerCase();
+      results = results.filter(
+        (r) =>
+          (r.tags ?? []).some((t) => t.toLowerCase().includes(occ)) ||
+          (r.description ?? '').toLowerCase().includes(occ),
+      );
+    }
+    if (filterRecency !== 9999) {
+      const cutoff = Date.now() - filterRecency * 24 * 60 * 60 * 1000;
+      results = results.filter((r) => new Date(r.timeAgo ?? 0).getTime() > cutoff);
+    }
+    return results;
+  }, [
+    rawRecs,
+    hasSearch,
+    activeCategory,
+    filterCategory,
+    budgetRange,
+    filterOccasion,
+    filterRecency,
+  ]);
 
   const isLoading = hasSearch ? searchLoading : discoverLoading;
 
-  if (isLoading) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" />
-        <Text className="text-sm text-muted mt-3">Loading discover…</Text>
+  const ListHeader = (
+    <View className="px-4 pt-6 pb-2">
+      {/* ── Search filters ─────────────────────────────────────────────────── */}
+      {hasSearch && (
+        <View className="mb-5">
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-2">
+            <View className="flex-row gap-2 pb-1">
+              {[
+                {
+                  id: 'budget',
+                  label:
+                    budgetRange[0] !== 1 || budgetRange[1] !== 5
+                      ? `$${budgetRange[0]}–$${budgetRange[1]}`
+                      : 'Budget',
+                  Icon: DollarSign,
+                  active: budgetRange[0] !== 1 || budgetRange[1] !== 5,
+                },
+                {
+                  id: 'category',
+                  label: filterCategory
+                    ? (allCats.find((c) => c.id === filterCategory)?.label ?? 'Category')
+                    : 'Category',
+                  Icon: Tag,
+                  active: !!filterCategory,
+                },
+                {
+                  id: 'occasion',
+                  label: filterOccasion ?? 'Occasion',
+                  Icon: Users,
+                  active: !!filterOccasion,
+                },
+                {
+                  id: 'recency',
+                  label: RECENCY_OPTIONS.find((r) => r.days === filterRecency)?.label ?? 'Recency',
+                  Icon: Clock,
+                  active: filterRecency !== 9999,
+                },
+              ].map((chip) => {
+                const { Icon } = chip;
+                return (
+                  <TouchableOpacity
+                    key={chip.id}
+                    onPress={() => setActiveFilter(activeFilter === chip.id ? null : chip.id)}
+                    activeOpacity={0.7}
+                    className={`flex-row items-center gap-1.5 px-3 py-1.5 rounded-full border ${
+                      chip.active
+                        ? 'bg-primary border-primary'
+                        : activeFilter === chip.id
+                          ? 'bg-muted border-border'
+                          : 'bg-card border-border'
+                    }`}
+                  >
+                    <Icon
+                      size={12}
+                      color={chip.active ? Theme.colors.primaryForeground : Theme.colors.muted}
+                    />
+                    <Text
+                      className={`text-xs font-medium ${chip.active ? 'text-primary-foreground' : 'text-muted-foreground'}`}
+                    >
+                      {chip.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+              {hasActiveFilters && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setBudgetRange([1, 5]);
+                    setFilterCategory(null);
+                    setFilterOccasion(null);
+                    setFilterRecency(9999);
+                    setActiveFilter(null);
+                  }}
+                  className="px-2 justify-center"
+                >
+                  <Text className="text-xs text-destructive font-medium">Clear all</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </ScrollView>
+
+          {activeFilter && (
+            <View className="p-4 bg-card border border-border rounded-xl mb-2">
+              {activeFilter === 'budget' && (
+                <View className="flex-row gap-2">
+                  {VALUE_LABELS.map((label, i) => {
+                    const val = i + 1;
+                    const selected = val >= budgetRange[0] && val <= budgetRange[1];
+                    return (
+                      <TouchableOpacity
+                        key={val}
+                        onPress={() =>
+                          setBudgetRange(
+                            budgetRange[0] === val && budgetRange[1] === val ? [1, 5] : [val, val],
+                          )
+                        }
+                        className={`flex-1 py-1.5 rounded-lg items-center border ${selected ? 'bg-primary border-primary' : 'bg-muted/50 border-border'}`}
+                      >
+                        <Text
+                          className={`text-[10px] font-semibold ${selected ? 'text-primary-foreground' : 'text-muted-foreground'}`}
+                        >
+                          {label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              )}
+              {activeFilter === 'category' && (
+                <View className="flex-row flex-wrap gap-2">
+                  {allCats.map((c) => (
+                    <TouchableOpacity
+                      key={c.id}
+                      onPress={() => {
+                        setFilterCategory(filterCategory === c.id ? null : c.id);
+                        setActiveFilter(null);
+                      }}
+                      className={`flex-row items-center gap-1 px-3 py-1.5 rounded-full border ${filterCategory === c.id ? 'bg-primary border-primary' : 'bg-muted/50 border-border'}`}
+                    >
+                      <Text style={{ fontSize: 12 }}>{c.emoji}</Text>
+                      <Text
+                        className={`text-xs font-medium ${filterCategory === c.id ? 'text-primary-foreground' : 'text-muted-foreground'}`}
+                      >
+                        {c.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+              {/* ... other filters ... */}
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* ── Trending tags ─────────────────────────────────────────────────── */}
+      {!hasSearch && (
+        <View className="mb-6">
+          <View className="flex-row items-center gap-2 mb-3">
+            <TrendingUp size={16} color={Theme.colors.accent} />
+            <Text className="text-sm font-display font-semibold text-foreground">Trending Now</Text>
+          </View>
+          <View className="flex-row flex-wrap gap-2">
+            {TRENDING_TAGS.map((tag) => (
+              <TouchableOpacity
+                key={tag}
+                className="px-3 py-1.5 rounded-full bg-card border border-border"
+              >
+                <Text className="text-xs text-muted-foreground">#{tag}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      )}
+
+      {/* ── Pinned categories ──────────────────────────────────────────────── */}
+      {!hasSearch && favouriteCats.length > 0 && (
+        <View className="mb-5">
+          <View className="flex-row items-center justify-between mb-3">
+            <View className="flex-row items-center gap-2">
+              <Star size={14} color={Theme.colors.primary} fill={Theme.colors.primary} />
+              <Text className="text-sm font-display font-semibold text-foreground">
+                Your Categories
+              </Text>
+            </View>
+            <TouchableOpacity onPress={() => setEditingFavourites(!editingFavourites)}>
+              <Text className="text-xs text-primary font-medium">
+                {editingFavourites ? 'Done' : 'Edit'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View className="flex-row gap-2 pb-1">
+              {favouriteCats.map((cat) => {
+                const isActive = activeCategory === cat.id;
+                return (
+                  <TouchableOpacity
+                    key={cat.id}
+                    onPress={() =>
+                      editingFavourites
+                        ? toggleFavourite(cat.id)
+                        : setActiveCategory(cat.id === activeCategory ? 'all' : cat.id)
+                    }
+                    className={`flex-row items-center gap-1.5 px-3.5 py-2 rounded-xl border ${isActive && !editingFavourites ? 'border-primary/40 bg-primary/10' : 'bg-card border-border'}`}
+                  >
+                    <Text style={{ fontSize: 18 }}>{cat.emoji}</Text>
+                    <Text
+                      className={`text-xs font-semibold ${isActive && !editingFavourites ? 'text-foreground' : 'text-muted-foreground'}`}
+                    >
+                      {cat.label}
+                    </Text>
+                    {editingFavourites && (
+                      <Text className="ml-1 text-destructive font-bold">×</Text>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </ScrollView>
+        </View>
+      )}
+
+      <View className="mb-8 ">
+        <View className="flex-row items-center justify-between mb-4">
+          <Text className="text-sm font-display font-semibold text-foreground">
+            Browse by Category
+          </Text>
+        </View>
+
+        <View className="flex-row flex-wrap gap-3">
+          {allCats.map((cat) => {
+            const isActive = activeCategory === cat.id;
+            const isFav = favourites.includes(cat.id);
+            return (
+              <TouchableOpacity
+                key={cat.id}
+                onPress={() => setActiveCategory(cat.id === activeCategory ? 'all' : cat.id)}
+                activeOpacity={0.8}
+                style={{ width: 230, height: 74 }}
+                className={`flex-col items-center justify-center gap-1 rounded-2xl border ${
+                  isActive ? 'bg-primary/10 border-primary/40' : 'bg-white border-gray-200'
+                }`}
+              >
+                <Text style={{ fontSize: 24 }}>{cat.emoji}</Text>
+                <Text
+                  className={`text-[11px] font-bold tracking-tight ${
+                    isActive ? 'text-primary' : 'text-gray-700'
+                  }`}
+                >
+                  {cat.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
-    );
-  }
+
+      {/* ── Feed title ──────────────────────────────────────────────────────── */}
+      <Text className="text-sm font-display font-semibold text-foreground mb-4">
+        {hasSearch
+          ? `Results for "${searchQuery}"${hasActiveFilters ? ' (filtered)' : ''}`
+          : activeCategory !== 'all'
+            ? `${activeCat?.emoji ?? ''} ${activeCat?.label ?? ''} Recs`
+            : 'Latest Rex'}
+      </Text>
+
+      {isLoading && (
+        <View className="gap-4">
+          {[1, 2, 3].map((i) => (
+            <View key={i} className="bg-card border border-border rounded-xl p-4 gap-3">
+              <View className="flex-row items-center gap-3">
+                <View className="w-9 h-9 rounded-full bg-muted" />
+                <View className="gap-1.5">
+                  <View className="h-3.5 w-24 bg-muted rounded" />
+                  <View className="h-3 w-32 bg-muted rounded" />
+                </View>
+              </View>
+              <View className="w-full aspect-[4/3] rounded-lg bg-muted" />
+              <View className="h-4 w-3/4 bg-muted rounded" />
+            </View>
+          ))}
+        </View>
+      )}
+    </View>
+  );
 
   return (
     <View className="flex-1">
       <FlatList
-        data={filtered}
+        data={isLoading ? [] : filtered}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={webContainerStyle}
         contentContainerClassName="pb-24"
-        ListHeaderComponent={() => (
-          <View style={webContainerStyle} className="px-4 pt-8 pb-3">
-            <CategoryPills
-              categories={categories}
-              activeCategory={activeCategory}
-              onSelect={setActiveCategory}
+        ListHeaderComponent={ListHeader}
+        ListEmptyComponent={
+          isLoading ? null : (
+            <View className="items-center py-16 px-4 gap-4">
+              <Text className="text-4xl">🔍</Text>
+              <Text className="font-display font-semibold text-foreground text-center">
+                No recommendations here yet.
+              </Text>
+              <Text className="text-sm text-muted-foreground text-center">
+                Know a great one? Add it.
+              </Text>
+              {onCreateRex && (
+                <TouchableOpacity
+                  onPress={onCreateRex}
+                  activeOpacity={0.8}
+                  className="flex-row items-center gap-2 px-5 py-2.5 rounded-xl bg-primary"
+                >
+                  <PlusCircle size={16} color="white" />
+                  <Text className="text-sm font-semibold text-white">Add Recommendation</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )
+        }
+        renderItem={({ item }) => (
+          <View className="px-4 mb-4">
+            <RecommendationCard
+              recommendation={item}
+              onTap={onOpenRec}
+              onSave={(rec) =>
+                setSaveTarget({
+                  id: rec.id,
+                  place_name: rec.title,
+                  category_code: rec.categoryId,
+                  location: rec.location,
+                })
+              }
             />
           </View>
         )}
-        ListEmptyComponent={() => (
-          <View className="items-center py-16">
-            <Text className="text-4xl mb-3">🦖</Text>
-            <Text className="text-sm text-muted">
-              {hasSearch
-                ? 'No matching recommendations. Try different words or filters.'
-                : 'No recs yet. Be the first to add one!'}
-            </Text>
-          </View>
-        )}
-        renderItem={({ item }) => {
-          const n = commentCountByRexId?.[item.id];
-          const rec = n !== undefined ? { ...item, comments: n } : item;
-          return (
-            <View className="px-4">
-              <RecommendationCard
-                recommendation={rec}
-                onTap={onOpenRec}
-                onSave={(r) => setSaveTarget({ id: r.id, place_name: r.title, category_code: r.category, location: r.location })}
-              />
-            </View>
-          );
-        }}
       />
 
       <AddToCollectionSheet
         open={!!saveTarget}
-        rec={saveTarget}
         onClose={() => setSaveTarget(null)}
+        rec={saveTarget}
       />
     </View>
   );

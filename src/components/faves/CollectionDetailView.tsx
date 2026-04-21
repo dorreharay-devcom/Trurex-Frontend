@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-  Modal,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Modal } from 'react-native';
 import { ArrowLeft, Plus, MoreVertical, X, Trash2 } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { webContainerStyle } from '~/utils';
@@ -85,7 +78,10 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
 
       <View className="gap-3">
         {detail.rexes.map((rex) => (
-          <View key={rex.rex_id} className="bg-card border border-border rounded-xl p-3 flex-row items-center gap-3">
+          <View
+            key={rex.rex_id}
+            className="bg-card border border-border rounded-xl p-3 flex-row items-center gap-3"
+          >
             <View className="w-12 h-12 bg-muted rounded-lg" />
             <View className="flex-1">
               <Text className="text-sm font-semibold text-foreground">{rex.place_name}</Text>
@@ -100,8 +96,11 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
 
       {showMenu && (
         <View className="absolute right-4 top-14 bg-card border border-border rounded-xl shadow-lg p-2 z-20">
-          <TouchableOpacity 
-            onPress={() => { setShowDeleteConfirm(true); setShowMenu(false); }}
+          <TouchableOpacity
+            onPress={() => {
+              setShowDeleteConfirm(true);
+              setShowMenu(false);
+            }}
             className="flex-row items-center gap-2 px-4 py-2"
           >
             <Trash2 size={14} color={Theme.colors.destructive} />
@@ -115,11 +114,14 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
           <View className="bg-card rounded-xl p-6 w-full max-w-sm">
             <Text className="text-lg font-bold mb-4">Delete collection?</Text>
             <View className="flex-row gap-3">
-              <TouchableOpacity onPress={() => setShowDeleteConfirm(false)} className="flex-1 py-2 bg-muted rounded-lg items-center">
+              <TouchableOpacity
+                onPress={() => setShowDeleteConfirm(false)}
+                className="flex-1 py-2 bg-muted rounded-lg items-center"
+              >
                 <Text>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
-                onPress={() => deleteMutation.mutate(collectionId, { onSuccess: onBack })} 
+              <TouchableOpacity
+                onPress={() => deleteMutation.mutate(collectionId, { onSuccess: onBack })}
                 className="flex-1 py-2 bg-destructive rounded-lg items-center"
               >
                 <Text className="text-white">Delete</Text>

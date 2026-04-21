@@ -42,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
       style={{ paddingTop: topPad }}
     >
       <View
-        className={`flex-row items-center gap-3 px-4 pb-3 sm:px-6 ${isWeb ? 'max-w-[1280px] w-full self-center' : ''}`}
+        className={`flex-row items-center gap-3 pl-0 pr-4 pb-3 sm:pr-6 ${isWeb ? 'max-w-[1280px] w-full self-center' : ''}`}
       >
         <Image
           source={require('../../../assets/truRexLogo.png')}

@@ -13,7 +13,6 @@ import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { likeRex, unlikeRex } from '~/api/rexLikesApi';
-import { useAuth } from '~/services/AuthContext';
 import { Theme } from '~/theme/Theme';
 import type {
   Recommendation,
@@ -25,19 +24,20 @@ import {
   rexCoverStoragePathFromRecommendation,
 } from '~/utils/recommendation/rexMediaPaths';
 import { valueForMoneyLabel } from '~/utils/recommendation/rexFeedDisplay';
-import { useShareRex } from '~/hooks/recommendation/useShareRex';
 
 export type { Recommendation, RecommendationOpenOptions };
 
 interface RecommendationCardProps {
   recommendation: Recommendation;
-  onTap?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
+  onTap?: (rec: Recommendation) => void;
   onSave?: (rec: Recommendation) => void;
 }
 
-const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation: rec, onTap, onSave }) => {
-  const { user: currentUser } = useAuth();
-  const { shareRecommendation } = useShareRex();
+const RecommendationCard: React.FC<RecommendationCardProps> = ({
+  recommendation: rec,
+  onTap,
+  onSave,
+}) => {
   const [liked, setLiked] = useState(rec.isLiked);
   const [likes, setLikes] = useState(rec.likes);
   const [saved, setSaved] = useState(rec.isSaved);
@@ -191,7 +191,15 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation:
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity onPress={() => onSave ? onSave(rec) : setSaved((v) => !v)}>
+        <TouchableOpacity
+          onPress={() => {
+            if (onSave) {
+              onSave(rec);
+            } else {
+              setSaved((v) => !v);
+            }
+          }}
+        >
           <Bookmark
             size={20}
             color={saved ? Theme.colors.foreground : Theme.colors.muted}

@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { DiscoveryApi, DiscoverQueryParams, SearchRexesParams } from '~/api/DiscoveryApi';
 import { getRexCategoryApiCode } from '~/constants/recommendation/rexCategories';
-import { recommendations as mockRecommendations } from '~/data/mockData';
+import { Backend, unwrap } from '~/services/AuthService';
+import { mapDiscoverFeedRowSafe } from '~/api/mapDiscoverFeed';
+import type { Recommendation } from '~/types/recommendation/recommendation';
 
 type DiscoverRecommendationsOptions = {
   enabled?: boolean;
@@ -13,18 +15,7 @@ export const useDiscoverRecommendations = (
 ) => {
   return useQuery({
     queryKey: ['discover-recommendations', params],
-    queryFn: async () => {
-      try {
-        const data = await DiscoveryApi.getDiscoverRecommendations(params);
-        if (!data || data.length === 0) {
-          return mockRecommendations;
-        }
-        return data;
-      } catch (error) {
-        console.warn('Discovery API error, falling back to mock data:', error);
-        return mockRecommendations;
-      }
-    },
+    queryFn: () => DiscoveryApi.getDiscoverRecommendations(params),
     enabled: options?.enabled ?? true,
   });
 };
@@ -64,5 +55,20 @@ export const useSearchRexes = (args: UseSearchRexesArgs, options?: UseSearchRexe
       }
     },
     enabled: (options?.enabled ?? true) && trimmed.length > 0,
+  });
+};
+
+export const useMyRexes = (userId?: string) => {
+  return useQuery<Recommendation[]>({
+    queryKey: ['my-rexes', userId],
+    queryFn: async () => {
+      const raw = unwrap(await Backend.rpc('my_rexes', { result_limit: 50, result_offset: 0 }));
+      if (!Array.isArray(raw)) return [];
+      return raw.flatMap((row) => {
+        const rec = mapDiscoverFeedRowSafe(row);
+        return rec ? [rec] : [];
+      });
+    },
+    enabled: !!userId,
   });
 };

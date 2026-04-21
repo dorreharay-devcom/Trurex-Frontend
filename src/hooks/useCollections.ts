@@ -1,6 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Backend } from '~/services/AuthService';
-import { CollectionsApi, UserCollection, UserCollectionRex, CollectionDetailRow } from '~/api/CollectionsApi';
+import {
+  CollectionsApi,
+  UserCollection,
+  UserCollectionRex,
+  CollectionDetailRow,
+} from '~/api/CollectionsApi';
 import { toastSuccess, toastError } from '~/utils/appToast';
 
 export const useMyCollections = () => {

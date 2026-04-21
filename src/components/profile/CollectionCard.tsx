@@ -8,14 +8,21 @@ import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { Theme } from '~/theme/Theme';
 import type { UserCollection } from '~/api/CollectionsApi';
 
+const CARD_WIDTH = 176;
+const CARD_HEIGHT = 224;
+
 interface CollectionCardProps {
   collection: UserCollection;
-  width: number;
+  width?: number;
   onPress?: () => void;
 }
 
-const CollectionCard: React.FC<CollectionCardProps> = ({ collection, width, onPress }) => {
-  const height = Math.round(width * (4 / 3));
+const CollectionCard: React.FC<CollectionCardProps> = ({
+  collection,
+  width = CARD_WIDTH,
+  onPress,
+}) => {
+  const height = Math.round(width * (CARD_HEIGHT / CARD_WIDTH));
   const { uri: coverUri, loading } = useSignedStorageUrl(
     REX_IMAGES_BUCKET,
     collection.cover_image_path ?? '',
@@ -25,18 +32,19 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ collection, width, onPr
     <TouchableOpacity
       activeOpacity={0.85}
       onPress={onPress}
-      style={{ width, height, borderRadius: 12, overflow: 'hidden' }}
+      className="rounded-xl overflow-hidden flex-shrink-0"
+      style={{ width, height }}
     >
       {coverUri ? (
         <Image
           source={{ uri: coverUri }}
-          style={{ width: '100%', height: '100%' }}
+          className="w-full h-full"
           contentFit="cover"
           cachePolicy="memory-disk"
           transition={200}
         />
       ) : (
-        <View style={{ width: '100%', height: '100%' }} className="bg-muted items-center justify-center">
+        <View className="w-full h-full bg-muted items-center justify-center">
           {loading && collection.cover_image_path ? (
             <ActivityIndicator size="small" color={Theme.colors.primary} />
           ) : (
@@ -46,16 +54,14 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ collection, width, onPr
       )}
 
       <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.25)', 'rgba(0,0,0,0.72)']}
+        colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.82)']}
         locations={[0, 0.45, 1]}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+        className="absolute inset-0"
       />
 
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 10 }}>
-        <Text
-          style={{ fontSize: 12, fontWeight: '700', color: 'white', lineHeight: 16 }}
-          numberOfLines={2}
-        >
+      <View className="absolute bottom-0 left-0 right-0 p-4">
+        <Text className="text-2xl mb-1">📁</Text>
+        <Text className="text-sm font-bold text-white leading-tight" numberOfLines={2}>
           {collection.display_name}
         </Text>
       </View>

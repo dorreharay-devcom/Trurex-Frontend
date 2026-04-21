@@ -12,7 +12,7 @@ import {
 import { ArrowLeft, Camera, X } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '~/services/AuthContext';
-// import { ProfileApi } from '~/api/ProfileApi'; // stashed with api layer
+import { ProfileApi } from '~/api/ProfileApi';
 import { Theme } from '~/theme/Theme';
 import { Button } from '~/components/common/Button';
 import Input from '~/components/common/Input';
@@ -45,15 +45,29 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
   const [handle, setHandle] = useState('');
   const [bio, setBio] = useState('');
   const [location, setLocation] = useState('');
-  const [avatarUrl] = useState<string | null>(null);
   const [currently, setCurrently] = useState<CurrentlyData>({});
+  const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
       setLoading(false);
       return;
     }
-    setLoading(false);
+    ProfileApi.getCurrentUser(user.id)
+      .then((data) => {
+        setDisplayName(data.display_name || '');
+        setHandle(data.handle || '');
+        setBio(data.bio || '');
+        setLocation(data.location || '');
+        setCurrentAvatarUrl(data.avatar_url);
+        setCurrently({
+          binging: data.currently_binging || '',
+          listening: data.currently_listening_to || '',
+          reading: data.currently_reading || '',
+        });
+      })
+      .catch((e) => console.error('[EditProfile] Initial load failed:', e))
+      .finally(() => setLoading(false));
   }, [user]);
 
   const handleAvatarPick = async () => {
@@ -72,7 +86,8 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
 
     setUploading(true);
     try {
-      // ProfileApi.uploadAvatar stashed with api layer
+      const publicUrl = await ProfileApi.uploadAvatar(user.id, result.assets[0].uri);
+      setCurrentAvatarUrl(publicUrl);
     } catch (e) {
       const error = e as Error;
       Alert.alert('Upload failed', error.message);
@@ -85,7 +100,15 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
     if (!user) return;
     setSaving(true);
     try {
-      // ProfileApi.update stashed with api layer
+      await ProfileApi.update(user.id, {
+        display_name: displayName,
+        handle: handle || null,
+        bio: bio || null,
+        location: location || null,
+        currently_binging: currently.binging || null,
+        currently_listening_to: currently.listening || null,
+        currently_reading: currently.reading || null,
+      });
       onClose();
     } catch (e) {
       const error = e as Error;
@@ -137,8 +160,12 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
         <View className="items-center gap-3">
           <TouchableOpacity onPress={handleAvatarPick} activeOpacity={0.85} className="relative">
             <View className="w-24 h-24 rounded-2xl overflow-hidden border-4 border-border bg-muted">
-              {avatarUrl ? (
-                <Image source={{ uri: avatarUrl }} className="w-full h-full" resizeMode="cover" />
+              {currentAvatarUrl ? (
+                <Image
+                  source={{ uri: currentAvatarUrl }}
+                  className="w-full h-full"
+                  resizeMode="cover"
+                />
               ) : (
                 <View className="flex-1 items-center justify-center">
                   <Text className="text-3xl font-bold text-muted-foreground">

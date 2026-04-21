@@ -42,6 +42,7 @@ export type DbCategoryRow = {
   code: string;
   display_name: string;
   sort_order: number;
+  icon?: string | null;
 };
 
 export type CreateRexRpcParams = {
