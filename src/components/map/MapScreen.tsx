@@ -10,6 +10,7 @@ import { MapLegend } from '~/components/map/MapLegend';
 import { MapLayerToggle } from '~/components/map/MapLayerToggle';
 import { MapPinDetailSheet } from '~/components/map/MapPinDetailSheet';
 import { MapLocationPromptBanner } from '~/components/map/MapLocationPromptBanner';
+import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import { ListRow } from '~/components/map/common/ListRow';
 import { Theme } from '~/theme/Theme';
 import { MapPin, List, LocateFixed } from 'lucide-react-native';
@@ -26,6 +27,7 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
   const flow = useMapScreen({ onRecommendationPress });
   const { locateMe } = flow;
   const [locationPromptVisible, setLocationPromptVisible] = useState(false);
+  const [saveTarget, setSaveTarget] = useState<RecSummary | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -245,8 +247,23 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
                   flow.openRec(flow.selectedRec!);
                   flow.clearSelection();
                 }}
+                onSave={() => {
+                  const r = flow.selectedRec!;
+                  setSaveTarget({
+                    id: r.id,
+                    place_name: r.title,
+                    category_code: r.category,
+                    location: r.location,
+                  });
+                }}
               />
             )}
+
+            <AddToCollectionSheet
+              open={!!saveTarget}
+              rec={saveTarget}
+              onClose={() => setSaveTarget(null)}
+            />
           </View>
         ) : (
           <ScrollView

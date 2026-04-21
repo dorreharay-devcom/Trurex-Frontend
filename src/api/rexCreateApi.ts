@@ -7,7 +7,7 @@ import type {
 
 export async function fetchActiveCategories(): Promise<DbCategoryRow[]> {
   const { data, error } = await Backend.from('categories')
-    .select('code, display_name, sort_order')
+    .select('code, display_name, sort_order, icon')
     .eq('is_active', true)
     .order('sort_order', { ascending: true });
   if (error) throw error;
