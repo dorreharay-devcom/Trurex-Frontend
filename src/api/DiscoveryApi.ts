@@ -22,7 +22,7 @@ export const DiscoveryApi = {
     params: DiscoverQueryParams = {},
   ): Promise<Recommendation[]> => {
     const raw = unwrap(
-      await Backend.rpc('discover_feed', {
+      await Backend.rpc('recommendation_feed', {
         result_limit: params.result_limit ?? 20,
         result_offset: params.result_offset ?? 0,
       }),

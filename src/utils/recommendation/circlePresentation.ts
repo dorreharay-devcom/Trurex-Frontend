@@ -1,11 +1,11 @@
 import type { CircleApiRow } from '~/api/circlesApi';
 import type { CreateRecCircle } from '~/constants/recommendation/createCircles';
 
-/** Matches Lovable-style system circles: lock / heart / users on tinted squares. */
 const SYSTEM_KIND_STYLE: Record<string, { accent: string; iconBg: string }> = {
   inner_circle: { accent: '#7c3aed', iconBg: '#ede9fe' },
+  trusted: { accent: '#ec4899', iconBg: '#fce7f3' },
   close_friends: { accent: '#db2777', iconBg: '#fce7f3' },
-  broader_network: { accent: '#2563eb', iconBg: '#dbeafe' },
+  broader_network: { accent: '#0ea5e9', iconBg: '#dbeafe' },
 };
 
 const USER_CIRCLE_PALETTE: { accent: string; iconBg: string }[] = [
@@ -22,7 +22,6 @@ function pickUserStyle(index: number) {
 
 const HEX_COLOR = /^#([0-9A-Fa-f]{6})$/;
 
-/** Reads persisted swatch from `color` or a hex stored in `icon_url`. */
 export function parseCircleAccentHex(row: CircleApiRow): string | null {
   const c = row.color?.trim();
   if (c && HEX_COLOR.test(c)) return c;
@@ -31,7 +30,6 @@ export function parseCircleAccentHex(row: CircleApiRow): string | null {
   return null;
 }
 
-/** Soft tint behind the glyph (matches chosen swatch). */
 export function hexToSoftIconBackground(accentHex: string, alpha = 0.2): string {
   const hex = accentHex.replace('#', '');
   const r = parseInt(hex.slice(0, 2), 16);
@@ -67,13 +65,12 @@ function colorsForCircleRow(
   };
 }
 
-/** Lucide icon key for Circles tab + detail header (not used by create-flow CircleRow). */
 export type CircleTabIconKind = 'lock' | 'heart' | 'users' | 'globe';
 
 export function circleTabIconKind(row: CircleApiRow): CircleTabIconKind {
   const k = row.system_kind;
   if (k === 'inner_circle') return 'lock';
-  if (k === 'close_friends') return 'heart';
+  if (k === 'trusted' || k === 'close_friends') return 'heart';
   if (k === 'broader_network') return 'users';
   return 'globe';
 }
@@ -83,8 +80,9 @@ export function defaultCircleSubtitle(row: CircleApiRow): string {
   if (d) return d;
   const kind = row.system_kind;
   if (kind === 'inner_circle') return 'Your closest, most trusted people';
-  if (kind === 'close_friends') return 'People you trust and know well';
-  if (kind === 'broader_network') return 'Your wider trusted network';
+  if (kind === 'trusted' || kind === 'close_friends')
+    return 'People you trust and who trust you back';
+  if (kind === 'broader_network') return 'Public circle';
   return 'Private circle';
 }
 
@@ -96,6 +94,35 @@ export type CircleTabRow = {
   iconBg: string;
   iconKind: CircleTabIconKind;
 };
+
+const SYSTEM_KIND_ORDER: Record<string, number> = {
+  inner_circle: 0,
+  trusted: 1,
+  close_friends: 1,
+  broader_network: 2,
+};
+
+function isUserCreatedCircle(row: CircleApiRow): boolean {
+  const k = row.system_kind;
+  return k == null || k === '';
+}
+
+export function sortCirclesForTabList(rows: CircleApiRow[]): CircleApiRow[] {
+  return [...rows].sort((a, b) => {
+    const aCustom = isUserCreatedCircle(a);
+    const bCustom = isUserCreatedCircle(b);
+    if (aCustom !== bCustom) {
+      return aCustom ? 1 : -1;
+    }
+    if (!aCustom && !bCustom) {
+      const ao = SYSTEM_KIND_ORDER[a.system_kind!] ?? 50;
+      const bo = SYSTEM_KIND_ORDER[b.system_kind!] ?? 50;
+      if (ao !== bo) return ao - bo;
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    }
+    return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+  });
+}
 
 export function mapApiCirclesToTabRows(rows: CircleApiRow[]): CircleTabRow[] {
   let userPaletteIndex = 0;

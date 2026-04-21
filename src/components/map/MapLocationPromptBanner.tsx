@@ -31,9 +31,12 @@ export const MapLocationPromptBanner: React.FC<Props> = ({ visible, onAllow, onN
           </Text>
           <Text className="text-sm font-semibold text-foreground">Enable Location</Text>
         </View>
-        <Text className="mb-3 text-xs leading-relaxed" style={{ color: Theme.colors.secondaryText }}>
-          TruRex uses your location to show recommendations near you. Allow location access to get the
-          most from the map.
+        <Text
+          className="mb-3 text-xs leading-relaxed"
+          style={{ color: Theme.colors.secondaryText }}
+        >
+          TruRex uses your location to show recommendations near you. Allow location access to get
+          the most from the map.
         </Text>
         <View className="flex-row gap-2">
           <Pressable

@@ -177,49 +177,70 @@ export function useCreateRecWizard() {
 
   const selectSearchPlace = useCallback((place: CreateRecSearchPlace) => {
     setSelectedSearchPlace(place);
-    if (place.source === 'database') {
-      setLinkedPlaceId(place.id);
-    } else {
-      setLinkedPlaceId(null);
-    }
+    setLinkedPlaceId(null);
   }, []);
 
-  const resolveSearchStepPlace = useCallback(async () => {
-    if (searchMode === 'manual') {
-      const name = manualName.trim();
-      if (!name) {
-        throw new Error('Enter a place name.');
+  useEffect(() => {
+    setLinkedPlaceId(null);
+  }, [selectedCategoryId]);
+
+  const persistPlaceForCategory = useCallback(
+    async (p_category_code: string) => {
+      if (linkedPlaceId) return;
+      const code = p_category_code.trim();
+      if (!code) {
+        throw new Error('Pick a category first.');
       }
-      const row = await createManualPlace({
-        p_name: name,
-        p_normalized_address: manualAddress.trim() || null,
-        p_latitude: manualGeotag?.lat ?? null,
-        p_longitude: manualGeotag?.lng ?? null,
-      });
-      setLinkedPlaceId(row.id);
-      return;
-    }
-    const sel = selectedSearchPlace;
-    if (!sel) {
-      throw new Error('Select a place.');
-    }
-    if (sel.source === 'database') {
-      setLinkedPlaceId(sel.id);
-      return;
-    }
-    const pid = sel.providerPlaceId;
-    if (!pid) {
-      throw new Error('Missing Google place id.');
-    }
-    const row = await upsertGooglePlace({
-      p_provider_place_id: pid,
-      p_name: sel.title,
-      p_normalized_address: sel.fullText ?? sel.subtitle ?? null,
-      p_latitude: sel.latitude ?? null,
-      p_longitude: sel.longitude ?? null,
-    });
-    setLinkedPlaceId(row.id);
-  }, [searchMode, manualName, manualAddress, manualGeotag, selectedSearchPlace]);
+      if (searchMode === 'manual') {
+        const name = manualName.trim();
+        if (!name) {
+          throw new Error('Enter a place name.');
+        }
+        const row = await createManualPlace({
+          p_name: name,
+          p_category_code: code,
+          p_normalized_address: manualAddress.trim() || null,
+          p_latitude: manualGeotag?.lat ?? null,
+          p_longitude: manualGeotag?.lng ?? null,
+        });
+        setLinkedPlaceId(row.id);
+        return;
+      }
+      const sel = selectedSearchPlace;
+      if (!sel) {
+        throw new Error('Select a place.');
+      }
+      if (sel.source === 'database') {
+        setLinkedPlaceId(sel.id);
+        return;
+      }
+      if (sel.source === 'google') {
+        const pid = sel.providerPlaceId;
+        if (!pid) {
+          throw new Error('Missing Google place id.');
+        }
+        const row = await upsertGooglePlace({
+          p_provider_place_id: pid,
+          p_name: sel.title,
+          p_category_code: code,
+          p_normalized_address: sel.fullText ?? sel.subtitle ?? null,
+          p_latitude: sel.latitude ?? null,
+          p_longitude: sel.longitude ?? null,
+        });
+        setLinkedPlaceId(row.id);
+        return;
+      }
+      throw new Error('Unsupported place source.');
+    },
+    [
+      linkedPlaceId,
+      searchMode,
+      manualName,
+      manualAddress,
+      manualGeotag,
+      selectedSearchPlace,
+    ],
+  );
 
   const reset = useCallback(() => {
     setStepId('search');
@@ -291,7 +312,7 @@ export function useCreateRecWizard() {
     selectedSearchPlace,
     selectSearchPlace,
     linkedPlaceId,
-    resolveSearchStepPlace,
+    persistPlaceForCategory,
     manualName,
     setManualName,
     manualAddress,
