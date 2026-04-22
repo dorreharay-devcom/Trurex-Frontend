@@ -60,7 +60,6 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
       />
 
       <View className="absolute bottom-0 left-0 right-0 p-4">
-        <Text className="text-2xl mb-1">📁</Text>
         <Text className="text-sm font-bold text-white leading-tight" numberOfLines={2}>
           {collection.display_name}
         </Text>

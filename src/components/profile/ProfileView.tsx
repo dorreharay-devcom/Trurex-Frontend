@@ -32,9 +32,10 @@ const TABS = [
 
 interface ProfileViewProps {
   userId?: string;
+  onAvatarUpdated?: () => void;
 }
 
-const ProfileView = ({ userId: propUserId }: ProfileViewProps) => {
+const ProfileView = ({ userId: propUserId, onAvatarUpdated }: ProfileViewProps) => {
   const { user: authUser, signOut } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -88,6 +89,7 @@ const ProfileView = ({ userId: propUserId }: ProfileViewProps) => {
       setAvatarUploading(true);
       await ProfileApi.uploadAvatar(authUser.id, result.assets[0].uri);
       await fetchProfile();
+      onAvatarUpdated?.();
     } catch {
       Alert.alert('Upload failed', 'Could not update avatar. Please try again.');
     } finally {

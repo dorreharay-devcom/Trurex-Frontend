@@ -18,6 +18,8 @@ import type {
   Recommendation,
   RecommendationOpenOptions,
 } from '~/types/recommendation/recommendation';
+import { useAuth } from '~/services/AuthContext';
+import { useShareRex } from '~/hooks/recommendation/useShareRex';
 import { toastError } from '~/utils/appToast';
 import {
   rexCoverRemoteHttpUrl,
@@ -29,7 +31,7 @@ export type { Recommendation, RecommendationOpenOptions };
 
 interface RecommendationCardProps {
   recommendation: Recommendation;
-  onTap?: (rec: Recommendation) => void;
+  onTap?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
   onSave?: (rec: Recommendation) => void;
 }
 
@@ -38,6 +40,8 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
   onTap,
   onSave,
 }) => {
+  const { user } = useAuth();
+  const { shareRecommendation } = useShareRex();
   const [liked, setLiked] = useState(rec.isLiked);
   const [likes, setLikes] = useState(rec.likes);
   const [saved, setSaved] = useState(rec.isSaved);
@@ -57,7 +61,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
   const showStarRating = rec.rating != null && rec.rating > 0;
 
   const toggleLike = async () => {
-    if (!currentUser) {
+    if (!user) {
       toastError('Sign in required', 'Please sign in to like recommendations.');
       return;
     }

@@ -263,7 +263,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                     value={name}
                     onChangeText={(v) => setName(v.slice(0, 60))}
                     placeholder="e.g. My Ideal Weekend in Lisbon, Best Hikes in Sydney…"
-                    placeholderTextColor={Theme.colors.muted}
+                    placeholderTextColor="#737373"
                     className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground"
                   />
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">
@@ -280,7 +280,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                     value={description}
                     onChangeText={(v) => setDescription(v.slice(0, 200))}
                     placeholder="What's this list about? Who's it for?"
-                    placeholderTextColor={Theme.colors.muted}
+                    placeholderTextColor="#737373"
                     multiline
                     numberOfLines={2}
                     textAlignVertical="top"
@@ -333,31 +333,33 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                         <TouchableOpacity
                           key={value}
                           onPress={() => setPrivacy(value)}
-                          className={`w-full flex-row items-center gap-3 p-3 rounded-xl border ${
+                          className={`w-full p-3 rounded-xl border ${
                             selected ? 'border-primary bg-primary/5' : 'border-border bg-muted/30'
                           }`}
                         >
-                          <View
-                            className={`w-8 h-8 rounded-lg items-center justify-center ${
-                              selected ? 'bg-primary/10' : 'bg-muted'
-                            }`}
-                          >
-                            <Icon
-                              size={16}
-                              color={selected ? Theme.colors.primary : Theme.colors.muted}
-                            />
-                          </View>
-                          <View className="flex-1">
-                            <Text
-                              className={`text-sm font-semibold ${
-                                selected ? 'text-foreground' : 'text-muted-foreground'
+                          <View className="flex-row items-center gap-3">
+                            <View
+                              className={`w-8 h-8 rounded-lg items-center justify-center ${
+                                selected ? 'bg-primary/10' : 'bg-muted'
                               }`}
                             >
-                              {label}
-                            </Text>
-                            <Text className="text-xs text-muted-foreground">{desc}</Text>
+                              <Icon
+                                size={16}
+                                color={selected ? Theme.colors.primary : '#737373'}
+                              />
+                            </View>
+                            <View className="flex-1">
+                              <Text
+                                className={`text-sm font-semibold ${
+                                  selected ? 'text-foreground' : 'text-muted-foreground'
+                                }`}
+                              >
+                                {label}
+                              </Text>
+                              <Text className="text-xs text-muted-foreground">{desc}</Text>
+                            </View>
+                            {selected && <Check size={16} color={Theme.colors.primary} />}
                           </View>
-                          {selected && <Check size={16} color={Theme.colors.primary} />}
                         </TouchableOpacity>
                       );
                     })}
@@ -374,13 +376,9 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                     !name.trim() || loading || uploading ? 'opacity-50' : ''
                   }`}
                 >
-                  {loading ? (
-                    <ActivityIndicator color={Theme.colors.primaryForeground} />
-                  ) : (
-                    <Text className="text-primary-foreground font-semibold text-sm">
-                      Create Collection
-                    </Text>
-                  )}
+                  <Text className="text-primary-foreground font-semibold text-sm">
+                    {loading ? 'Creating…' : 'Create Collection'}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>

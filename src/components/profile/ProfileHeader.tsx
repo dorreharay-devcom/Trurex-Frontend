@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Share, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { LogOut, Camera } from 'lucide-react-native';
+import { Share2, Camera, LogOut } from 'lucide-react-native';
+import * as Linking from 'expo-linking';
 import { Theme } from '~/theme/Theme';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
@@ -26,6 +27,17 @@ const ProfileHeader = ({
   onAvatarPress,
   avatarUploading = false,
 }: ProfileHeaderProps) => {
+  const handleShare = async () => {
+    const handle = profile.handle?.replace('@', '');
+    const url =
+      Platform.OS === 'web'
+        ? `${typeof window !== 'undefined' ? window.location.origin : ''}/join/${handle ?? ''}`
+        : Linking.createURL('/', { queryParams: handle ? { handle } : {} });
+    try {
+      await Share.share({ message: `Check out my profile on TruRex\n${url}`, title: 'TruRex Profile' });
+    } catch {}
+  };
+
   return (
     <View className="overflow-hidden rounded-t-xl">
       <LinearGradient
@@ -36,6 +48,7 @@ const ProfileHeader = ({
       />
 
       <View className="px-4 -mt-12">
+        {/* Avatar */}
         <View className="self-start">
           <TouchableOpacity
             onPress={isOwnProfile ? onAvatarPress : undefined}
@@ -57,10 +70,7 @@ const ProfileHeader = ({
                 </View>
               )}
               {isOwnProfile && (
-                <View
-                  className="absolute bottom-0 left-0 right-0 items-center justify-center py-1.5"
-                  style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
-                >
+                <View className="absolute bottom-0 left-0 right-0 items-center justify-center py-1.5 bg-black/45">
                   <Camera size={14} color="white" />
                 </View>
               )}
@@ -73,11 +83,14 @@ const ProfileHeader = ({
           </View>
         </View>
 
+        {/* Name & info */}
         <View className="mt-3">
-          <View className="flex-row items-center gap-2">
-            <Text className="text-xl font-bold text-foreground">{profile.displayName}</Text>
+          <View className="flex-row items-center gap-2 flex-wrap">
+            <Text className="text-xl font-display font-bold text-foreground">
+              {profile.displayName}
+            </Text>
             {profile.relationshipStatus && (
-              <View className="px-2 py-0.5 rounded-full bg-secondary">
+              <View className="px-1.5 py-0.5 rounded-full bg-secondary">
                 <Text className="text-[10px] font-bold text-secondary-foreground uppercase">
                   {profile.relationshipStatus.replace('_', ' ')}
                 </Text>
@@ -86,40 +99,32 @@ const ProfileHeader = ({
           </View>
           <Text className="text-sm text-muted-foreground">{profile.handle}</Text>
           {!!profile.bio && (
-            <Text className="text-sm text-foreground/80 mt-2 leading-relaxed">{profile.bio}</Text>
+            <Text className="text-sm mt-2 leading-relaxed" style={{ color: 'rgba(0,0,0,0.8)' }}>
+              {profile.bio}
+            </Text>
           )}
           {!!profile.location && (
             <Text className="text-xs text-muted-foreground mt-1.5">📍 {profile.location}</Text>
           )}
         </View>
 
+        {/* Stats */}
         <View className="flex-row gap-6 mt-4 pb-4 border-b border-border">
           <View className="items-center">
-            <Text className="text-lg font-bold text-foreground text-center">
+            <Text className="text-lg font-display font-bold text-foreground">
               {profile.rexCount}
             </Text>
-            <Text className="text-xs text-muted-foreground text-center">Rex's</Text>
+            <Text className="text-xs text-muted-foreground">Rex's</Text>
           </View>
           <View className="items-center">
-            <Text className="text-lg font-bold text-foreground text-center">
-              {profile.followers}
-            </Text>
-            <Text className="text-xs text-muted-foreground text-center">Followers</Text>
-          </View>
-          <View className="items-center">
-            <Text className="text-lg font-bold text-foreground text-center">
-              {profile.following}
-            </Text>
-            <Text className="text-xs text-muted-foreground text-center">Following</Text>
-          </View>
-          <View className="items-center">
-            <Text className="text-lg font-bold text-accent-foreground text-center">
+            <Text className="text-lg font-display font-bold text-accent-foreground">
               {profile.trustScore}
             </Text>
-            <Text className="text-xs text-muted-foreground text-center">Trust</Text>
+            <Text className="text-xs text-muted-foreground">Score</Text>
           </View>
         </View>
 
+        {/* Action buttons */}
         {isOwnProfile ? (
           <View className="flex-row gap-2 mt-4 mb-2">
             <TouchableOpacity
@@ -128,6 +133,14 @@ const ProfileHeader = ({
               className="flex-1 py-2.5 rounded-lg border border-border items-center"
             >
               <Text className="text-sm font-medium text-foreground">Edit Profile</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleShare}
+              activeOpacity={0.7}
+              className="flex-row items-center gap-1.5 px-4 py-2.5 rounded-lg border border-border"
+            >
+              <Share2 size={15} color={Theme.colors.foreground} />
+              <Text className="text-sm font-medium text-foreground">Share</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={onSignOut}

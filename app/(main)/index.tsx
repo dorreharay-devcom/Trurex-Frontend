@@ -23,6 +23,7 @@ export default function HomeScreen() {
   const [previewRecommendation, setPreviewRecommendation] = useState<Recommendation | null>(null);
   const [previewOptions, setPreviewOptions] = useState<RecommendationOpenOptions>({});
   const [commentCountByRexId, setCommentCountByRexId] = useState<Record<string, number>>({});
+  const [avatarRefreshKey, setAvatarRefreshKey] = useState(0);
 
   const handleCloseCreate = useCallback(() => {
     setCreateRecommendationOpen(false);
@@ -59,6 +60,7 @@ export default function HomeScreen() {
         onSearchChange={setSearchQuery}
         onProfilePress={() => setCurrentTab('profile')}
         onAddPress={() => setCreateRecommendationOpen(true)}
+        avatarRefreshKey={avatarRefreshKey}
       />
 
       <TabBar currentTab={currentTab} onTabChange={setCurrentTab} />
@@ -67,7 +69,6 @@ export default function HomeScreen() {
         {currentTab === 'discover' && (
           <DiscoverView
             searchQuery={searchQuery}
-            commentCountByRexId={commentCountByRexId}
             onRecommendationPress={openPreview}
           />
         )}
@@ -79,7 +80,7 @@ export default function HomeScreen() {
         )}
         {currentTab === 'circles' && <CirclesView isActive={currentTab === 'circles'} />}
         {currentTab === 'map' && <MapScreen onRecommendationPress={openPreview} />}
-        {currentTab === 'profile' && <ProfileView />}
+        {currentTab === 'profile' && <ProfileView onAvatarUpdated={() => setAvatarRefreshKey((k) => k + 1)} />}
       </View>
 
       {currentTab === 'discover' && (
