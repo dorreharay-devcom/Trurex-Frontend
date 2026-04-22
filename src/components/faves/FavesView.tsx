@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,15 @@ import {
   Modal,
   Pressable,
   ScrollView,
+  Animated,
+  StyleSheet,
+  Platform,
 } from 'react-native';
-import { Plus, MapPin, PackageOpen, Search } from 'lucide-react-native';
+import { Plus, PackageOpen, Search } from 'lucide-react-native';
+import { SignedStorageImage } from '~/components/common/SignedStorageImage';
+import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
+import { rexCoverStoragePathFromRecommendation, rexCoverRemoteHttpUrl } from '~/utils/recommendation/rexMediaPaths';
+import RecommendationCard from '~/components/recommendation/RecommendationCard';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Backend } from '~/services/AuthService';
 import { useMyCollections, useAddRexToCollection } from '~/hooks/useCollections';
@@ -34,42 +41,6 @@ const SkeletonCard: React.FC<{ width: number }> = ({ width }) => (
   />
 );
 
-// ─── uncollected rec row ──────────────────────────────────────────────────────
-const UncollectedRow: React.FC<{
-  rec: Recommendation;
-  onAddToCollection: () => void;
-}> = ({ rec, onAddToCollection }) => (
-  <View className="flex-row items-center gap-3 p-3 rounded-xl bg-card border border-border mb-2">
-    <View className="flex-1 min-w-0">
-      <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
-        {rec.title}
-      </Text>
-      <View className="flex-row items-center flex-wrap gap-2 mt-1">
-        <View className="bg-muted rounded-full px-2 py-0.5">
-          <Text className="text-[10px] font-medium text-muted-foreground capitalize">
-            {rec.category}
-          </Text>
-        </View>
-        {rec.location ? (
-          <View className="flex-row items-center gap-0.5">
-            <MapPin size={10} color={Theme.colors.muted} />
-            <Text className="text-[11px] text-muted-foreground">{rec.location}</Text>
-          </View>
-        ) : null}
-      </View>
-    </View>
-    <View className="items-end gap-1.5 shrink-0">
-      <TouchableOpacity
-        onPress={onAddToCollection}
-        activeOpacity={0.7}
-        className="flex-row items-center gap-1 px-2.5 py-1 rounded-lg border border-border"
-      >
-        <Plus size={10} color={Theme.colors.foreground} />
-        <Text className="text-[11px] font-medium text-foreground">Add</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-);
 
 // ─── main view ───────────────────────────────────────────────────────────────
 type FavesViewProps = {
@@ -125,6 +96,30 @@ const FavesView: React.FC<FavesViewProps> = () => {
 
   const isDemo = collections.length === 0 && !loadingCollections;
 
+  const backdropOpacity = useRef(new Animated.Value(0)).current;
+  const sheetTranslateY = useRef(new Animated.Value(400)).current;
+  const [sheetVisible, setSheetVisible] = useState(false);
+
+  useEffect(() => {
+    if (addToCollectionId) {
+      setSheetVisible(true);
+      Animated.parallel([
+        Animated.timing(backdropOpacity, { toValue: 1, duration: 250, useNativeDriver: true }),
+        Animated.spring(sheetTranslateY, {
+          toValue: 0,
+          damping: 20,
+          stiffness: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(backdropOpacity, { toValue: 0, duration: 200, useNativeDriver: true }),
+        Animated.timing(sheetTranslateY, { toValue: 400, duration: 220, useNativeDriver: true }),
+      ]).start(() => setSheetVisible(false));
+    }
+  }, [addToCollectionId]);
+
   // ── collection detail screen ─────────────────────────────────────────────
   if (openCollectionId) {
     return (
@@ -138,29 +133,32 @@ const FavesView: React.FC<FavesViewProps> = () => {
           onAddItem={(id) => setAddToCollectionId(id)}
         />
         <Modal
-          visible={!!addToCollectionId}
+          visible={sheetVisible}
           transparent
-          animationType="slide"
+          animationType="none"
+          presentationStyle={Platform.OS === 'ios' ? 'overFullScreen' : undefined}
+          statusBarTranslucent={Platform.OS === 'android'}
           onRequestClose={() => setAddToCollectionId(null)}
         >
-          <Pressable
-            style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}
-            onPress={() => setAddToCollectionId(null)}
+          <Animated.View
+            style={[StyleSheet.absoluteFill, styles.backdrop, { opacity: backdropOpacity }]}
+            pointerEvents="box-none"
           >
-            <Pressable onPress={() => {}}>
-              <View
-                className="bg-card rounded-t-2xl border-t border-border"
-                style={{ maxHeight: 400 }}
-              >
-                <View className="items-center py-3">
+            <Pressable style={StyleSheet.absoluteFill} onPress={() => setAddToCollectionId(null)} />
+          </Animated.View>
+
+          <View style={styles.overlay} pointerEvents="box-none">
+            <Animated.View style={[{ width: '100%' }, { transform: [{ translateY: sheetTranslateY }] }]}>
+              <View className="bg-card rounded-t-2xl border-t border-border" style={{ maxHeight: 400 }}>
+                <View style={webContainerStyle} className="items-center py-3">
                   <View className="w-10 h-1 rounded-full bg-muted-foreground/30" />
                 </View>
-                <View className="px-4 pb-3">
+                <View style={[{ paddingHorizontal: 16, paddingBottom: 12 }, webContainerStyle]}>
                   <Text className="text-base font-display font-medium text-foreground">
                     Pick a saved rex
                   </Text>
                 </View>
-                <View className="h-px bg-border mx-4 mb-1" />
+                <View className="h-px bg-border mb-1" style={webContainerStyle} />
                 <ScrollView
                   showsVerticalScrollIndicator={false}
                   keyboardShouldPersistTaps="handled"
@@ -170,7 +168,7 @@ const FavesView: React.FC<FavesViewProps> = () => {
                       No saved rexes
                     </Text>
                   ) : (
-                    <View className="px-4 py-2 gap-1">
+                    <View style={[{ paddingHorizontal: 16, paddingVertical: 8, gap: 4 }, webContainerStyle]}>
                       {savedRexes.map((rec) => (
                         <TouchableOpacity
                           key={rec.id}
@@ -191,7 +189,15 @@ const FavesView: React.FC<FavesViewProps> = () => {
                           }}
                           className="flex-row items-center gap-3 p-3 rounded-xl"
                         >
-                          <View className="w-10 h-10 rounded-lg bg-muted" />
+                          <View className="w-10 h-10 rounded-lg overflow-hidden bg-muted">
+                            <SignedStorageImage
+                              bucket={REX_IMAGES_BUCKET}
+                              storagePath={rexCoverStoragePathFromRecommendation(rec)}
+                              remoteUri={rexCoverRemoteHttpUrl(rec)}
+                              className="w-full h-full"
+                              accessibilityLabel={rec.title}
+                            />
+                          </View>
                           <View className="flex-1">
                             <Text
                               className="text-sm font-semibold text-foreground"
@@ -208,8 +214,8 @@ const FavesView: React.FC<FavesViewProps> = () => {
                   <View className="h-4" />
                 </ScrollView>
               </View>
-            </Pressable>
-          </Pressable>
+            </Animated.View>
+          </View>
         </Modal>
       </>
     );
@@ -333,17 +339,19 @@ const FavesView: React.FC<FavesViewProps> = () => {
         contentContainerClassName="px-4 pt-6 pb-24"
         ListHeaderComponent={ListHeader}
         renderItem={({ item }) => (
-          <UncollectedRow
-            rec={item}
-            onAddToCollection={() =>
-              setAddToCollectionRec({
-                id: item.id,
-                place_name: item.title,
-                category_code: item.category,
-                location: item.location,
-              })
-            }
-          />
+          <View className="px-0 mb-4">
+            <RecommendationCard
+              recommendation={item}
+              onSave={() =>
+                setAddToCollectionRec({
+                  id: item.id,
+                  place_name: item.title,
+                  category_code: item.category,
+                  location: item.location,
+                })
+              }
+            />
+          </View>
         )}
         ListEmptyComponent={
           loadingSaved || !collectedIds ? null : (
@@ -381,5 +389,16 @@ const FavesView: React.FC<FavesViewProps> = () => {
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  backdrop: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+});
 
 export default FavesView;

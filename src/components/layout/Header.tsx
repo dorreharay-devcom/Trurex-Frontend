@@ -16,6 +16,8 @@ import { ProfileApi } from '~/api/ProfileApi';
 import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import { isWeb } from '~/utils';
 import { NotificationBell } from '~/components/layout/NotificationBell';
+import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
+import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
 
 interface HeaderProps {
   searchQuery: string;
@@ -40,20 +42,18 @@ export const Header: React.FC<HeaderProps> = ({
   const isMobile = !isWeb || width < 640;
   const topPad = Platform.OS === 'web' ? 12 : insets.top;
 
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarPath, setAvatarPath] = useState<string | null>(null);
+  const { uri: avatarUri } = useSignedStorageUrl(USER_AVATARS_BUCKET, avatarPath ?? '');
 
   useEffect(() => {
     if (!user?.id) return;
     ProfileApi.getProfile({ userId: user.id })
-      .then((p) => setAvatarUrl(p.avatarUrl ?? null))
+      .then((p) => setAvatarPath(p.avatarUrl ?? null))
       .catch(() => {});
   }, [user?.id, avatarRefreshKey]);
 
   return (
-    <View
-      className="border-b border-border bg-card/80 backdrop-blur-lg"
-      style={{ paddingTop: topPad }}
-    >
+    <View className="border-b border-border bg-card" style={{ paddingTop: topPad }}>
       <View
         className={`flex-row items-center justify-between pl-0 pr-4 pb-2 sm:pr-6 ${isWeb ? 'max-w-[1280px] w-full self-center' : ''}`}
       >
@@ -123,9 +123,9 @@ export const Header: React.FC<HeaderProps> = ({
             accessibilityRole="button"
             accessibilityLabel="Profile"
           >
-            {avatarUrl ? (
+            {avatarUri ? (
               <Image
-                source={{ uri: avatarUrl }}
+                source={{ uri: avatarUri }}
                 style={{ width: '100%', height: '100%' }}
                 resizeMode="cover"
               />

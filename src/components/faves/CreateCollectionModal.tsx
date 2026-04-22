@@ -22,7 +22,7 @@ import { useCreateCollection } from '~/hooks/useCollections';
 import { toastSuccess, toastError } from '~/utils/appToast';
 import { fetchUriAsBlob, uploadBlobToStorageBucket } from '~/utils/photos/storageUpload';
 import { generateRexImageStoragePath } from '~/utils/photos/photoUtils';
-import { isWeb } from '~/utils';
+import { isWeb, webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
 
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
@@ -212,7 +212,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                 style={styles.scroll}
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
-                contentContainerClassName="p-4 gap-5"
+                contentContainerStyle={[{ padding: 16, gap: 20 }, webContainerStyle]}
               >
                 {/* Cover image */}
                 <View>
@@ -368,18 +368,20 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
               </ScrollView>
 
               {/* sticky bottom-0 bg-card — Footer */}
-              <View className="p-4 border-t border-border bg-card">
-                <TouchableOpacity
-                  onPress={handleCreate}
-                  disabled={!name.trim() || loading || uploading}
-                  className={`w-full py-3 rounded-xl bg-primary items-center ${
-                    !name.trim() || loading || uploading ? 'opacity-50' : ''
-                  }`}
-                >
-                  <Text className="text-primary-foreground font-semibold text-sm">
-                    {loading ? 'Creating…' : 'Create Collection'}
-                  </Text>
-                </TouchableOpacity>
+              <View className="border-t border-border bg-card">
+                <View style={[{ padding: 16 }, webContainerStyle]}>
+                  <TouchableOpacity
+                    onPress={handleCreate}
+                    disabled={!name.trim() || loading || uploading}
+                    className={`w-full py-3 rounded-xl bg-primary items-center ${
+                      !name.trim() || loading || uploading ? 'opacity-50' : ''
+                    }`}
+                  >
+                    <Text className="text-primary-foreground font-semibold text-sm">
+                      {loading ? 'Creating…' : 'Create Collection'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </Animated.View>

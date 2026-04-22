@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, Pressable, useWindowDimensions, ActivityIndicator } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ChevronRight } from 'lucide-react-native';
 import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';
 import { getRexCategoryApiCode } from '~/constants/recommendation/rexCategories';
@@ -48,6 +48,7 @@ type Props = {
 
 export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
   const { height: windowHeight } = useWindowDimensions();
+  const queryClient = useQueryClient();
   const flow = useCreateRecWizard();
   const { reset, setManualGeotag, setManualAddress, syncFormToConfig, syncCategoryCreateShape } =
     flow;
@@ -305,6 +306,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
       await createRex(params);
       postedSuccessfullyRef.current = true;
       toastSuccess('Posted', 'Your recommendation is live.');
+      queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
       handleClose();
     } catch (e) {
       const err = e as Error;

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Modal, StyleSheet } from 'react-native';
 import { ArrowLeft, Plus, MoreVertical, X, Trash2 } from 'lucide-react-native';
 import { Image } from 'expo-image';
+import { useQuery } from '@tanstack/react-query';
+import ImageColors from 'react-native-image-colors';
 import { webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
 import {
@@ -11,6 +13,26 @@ import {
 } from '~/hooks/useCollections';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
+import { Backend, unwrap } from '~/services/AuthService';
+
+const RexThumb: React.FC<{ rexId: string }> = ({ rexId }) => {
+  const { data: photoPath } = useQuery({
+    queryKey: ['rex-cover-path', rexId],
+    queryFn: async () => {
+      const detail = unwrap(await Backend.rpc('get_rex_detail', { input_rex_id: rexId }));
+      const paths = (detail as any)?.photo_paths;
+      return Array.isArray(paths) && paths.length > 0 ? String(paths[0]) : null;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+  const { uri } = useSignedStorageUrl(REX_IMAGES_BUCKET, photoPath ?? '');
+
+  return (
+    <View className="w-12 h-12 bg-muted rounded-lg overflow-hidden">
+      {uri && <Image source={{ uri }} style={{ width: 48, height: 48 }} contentFit="cover" />}
+    </View>
+  );
+};
 
 export interface CollectionDetailViewProps {
   collectionId: string;
@@ -25,6 +47,24 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
 }) => {
   const { data: detail, isLoading } = useCollectionDetail(collectionId);
   const { uri: coverUri } = useSignedStorageUrl(REX_IMAGES_BUCKET, detail?.cover_image_path ?? '');
+  const [coverBg, setCoverBg] = useState('#1a1a1a');
+
+  useEffect(() => {
+    if (!coverUri) return;
+    ImageColors.getColors(coverUri, { fallback: '#1a1a1a', cache: true, key: coverUri })
+      .then((colors) => {
+        const color =
+          colors.platform === 'ios'
+            ? colors.primary
+            : colors.platform === 'android'
+              ? colors.dominant
+              : colors.platform === 'web'
+                ? colors.dominant
+                : '#1a1a1a';
+        setCoverBg(color ?? '#1a1a1a');
+      })
+      .catch(() => {});
+  }, [coverUri]);
   const removeMutation = useRemoveRexFromCollection(collectionId);
   const deleteMutation = useDeleteCollection();
 
@@ -57,11 +97,16 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
       </View>
 
       {coverUri && (
-        <Image
-          source={{ uri: coverUri }}
-          style={{ width: '100%', height: 180, borderRadius: 12, marginBottom: 12 }}
-          contentFit="cover"
-        />
+        <View
+          style={{ width: '100%', height: 220, borderRadius: 12, overflow: 'hidden', marginBottom: 12 }}
+        >
+          <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: coverBg, opacity: 0.15 }} />
+          <Image
+            source={{ uri: coverUri }}
+            style={{ width: '100%', height: '100%' }}
+            contentFit="contain"
+          />
+        </View>
       )}
       <Text className="text-xl font-bold text-foreground">{detail.display_name}</Text>
       {detail.description && (
@@ -82,7 +127,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
             key={rex.rex_id}
             className="bg-card border border-border rounded-xl p-3 flex-row items-center gap-3"
           >
-            <View className="w-12 h-12 bg-muted rounded-lg" />
+            <RexThumb rexId={rex.rex_id} />
             <View className="flex-1">
               <Text className="text-sm font-semibold text-foreground">{rex.place_name}</Text>
               <Text className="text-xs text-muted-foreground">{rex.category_code}</Text>

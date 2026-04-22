@@ -180,30 +180,39 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated }: ProfileViewProps) 
             ) : myRexes.length === 0 ? (
               <Text className="text-sm text-muted-foreground text-center py-8">No rexes yet</Text>
             ) : (
-              <View className="flex-row flex-wrap p-4 gap-3">
-                {myRexes.map((rec) => (
-                  <View
-                    key={rec.id}
-                    className="w-[22%] rounded-xl overflow-hidden shadow-card bg-background border border-border"
-                  >
-                    <SignedStorageImage
-                      bucket={REX_IMAGES_BUCKET}
-                      storagePath={rexCoverStoragePathFromRecommendation(rec)}
-                      remoteUri={rexCoverRemoteHttpUrl(rec)}
-                      className="aspect-square w-full"
-                      accessibilityLabel={rec.title}
-                    />
-                    <View className="p-2.5">
-                      <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>
-                        {rec.title}
-                      </Text>
-                      <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
-                        {rec.location || rec.category}
-                      </Text>
-                      <Text className="text-[10px] text-accent font-medium">★ {rec.rating}</Text>
-                    </View>
-                  </View>
-                ))}
+              <View className="p-4">
+                <Text className="text-xs font-medium text-muted-foreground mb-3">
+                  {myRexes.length} {myRexes.length === 1 ? 'Rex' : 'Rexes'}
+                </Text>
+                <View className="flex-row flex-wrap gap-3">
+                  {myRexes.map((rec) => {
+                    return (
+                      <View
+                        key={rec.id}
+                        className="w-[22%] rounded-xl overflow-hidden shadow-card bg-background border border-border"
+                      >
+                        <SignedStorageImage
+                          bucket={REX_IMAGES_BUCKET}
+                          storagePath={rexCoverStoragePathFromRecommendation(rec)}
+                          remoteUri={rexCoverRemoteHttpUrl(rec)}
+                          className="aspect-square w-full"
+                          accessibilityLabel={rec.title}
+                        />
+                        <View className="p-2.5">
+                          <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>
+                            {rec.title}
+                          </Text>
+                          <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
+                            {rec.location || rec.category}
+                          </Text>
+                          <Text className="text-[10px] font-medium" style={{ color: '#f97316' }}>
+                            ★ {rec.rating}
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
               </View>
             ))}
 

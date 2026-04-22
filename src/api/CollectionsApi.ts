@@ -103,19 +103,13 @@ export const CollectionsApi = {
     return (data || []).map((row: any) => row.rex_id);
   },
 
-  saveRex: async (userId: string, rexId: string): Promise<void> => {
-    const { error } = await Backend.from('saved_rexes').insert({
-      user_id: userId,
-      rex_id: rexId,
-    });
+  saveRex: async (_userId: string, rexId: string): Promise<void> => {
+    const { error } = await Backend.rpc('save_rex', { input_rex_id: rexId });
     if (error) throw error;
   },
 
-  unsaveRex: async (userId: string, rexId: string): Promise<void> => {
-    const { error } = await Backend.from('saved_rexes')
-      .delete()
-      .eq('user_id', userId)
-      .eq('rex_id', rexId);
+  unsaveRex: async (_userId: string, rexId: string): Promise<void> => {
+    const { error } = await Backend.rpc('unsave_rex', { input_rex_id: rexId });
     if (error) throw error;
   },
 };
