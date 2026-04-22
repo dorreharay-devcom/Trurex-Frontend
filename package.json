@@ -66,6 +66,7 @@
     "eslint-config-expo": "^55.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
+    "expo-cli": "^6.3.12",
     "prettier": "3.4.1",
     "typescript": "~5.9.2"
   },
