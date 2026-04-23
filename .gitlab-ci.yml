@@ -1,0 +1,13 @@
+stages:
+  - mirror
+
+mirror_to_github:
+  stage: mirror
+  image: bitnami/git:latest
+  tags:
+    - trurex
+  script:
+    - git remote add github https://${GITHUB_USER}:${GITHUB_PAT}@${GITHUB_REPO_URL}
+    - git push github HEAD:refs/heads/${CI_COMMIT_REF_NAME} --force
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
