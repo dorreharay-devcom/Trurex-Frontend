@@ -21,6 +21,7 @@ import {
 import type { CirclesViewModel } from '~/hooks/circles/useCirclesViewModel';
 import { Theme } from '~/theme/Theme';
 import { canEditOrDeleteUserCircle } from '~/utils/circleTabUtils';
+import { webContainerStyle } from '~/utils';
 
 type Props = { vm: CirclesViewModel };
 
@@ -34,8 +35,9 @@ export function CircleDetailScreen({ vm }: Props) {
   return (
     <>
       <ScrollView
-        className="flex-1"
-        contentContainerClassName="p-4 pb-24"
+        className="flex-1 w-full"
+        contentContainerStyle={webContainerStyle}
+        contentContainerClassName="w-full p-4 pb-24"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >

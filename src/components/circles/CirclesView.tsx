@@ -11,6 +11,7 @@ import {
 import { type CirclesViewModel, useCirclesViewModel } from '~/hooks/circles/useCirclesViewModel';
 import { Theme } from '~/theme/Theme';
 import type { NetworkUserRow } from '~/types/network';
+import { webContainerStyle } from '~/utils';
 
 type Props = { isActive: boolean };
 
@@ -27,8 +28,9 @@ const CirclesView = ({ isActive }: Props) => {
 function CirclesListContent({ vm, isActive }: { vm: CirclesViewModel; isActive: boolean }) {
   return (
     <ScrollView
-      className="flex-1"
-      contentContainerClassName="p-4 pb-24"
+      className="flex-1 w-full"
+      contentContainerStyle={webContainerStyle}
+      contentContainerClassName="w-full p-4 pb-24"
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
