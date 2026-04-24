@@ -40,17 +40,12 @@ export async function createRex(params: CreateRexRpcParams) {
   return data;
 }
 
-/**
- * Edge Function: cleans up unreferenced manual places and draft rex-images after the user
- * leaves the create flow (see product docs for discard_draft_rex_data).
- */
 export async function discardDraftRexData(): Promise<DiscardDraftRexDataResult> {
   const { data, error } =
     await Backend.functions.invoke<DiscardDraftRexDataResult>('discard_draft_rex_data');
   if (error) throw error;
   if (
     !isPlainObject(data) ||
-    typeof data.userId !== 'string' ||
     !isFiniteNumber(data.deletedObjectCount) ||
     !isFiniteNumber(data.deletedManualPlaceCount)
   ) {
