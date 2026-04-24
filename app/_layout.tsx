@@ -3,18 +3,10 @@ import '~/i18n/config';
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '~/services/AuthContext';
-import {
-  useFonts,
-  HankenGrotesk_300Light,
-  HankenGrotesk_400Regular,
-  HankenGrotesk_500Medium,
-  HankenGrotesk_600SemiBold,
-  HankenGrotesk_700Bold,
-  HankenGrotesk_800ExtraBold,
-} from '@expo-google-fonts/hanken-grotesk';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ComponentProps } from 'react';
 import Toast, { ErrorToast, InfoToast, SuccessToast } from 'react-native-toast-message';
+import { useFonts } from 'expo-font';
 
 type ToastRowProps = ComponentProps<typeof SuccessToast>;
 
@@ -37,12 +29,12 @@ const toastConfig = {
 
 export default function RootLayout() {
   const [loaded] = useFonts({
-    HankenGrotesk_300Light,
-    HankenGrotesk_400Regular,
-    HankenGrotesk_500Medium,
-    HankenGrotesk_600SemiBold,
-    HankenGrotesk_700Bold,
-    HankenGrotesk_800ExtraBold,
+    HankenGrotesk_300Light: require('../assets/fonts/HankenGrotesk-Light.ttf'),
+    HankenGrotesk_400Regular: require('../assets/fonts/HankenGrotesk-Regular.ttf'),
+    HankenGrotesk_500Medium: require('../assets/fonts/HankenGrotesk-Medium.ttf'),
+    HankenGrotesk_600SemiBold: require('../assets/fonts/HankenGrotesk-SemiBold.ttf'),
+    HankenGrotesk_700Bold: require('../assets/fonts/HankenGrotesk-Bold.ttf'),
+    HankenGrotesk_800ExtraBold: require('../assets/fonts/HankenGrotesk-ExtraBold.ttf'),
   });
 
   if (!loaded) return null;

@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@expo-google-fonts/hanken-grotesk':
-        specifier: ^0.4.3
-        version: 0.4.3
       '@expo/metro-runtime':
         specifier: ~6.1.2
         version: 6.1.2(expo@54.0.33)(react-dom@19.1.0(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@react-native/metro-config@0.84.1(@babel/core@7.29.0))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
@@ -722,9 +719,6 @@ packages:
   '@eslint/js@8.57.0':
     resolution: {integrity: sha512-Ys+3g2TaW7gADOJzPt83SJtCDhMjndcDMFVQ/Tj9iA1BfJzFKD9mAUXT3OenpuPHbI6P/myECxRJrofUsDx/5g==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
-
-  '@expo-google-fonts/hanken-grotesk@0.4.3':
-    resolution: {integrity: sha512-TZn/Ux+nCxEjG/zAenCFbEhOAPxSXN3lo2YU2jHcPsNBPFeicm8feQStL81igJuAwJLCn62VvEOdTtmVEBDl0g==}
 
   '@expo/apple-utils@1.0.0':
     resolution: {integrity: sha512-V8gMy1C63oAYlvkSjhfGYOET7sOmRIUAYv/wVcKJZiVAMZ5MQ2geeXCpLGC4+vuOQe2Hs3+qAgl4y0/b8OUO+A==}
@@ -7702,8 +7696,6 @@ snapshots:
       - supports-color
 
   '@eslint/js@8.57.0': {}
-
-  '@expo-google-fonts/hanken-grotesk@0.4.3': {}
 
   '@expo/apple-utils@1.0.0': {}
 
