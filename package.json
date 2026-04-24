@@ -2,6 +2,7 @@
   "name": "trurex",
   "version": "1.0.0",
   "main": "expo-router/entry",
+  "homepage": "",
   "scripts": {
     "start": "expo start --clear",
     "android": "expo start --android",
@@ -13,7 +14,6 @@
     "clean": "rm -rf node_modules pnpm-lock.yaml && pnpm install"
   },
   "dependencies": {
-    "@expo-google-fonts/hanken-grotesk": "^0.4.3",
     "@expo/metro-runtime": "~6.1.2",
     "@hookform/resolvers": "^5.2.2",
     "@react-google-maps/api": "^2.20.8",
@@ -67,6 +67,7 @@
     "eslint-config-expo": "^55.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
+    "expo-cli": "^6.3.12",
     "prettier": "3.4.1",
     "typescript": "~5.9.2"
   },

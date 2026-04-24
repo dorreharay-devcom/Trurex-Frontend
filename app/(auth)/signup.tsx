@@ -77,7 +77,7 @@ export default function SignupScreen() {
           source={require('../../assets/truRexLogo.png')}
           style={{ height: 40, resizeMode: 'contain' }}
         />
-        <Text className="text-muted-foreground text-sm">Create your TruRex account</Text>
+        <Text className="text-sm text-muted-foreground">Create your TruRex account</Text>
       </View>
 
       <View className="space-y-3">
@@ -86,7 +86,7 @@ export default function SignupScreen() {
           className="w-full flex-row items-center justify-center gap-2 py-2.5 rounded-lg bg-card border border-border"
         >
           <GoogleIcon size={16} color={Theme.colors.foreground} />
-          <Text className="text-foreground font-medium text-sm">Continue with Google</Text>
+          <Text className="text-sm font-medium text-foreground">Continue with Google</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -94,7 +94,7 @@ export default function SignupScreen() {
           className="w-full flex-row items-center justify-center gap-2 py-2.5 rounded-lg bg-card border border-border"
         >
           <AppleIcon size={16} color={Theme.colors.foreground} />
-          <Text className="text-foreground font-medium text-sm">Continue with Apple</Text>
+          <Text className="text-sm font-medium text-foreground">Continue with Apple</Text>
         </TouchableOpacity>
       </View>
 
@@ -149,13 +149,13 @@ export default function SignupScreen() {
           className="w-full"
         />
         {errors.general && (
-          <Text className="mt-1 text-xs text-destructive text-center">{errors.general}</Text>
+          <Text className="mt-1 text-xs text-center text-destructive">{errors.general}</Text>
         )}
       </View>
 
-      <Text className="text-center text-sm text-muted-foreground">
+      <Text className="text-sm text-center text-muted-foreground">
         Already have an account?{' '}
-        <Text className="text-foreground font-medium" onPress={() => router.replace(Routes.Login)}>
+        <Text className="font-medium text-foreground" onPress={() => router.replace(Routes.Login)}>
           Sign in
         </Text>
       </Text>

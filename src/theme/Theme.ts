@@ -1,12 +1,12 @@
 import type { TextStyle } from 'react-native';
 
 export const FontFamily = {
-  light: 'HankenGrotesk_300Light',
-  regular: 'HankenGrotesk_400Regular',
-  medium: 'HankenGrotesk_500Medium',
-  semibold: 'HankenGrotesk_600SemiBold',
-  bold: 'HankenGrotesk_700Bold',
-  extrabold: 'HankenGrotesk_800ExtraBold',
+  light: 'HankenGrotesk-Light',
+  regular: 'HankenGrotesk-Regular',
+  medium: 'HankenGrotesk-Medium',
+  semibold: 'HankenGrotesk-SemiBold',
+  bold: 'HankenGrotesk-Bold',
+  extrabold: 'HankenGrotesk-ExtraBold',
 } as const;
 
 export const Colors = {

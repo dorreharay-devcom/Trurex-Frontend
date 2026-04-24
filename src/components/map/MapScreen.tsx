@@ -16,6 +16,7 @@ import { Theme } from '~/theme/Theme';
 import { MapPin, List, LocateFixed } from 'lucide-react-native';
 import { MAP_ACTION_INSET } from '~/constants/map/mapUi';
 import { deriveMapPinType, formatDistanceKm, haversineKm } from '~/utils/map/mapRecommendationData';
+import { webContainerStyle } from '~/utils';
 
 const MAP_LOCATION_PROMPT_DISMISSED_KEY = 'mapLocationPromptDismissed';
 
@@ -109,7 +110,7 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
 
   return (
     <View className="relative min-h-0 w-full flex-1 bg-background pt-4">
-      <View className="relative min-h-0 w-full flex-1 px-4 pb-5">
+      <View className="relative min-h-0 w-full flex-1 px-4 pb-5" style={webContainerStyle}>
         {!flow.listView ? (
           <View className="relative min-h-0 w-full flex-1">
             <View
@@ -267,9 +268,10 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
           </View>
         ) : (
           <ScrollView
-            className="flex-1 pt-32"
+            className="flex-1 w-full pt-32"
             keyboardShouldPersistTaps="handled"
-            contentContainerClassName="pb-28"
+            contentContainerStyle={webContainerStyle}
+            contentContainerClassName="w-full pb-28"
           >
             {sortedList.length === 0 ? (
               <View className="items-center py-12">

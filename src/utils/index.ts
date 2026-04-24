@@ -20,3 +20,11 @@ export const formatCurrency = (amount: number, currency: string = 'USD') => {
 };
 
 export const getRedirectUrl = () => (isWeb ? window.location.origin : Linking.createURL('/'));
+
+export const isFiniteNumber = (value: unknown): value is number => {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+export const isPlainObject = (value: unknown): value is Record<string, unknown>  => {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}

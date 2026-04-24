@@ -4,6 +4,10 @@ import type {
   DbCategoryRow,
   CreateRexRpcParams,
 } from '~/types/recommendation/rexCategoryCreateConfig';
+import type { DiscardDraftRexDataResult } from '~/types/recommendation/rexApi';
+import { isFiniteNumber, isPlainObject } from '~/utils';
+
+export type { DiscardDraftRexDataResult };
 
 export async function fetchActiveCategories(): Promise<DbCategoryRow[]> {
   const { data, error } = await Backend.from('categories')
@@ -36,10 +40,16 @@ export async function createRex(params: CreateRexRpcParams) {
   return data;
 }
 
-export async function discardDraftRexData(): Promise<number> {
-  const { data, error } = await Backend.rpc('discard_draft_rex_data');
+export async function discardDraftRexData(): Promise<DiscardDraftRexDataResult> {
+  const { data, error } =
+    await Backend.functions.invoke<DiscardDraftRexDataResult>('discard_draft_rex_data');
   if (error) throw error;
-  if (typeof data === 'number' && Number.isFinite(data)) return data;
-  const n = Number(data);
-  return Number.isFinite(n) ? n : 0;
+  if (
+    !isPlainObject(data) ||
+    !isFiniteNumber(data.deletedObjectCount) ||
+    !isFiniteNumber(data.deletedManualPlaceCount)
+  ) {
+    throw new Error('discard_draft_rex_data: invalid or empty response');
+  }
+  return data as DiscardDraftRexDataResult;
 }
