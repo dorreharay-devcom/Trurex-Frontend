@@ -3,8 +3,8 @@ import '~/i18n/config';
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '~/services/AuthContext';
-import { useFonts } from 'expo-font';
 import {
+  useFonts,
   HankenGrotesk_300Light,
   HankenGrotesk_400Regular,
   HankenGrotesk_500Medium,
