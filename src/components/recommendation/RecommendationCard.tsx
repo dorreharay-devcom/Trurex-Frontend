@@ -116,6 +116,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           remoteUri={coverHttp}
           className="w-full aspect-[4/3]"
           accessibilityLabel={rec.title}
+          adaptiveContentFit
         />
         <View className="absolute bottom-0 left-0 right-0 p-3 bg-black/55">
           <Text className="text-lg font-bold text-white">{rec.title}</Text>

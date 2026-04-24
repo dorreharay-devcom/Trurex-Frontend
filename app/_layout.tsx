@@ -20,18 +20,17 @@ type ToastRowProps = ComponentProps<typeof SuccessToast>;
 
 const queryClient = new QueryClient();
 
-/** Bottom-right: library container centers; alignSelf pulls each toast to the trailing edge. */
-const toastTrailing = { alignSelf: 'flex-end' as const, marginRight: 16 };
+const toastBase = { alignSelf: 'flex-end' as const, marginRight: 16, borderLeftColor: '#E9560C' };
 
 const toastConfig = {
   success: (props: ToastRowProps) => (
-    <SuccessToast {...props} style={[toastTrailing, props.style]} />
+    <SuccessToast {...props} style={[toastBase, props.style]} />
   ),
   error: (props: ComponentProps<typeof ErrorToast>) => (
-    <ErrorToast {...props} style={[toastTrailing, props.style]} />
+    <ErrorToast {...props} style={[toastBase, props.style]} />
   ),
   info: (props: ComponentProps<typeof InfoToast>) => (
-    <InfoToast {...props} style={[toastTrailing, props.style]} />
+    <InfoToast {...props} style={[toastBase, props.style]} />
   ),
 };
 

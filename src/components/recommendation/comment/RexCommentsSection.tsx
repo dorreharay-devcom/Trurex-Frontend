@@ -15,6 +15,7 @@ export type RexCommentsSectionProps = {
   onCommentTotalChange?: (total: number) => void;
   composerAnchorRef?: React.RefObject<View | null>;
   autoFocusComposer?: boolean;
+  onUserPress?: (userId: string) => void;
 };
 
 export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
@@ -23,6 +24,7 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
   onCommentTotalChange,
   composerAnchorRef,
   autoFocusComposer,
+  onUserPress,
 }) => {
   const { user } = useAuth();
   const { comments, loading, addComment, deleteComment } = useRexComments(rexId);
@@ -97,6 +99,7 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
               rexOwnerId={rexOwnerId}
               onReply={startReply}
               onDelete={handleDelete}
+              onUserPress={onUserPress}
             />
           ))}
         </View>

@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ScrollView, useWindowDimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TrendingUp, Star, DollarSign, Clock, Users, Tag, PlusCircle } from 'lucide-react-native';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
-import { webContainerStyle } from '~/utils';
+import { isWeb, webContainerStyle } from '~/utils';
 import RecommendationCard, { Recommendation } from '~/components/recommendation/RecommendationCard';
 import { useDiscoverRecommendations, useSearchRexes } from '~/hooks/useDiscovery';
 import { useActiveCategories } from '~/hooks/useActiveCategories';
@@ -74,6 +74,7 @@ type DiscoverViewProps = {
   onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
   onTapRec?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
   onCreateRex?: () => void;
+  onAuthorPress?: (authorId: string) => void;
 };
 
 const DiscoverView = ({
@@ -81,8 +82,12 @@ const DiscoverView = ({
   onRecommendationPress,
   onTapRec,
   onCreateRex,
+  onAuthorPress,
 }: DiscoverViewProps) => {
   const onOpenRec = onRecommendationPress ?? onTapRec;
+  useWindowDimensions();
+
+
 
   const [activeCategory, setActiveCategory] = useState('all');
   const [saveTarget, setSaveTarget] = useState<RecSummary | null>(null);
@@ -385,39 +390,39 @@ const DiscoverView = ({
         </View>
       )}
 
-      <View className="mb-8 ">
-        <View className="flex-row items-center justify-between mb-4">
-          <Text className="text-sm font-display font-semibold text-foreground">
-            Browse by Category
-          </Text>
-        </View>
-
-        <View className="flex-row flex-wrap gap-3">
-          {allCats.map((cat) => {
-            const isActive = activeCategory === cat.id;
-            const isFav = favourites.includes(cat.id);
-            return (
-              <TouchableOpacity
-                key={cat.id}
-                onPress={() => setActiveCategory(cat.id === activeCategory ? 'all' : cat.id)}
-                activeOpacity={0.8}
-                style={{ width: 230, height: 74 }}
-                className={`flex-col items-center justify-center gap-1 rounded-2xl border ${
-                  isActive ? 'bg-primary/10 border-primary/40' : 'bg-white border-gray-200'
-                }`}
-              >
-                <Text style={{ fontSize: 24 }}>{cat.emoji}</Text>
-                <Text
-                  className={`text-[11px] font-bold tracking-tight ${
-                    isActive ? 'text-primary' : 'text-gray-700'
+      <View className="mb-8">
+        <Text className="text-sm font-display font-semibold text-foreground mb-3">
+          Browse by Category
+        </Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-4">
+          <View className="flex-row gap-2 px-4">
+            {allCats.map((cat) => {
+              const isActive = activeCategory === cat.id;
+              return (
+                <TouchableOpacity
+                  key={cat.id}
+                  onPress={() => setActiveCategory(cat.id === activeCategory ? 'all' : cat.id)}
+                  activeOpacity={0.8}
+                  style={{ width: 60, height: 60 }}
+                  className={`items-center justify-center rounded-xl border ${
+                    isActive ? 'bg-primary/10 border-primary/40' : 'bg-card border-border'
                   }`}
                 >
-                  {cat.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+                  <Text style={{ fontSize: 20 }}>{cat.emoji}</Text>
+                  <Text
+                    className={`text-[9px] font-semibold text-center mt-0.5 ${
+                      isActive ? 'text-primary' : 'text-foreground'
+                    }`}
+                    numberOfLines={1}
+                    style={{ maxWidth: 56 }}
+                  >
+                    {cat.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </ScrollView>
       </View>
 
       {/* ── Feed title ──────────────────────────────────────────────────────── */}
@@ -482,10 +487,14 @@ const DiscoverView = ({
           )
         }
         renderItem={({ item }) => (
-          <View className="px-4 mb-4">
+          <View
+            className="px-4 mb-4"
+            style={isWeb ? { maxWidth: 680, width: '100%', alignSelf: 'center' } : undefined}
+          >
             <RecommendationCard
               recommendation={item}
               onTap={onOpenRec}
+              onAuthorPress={onAuthorPress}
               onSave={(rec) =>
                 setSaveTarget({
                   id: rec.id,

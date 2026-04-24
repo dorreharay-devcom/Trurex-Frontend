@@ -24,6 +24,7 @@ export default function HomeScreen() {
   const [previewOptions, setPreviewOptions] = useState<RecommendationOpenOptions>({});
   const [commentCountByRexId, setCommentCountByRexId] = useState<Record<string, number>>({});
   const [avatarRefreshKey, setAvatarRefreshKey] = useState(0);
+  const [viewingUserId, setViewingUserId] = useState<string | undefined>(undefined);
 
   const handleCloseCreate = useCallback(() => {
     setCreateRecommendationOpen(false);
@@ -45,6 +46,13 @@ export default function HomeScreen() {
     setPreviewOptions({});
   }, []);
 
+  const openUserProfile = useCallback((userId: string) => {
+    setPreviewRecommendation(null);
+    setPreviewOptions({});
+    setViewingUserId(userId);
+    setCurrentTab('profile');
+  }, []);
+
   const handleCommentCountChange = useCallback(
     (total: number) => {
       const id = previewRecommendation?.id;
@@ -53,17 +61,22 @@ export default function HomeScreen() {
     [previewRecommendation?.id],
   );
 
+  const handleTabChange = useCallback((tab: Tab) => {
+    if (tab === 'profile') setViewingUserId(undefined);
+    setCurrentTab(tab);
+  }, []);
+
   return (
     <View className="flex-1 bg-background">
       <Header
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onProfilePress={() => setCurrentTab('profile')}
+        onProfilePress={() => handleTabChange('profile')}
         onAddPress={() => setCreateRecommendationOpen(true)}
         avatarRefreshKey={avatarRefreshKey}
       />
 
-      <TabBar currentTab={currentTab} onTabChange={setCurrentTab} />
+      <TabBar currentTab={currentTab} onTabChange={handleTabChange} />
 
       <View className="flex-1">
         {currentTab === 'discover' && (
@@ -80,7 +93,13 @@ export default function HomeScreen() {
         )}
         {currentTab === 'circles' && <CirclesView isActive={currentTab === 'circles'} />}
         {currentTab === 'map' && <MapScreen onRecommendationPress={openPreview} />}
-        {currentTab === 'profile' && <ProfileView onAvatarUpdated={() => setAvatarRefreshKey((k) => k + 1)} />}
+        {currentTab === 'profile' && (
+          <ProfileView
+            userId={viewingUserId}
+            onAvatarUpdated={() => setAvatarRefreshKey((k) => k + 1)}
+            onBack={viewingUserId ? () => { setViewingUserId(undefined); setCurrentTab('discover'); } : undefined}
+          />
+        )}
       </View>
 
       {currentTab === 'discover' && (
@@ -110,6 +129,8 @@ export default function HomeScreen() {
         onAddYourOwn={openCreateFromDetail}
         onCommentCountChange={handleCommentCountChange}
         scrollToComments={previewOptions.scrollToComments === true}
+        onAuthorPress={openUserProfile}
+        onUserPress={openUserProfile}
       />
     </View>
   );

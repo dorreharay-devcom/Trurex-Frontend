@@ -11,6 +11,7 @@ import {
   Animated,
   StyleSheet,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { Plus, PackageOpen, Search } from 'lucide-react-native';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
@@ -22,7 +23,7 @@ import { Backend } from '~/services/AuthService';
 import { useMyCollections, useAddRexToCollection } from '~/hooks/useCollections';
 import { useSavedRexes } from '~/hooks/useGems';
 import { useAuth } from '~/services/AuthContext';
-import { webContainerStyle } from '~/utils';
+import { isWeb, webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
 import type {
   Recommendation,
@@ -46,11 +47,14 @@ const SkeletonCard: React.FC<{ width: number }> = ({ width }) => (
 type FavesViewProps = {
   commentCountByRexId?: Record<string, number>;
   onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
+  onAuthorPress?: (authorId: string) => void;
 };
 
-const FavesView: React.FC<FavesViewProps> = () => {
+const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  useWindowDimensions(); // triggers re-render on resize
+  const cardMaxWidth = isWeb ? 680 : undefined;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [openCollectionId, setOpenCollectionId] = useState<string | null>(null);
@@ -93,8 +97,6 @@ const FavesView: React.FC<FavesViewProps> = () => {
         (r.location?.toLowerCase() ?? '').includes(q),
     );
   }, [uncollectedRecs, searchQuery]);
-
-  const isDemo = collections.length === 0 && !loadingCollections;
 
   const backdropOpacity = useRef(new Animated.Value(0)).current;
   const sheetTranslateY = useRef(new Animated.Value(400)).current;
@@ -254,14 +256,6 @@ const FavesView: React.FC<FavesViewProps> = () => {
         Showing {filteredCollections.length} collection{filteredCollections.length !== 1 ? 's' : ''}
       </Text>
 
-      {/* Demo banner */}
-      {isDemo && (
-        <View className="mb-4 px-3 py-2 rounded-lg bg-muted/60 border border-border">
-          <Text className="text-xs text-muted-foreground text-center">
-            ✨ This is a preview — create your first collection to get started!
-          </Text>
-        </View>
-      )}
 
       {/* Collections horizontal scroll */}
       {loadingCollections ? (
@@ -291,21 +285,53 @@ const FavesView: React.FC<FavesViewProps> = () => {
           ))}
         </ScrollView>
       ) : (
-        <View className="items-center py-12 gap-3 mb-6">
-          <Text className="text-4xl">📚</Text>
-          <Text className="font-display font-semibold text-foreground">No collections yet.</Text>
-          <Text className="text-sm text-muted-foreground text-center max-w-xs">
-            Start with something you know well — your favourite weekend walk, the best spots in your
-            city.
+        <View className="items-center mb-6 py-6 px-4 rounded-2xl border border-dashed border-border bg-muted/30">
+          {/* Stacked emoji cards */}
+          <View className="flex-row mb-5">
+            {[
+              { emoji: '🍜', bg: 'bg-purple-500' },
+              { emoji: '🏕️', bg: 'bg-sky-500' },
+              { emoji: '📚', bg: 'bg-amber-500' },
+            ].map((item, idx) => (
+              <View
+                key={idx}
+                className={`w-12 h-16 rounded-xl ${item.bg} items-center justify-center`}
+                style={{ marginLeft: idx === 0 ? 0 : -8, zIndex: idx, transform: [{ rotate: `${(idx - 1) * 6}deg` }] }}
+              >
+                <Text className="text-2xl">{item.emoji}</Text>
+              </View>
+            ))}
+          </View>
+
+          <Text className="text-base font-display font-bold text-foreground mb-1">
+            No collections yet
           </Text>
+          <Text className="text-sm text-muted-foreground text-center mb-4">
+            Group your saved Rex into collections — by vibe, city, or whoever you'd share them with.
+          </Text>
+
+          {/* Suggestion chips */}
+          <View className="flex-row flex-wrap justify-center gap-2 mb-5">
+            {['Best eats in Tokyo 🍜', 'Weekend escapes 🏕️', 'Hidden bars 🍸'].map((label) => (
+              <TouchableOpacity
+                key={label}
+                activeOpacity={0.7}
+                onPress={() => setShowCreateCollection(true)}
+                className="px-3 py-1.5 rounded-full border border-border bg-card"
+              >
+                <Text className="text-xs text-foreground">{label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
           <TouchableOpacity
             onPress={() => setShowCreateCollection(true)}
             activeOpacity={0.8}
-            className="flex-row items-center gap-2 px-5 py-2.5 rounded-xl bg-primary mt-2"
+            className="flex-row items-center gap-2 px-5 py-2.5 rounded-xl bg-primary"
           >
             <Plus size={16} color={Theme.colors.primaryForeground} />
             <Text className="text-sm font-semibold text-primary-foreground">
-              Create your first collection
+              Create first collection
             </Text>
           </TouchableOpacity>
         </View>
@@ -339,7 +365,10 @@ const FavesView: React.FC<FavesViewProps> = () => {
         contentContainerClassName="px-4 pt-6 pb-24"
         ListHeaderComponent={ListHeader}
         renderItem={({ item }) => (
-          <View className="px-0 mb-4">
+          <View
+            className="mb-4"
+            style={cardMaxWidth ? { maxWidth: cardMaxWidth, width: '100%', alignSelf: 'center' } : undefined}
+          >
             <RecommendationCard
               recommendation={item}
               onSave={() =>

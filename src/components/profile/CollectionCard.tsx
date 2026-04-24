@@ -27,7 +27,6 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
     REX_IMAGES_BUCKET,
     collection.cover_image_path ?? '',
   );
-
   return (
     <TouchableOpacity
       activeOpacity={0.85}

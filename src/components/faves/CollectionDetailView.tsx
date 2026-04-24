@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Modal, StyleSheet } from 'react-native';
-import { ArrowLeft, Plus, MoreVertical, X, Trash2 } from 'lucide-react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Modal, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
+import { ArrowLeft, Plus, MoreVertical, X, Trash2, Pencil, Link } from 'lucide-react-native';
 import { Image } from 'expo-image';
-import { useQuery } from '@tanstack/react-query';
 import ImageColors from 'react-native-image-colors';
 import { webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
@@ -11,25 +11,17 @@ import {
   useRemoveRexFromCollection,
   useDeleteCollection,
 } from '~/hooks/useCollections';
+import EditCollectionModal from '~/components/faves/EditCollectionModal';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
-import { Backend, unwrap } from '~/services/AuthService';
+import { toastSuccess } from '~/utils/appToast';
 
-const RexThumb: React.FC<{ rexId: string }> = ({ rexId }) => {
-  const { data: photoPath } = useQuery({
-    queryKey: ['rex-cover-path', rexId],
-    queryFn: async () => {
-      const detail = unwrap(await Backend.rpc('get_rex_detail', { input_rex_id: rexId }));
-      const paths = (detail as any)?.photo_paths;
-      return Array.isArray(paths) && paths.length > 0 ? String(paths[0]) : null;
-    },
-    staleTime: 5 * 60 * 1000,
-  });
+const RexThumb: React.FC<{ photoPath: string | null }> = ({ photoPath }) => {
   const { uri } = useSignedStorageUrl(REX_IMAGES_BUCKET, photoPath ?? '');
 
   return (
-    <View className="w-12 h-12 bg-muted rounded-lg overflow-hidden">
-      {uri && <Image source={{ uri }} style={{ width: 48, height: 48 }} contentFit="cover" />}
+    <View className="w-20 h-20 bg-muted rounded-xl overflow-hidden">
+      {uri && <Image source={{ uri }} style={{ width: 80, height: 80 }} contentFit="cover" />}
     </View>
   );
 };
@@ -45,6 +37,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   onBack,
   onAddItem,
 }) => {
+  const { width: screenWidth } = useWindowDimensions();
   const { data: detail, isLoading } = useCollectionDetail(collectionId);
   const { uri: coverUri } = useSignedStorageUrl(REX_IMAGES_BUCKET, detail?.cover_image_path ?? '');
   const [coverBg, setCoverBg] = useState('#1a1a1a');
@@ -70,6 +63,19 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
 
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+
+  const handleCopyLink = async () => {
+    setShowMenu(false);
+    const base =
+      typeof window !== 'undefined'
+        ? window.location.origin
+        : 'https://trurex.netlify.app';
+    await Clipboard.setStringAsync(`${base}/collection/${collectionId}`);
+    toastSuccess('Link copied!');
+  };
+  const menuButtonRef = useRef<TouchableOpacity>(null);
+  const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
 
   if (isLoading || !detail) {
     return (
@@ -91,7 +97,16 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
           <Text className="text-sm text-muted-foreground">Back</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => setShowMenu((v) => !v)} className="p-2">
+        <TouchableOpacity
+          ref={menuButtonRef}
+          onPress={() => {
+            menuButtonRef.current?.measure((_x, _y, width, height, pageX, pageY) => {
+              setMenuPos({ top: pageY + height + 4, right: screenWidth - pageX - width });
+            });
+            setShowMenu((v) => !v);
+          }}
+          className="p-2"
+        >
           <MoreVertical size={18} color={Theme.colors.muted} />
         </TouchableOpacity>
       </View>
@@ -108,6 +123,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
           />
         </View>
       )}
+
       <Text className="text-xl font-bold text-foreground">{detail.display_name}</Text>
       {detail.description && (
         <Text className="text-sm text-muted-foreground mt-1">{detail.description}</Text>
@@ -125,38 +141,82 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
         {detail.rexes.map((rex) => (
           <View
             key={rex.rex_id}
-            className="bg-card border border-border rounded-xl p-3 flex-row items-center gap-3"
+            className="bg-card border border-border rounded-xl overflow-hidden flex-row items-stretch"
           >
-            <RexThumb rexId={rex.rex_id} />
-            <View className="flex-1">
-              <Text className="text-sm font-semibold text-foreground">{rex.place_name}</Text>
-              <Text className="text-xs text-muted-foreground">{rex.category_code}</Text>
+            <RexThumb photoPath={rex.photo_path} />
+            <View className="flex-1 px-4 py-3 justify-center">
+              <Text className="text-sm font-semibold text-foreground" numberOfLines={2}>{rex.place_name}</Text>
+              <Text className="text-xs text-muted-foreground mt-0.5">{rex.category_name ?? rex.category_code}</Text>
             </View>
-            <TouchableOpacity onPress={() => removeMutation.mutate(rex.rex_id)}>
-              <X size={14} color={Theme.colors.muted} />
+            <TouchableOpacity onPress={() => removeMutation.mutate(rex.rex_id)} className="px-4 items-center justify-center">
+              <X size={16} color={Theme.colors.muted} />
             </TouchableOpacity>
           </View>
         ))}
       </View>
 
-      {showMenu && (
-        <View className="absolute right-4 top-14 bg-card border border-border rounded-xl shadow-lg p-2 z-20">
+      <Modal
+        visible={showMenu}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowMenu(false)}
+      >
+        <Pressable style={StyleSheet.absoluteFill} onPress={() => setShowMenu(false)} />
+        <View style={{ position: 'absolute', top: menuPos.top, right: menuPos.right, minWidth: 200 }} className="bg-card border border-border rounded-xl shadow-lg p-2">
+          <TouchableOpacity
+            onPress={() => {
+              setShowEdit(true);
+              setShowMenu(false);
+            }}
+            className="flex-row items-center gap-3 px-4 py-2.5"
+          >
+            <Pencil size={15} color={Theme.colors.foreground} />
+            <Text className="text-sm text-foreground">Edit collection</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleCopyLink}
+            className="flex-row items-center gap-3 px-4 py-2.5"
+          >
+            <Link size={15} color={Theme.colors.foreground} />
+            <Text className="text-sm text-foreground">Copy link</Text>
+          </TouchableOpacity>
+          <View className="h-px bg-border mx-2 my-1" />
           <TouchableOpacity
             onPress={() => {
               setShowDeleteConfirm(true);
               setShowMenu(false);
             }}
-            className="flex-row items-center gap-2 px-4 py-2"
+            className="flex-row items-center gap-3 px-4 py-2.5"
           >
-            <Trash2 size={14} color={Theme.colors.destructive} />
+            <Trash2 size={15} color={Theme.colors.destructive} />
             <Text className="text-sm text-destructive">Delete</Text>
           </TouchableOpacity>
         </View>
-      )}
+      </Modal>
 
-      <Modal visible={showDeleteConfirm} transparent animationType="fade">
-        <View className="flex-1 bg-black/50 items-center justify-center px-4">
-          <View className="bg-card rounded-xl p-6 w-full max-w-sm">
+      <EditCollectionModal
+        open={showEdit}
+        onClose={() => setShowEdit(false)}
+        onUpdated={() => setShowEdit(false)}
+        collection={{
+          id: collectionId,
+          display_name: detail.display_name,
+          description: detail.description ?? null,
+          cover_image_path: detail.cover_image_path ?? null,
+        }}
+      />
+
+      <Modal
+        visible={showDeleteConfirm}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowDeleteConfirm(false)}
+      >
+        <Pressable
+          className="flex-1 bg-black/50 items-center justify-center px-4"
+          onPress={() => setShowDeleteConfirm(false)}
+        >
+          <Pressable className="bg-card rounded-xl p-6 w-full max-w-sm" onPress={() => {}}>
             <Text className="text-lg font-bold mb-4">Delete collection?</Text>
             <View className="flex-row gap-3">
               <TouchableOpacity
@@ -172,8 +232,8 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                 <Text className="text-white">Delete</Text>
               </TouchableOpacity>
             </View>
-          </View>
-        </View>
+          </Pressable>
+        </Pressable>
       </Modal>
     </ScrollView>
   );

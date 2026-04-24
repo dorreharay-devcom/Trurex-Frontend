@@ -14,65 +14,36 @@ import {
   useWindowDimensions,
   Animated,
 } from 'react-native';
-import { X, Upload, Lock, Link2, Globe, Check } from 'lucide-react-native';
+import { X, Upload } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
-import { useAuth } from '~/services/AuthContext';
-import { useCreateCollection } from '~/hooks/useCollections';
-import { toastSuccess, toastError } from '~/utils/appToast';
+import { useUpdateCollection } from '~/hooks/useCollections';
+import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
+import { toastError } from '~/utils/appToast';
 import { fetchUriAsBlob, uploadBlobToStorageBucket, resizeForUpload } from '~/utils/photos/storageUpload';
 import { generateRexImageStoragePath } from '~/utils/photos/photoUtils';
 import { isWeb, webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
-
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
+import { useAuth } from '~/services/AuthContext';
 
-const COLLECTION_COVERS_BUCKET = REX_IMAGES_BUCKET;
-
-const CATEGORY_TAGS = [
-  'Food & Drink',
-  'Experiences',
-  'Travel',
-  'Outdoors',
-  'Culture',
-  'Shopping',
-  'Services',
-  'Mixed',
-];
-
-type Privacy = 'private' | 'shared' | 'public';
-
-const PRIVACY_OPTIONS: {
-  value: Privacy;
-  label: string;
-  desc: string;
-  Icon: React.ComponentType<{ size: number; color: string }>;
-}[] = [
-  { value: 'private', label: 'Private', desc: 'Only you can see this', Icon: Lock },
-  {
-    value: 'shared',
-    label: 'Shared',
-    desc: 'Share via link or with specific Circles',
-    Icon: Link2,
-  },
-  {
-    value: 'public',
-    label: 'Public',
-    desc: 'Anyone on TruRex can find and follow this',
-    Icon: Globe,
-  },
-];
-
-export interface CreateCollectionModalProps {
+export interface EditCollectionModalProps {
   open: boolean;
   onClose: () => void;
-  onCreated: (id: string) => void;
+  onUpdated: () => void;
+  collection: {
+    id: string;
+    display_name: string;
+    description: string | null;
+    cover_image_path: string | null;
+  };
 }
 
-const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
+const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
   open,
   onClose,
-  onCreated,
+  onUpdated,
+  collection,
 }) => {
   const { user } = useAuth();
   const { width, height } = useWindowDimensions();
@@ -101,16 +72,29 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
     }
   }, [open]);
 
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [categoryTag, setCategoryTag] = useState<string | null>(null);
-  const [privacy, setPrivacy] = useState<Privacy>('private');
-  const [coverPreview, setCoverPreview] = useState<string | null>(null);
-  const [coverStoragePath, setCoverStoragePath] = useState<string | null>(null);
+  // Sync form fields when collection changes (e.g. modal reopened for different collection)
+  const [name, setName] = useState(collection.display_name);
+  const [description, setDescription] = useState(collection.description ?? '');
+  useEffect(() => {
+    setName(collection.display_name);
+    setDescription(collection.description ?? '');
+    setNewCoverPreview(null);
+    setNewCoverStoragePath(null);
+    setCoverRemoved(false);
+  }, [collection.id, open]);
+
+  // Cover: existing (signed) vs new pick vs removed
+  const { uri: existingCoverUri } = useSignedStorageUrl(
+    REX_IMAGES_BUCKET,
+    collection.cover_image_path ?? '',
+  );
+  const [newCoverPreview, setNewCoverPreview] = useState<string | null>(null);
+  const [newCoverStoragePath, setNewCoverStoragePath] = useState<string | null>(null);
+  const [coverRemoved, setCoverRemoved] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  const createColMutation = useCreateCollection();
-  const loading = createColMutation.isPending;
+  const updateMutation = useUpdateCollection();
+  const loading = updateMutation.isPending;
 
   const pickCover = async () => {
     if (!user) return;
@@ -127,50 +111,54 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
     if (result.canceled || !result.assets?.length) return;
 
     const asset = result.assets[0];
-    setCoverPreview(asset.uri);
+    setNewCoverPreview(asset.uri);
+    setCoverRemoved(false);
     setUploading(true);
     try {
       const fileName = asset.fileName ?? `cover-${Date.now()}.jpg`;
       const storagePath = generateRexImageStoragePath(user.id, fileName);
       const resized = await resizeForUpload(asset.uri, 800);
       const blob = await fetchUriAsBlob(resized);
-      await uploadBlobToStorageBucket(COLLECTION_COVERS_BUCKET, storagePath, blob);
-      setCoverStoragePath(storagePath);
+      await uploadBlobToStorageBucket(REX_IMAGES_BUCKET, storagePath, blob);
+      setNewCoverStoragePath(storagePath);
     } catch (e: any) {
       toastError('Upload failed', e?.message);
-      setCoverPreview(null);
-      setCoverStoragePath(null);
+      setNewCoverPreview(null);
+      setNewCoverStoragePath(null);
     } finally {
       setUploading(false);
     }
   };
 
-  const handleCreate = async () => {
-    if (!user || !name.trim()) return;
+  const removeCover = () => {
+    setNewCoverPreview(null);
+    setNewCoverStoragePath(null);
+    setCoverRemoved(true);
+  };
 
-    createColMutation.mutate(
+  const handleSave = () => {
+    if (!name.trim()) return;
+
+    const coverChanged = newCoverStoragePath !== null || coverRemoved;
+
+    updateMutation.mutate(
       {
+        collection_id: collection.id,
         display_name: name.trim(),
-        description: description.trim() || undefined,
-        cover_image_path: coverStoragePath ?? undefined,
+        description: description.trim() || null,
+        update_cover_image_path: coverChanged,
+        cover_image_path: coverChanged
+          ? (newCoverStoragePath ?? null)
+          : undefined,
       },
-      {
-        onSuccess: (collection) => {
-          onCreated(collection.id);
-          setName('');
-          setDescription('');
-          setCategoryTag(null);
-          setPrivacy('private');
-          setCoverPreview(null);
-          setCoverStoragePath(null);
-        },
-      },
+      { onSuccess: onUpdated },
     );
   };
 
-  // web: fixed inset-0 z-[100] flex items-end sm:items-center justify-center
-  // web panel: bg-card rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg max-h-[90vh]
-  //            overflow-y-auto border border-border shadow-elevated
+  // Determine what cover to display
+  const displayCoverUri = newCoverPreview ?? (coverRemoved ? null : existingCoverUri);
+  const hasCover = !!displayCoverUri;
+
   return (
     <Modal
       visible={visible}
@@ -198,17 +186,16 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
               style={{ maxHeight: height * 0.9 }}
               className={`bg-card ${isWeb ? 'rounded-2xl' : 'rounded-t-2xl'} border border-border shadow-elevated overflow-hidden`}
             >
-              {/* sticky top-0 bg-card z-10 — Header */}
+              {/* Header */}
               <View className="flex-row items-center justify-between p-4 border-b border-border bg-card">
                 <Text className="font-display font-bold text-foreground text-lg">
-                  New Collection
+                  Edit Collection
                 </Text>
                 <TouchableOpacity onPress={onClose} className="p-1">
                   <X size={20} color={Theme.colors.muted} />
                 </TouchableOpacity>
               </View>
 
-              {/* p-4 space-y-5 — scrollable content */}
               <ScrollView
                 style={styles.scroll}
                 keyboardShouldPersistTaps="handled"
@@ -220,12 +207,12 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                   <Text className="text-xs font-semibold text-muted-foreground mb-1.5">
                     Cover image (optional)
                   </Text>
-                  {coverPreview ? (
+                  {hasCover ? (
                     <View className="rounded-xl overflow-hidden">
                       <Image
-                        source={{ uri: coverPreview }}
+                        source={{ uri: displayCoverUri }}
                         style={{ width: '100%', height: 128 }}
-                        contentFit="cover"
+                        contentFit="contain"
                       />
                       {uploading && (
                         <View className="absolute inset-0 bg-background/60 items-center justify-center">
@@ -233,10 +220,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                         </View>
                       )}
                       <TouchableOpacity
-                        onPress={() => {
-                          setCoverPreview(null);
-                          setCoverStoragePath(null);
-                        }}
+                        onPress={removeCover}
                         className="absolute top-2 right-2 p-1 rounded-full bg-black/50"
                       >
                         <X size={14} color="white" />
@@ -258,12 +242,12 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                 {/* Name */}
                 <View>
                   <Text className="text-xs font-semibold text-muted-foreground mb-1.5">
-                    Name your collection *
+                    Name *
                   </Text>
                   <TextInput
                     value={name}
                     onChangeText={(v) => setName(v.slice(0, 60))}
-                    placeholder="e.g. My Ideal Weekend in Lisbon, Best Hikes in Sydney…"
+                    placeholder="Collection name"
                     placeholderTextColor="#737373"
                     className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground"
                   />
@@ -280,7 +264,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                   <TextInput
                     value={description}
                     onChangeText={(v) => setDescription(v.slice(0, 200))}
-                    placeholder="What's this list about? Who's it for?"
+                    placeholder="What's this list about?"
                     placeholderTextColor="#737373"
                     multiline
                     numberOfLines={2}
@@ -291,95 +275,20 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                     {description.length}/200
                   </Text>
                 </View>
-
-                {/* Category tag */}
-                <View>
-                  <Text className="text-xs font-semibold text-muted-foreground mb-1.5">
-                    Category tag (optional)
-                  </Text>
-                  <View className="flex-row flex-wrap gap-1.5">
-                    {CATEGORY_TAGS.map((tag) => (
-                      <TouchableOpacity
-                        key={tag}
-                        onPress={() => setCategoryTag(categoryTag === tag ? null : tag)}
-                        className={`px-3 py-1.5 rounded-full border ${
-                          categoryTag === tag
-                            ? 'bg-primary border-primary'
-                            : 'bg-muted/50 border-border'
-                        }`}
-                      >
-                        <Text
-                          className={`text-xs font-medium ${
-                            categoryTag === tag
-                              ? 'text-primary-foreground'
-                              : 'text-muted-foreground'
-                          }`}
-                        >
-                          {tag}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-
-                {/* Privacy */}
-                <View>
-                  <Text className="text-xs font-semibold text-muted-foreground mb-1.5">
-                    Privacy setting
-                  </Text>
-                  <View className="gap-2">
-                    {PRIVACY_OPTIONS.map(({ value, label, desc, Icon }) => {
-                      const selected = privacy === value;
-                      return (
-                        <TouchableOpacity
-                          key={value}
-                          onPress={() => setPrivacy(value)}
-                          className={`w-full p-3 rounded-xl border ${
-                            selected ? 'border-primary bg-primary/5' : 'border-border bg-muted/30'
-                          }`}
-                        >
-                          <View className="flex-row items-center gap-3">
-                            <View
-                              className={`w-8 h-8 rounded-lg items-center justify-center ${
-                                selected ? 'bg-primary/10' : 'bg-muted'
-                              }`}
-                            >
-                              <Icon
-                                size={16}
-                                color={selected ? Theme.colors.primary : '#737373'}
-                              />
-                            </View>
-                            <View className="flex-1">
-                              <Text
-                                className={`text-sm font-semibold ${
-                                  selected ? 'text-foreground' : 'text-muted-foreground'
-                                }`}
-                              >
-                                {label}
-                              </Text>
-                              <Text className="text-xs text-muted-foreground">{desc}</Text>
-                            </View>
-                            {selected && <Check size={16} color={Theme.colors.primary} />}
-                          </View>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                </View>
               </ScrollView>
 
-              {/* sticky bottom-0 bg-card — Footer */}
+              {/* Footer */}
               <View className="border-t border-border bg-card">
                 <View style={[{ padding: 16 }, webContainerStyle]}>
                   <TouchableOpacity
-                    onPress={handleCreate}
+                    onPress={handleSave}
                     disabled={!name.trim() || loading || uploading}
                     className={`w-full py-3 rounded-xl bg-primary items-center ${
                       !name.trim() || loading || uploading ? 'opacity-50' : ''
                     }`}
                   >
                     <Text className="text-primary-foreground font-semibold text-sm">
-                      {loading ? 'Creating…' : 'Create Collection'}
+                      {loading ? 'Saving…' : 'Save Changes'}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -396,7 +305,6 @@ const styles = StyleSheet.create({
   backdrop: {
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
-  // web: items-center (centered), native: items-end (bottom sheet)
   overlay: {
     flex: 1,
     justifyContent: isWeb ? 'center' : 'flex-end',
@@ -407,4 +315,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateCollectionModal;
+export default EditCollectionModal;

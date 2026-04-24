@@ -26,7 +26,10 @@ export interface CollectionRexEntry {
   rex_id: string;
   place_name: string;
   category_code: string;
+  category_name?: string;
+  category_icon?: string;
   added_at: string;
+  photo_path: string | null;
 }
 
 export interface CollectionDetailRow {

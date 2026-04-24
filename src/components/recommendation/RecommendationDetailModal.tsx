@@ -8,7 +8,7 @@ import {
   findNodeHandle,
   Platform,
 } from 'react-native';
-import { ArrowLeft, Star, MapPin, Quote, Plus } from 'lucide-react-native';
+import { ArrowLeft, Star, MapPin, Quote, Plus, ChevronRight } from 'lucide-react-native';
 import { RexCommentsSection } from '~/components/recommendation/comment';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
@@ -33,6 +33,8 @@ type Props = {
   onAddYourOwn?: () => void;
   onCommentCountChange?: (total: number) => void;
   scrollToComments?: boolean;
+  onAuthorPress?: (authorId: string) => void;
+  onUserPress?: (userId: string) => void;
 };
 
 export const RecommendationDetailModal: React.FC<Props> = ({
@@ -42,6 +44,8 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   onAddYourOwn,
   onCommentCountChange,
   scrollToComments,
+  onAuthorPress,
+  onUserPress,
 }) => {
   const { height: windowHeight } = useWindowDimensions();
   const { layout } = modalConfig;
@@ -187,13 +191,25 @@ export const RecommendationDetailModal: React.FC<Props> = ({
               ) : null}
             </View>
 
-            <View className="flex-row items-center gap-3 rounded-xl border border-border bg-muted/50 p-4">
+            <Pressable
+              onPress={() => {
+                if (!recommendation.authorId || !onAuthorPress) return;
+                onClose();
+                onAuthorPress(recommendation.authorId);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={`View ${user.name}'s profile`}
+              className="flex-row items-center gap-3 rounded-xl border border-border bg-muted/50 p-4 active:opacity-70"
+            >
               <SignedUserAvatar name={user.name} avatar={user.avatar} className="h-10 w-10" />
-              <View>
+              <View className="flex-1">
                 <Text className="text-sm text-muted-foreground">Recommended by</Text>
                 <Text className="font-semibold text-foreground">{user.name}</Text>
               </View>
-            </View>
+              {recommendation.authorId && (
+                <ChevronRight size={16} color={Theme.colors.secondaryText} />
+              )}
+            </Pressable>
 
             {recommendation.description ? (
               <View className="rounded-xl border-l-4 border-primary bg-primary/5 p-4">
@@ -276,6 +292,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                 onCommentTotalChange={onCommentCountChange}
                 composerAnchorRef={composerAnchorRef}
                 autoFocusComposer={scrollToComments === true}
+                onUserPress={onUserPress}
               />
             </View>
 

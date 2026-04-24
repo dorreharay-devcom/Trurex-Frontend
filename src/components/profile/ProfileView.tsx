@@ -19,6 +19,7 @@ import EditProfile from './EditProfile';
 import CollectionCard from './CollectionCard';
 import { useMyCollections } from '~/hooks/useCollections';
 import { useMyRexes } from '~/hooks/useDiscovery';
+import { ChevronLeft } from 'lucide-react-native';
 
 enum ProfileTab {
   Recs = 'recs',
@@ -33,9 +34,10 @@ const TABS = [
 interface ProfileViewProps {
   userId?: string;
   onAvatarUpdated?: () => void;
+  onBack?: () => void;
 }
 
-const ProfileView = ({ userId: propUserId, onAvatarUpdated }: ProfileViewProps) => {
+const ProfileView = ({ userId: propUserId, onAvatarUpdated, onBack }: ProfileViewProps) => {
   const { user: authUser, signOut } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,7 +46,8 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated }: ProfileViewProps) 
   const [avatarUploading, setAvatarUploading] = useState(false);
 
   const targetUserId = propUserId || authUser?.id;
-  const { data: myRexes = [], isLoading: rexesLoading } = useMyRexes(targetUserId);
+  const isOwnProfile = !propUserId || propUserId === authUser?.id;
+  const { data: myRexes = [], isLoading: rexesLoading } = useMyRexes(isOwnProfile ? targetUserId : undefined);
   const { data: myCollections = [], isLoading: collectionsLoading } = useMyCollections();
 
   const fetchProfile = useCallback(async () => {
@@ -127,6 +130,9 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated }: ProfileViewProps) 
     );
   }
 
+  const visibleTabs = isOwnProfile ? TABS : TABS.filter((t) => t.id === ProfileTab.Recs);
+  const rexTabCount = isOwnProfile ? myRexes.length : (profile?.rexCount ?? 0);
+
   return (
     <ScrollView
       className="flex-1"
@@ -134,11 +140,22 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated }: ProfileViewProps) 
       contentContainerStyle={webContainerStyle}
       contentContainerClassName="p-4 pb-24"
     >
+      {onBack && (
+        <TouchableOpacity
+          onPress={onBack}
+          className="flex-row items-center gap-1 mb-3 self-start"
+          activeOpacity={0.7}
+        >
+          <ChevronLeft size={20} color={Theme.colors.foreground} />
+          <Text className="text-sm font-medium text-foreground">Back</Text>
+        </TouchableOpacity>
+      )}
+
       <View className="bg-card border border-border rounded-xl shadow-card">
         {profile && (
           <ProfileHeader
             profile={profile}
-            isOwnProfile={!propUserId || propUserId === authUser?.id}
+            isOwnProfile={isOwnProfile}
             onEditProfile={() => setIsEditing(true)}
             onSignOut={signOut}
             onAvatarPress={handleAvatarPress}
@@ -149,8 +166,8 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated }: ProfileViewProps) 
         {profile?.currently && <CurrentlySection currently={profile.currently} />}
 
         <View className="flex-row border-b border-border">
-          {TABS.map((tab) => {
-            const label = tab.id === ProfileTab.Recs ? `Rex's (${myRexes.length})` : tab.label;
+          {visibleTabs.map((tab) => {
+            const label = tab.id === ProfileTab.Recs ? `Rex's (${rexTabCount})` : tab.label;
             return (
               <TouchableOpacity
                 key={tab.id}
@@ -173,20 +190,20 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated }: ProfileViewProps) 
 
         <View className="pb-4">
           {activeTab === ProfileTab.Recs &&
-            (rexesLoading ? (
-              <View className="items-center py-8">
-                <ActivityIndicator color={Theme.colors.primary} />
-              </View>
-            ) : myRexes.length === 0 ? (
-              <Text className="text-sm text-muted-foreground text-center py-8">No rexes yet</Text>
-            ) : (
-              <View className="p-4">
-                <Text className="text-xs font-medium text-muted-foreground mb-3">
-                  {myRexes.length} {myRexes.length === 1 ? 'Rex' : 'Rexes'}
-                </Text>
-                <View className="flex-row flex-wrap gap-3">
-                  {myRexes.map((rec) => {
-                    return (
+            (isOwnProfile ? (
+              rexesLoading ? (
+                <View className="items-center py-8">
+                  <ActivityIndicator color={Theme.colors.primary} />
+                </View>
+              ) : myRexes.length === 0 ? (
+                <Text className="text-sm text-muted-foreground text-center py-8">No rexes yet</Text>
+              ) : (
+                <View className="p-4">
+                  <Text className="text-xs font-medium text-muted-foreground mb-3">
+                    {myRexes.length} {myRexes.length === 1 ? 'Rex' : 'Rexes'}
+                  </Text>
+                  <View className="flex-row flex-wrap gap-3">
+                    {myRexes.map((rec) => (
                       <View
                         key={rec.id}
                         className="w-[22%] rounded-xl overflow-hidden shadow-card bg-background border border-border"
@@ -210,10 +227,14 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated }: ProfileViewProps) 
                           </Text>
                         </View>
                       </View>
-                    );
-                  })}
+                    ))}
+                  </View>
                 </View>
-              </View>
+              )
+            ) : (
+              <Text className="text-sm text-muted-foreground text-center py-8">
+                {rexTabCount > 0 ? `${rexTabCount} Rex's` : 'No rexes yet'}
+              </Text>
             ))}
 
           {activeTab === ProfileTab.Collections &&

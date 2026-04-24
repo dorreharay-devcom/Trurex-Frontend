@@ -6,8 +6,35 @@ interface CacheEntry {
   expiresAt: number;
 }
 
-// Module-level cache: survives re-renders and navigation, cleared on app restart
+const STORAGE_KEY = 'trurex_signed_url_cache_v1';
+
+// Module-level cache: survives re-renders and navigation
 const urlCache = new Map<string, CacheEntry>();
+
+// On web: restore valid entries from localStorage so reloads skip API calls
+function loadPersistedCache() {
+  if (typeof window === 'undefined') return;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const entries: [string, CacheEntry][] = JSON.parse(raw);
+    const now = Date.now();
+    for (const [key, entry] of entries) {
+      if (entry.expiresAt - 60_000 > now) {
+        urlCache.set(key, entry);
+      }
+    }
+  } catch {}
+}
+
+function persistCache() {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(urlCache.entries())));
+  } catch {}
+}
+
+loadPersistedCache();
 
 function getCached(key: string): string | null {
   const entry = urlCache.get(key);
@@ -60,6 +87,7 @@ export function useSignedStorageUrl(
           url: data.signedUrl,
           expiresAt: Date.now() + expiresInSec * 1000,
         });
+        persistCache();
         setUri(data.signedUrl);
       }
       setLoading(false);
