@@ -78,13 +78,19 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
     throw new Error('feed row missing id');
   }
 
+  const photoPathsRaw = o.photo_paths ?? o.photoPaths;
+  const photoPaths: string[] = Array.isArray(photoPathsRaw)
+    ? (photoPathsRaw as unknown[]).map((x) => String(x).trim()).filter(Boolean)
+    : [];
+
   const photoPath =
-    optStr(o, 'photo_path', 'photoPath') ??
-    (Array.isArray(o.photo_paths) && o.photo_paths.length > 0
-      ? String((o.photo_paths as unknown[])[0])
-      : Array.isArray(o.photoPaths) && o.photoPaths.length > 0
-        ? String((o.photoPaths as unknown[])[0])
-        : null);
+    optStr(o, 'photo_path', 'photoPath') ?? (photoPaths[0] ? photoPaths[0] : null);
+
+  const photoCountRaw = o.photo_count;
+  const photoCount =
+    typeof photoCountRaw === 'number' && !Number.isNaN(photoCountRaw)
+      ? photoCountRaw
+      : photoPaths.length;
 
   const imageField = optStr(o, 'image', 'photo_url');
   const image = imageField && /^https?:\/\//i.test(imageField) ? imageField : null;
@@ -121,6 +127,8 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
     description: bodyText,
     image,
     photoPath,
+    photoPaths: photoPaths.length > 0 ? photoPaths : undefined,
+    photoCount,
     categoryId: categoryCode || 'all',
     category: categoryLabel,
     location: optStr(o, 'location', 'place_address') ?? undefined,

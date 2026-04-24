@@ -13,6 +13,17 @@ export function rexCoverStoragePathFromRecommendation(rec: {
   return null;
 }
 
+/** All gallery storage keys in order; first is the feed cover. */
+export function rexPhotoStoragePathsFromRecommendation(rec: {
+  photoPaths?: string[] | null;
+  photoPath?: string | null;
+}): string[] {
+  const fromList = rec.photoPaths?.map((p) => p.trim()).filter(Boolean) ?? [];
+  if (fromList.length > 0) return fromList;
+  const one = rec.photoPath?.trim() ?? '';
+  return one ? [one] : [];
+}
+
 export function rexCoverRemoteHttpUrl(rec: { image?: string | null }): string | null {
   const img = rec.image?.trim() ?? '';
   if (img && isHttpUrl(img)) return img;

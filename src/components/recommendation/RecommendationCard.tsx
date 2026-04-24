@@ -24,6 +24,7 @@ import { toastError } from '~/utils/appToast';
 import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
+  rexPhotoStoragePathsFromRecommendation,
 } from '~/utils/recommendation/rexMediaPaths';
 import { valueForMoneyLabel } from '~/utils/recommendation/rexFeedDisplay';
 
@@ -56,6 +57,11 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
   const tags = rec.tags ?? [];
   const coverPath = rexCoverStoragePathFromRecommendation(rec);
   const coverHttp = rexCoverRemoteHttpUrl(rec);
+  const gallery = rexPhotoStoragePathsFromRecommendation(rec);
+  const galleryCount = Math.max(rec.photoCount ?? 0, gallery.length) || 0;
+  const showGalleryHint = galleryCount > 1;
+  const maxGalleryDots = 5;
+  const galleryDotCount = Math.min(maxGalleryDots, galleryCount);
   const vfmLabel =
     rec.scoreValueForMoney != null ? valueForMoneyLabel(rec.scoreValueForMoney) : null;
   const showStarRating = rec.rating != null && rec.rating > 0;
@@ -117,6 +123,17 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           className="w-full aspect-[4/3]"
           accessibilityLabel={rec.title}
         />
+        {showGalleryHint ? (
+          <View className="absolute right-2 top-2 flex-row items-center gap-1 rounded-full bg-black/45 px-2 py-1.5">
+            {Array.from({ length: galleryDotCount }, (_, index) => (
+              <View
+                key={index}
+                className="h-1.5 w-1.5 rounded-full bg-white"
+                style={{ opacity: index === 0 ? 1 : 0.4 }}
+              />
+            ))}
+          </View>
+        ) : null}
         <View className="absolute bottom-0 left-0 right-0 p-3 bg-black/55">
           <Text className="text-lg font-bold text-white">{rec.title}</Text>
           <View className="mt-1 flex-row flex-wrap items-center gap-x-3 gap-y-1">

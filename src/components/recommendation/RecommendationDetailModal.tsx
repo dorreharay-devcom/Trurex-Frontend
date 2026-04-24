@@ -7,7 +7,9 @@ import {
   useWindowDimensions,
   findNodeHandle,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
+import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Star, MapPin, Quote, Plus } from 'lucide-react-native';
 import { RexCommentsSection } from '~/components/recommendation/comment';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
@@ -16,14 +18,17 @@ import { OverlayModal } from '~/components/common/OverlayModal';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
+import { fetchRexDetail } from '~/api/rexDetailApi';
 import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
 import { Theme } from '~/theme/Theme';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { buildDetailRatingRows } from '~/utils/recommendation/recommendationDetailRatings';
 import { cn } from '~/utils/general';
+import { RexImageCarousel } from './RexImageCarousel';
 import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
+  rexPhotoStoragePathsFromRecommendation,
 } from '~/utils/recommendation/rexMediaPaths';
 
 type Props = {
@@ -106,19 +111,67 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     };
   }, [visible, scrollToComments, recommendation?.id]);
 
+  const { data: rexDetail, isLoading: detailLoading } = useQuery({
+    queryKey: ['rexDetail', recommendation?.id] as const,
+    queryFn: async ({ queryKey }) => {
+      const id = queryKey[1];
+      if (typeof id !== 'string') {
+        throw new Error('Missing rex id');
+      }
+      return fetchRexDetail(id);
+    },
+    enabled: visible && typeof recommendation?.id === 'string',
+    staleTime: 0,
+    refetchOnMount: 'always',
+  });
+
   const mockRatings = useMemo(
     () => (recommendation ? buildDetailRatingRows(recommendation.rating ?? undefined) : []),
     [recommendation],
   );
+
+  const galleryPaths = useMemo(() => {
+    if (!recommendation) return [];
+    const normalize = (s: string) => {
+      const t = s.trim();
+      if (!t || t === 'null' || t === 'undefined') {
+        return null;
+      }
+      return t;
+    };
+    const fromDetail =
+      rexDetail?.photo_paths
+        ?.map((p) => normalize(String(p)))
+        .filter((p): p is string => p != null) ?? [];
+    if (fromDetail.length > 0) {
+      return fromDetail;
+    }
+    return rexPhotoStoragePathsFromRecommendation(recommendation);
+  }, [rexDetail, recommendation]);
+
+  const coverPath = useMemo(
+    () => (recommendation ? rexCoverStoragePathFromRecommendation(recommendation) : null),
+    [recommendation],
+  );
+  const coverHttp = useMemo(
+    () => (recommendation ? rexCoverRemoteHttpUrl(recommendation) : null),
+    [recommendation],
+  );
+  const showHero = useMemo(
+    () => galleryPaths.length > 0 || !!(coverPath || coverHttp),
+    [galleryPaths, coverPath, coverHttp],
+  );
+  const showDetailHeroLoading =
+    Boolean(visible && recommendation) &&
+    detailLoading &&
+    galleryPaths.length === 0 &&
+    !(coverPath || coverHttp);
 
   if (!recommendation) {
     return null;
   }
 
   const user = recommendation.user ?? { name: 'Member', handle: '', avatar: '' };
-  const coverPath = rexCoverStoragePathFromRecommendation(recommendation);
-  const coverHttp = rexCoverRemoteHttpUrl(recommendation);
-  const showHero = !!(coverPath || coverHttp);
 
   return (
     <OverlayModal
@@ -156,7 +209,19 @@ export const RecommendationDetailModal: React.FC<Props> = ({
           contentContainerClassName="items-center pb-8"
         >
           <View className={cn(CREATE_REC_STEP_INNER, 'gap-6')}>
-            {showHero ? (
+            {showDetailHeroLoading ? (
+              <View
+                className="aspect-[16/9] w-full items-center justify-center overflow-hidden rounded-xl border border-border bg-muted"
+                accessibilityLabel="Loading photos"
+              >
+                <ActivityIndicator color={Theme.colors.primary} />
+              </View>
+            ) : galleryPaths.length > 0 ? (
+              <RexImageCarousel
+                paths={galleryPaths}
+                accessibilityLabelBase={recommendation.title}
+              />
+            ) : showHero && (coverPath || coverHttp) ? (
               <View className="overflow-hidden rounded-xl">
                 <SignedStorageImage
                   bucket={REX_IMAGES_BUCKET}
