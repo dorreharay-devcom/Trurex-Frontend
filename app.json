@@ -8,6 +8,32 @@
     "icon": "./assets/truRexIcon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "fonts": [
+      {
+        "asset": "./assets/fonts/HankenGrotesk-Light.ttf",
+        "name": "HankenGrotesk-Light"
+      },
+      {
+        "asset": "./assets/fonts/HankenGrotesk-Regular.ttf",
+        "name": "HankenGrotesk-Regular"
+      },
+      {
+        "asset": "./assets/fonts/HankenGrotesk-Medium.ttf",
+        "name": "HankenGrotesk-Medium"
+      },
+      {
+        "asset": "./assets/fonts/HankenGrotesk-SemiBold.ttf",
+        "name": "HankenGrotesk-SemiBold"
+      },
+      {
+        "asset": "./assets/fonts/HankenGrotesk-Bold.ttf",
+        "name": "HankenGrotesk-Bold"
+      },
+      {
+        "asset": "./assets/fonts/HankenGrotesk-ExtraBold.ttf",
+        "name": "HankenGrotesk-ExtraBold"
+      }
+    ],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",

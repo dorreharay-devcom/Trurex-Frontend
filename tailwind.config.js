@@ -5,16 +5,19 @@ module.exports = {
   content: ['./app/**/*.{js,jsx,ts,tsx}', './src/**/*.{js,jsx,ts,tsx}'],
   presets: [require('nativewind/preset')],
   theme: {
+    fontFamily: {
+      sans: ['HankenGrotesk-Regular', 'sans-serif'],
+    },
     extend: {
       fontFamily: {
-        sans: ['HankenGrotesk_400Regular'],
-        display: ['HankenGrotesk_700Bold'],
-        'hk-light': ['HankenGrotesk_300Light'],
-        'hk-regular': ['HankenGrotesk_400Regular'],
-        'hk-medium': ['HankenGrotesk_500Medium'],
-        'hk-semibold': ['HankenGrotesk_600SemiBold'],
-        'hk-bold': ['HankenGrotesk_700Bold'],
-        'hk-extrabold': ['HankenGrotesk_800ExtraBold'],
+        sans: ['HankenGrotesk-Regular'],
+        display: ['HankenGrotesk-Bold'],
+        'hk-light': ['HankenGrotesk-Light'],
+        'hk-regular': ['HankenGrotesk-Regular'],
+        'hk-medium': ['HankenGrotesk-Medium'],
+        'hk-semibold': ['HankenGrotesk-SemiBold'],
+        'hk-bold': ['HankenGrotesk-Bold'],
+        'hk-extrabold': ['HankenGrotesk-ExtraBold'],
       },
       colors: {
         background: '#F5F5F5', // hsl(0 0% 96%)
