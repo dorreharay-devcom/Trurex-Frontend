@@ -13,7 +13,6 @@ export function rexCoverStoragePathFromRecommendation(rec: {
   return null;
 }
 
-/** All gallery storage keys in order; first is the feed cover. */
 export function rexPhotoStoragePathsFromRecommendation(rec: {
   photoPaths?: string[] | null;
   photoPath?: string | null;

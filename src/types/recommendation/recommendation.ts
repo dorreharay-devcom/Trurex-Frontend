@@ -43,9 +43,7 @@ export interface Recommendation {
   description?: string | null;
   image?: string | null;
   photoPath?: string | null;
-  /** Storage object keys, feed order: first = cover. */
   photoPaths?: string[];
-  /** From API when `photo_paths` is not included in full. */
   photoCount?: number;
   categoryId: string;
   category: string;

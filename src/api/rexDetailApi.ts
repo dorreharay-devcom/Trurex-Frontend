@@ -1,10 +1,6 @@
 import { Backend, unwrap } from '~/services/AuthService';
 import type { RexDetailRow } from '~/types/recommendation/rexDetail';
 
-/**
- * PostgREST / RPC sometimes returns a one-row result as a JSON array `[{ ... }]` instead of a
- * single object. Accept both so `photo_paths` and other fields resolve correctly.
- */
 function normalizeRexDetailPayload(data: unknown): RexDetailRow | null {
   if (data == null) {
     return null;

@@ -1,8 +1,5 @@
 import type { CategoryRatingRead } from '~/types/recommendation/recommendation';
 
-/**
- * `get_rex_detail` — full read model including every photo storage key in order.
- */
 export type RexDetailRow = {
   id: string;
   author_id: string;
