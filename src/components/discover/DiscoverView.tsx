@@ -1,16 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ScrollView } from 'react-native';
-import {
-  TrendingUp,
-  Star,
-  DollarSign,
-  Clock,
-  Users,
-  Tag,
-  PlusCircle,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react-native';
+import { TrendingUp, Star, PlusCircle, ChevronDown, ChevronUp } from 'lucide-react-native';
 import {
   DiscoverCategoryPinButton,
   DiscoverCategoryPinHintIcon,
@@ -19,7 +9,12 @@ import { DiscoverRemainingCategoryPills } from '~/components/discover/DiscoverRe
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import { webContainerStyle } from '~/utils';
 import RecommendationCard, { Recommendation } from '~/components/recommendation/RecommendationCard';
-import { useDiscoverRecommendations, useSearchRexes } from '~/hooks/useDiscovery';
+import { useDiscoverRecommendations } from '~/hooks/useDiscovery';
+import {
+  useDiscoverSearchFilters,
+  DISCOVER_VALUE_LABELS,
+  DISCOVER_TIME_FILTER_OPTIONS,
+} from '~/hooks/useDiscoverSearchFilters';
 import { useActiveCategories } from '~/hooks/useActiveCategories';
 import { usePinnedCategoryIds } from '~/hooks/usePinnedCategoryIds';
 import { categoryPillColor } from '~/utils/recommendation/categoryPillColor';
@@ -28,23 +23,12 @@ import { Theme } from '~/theme/Theme';
 import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
 import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
 
-const VALUE_LABELS = ['Total Steal', 'Budget-Friendly', 'Good Value', 'Worth It', 'Splurge'];
-const OCCASION_OPTIONS = [
-  'Date night',
-  'Family',
-  'Solo',
-  'Work',
-  'Celebration',
-  'Groups',
-  'First timers',
-];
-const RECENCY_OPTIONS = [
-  { label: 'Today', days: 1 },
-  { label: 'This week', days: 7 },
-  { label: 'This month', days: 30 },
-  { label: 'All time', days: 9999 },
-];
 const TRENDING_TAGS = ['pasta', 'speakeasy', 'santorini', 'memoir'];
+
+const searchFilterHeaderPill =
+  'flex-row items-center gap-1.5 px-3 py-1.5 rounded-full border';
+const searchFilterPanelPill =
+  'flex-row items-center gap-1.5 px-3 py-1.5 rounded-full border';
 
 const FALLBACK_CATEGORY_CODES = [
   { code: 'restaurants', label: 'Restaurants' },
@@ -97,20 +81,6 @@ const DiscoverView = ({
   const [editingPinned, setEditingPinned] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
 
-  const [budgetRange, setBudgetRange] = useState<[number, number]>([1, 5]);
-  const [filterCategory, setFilterCategory] = useState<string | null>(null);
-  const [filterOccasion, setFilterOccasion] = useState<string | null>(null);
-  const [filterRecency, setFilterRecency] = useState<number>(9999);
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
-
-  const hasSearch = searchQuery.trim().length > 0;
-  const hasActiveFilters =
-    budgetRange[0] !== 1 ||
-    budgetRange[1] !== 5 ||
-    filterCategory ||
-    filterOccasion ||
-    filterRecency !== 9999;
-
   const { data: activeCategoryRows } = useActiveCategories(true);
   const allCats = useMemo((): Category[] => {
     if (activeCategoryRows?.length) {
@@ -125,6 +95,23 @@ const DiscoverView = ({
     }
     return buildFallbackCategories();
   }, [activeCategoryRows]);
+
+  const {
+    hasSearch,
+    searchRows,
+    searchLoading,
+    vfmFilter,
+    searchCategoryFilter,
+    recencyFilterDays,
+    activeFilter,
+    setActiveFilter,
+    toggleVfm,
+    toggleSearchCategory,
+    toggleRecencyDay,
+    clearAllFilters,
+    hasActiveSearchFilters,
+    filterChips,
+  } = useDiscoverSearchFilters({ searchQuery, activeCategory, allCats });
 
   const isPinned = useCallback(
     (c: Category) => Boolean(c.serverId && pinnedCategoryIds.includes(c.serverId)),
@@ -146,129 +133,46 @@ const DiscoverView = ({
   const { data: discoverData, isLoading: discoverLoading } = useDiscoverRecommendations(undefined, {
     enabled: !hasSearch,
   });
-  const { data: searchData, isLoading: searchLoading } = useSearchRexes(
-    { searchTerm: searchQuery, categoryId: activeCategory },
-    { enabled: hasSearch },
-  );
-
-  const rawRecs = hasSearch ? (searchData ?? []) : discoverData?.length ? discoverData : MOCK_RECS;
 
   const filtered = useMemo(() => {
-    let results = [...rawRecs];
-    if (!hasSearch && activeCategory !== 'all') {
-      results = results.filter((r) => r.categoryId === activeCategory);
+    if (hasSearch) {
+      return searchRows;
     }
-    if (filterCategory) {
-      results = results.filter(
-        (r) => r.category === filterCategory || r.categoryId === filterCategory,
-      );
+    const base = discoverData?.length ? discoverData : MOCK_RECS;
+    if (activeCategory === 'all') {
+      return base;
     }
-    if (budgetRange[0] !== 1 || budgetRange[1] !== 5) {
-      results = results.filter((r) => {
-        if (!r.scoreValueForMoney) return true;
-        return r.scoreValueForMoney >= budgetRange[0] && r.scoreValueForMoney <= budgetRange[1];
-      });
-    }
-    if (filterOccasion) {
-      const occ = filterOccasion.toLowerCase();
-      results = results.filter(
-        (r) =>
-          (r.tags ?? []).some((t) => t.toLowerCase().includes(occ)) ||
-          (r.description ?? '').toLowerCase().includes(occ),
-      );
-    }
-    if (filterRecency !== 9999) {
-      const cutoff = Date.now() - filterRecency * 24 * 60 * 60 * 1000;
-      results = results.filter((r) => new Date(r.timeAgo ?? 0).getTime() > cutoff);
-    }
-    return results;
-  }, [
-    rawRecs,
-    hasSearch,
-    activeCategory,
-    filterCategory,
-    budgetRange,
-    filterOccasion,
-    filterRecency,
-  ]);
+    return base.filter((r) => r.categoryId === activeCategory);
+  }, [hasSearch, searchRows, discoverData, activeCategory]);
 
   const isLoading = hasSearch ? searchLoading : discoverLoading;
 
   const ListHeader = (
     <View className="px-4 pt-6 pb-2">
-      {/* ── Search filters ─────────────────────────────────────────────────── */}
       {hasSearch && (
         <View className="mb-5">
           <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-2">
             <View className="flex-row gap-2 pb-1">
-              {[
-                {
-                  id: 'budget',
-                  label:
-                    budgetRange[0] !== 1 || budgetRange[1] !== 5
-                      ? `$${budgetRange[0]}–$${budgetRange[1]}`
-                      : 'Budget',
-                  Icon: DollarSign,
-                  active: budgetRange[0] !== 1 || budgetRange[1] !== 5,
-                },
-                {
-                  id: 'category',
-                  label: filterCategory
-                    ? (allCats.find((c) => c.code === filterCategory)?.label ?? 'Category')
-                    : 'Category',
-                  Icon: Tag,
-                  active: !!filterCategory,
-                },
-                {
-                  id: 'occasion',
-                  label: filterOccasion ?? 'Occasion',
-                  Icon: Users,
-                  active: !!filterOccasion,
-                },
-                {
-                  id: 'recency',
-                  label: RECENCY_OPTIONS.find((r) => r.days === filterRecency)?.label ?? 'Recency',
-                  Icon: Clock,
-                  active: filterRecency !== 9999,
-                },
-              ].map((chip) => {
+              {filterChips.map((chip) => {
                 const { Icon } = chip;
+                const isHeaderOn =
+                  chip.active || activeFilter === chip.id
+                    ? 'bg-primary/10 border-primary/40'
+                    : 'bg-card border-border';
                 return (
                   <TouchableOpacity
                     key={chip.id}
                     onPress={() => setActiveFilter(activeFilter === chip.id ? null : chip.id)}
                     activeOpacity={0.7}
-                    className={`flex-row items-center gap-1.5 px-3 py-1.5 rounded-full border ${
-                      chip.active
-                        ? 'bg-primary border-primary'
-                        : activeFilter === chip.id
-                          ? 'bg-muted border-border'
-                          : 'bg-card border-border'
-                    }`}
+                    className={`${searchFilterHeaderPill} ${isHeaderOn}`}
                   >
-                    <Icon
-                      size={12}
-                      color={chip.active ? Theme.colors.primaryForeground : Theme.colors.muted}
-                    />
-                    <Text
-                      className={`text-xs font-medium ${chip.active ? 'text-primary-foreground' : 'text-muted-foreground'}`}
-                    >
-                      {chip.label}
-                    </Text>
+                    <Icon size={12} color={Theme.colors.foreground} />
+                    <Text className="text-xs font-medium text-foreground">{chip.label}</Text>
                   </TouchableOpacity>
                 );
               })}
-              {hasActiveFilters && (
-                <TouchableOpacity
-                  onPress={() => {
-                    setBudgetRange([1, 5]);
-                    setFilterCategory(null);
-                    setFilterOccasion(null);
-                    setFilterRecency(9999);
-                    setActiveFilter(null);
-                  }}
-                  className="px-2 justify-center"
-                >
+              {hasActiveSearchFilters && (
+                <TouchableOpacity onPress={clearAllFilters} className="px-2 justify-center">
                   <Text className="text-xs text-destructive font-medium">Clear all</Text>
                 </TouchableOpacity>
               )}
@@ -278,22 +182,22 @@ const DiscoverView = ({
           {activeFilter && (
             <View className="p-4 bg-card border border-border rounded-xl mb-2">
               {activeFilter === 'budget' && (
-                <View className="flex-row gap-2">
-                  {VALUE_LABELS.map((label, i) => {
+                <View className="flex-row flex-wrap gap-2">
+                  {DISCOVER_VALUE_LABELS.map((label, i) => {
                     const val = i + 1;
-                    const selected = val >= budgetRange[0] && val <= budgetRange[1];
+                    const selected = vfmFilter.includes(val);
                     return (
                       <TouchableOpacity
                         key={val}
-                        onPress={() =>
-                          setBudgetRange(
-                            budgetRange[0] === val && budgetRange[1] === val ? [1, 5] : [val, val],
-                          )
-                        }
-                        className={`flex-1 py-1.5 rounded-lg items-center border ${selected ? 'bg-primary border-primary' : 'bg-muted/50 border-border'}`}
+                        onPress={() => toggleVfm(val)}
+                        className={`${searchFilterPanelPill} ${
+                          selected ? 'bg-primary border-primary' : 'bg-card border-border'
+                        }`}
                       >
                         <Text
-                          className={`text-[10px] font-semibold ${selected ? 'text-primary-foreground' : 'text-muted-foreground'}`}
+                          className={`text-xs font-medium ${
+                            selected ? 'text-primary-foreground' : 'text-foreground'
+                          }`}
                         >
                           {label}
                         </Text>
@@ -304,32 +208,54 @@ const DiscoverView = ({
               )}
               {activeFilter === 'category' && (
                 <View className="flex-row flex-wrap gap-2">
-                  {allCats.map((c) => (
-                    <TouchableOpacity
-                      key={c.id}
-                      onPress={() => {
-                        setFilterCategory(filterCategory === c.code ? null : c.code);
-                        setActiveFilter(null);
-                      }}
-                      className={`flex-row items-center gap-1 px-3 py-1.5 rounded-full border ${filterCategory === c.code ? 'bg-primary border-primary' : 'bg-muted/50 border-border'}`}
-                    >
-                      <Text style={{ fontSize: 12 }}>{c.emoji}</Text>
-                      <Text
-                        className={`text-xs font-medium ${filterCategory === c.code ? 'text-primary-foreground' : 'text-muted-foreground'}`}
+                  {allCats.map((c) => {
+                    const selected = searchCategoryFilter.includes(c.code);
+                    return (
+                      <TouchableOpacity
+                        key={c.id}
+                        onPress={() => toggleSearchCategory(c.code)}
+                        className={`${searchFilterPanelPill} ${
+                          selected ? 'bg-primary border-primary' : 'bg-card border-border'
+                        }`}
                       >
-                        {c.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                        <Text style={{ fontSize: 12 }}>{c.emoji}</Text>
+                        <Text
+                          className={`text-xs font-medium ${selected ? 'text-primary-foreground' : 'text-foreground'}`}
+                        >
+                          {c.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
               )}
-              {/* ... other filters ... */}
+              {activeFilter === 'time' && (
+                <View className="flex-row flex-wrap gap-2">
+                  {DISCOVER_TIME_FILTER_OPTIONS.map((o) => {
+                    const selected = recencyFilterDays.includes(o.days);
+                    return (
+                      <TouchableOpacity
+                        key={o.days}
+                        onPress={() => toggleRecencyDay(o.days)}
+                        className={`${searchFilterPanelPill} ${
+                          selected ? 'bg-primary border-primary' : 'bg-card border-border'
+                        }`}
+                      >
+                        <Text
+                          className={`text-xs font-medium ${selected ? 'text-primary-foreground' : 'text-foreground'}`}
+                        >
+                          {o.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              )}
             </View>
           )}
         </View>
       )}
 
-      {/* ── Trending tags ─────────────────────────────────────────────────── */}
       {!hasSearch && (
         <View className="mb-6">
           <View className="flex-row items-center gap-2 mb-3">
@@ -349,7 +275,6 @@ const DiscoverView = ({
         </View>
       )}
 
-      {/* ── Pinned categories ──────────────────────────────────────────────── */}
       {!hasSearch && pinnedCats.length > 0 && (
         <View className="mb-5">
           <View className="flex-row items-center justify-between mb-3">
@@ -479,10 +404,9 @@ const DiscoverView = ({
         </View>
       )}
 
-      {/* ── Feed title ──────────────────────────────────────────────────────── */}
       <Text className="text-sm font-display font-semibold text-foreground mb-4">
         {hasSearch
-          ? `Results for "${searchQuery}"${hasActiveFilters ? ' (filtered)' : ''}`
+          ? `Results for "${searchQuery}"${hasActiveSearchFilters ? ' (filtered)' : ''}`
           : activeCategory !== 'all'
             ? `${activeCat?.emoji ?? ''} ${activeCat?.label ?? ''} Recs`
             : 'Latest Rex'}
