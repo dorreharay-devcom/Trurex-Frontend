@@ -8,16 +8,19 @@ const PIN_STROKE = 2.25;
 type DiscoverCategoryPinButtonProps = {
   isPinned: boolean;
   onPress: () => void;
+  disabled?: boolean;
 };
 
 export const DiscoverCategoryPinButton = React.memo(
-  function DiscoverCategoryPinButton({ isPinned, onPress }: DiscoverCategoryPinButtonProps) {
+  function DiscoverCategoryPinButton({ isPinned, onPress, disabled = false }: DiscoverCategoryPinButtonProps) {
     return (
       <Pressable
         hitSlop={8}
+        disabled={disabled}
+        accessibilityState={{ disabled }}
         accessibilityLabel={isPinned ? 'Unpin category' : 'Pin category'}
         onPress={onPress}
-        className="absolute right-1 top-1 z-10 p-1"
+        className={`absolute right-1 top-1 z-10 p-1 ${disabled ? 'opacity-40' : ''}`}
       >
         <Pin
           size={12}
