@@ -25,9 +25,7 @@ import type { RecommendationOpenOptions } from '~/types/recommendation/recommend
 
 const TRENDING_TAGS = ['pasta', 'speakeasy', 'santorini', 'memoir'];
 
-const searchFilterHeaderPill =
-  'flex-row items-center gap-1.5 px-3 py-1.5 rounded-full border';
-const searchFilterPanelPill =
+const searchFilterPill =
   'flex-row items-center gap-1.5 px-3 py-1.5 rounded-full border';
 
 const FALLBACK_CATEGORY_CODES = [
@@ -164,7 +162,7 @@ const DiscoverView = ({
                     key={chip.id}
                     onPress={() => setActiveFilter(activeFilter === chip.id ? null : chip.id)}
                     activeOpacity={0.7}
-                    className={`${searchFilterHeaderPill} ${isHeaderOn}`}
+                    className={`${searchFilterPill} ${isHeaderOn}`}
                   >
                     <Icon size={12} color={Theme.colors.foreground} />
                     <Text className="text-xs font-medium text-foreground">{chip.label}</Text>
@@ -190,7 +188,7 @@ const DiscoverView = ({
                       <TouchableOpacity
                         key={val}
                         onPress={() => toggleVfm(val)}
-                        className={`${searchFilterPanelPill} ${
+                        className={`${searchFilterPill} ${
                           selected ? 'bg-primary border-primary' : 'bg-card border-border'
                         }`}
                       >
@@ -214,7 +212,7 @@ const DiscoverView = ({
                       <TouchableOpacity
                         key={c.id}
                         onPress={() => toggleSearchCategory(c.code)}
-                        className={`${searchFilterPanelPill} ${
+                        className={`${searchFilterPill} ${
                           selected ? 'bg-primary border-primary' : 'bg-card border-border'
                         }`}
                       >
@@ -237,7 +235,7 @@ const DiscoverView = ({
                       <TouchableOpacity
                         key={o.days}
                         onPress={() => toggleRecencyDay(o.days)}
-                        className={`${searchFilterPanelPill} ${
+                        className={`${searchFilterPill} ${
                           selected ? 'bg-primary border-primary' : 'bg-card border-border'
                         }`}
                       >
