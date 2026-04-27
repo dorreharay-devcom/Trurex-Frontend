@@ -9,7 +9,7 @@ import { cn } from '~/utils/general';
 import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
-} from '~/utils/recommendation/rexMediaPaths';
+} from '~/utils/recommendation/recContentDisplay';
 
 type HoverProps = Pick<PressableProps, 'onHoverIn' | 'onHoverOut'>;
 

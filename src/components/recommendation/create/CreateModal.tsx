@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, Pressable, useWindowDimensions, ActivityIndicator } from 'react-native';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ChevronRight } from 'lucide-react-native';
@@ -11,6 +11,7 @@ import {
   useCreateRecWizard,
   useCreateRecommendationModalPresentation,
 } from '~/hooks/recommendation';
+import type { AddYourOwnRecSource } from '~/utils/recommendation/recCreateFlow';
 import {
   useManualPlaceGeotag,
   type ManualPlaceGeotagResult,
@@ -29,14 +30,12 @@ import {
   subcategoryRatingDimensionsOnly,
   categoryQuestionsOnly,
   subcategoryQuestionsOnly,
-} from '~/utils/recommendation/mergeCategoryConfig';
-import {
   buildCategoryRatingsPayload,
   getLinkedPlaceId,
   getPlaceNameForRex,
   hasNonPublicMockCircleSelection,
   resolveVisibilityAndCircles,
-} from '~/utils/recommendation/createRexPayload';
+} from '~/utils/recommendation/recCreateFlow';
 import { toastError, toastInfo, toastSuccess } from '~/utils/appToast';
 import { CreateWizardStepper } from './CreateWizardStepper';
 import { CreateModalBody } from './CreateModalBody';
@@ -44,14 +43,21 @@ import { CreateModalBody } from './CreateModalBody';
 type Props = {
   visible: boolean;
   onClose: () => void;
+  addYourOwnPrefill?: AddYourOwnRecSource | null;
 };
 
-export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
+export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefill = null }) => {
   const { height: windowHeight } = useWindowDimensions();
   const queryClient = useQueryClient();
   const flow = useCreateRecWizard();
-  const { reset, setManualGeotag, setManualAddress, syncFormToConfig, syncCategoryCreateShape } =
-    flow;
+  const {
+    reset,
+    applyAddYourOwnPrefill,
+    setManualGeotag,
+    setManualAddress,
+    syncFormToConfig,
+    syncCategoryCreateShape,
+  } = flow;
   const [submitting, setSubmitting] = useState(false);
   const postedSuccessfullyRef = useRef(false);
 
@@ -79,13 +85,17 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose }) => {
     reset,
   });
 
+  useLayoutEffect(() => {
+    if (!visible || !addYourOwnPrefill) return;
+    applyAddYourOwnPrefill(addYourOwnPrefill);
+  }, [visible, addYourOwnPrefill, applyAddYourOwnPrefill]);
+
   const abandonDraftAndClose = useCallback(() => {
     void (async () => {
       if (!postedSuccessfullyRef.current) {
         try {
           await discardDraftRexData();
-        } catch {
-        }
+        } catch {}
       }
       handleClose();
     })();

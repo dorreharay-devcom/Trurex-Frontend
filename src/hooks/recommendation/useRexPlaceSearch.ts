@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { searchPlacesForRex } from '~/api/rexPlacesApi';
 import { useDebouncedValue } from '~/hooks/useDebouncedValue';
 import type { CreateRecSearchPlace } from '~/types/recommendation/create';
-import { mapSearchResponseToPlaces } from '~/utils/recommendation/mapGooglePlacesSearch';
+import { mapSearchResponseToPlaces } from '~/utils/recommendation/recPlaceSearch';
 
 const DEFAULT_DEBOUNCE_MS = 350;
 const DEFAULT_MIN_QUERY_LENGTH = 1;

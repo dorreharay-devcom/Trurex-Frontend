@@ -1,6 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createManualPlace, upsertGooglePlace } from '~/api/rexPlacesApi';
 import { CREATE_REC_REVIEW_MAX } from '~/constants/recommendation/createScorecard';
+import {
+  buildSelectedSearchPlaceFromAddYourOwn,
+  type AddYourOwnRecSource,
+} from '~/utils/recommendation/recCreateFlow';
 import {
   CREATE_REC_STEP_ORDER,
   getActiveCreateRecSteps,
@@ -66,6 +70,8 @@ function resolveStepIdAfterStepsChange(
 }
 
 export function useCreateRecWizard() {
+  const categoryCodePrefillRef = useRef<string | null>(null);
+
   const [stepId, setStepId] = useState<CreateRecStepId>('search');
   const [searchMode, setSearchMode] = useState<SearchEntryMode>('select');
   const [searchQuery, setSearchQuery] = useState('');
@@ -126,6 +132,12 @@ export function useCreateRecWizard() {
   useEffect(() => {
     if (stepId !== 'category') return;
     if (selectedCategoryId !== null) return;
+    const pending = categoryCodePrefillRef.current;
+    if (pending) {
+      setSelectedCategoryId(pending);
+      categoryCodePrefillRef.current = null;
+      return;
+    }
     const sug = suggestedCategoryFromSearch(searchMode, selectedSearchPlace);
     if (sug) setSelectedCategoryId(sug);
   }, [stepId, selectedCategoryId, searchMode, selectedSearchPlace]);
@@ -232,17 +244,11 @@ export function useCreateRecWizard() {
       }
       throw new Error('Unsupported place source.');
     },
-    [
-      linkedPlaceId,
-      searchMode,
-      manualName,
-      manualAddress,
-      manualGeotag,
-      selectedSearchPlace,
-    ],
+    [linkedPlaceId, searchMode, manualName, manualAddress, manualGeotag, selectedSearchPlace],
   );
 
   const reset = useCallback(() => {
+    categoryCodePrefillRef.current = null;
     setStepId('search');
     setSearchMode('select');
     setSearchQuery('');
@@ -263,6 +269,16 @@ export function useCreateRecWizard() {
     setSelectedCircleIds(new Set(['public']));
     setCategoryHasSubcategoryStep(false);
   }, []);
+
+  const applyAddYourOwnPrefill = useCallback(
+    (source: AddYourOwnRecSource) => {
+      reset();
+      setSearchQuery(source.placeName);
+      setSelectedSearchPlace(buildSelectedSearchPlaceFromAddYourOwn(source));
+      categoryCodePrefillRef.current = source.categoryCode;
+    },
+    [reset],
+  );
 
   const toggleCircleId = useCallback((id: string) => {
     setSelectedCircleIds((prev) => {
@@ -325,6 +341,7 @@ export function useCreateRecWizard() {
     canProceed,
     canContinue: canProceed,
     reset,
+    applyAddYourOwnPrefill,
     goNext,
     goBack,
     openManual,

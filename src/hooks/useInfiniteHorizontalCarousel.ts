@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type RefObject,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { FlatList, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 
 function paddedIndexToReal(paddedIndex: number, count: number) {
@@ -78,20 +71,14 @@ export function useInfiniteHorizontalCarousel<T>({
 
   const n = items.length;
   const { listData, isInfinite } = useMemo(() => buildPaddedList(items), [items]);
-  const itemsKey = useMemo(
-    () => makeItemsKey(items, getItemsKey),
-    [items, getItemsKey],
-  );
+  const itemsKey = useMemo(() => makeItemsKey(items, getItemsKey), [items, getItemsKey]);
 
   const scrollIndexFromOffsetX = useCallback(
     (offsetX: number) => {
       if (itemWidth <= 0 || listData.length === 0) {
         return 0;
       }
-      return Math.min(
-        Math.max(0, Math.round(offsetX / itemWidth)),
-        listData.length - 1,
-      );
+      return Math.min(Math.max(0, Math.round(offsetX / itemWidth)), listData.length - 1);
     },
     [itemWidth, listData.length],
   );
@@ -193,10 +180,7 @@ export function useInfiniteHorizontalCarousel<T>({
     [n, isInfinite, itemWidth],
   );
 
-  const listIndexToReal = useCallback(
-    (listIndex: number) => paddedIndexToReal(listIndex, n),
-    [n],
-  );
+  const listIndexToReal = useCallback((listIndex: number) => paddedIndexToReal(listIndex, n), [n]);
 
   const getItemLayout = useCallback(
     (_data: ArrayLike<T> | null | undefined, index: number) => ({

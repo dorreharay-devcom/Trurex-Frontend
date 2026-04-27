@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Modal, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Modal,
+  StyleSheet,
+} from 'react-native';
 import { ArrowLeft, Plus, MoreVertical, X, Trash2 } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { useQuery } from '@tanstack/react-query';
@@ -98,9 +106,17 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
 
       {coverUri && (
         <View
-          style={{ width: '100%', height: 220, borderRadius: 12, overflow: 'hidden', marginBottom: 12 }}
+          style={{
+            width: '100%',
+            height: 220,
+            borderRadius: 12,
+            overflow: 'hidden',
+            marginBottom: 12,
+          }}
         >
-          <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: coverBg, opacity: 0.15 }} />
+          <View
+            style={{ ...StyleSheet.absoluteFillObject, backgroundColor: coverBg, opacity: 0.15 }}
+          />
           <Image
             source={{ uri: coverUri }}
             style={{ width: '100%', height: '100%' }}

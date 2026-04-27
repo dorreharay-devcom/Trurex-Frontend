@@ -68,8 +68,7 @@ export function useDiscoverSearchFilters({
   }, [searchData, searchCategoryFilter]);
 
   const hasActiveSearchFilters = useMemo(
-    () =>
-      vfmFilter.length > 0 || searchCategoryFilter.length > 0 || recencyFilterDays.length > 0,
+    () => vfmFilter.length > 0 || searchCategoryFilter.length > 0 || recencyFilterDays.length > 0,
     [vfmFilter, searchCategoryFilter, recencyFilterDays],
   );
 
@@ -114,9 +113,7 @@ export function useDiscoverSearchFilters({
       if (recencyFilterDays.length === 0) return 'Time';
       if (recencyFilterDays.length === 1) {
         const d = recencyFilterDays[0]!;
-        return (
-          DISCOVER_TIME_FILTER_OPTIONS.find((o) => o.days === d)?.label ?? 'Time'
-        );
+        return DISCOVER_TIME_FILTER_OPTIONS.find((o) => o.days === d)?.label ?? 'Time';
       }
       return `Time (${recencyFilterDays.length})`;
     })();
@@ -133,9 +130,7 @@ export function useDiscoverSearchFilters({
         label: (() => {
           if (searchCategoryFilter.length === 0) return 'Category';
           if (searchCategoryFilter.length === 1) {
-            return (
-              allCats.find((c) => c.code === searchCategoryFilter[0])?.label ?? 'Category'
-            );
+            return allCats.find((c) => c.code === searchCategoryFilter[0])?.label ?? 'Category';
           }
           return `Category (${searchCategoryFilter.length})`;
         })(),

@@ -6,7 +6,7 @@ import { MAP_PIN_COLOR, MAP_PIN_GLYPH } from '~/types/map/mapPin';
 import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
-} from '~/utils/recommendation/rexMediaPaths';
+} from '~/utils/recommendation/recContentDisplay';
 
 export type LatLngBounds = {
   min_lat: number;

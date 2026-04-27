@@ -34,7 +34,10 @@ const ProfileHeader = ({
         ? `${typeof window !== 'undefined' ? window.location.origin : ''}/join/${handle ?? ''}`
         : Linking.createURL('/', { queryParams: handle ? { handle } : {} });
     try {
-      await Share.share({ message: `Check out my profile on TruRex\n${url}`, title: 'TruRex Profile' });
+      await Share.share({
+        message: `Check out my profile on TruRex\n${url}`,
+        title: 'TruRex Profile',
+      });
     } catch {}
   };
 
