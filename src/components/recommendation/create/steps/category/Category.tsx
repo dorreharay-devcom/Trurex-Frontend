@@ -4,7 +4,7 @@ import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { categoryRowToPickerTile } from '~/constants/recommendation/rexCategories';
 import { useActiveCategories } from '~/hooks/useActiveCategories';
 import { Theme } from '~/theme/Theme';
-import { getCategoryGridConfig } from '~/utils/recommendation/categoryGridConfig';
+import { getCategoryGridConfig } from '~/utils/recommendation/recCategoryNav';
 import { cn } from '~/utils/general';
 import { CategoryListHeader, CategoryTile } from './common';
 

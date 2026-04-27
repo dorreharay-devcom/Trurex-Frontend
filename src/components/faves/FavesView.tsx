@@ -15,7 +15,10 @@ import {
 import { Plus, PackageOpen, Search } from 'lucide-react-native';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
-import { rexCoverStoragePathFromRecommendation, rexCoverRemoteHttpUrl } from '~/utils/recommendation/rexMediaPaths';
+import {
+  rexCoverStoragePathFromRecommendation,
+  rexCoverRemoteHttpUrl,
+} from '~/utils/recommendation/recContentDisplay';
 import RecommendationCard from '~/components/recommendation/RecommendationCard';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Backend } from '~/services/AuthService';
@@ -40,7 +43,6 @@ const SkeletonCard: React.FC<{ width: number }> = ({ width }) => (
     className="bg-muted"
   />
 );
-
 
 // ─── main view ───────────────────────────────────────────────────────────────
 type FavesViewProps = {
@@ -148,8 +150,13 @@ const FavesView: React.FC<FavesViewProps> = () => {
           </Animated.View>
 
           <View style={styles.overlay} pointerEvents="box-none">
-            <Animated.View style={[{ width: '100%' }, { transform: [{ translateY: sheetTranslateY }] }]}>
-              <View className="bg-card rounded-t-2xl border-t border-border" style={{ maxHeight: 400 }}>
+            <Animated.View
+              style={[{ width: '100%' }, { transform: [{ translateY: sheetTranslateY }] }]}
+            >
+              <View
+                className="bg-card rounded-t-2xl border-t border-border"
+                style={{ maxHeight: 400 }}
+              >
                 <View style={webContainerStyle} className="items-center py-3">
                   <View className="w-10 h-1 rounded-full bg-muted-foreground/30" />
                 </View>
@@ -168,7 +175,12 @@ const FavesView: React.FC<FavesViewProps> = () => {
                       No saved rexes
                     </Text>
                   ) : (
-                    <View style={[{ paddingHorizontal: 16, paddingVertical: 8, gap: 4 }, webContainerStyle]}>
+                    <View
+                      style={[
+                        { paddingHorizontal: 16, paddingVertical: 8, gap: 4 },
+                        webContainerStyle,
+                      ]}
+                    >
                       {savedRexes.map((rec) => (
                         <TouchableOpacity
                           key={rec.id}

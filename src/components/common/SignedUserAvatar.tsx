@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
-import { userAvatarHttpUrl, userAvatarStoragePath } from '~/utils/recommendation/rexMediaPaths';
+import { userAvatarHttpUrl, userAvatarStoragePath } from '~/utils/recommendation/recContentDisplay';
 import { cn } from '~/utils/general';
 
 type Props = {

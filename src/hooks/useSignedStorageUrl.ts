@@ -41,9 +41,7 @@ async function resolveUrl(
   expiresInSec: number,
 ): Promise<{ url: string; cacheUntil: number } | null> {
   try {
-    const { data, error } = await Backend.storage
-      .from(bucket)
-      .createSignedUrl(path, expiresInSec);
+    const { data, error } = await Backend.storage.from(bucket).createSignedUrl(path, expiresInSec);
     if (error) {
       return null;
     }
@@ -77,14 +75,10 @@ export function useSignedStorageUrl(
   objectPath: string,
   expiresInSec = 3600,
 ): { uri: string | null; loading: boolean } {
-  const trimmed = (objectPath ?? '')
-    .trim()
-    .replace(/^\/+/, '');
+  const trimmed = (objectPath ?? '').trim().replace(/^\/+/, '');
   const cacheKey = trimmed ? `${bucket}:${trimmed}` : '';
 
-  const [uri, setUri] = useState<string | null>(() =>
-    cacheKey ? getCached(cacheKey) : null,
-  );
+  const [uri, setUri] = useState<string | null>(() => (cacheKey ? getCached(cacheKey) : null));
   const [loading, setLoading] = useState(() => {
     if (!trimmed) return false;
     if (!cacheKey) return false;

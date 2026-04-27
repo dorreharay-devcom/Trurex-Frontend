@@ -9,9 +9,10 @@ export type RecencyDayToken = 1 | 7 | 30 | 9999;
 
 const VFM_ALL = [1, 2, 3, 4, 5] as const;
 
-function recencyDaysToCreatedBounds(
-  days: RecencyDayToken[],
-): { created_from: string | null; created_to: string | null } {
+function recencyDaysToCreatedBounds(days: RecencyDayToken[]): {
+  created_from: string | null;
+  created_to: string | null;
+} {
   if (days.length === 0) {
     return { created_from: null, created_to: null };
   }
@@ -42,9 +43,7 @@ function vfmForRpc(filters: number[]): number[] | null {
   if (filters.length === 5 && VFM_ALL.every((n) => filters.includes(n))) {
     return null;
   }
-  return [...new Set(filters)]
-    .filter((n) => n >= 1 && n <= 5)
-    .sort((a, b) => a - b);
+  return [...new Set(filters)].filter((n) => n >= 1 && n <= 5).sort((a, b) => a - b);
 }
 
 type DiscoverRecommendationsOptions = {
@@ -92,10 +91,7 @@ function effectiveCategoryFilter(
 
 export const useSearchRexes = (args: UseSearchRexesArgs, options?: UseSearchRexesOptions) => {
   const trimmed = args.searchTerm.trim();
-  const category_filter = effectiveCategoryFilter(
-    args.categoryId,
-    args.searchCategoryFilter,
-  );
+  const category_filter = effectiveCategoryFilter(args.categoryId, args.searchCategoryFilter);
   const { created_from, created_to } = recencyDaysToCreatedBounds(args.recencyFilterDays);
   const vfmRpc = vfmForRpc(args.valueForMoneyFilters);
 
@@ -106,7 +102,10 @@ export const useSearchRexes = (args: UseSearchRexesArgs, options?: UseSearchRexe
       category_filter,
       [...args.searchCategoryFilter].sort().join(),
       [...args.valueForMoneyFilters].sort().join(),
-      args.recencyFilterDays.slice().sort((a, b) => a - b).join(),
+      args.recencyFilterDays
+        .slice()
+        .sort((a, b) => a - b)
+        .join(),
       created_from,
       created_to,
       args.result_limit ?? 20,

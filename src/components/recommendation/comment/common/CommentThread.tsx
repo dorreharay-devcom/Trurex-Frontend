@@ -10,8 +10,6 @@ type Props = {
 export const CommentThread: React.FC<Props> = ({ root, ...rest }) => (
   <View className="gap-3">
     <CommentRow comment={root} isReply={false} {...rest} />
-    {root.replies?.map((r) => (
-      <CommentRow key={r.id} comment={r} isReply {...rest} />
-    ))}
+    {root.replies?.map((r) => <CommentRow key={r.id} comment={r} isReply {...rest} />)}
   </View>
 );

@@ -22,20 +22,24 @@ import { fetchRexDetail } from '~/api/rexDetailApi';
 import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
 import { Theme } from '~/theme/Theme';
 import type { Recommendation } from '~/types/recommendation/recommendation';
-import { buildDetailRatingRows } from '~/utils/recommendation/recommendationDetailRatings';
+import {
+  buildAddYourOwnRecSource,
+  type AddYourOwnRecSource,
+} from '~/utils/recommendation/recCreateFlow';
+import { buildDetailRatingRows } from '~/utils/recommendation/recContentDisplay';
 import { cn } from '~/utils/general';
 import { RexImageCarousel } from './RexImageCarousel';
 import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
   rexPhotoStoragePathsFromRecommendation,
-} from '~/utils/recommendation/rexMediaPaths';
+} from '~/utils/recommendation/recContentDisplay';
 
 type Props = {
   visible: boolean;
   recommendation: Recommendation | null;
   onClose: () => void;
-  onAddYourOwn?: () => void;
+  onAddYourOwn?: (source: AddYourOwnRecSource) => void;
   onCommentCountChange?: (total: number) => void;
   scrollToComments?: boolean;
 };
@@ -322,7 +326,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
 
             {onAddYourOwn ? (
               <Pressable
-                onPress={() => onAddYourOwn()}
+                onPress={() => onAddYourOwn(buildAddYourOwnRecSource(recommendation, rexDetail))}
                 accessibilityRole="button"
                 accessibilityLabel="Add your own rec for this place"
                 className="h-12 w-full flex-row items-center justify-center gap-2 rounded-xl bg-primary px-4 active:bg-primary/90"

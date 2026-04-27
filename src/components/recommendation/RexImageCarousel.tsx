@@ -23,11 +23,7 @@ type Props = {
   accessibilityLabelBase?: string;
 };
 
-export function RexImageCarousel({
-  paths,
-  className,
-  accessibilityLabelBase = 'Photo',
-}: Props) {
+export function RexImageCarousel({ paths, className, accessibilityLabelBase = 'Photo' }: Props) {
   const { width: winW } = useWindowDimensions();
   const [measuredW, setMeasuredW] = useState(0);
   const itemWidth = useMemo(() => {

@@ -12,7 +12,7 @@ import { webContainerStyle } from '~/utils';
 import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
-} from '~/utils/recommendation/rexMediaPaths';
+} from '~/utils/recommendation/recContentDisplay';
 import ProfileHeader from './ProfileHeader';
 import CurrentlySection from './CurrentlySection';
 import EditProfile from './EditProfile';

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import type { Recommendation } from '~/types/recommendation/recommendation';
-import { averageScoreFromCategoryRatings } from '~/utils/recommendation/rexFeedDisplay';
+import { averageScoreFromCategoryRatings } from '~/utils/recommendation/recContentDisplay';
 
 dayjs.extend(relativeTime);
 
@@ -83,8 +83,7 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
     ? (photoPathsRaw as unknown[]).map((x) => String(x).trim()).filter(Boolean)
     : [];
 
-  const photoPath =
-    optStr(o, 'photo_path', 'photoPath') ?? (photoPaths[0] ? photoPaths[0] : null);
+  const photoPath = optStr(o, 'photo_path', 'photoPath') ?? (photoPaths[0] ? photoPaths[0] : null);
 
   const photoCountRaw = o.photo_count;
   const photoCount =

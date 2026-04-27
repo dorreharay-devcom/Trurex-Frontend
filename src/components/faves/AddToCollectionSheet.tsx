@@ -323,7 +323,9 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
                         {creating ? (
                           <ActivityIndicator size="small" color={Theme.colors.primaryForeground} />
                         ) : (
-                          <Text className="text-primary-foreground text-sm font-medium">Create & add</Text>
+                          <Text className="text-primary-foreground text-sm font-medium">
+                            Create & add
+                          </Text>
                         )}
                       </TouchableOpacity>
                     </View>
@@ -334,7 +336,9 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
                       className="w-full flex-row items-center justify-center gap-1.5 py-2.5 rounded-lg border border-border"
                     >
                       <Plus size={14} color={Theme.colors.foreground} />
-                      <Text className="text-sm font-medium text-foreground">Create new collection</Text>
+                      <Text className="text-sm font-medium text-foreground">
+                        Create new collection
+                      </Text>
                     </TouchableOpacity>
                   )}
                 </View>

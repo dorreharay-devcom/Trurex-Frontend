@@ -25,8 +25,8 @@ import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
   rexPhotoStoragePathsFromRecommendation,
-} from '~/utils/recommendation/rexMediaPaths';
-import { valueForMoneyLabel } from '~/utils/recommendation/rexFeedDisplay';
+  valueForMoneyLabel,
+} from '~/utils/recommendation/recContentDisplay';
 
 export type { Recommendation, RecommendationOpenOptions };
 

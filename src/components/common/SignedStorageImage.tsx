@@ -3,7 +3,7 @@ import { View, ActivityIndicator, StyleSheet, Platform } from 'react-native';
 import { Image } from 'expo-image';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { cn } from '~/utils/general';
-import { isHttpUrl } from '~/utils/recommendation/rexMediaPaths';
+import { isHttpUrl } from '~/utils/recommendation/recContentDisplay';
 import { Theme } from '~/theme/Theme';
 
 type Props = {

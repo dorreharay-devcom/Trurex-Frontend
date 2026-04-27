@@ -11,7 +11,7 @@ import {
   getConfirmPreviewPlace,
   getConfirmCircleTitles,
   getConfirmTagLabels,
-} from '~/utils/recommendation/confirmPreview';
+} from '~/utils/recommendation/recCreateFlow';
 import type { CreateRecSearchPlace, SearchEntryMode } from '~/types/recommendation/create';
 import type { CategoryTagOption } from '~/types/recommendation/rexCategoryCreateConfig';
 import { ConfirmPreviewCard } from './common';

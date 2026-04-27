@@ -63,7 +63,10 @@ export function LikeAction({ count, liked, disabled, onPress }: LikeActionProps)
         fill={liked ? Theme.colors.primary : 'transparent'}
       />
       {countLabel ? (
-        <Text className="text-[11px] font-medium leading-[15px] tabular-nums" style={{ color: countColor }}>
+        <Text
+          className="text-[11px] font-medium leading-[15px] tabular-nums"
+          style={{ color: countColor }}
+        >
           {countLabel}
         </Text>
       ) : null}

@@ -17,7 +17,7 @@ import {
 } from '~/hooks/useDiscoverSearchFilters';
 import { useActiveCategories } from '~/hooks/useActiveCategories';
 import { usePinnedCategoryIds } from '~/hooks/usePinnedCategoryIds';
-import { categoryPillColor } from '~/utils/recommendation/categoryPillColor';
+import { categoryPillColor } from '~/utils/recommendation/recCategoryNav';
 import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
 import { Theme } from '~/theme/Theme';
 import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
@@ -25,8 +25,7 @@ import type { RecommendationOpenOptions } from '~/types/recommendation/recommend
 
 const TRENDING_TAGS = ['pasta', 'speakeasy', 'santorini', 'memoir'];
 
-const searchFilterPill =
-  'flex-row items-center gap-1.5 px-3 py-1.5 rounded-full border';
+const searchFilterPill = 'flex-row items-center gap-1.5 px-3 py-1.5 rounded-full border';
 
 const FALLBACK_CATEGORY_CODES = [
   { code: 'restaurants', label: 'Restaurants' },
@@ -117,15 +116,9 @@ const DiscoverView = ({
   );
 
   const pinnedCats = useMemo(() => allCats.filter(isPinned), [allCats, isPinned]);
-  const remainingCats = useMemo(
-    () => allCats.filter((c) => !isPinned(c)),
-    [allCats, isPinned],
-  );
+  const remainingCats = useMemo(() => allCats.filter((c) => !isPinned(c)), [allCats, isPinned]);
   const showRemainingPills =
-    !hasSearch &&
-    pinnedCats.length > 0 &&
-    !showAllCategories &&
-    remainingCats.length > 0;
+    !hasSearch && pinnedCats.length > 0 && !showAllCategories && remainingCats.length > 0;
   const activeCat = allCats.find((c) => c.code === activeCategory);
 
   const { data: discoverData, isLoading: discoverLoading } = useDiscoverRecommendations(undefined, {
@@ -310,9 +303,7 @@ const DiscoverView = ({
                     >
                       {cat.label}
                     </Text>
-                    {editingPinned && (
-                      <Text className="ml-1 text-destructive font-bold">×</Text>
-                    )}
+                    {editingPinned && <Text className="ml-1 text-destructive font-bold">×</Text>}
                   </TouchableOpacity>
                 );
               })}
@@ -347,7 +338,11 @@ const DiscoverView = ({
 
           {showRemainingPills ? (
             <DiscoverRemainingCategoryPills
-              categories={remainingCats.map((c) => ({ id: c.code, label: c.label, emoji: c.emoji }))}
+              categories={remainingCats.map((c) => ({
+                id: c.code,
+                label: c.label,
+                emoji: c.emoji,
+              }))}
               activeCategoryId={activeCategory}
               onSelectCategory={(id) => setActiveCategory(id === activeCategory ? 'all' : id)}
             />

@@ -5,7 +5,7 @@ import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
 import type {
   ConfirmAuthorPreview,
   ConfirmPreviewPlace,
-} from '~/utils/recommendation/confirmPreview';
+} from '~/utils/recommendation/recCreateFlow';
 import { Theme } from '~/theme/Theme';
 import { cn } from '~/utils/general';
 
