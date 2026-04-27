@@ -1,11 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { useAuth } from '~/services/AuthContext';
-import {
-  fetchUserPinnedCategoryIds,
-  pinCategory,
-  unpinCategory,
-} from '~/api/pinnedCategoriesApi';
+import { pinCategory, unpinCategory } from '~/api/pinnedCategoriesApi';
+import { fetchUserConfig } from '~/api/usersApi';
 
 const queryKey = (userId: string) => ['user_config', 'pinned_category_ids', userId] as const;
 
@@ -16,7 +13,7 @@ export function usePinnedCategoryIds() {
 
   const query = useQuery({
     queryKey: userId ? queryKey(userId) : ['user_config', 'pinned_category_ids', 'no-session'],
-    queryFn: fetchUserPinnedCategoryIds,
+    queryFn: async () => (await fetchUserConfig()).pinned_category_ids,
     enabled: Boolean(userId),
   });
 
