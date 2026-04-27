@@ -1,6 +1,5 @@
-import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ScrollView } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   TrendingUp,
   Star,
@@ -22,13 +21,13 @@ import { webContainerStyle } from '~/utils';
 import RecommendationCard, { Recommendation } from '~/components/recommendation/RecommendationCard';
 import { useDiscoverRecommendations, useSearchRexes } from '~/hooks/useDiscovery';
 import { useActiveCategories } from '~/hooks/useActiveCategories';
+import { usePinnedCategoryIds } from '~/hooks/usePinnedCategoryIds';
 import { categoryPillColor } from '~/utils/recommendation/categoryPillColor';
 import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
 import { Theme } from '~/theme/Theme';
 import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
 import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
 
-const STORAGE_KEY = 'trurex-fav-categories';
 const VALUE_LABELS = ['Total Steal', 'Budget-Friendly', 'Good Value', 'Worth It', 'Splurge'];
 const OCCASION_OPTIONS = [
   'Date night',
@@ -57,30 +56,23 @@ const FALLBACK_CATEGORY_CODES = [
   { code: 'real_estate', label: 'Real estate' },
 ];
 
-type Category = { id: string; label: string; emoji: string; color: string };
+type Category = {
+  id: string;
+  code: string;
+  label: string;
+  emoji: string;
+  color: string;
+  serverId?: string;
+};
 
 function buildFallbackCategories(): Category[] {
   return FALLBACK_CATEGORY_CODES.map(({ code, label }) => ({
     id: code,
+    code,
     label,
     emoji: getCategoryEmoji(code),
     color: categoryPillColor(code),
   }));
-}
-
-async function loadFavourites(): Promise<string[]> {
-  try {
-    const stored = await AsyncStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-}
-
-async function saveFavourites(ids: string[]) {
-  try {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
-  } catch {}
 }
 
 type DiscoverViewProps = {
@@ -98,11 +90,11 @@ const DiscoverView = ({
   onCreateRex,
 }: DiscoverViewProps) => {
   const onOpenRec = onRecommendationPress ?? onTapRec;
+  const { pinnedCategoryIds, togglePin, isTogglingPin } = usePinnedCategoryIds();
 
   const [activeCategory, setActiveCategory] = useState('all');
   const [saveTarget, setSaveTarget] = useState<RecSummary | null>(null);
-  const [favourites, setFavourites] = useState<string[]>([]);
-  const [editingFavourites, setEditingFavourites] = useState(false);
+  const [editingPinned, setEditingPinned] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
 
   const [budgetRange, setBudgetRange] = useState<[number, number]>([1, 5]);
@@ -119,42 +111,37 @@ const DiscoverView = ({
     filterOccasion ||
     filterRecency !== 9999;
 
-  useEffect(() => {
-    loadFavourites().then(setFavourites);
-  }, []);
-
-  const toggleFavourite = useCallback((id: string) => {
-    setFavourites((prev) => {
-      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
-      saveFavourites(next);
-      return next;
-    });
-  }, []);
-
   const { data: activeCategoryRows } = useActiveCategories(true);
   const allCats = useMemo((): Category[] => {
     if (activeCategoryRows?.length) {
       return activeCategoryRows.map((row) => ({
-        id: row.code,
+        id: row.id,
+        code: row.code,
+        serverId: row.id,
         label: row.display_name,
         emoji: row.icon || '',
         color: categoryPillColor(row.code),
       }));
     }
-    return [];
+    return buildFallbackCategories();
   }, [activeCategoryRows]);
 
-  const favouriteCats = allCats.filter((c) => favourites.includes(c.id));
+  const isPinned = useCallback(
+    (c: Category) => Boolean(c.serverId && pinnedCategoryIds.includes(c.serverId)),
+    [pinnedCategoryIds],
+  );
+
+  const pinnedCats = useMemo(() => allCats.filter(isPinned), [allCats, isPinned]);
   const remainingCats = useMemo(
-    () => allCats.filter((c) => !favourites.includes(c.id)),
-    [allCats, favourites],
+    () => allCats.filter((c) => !isPinned(c)),
+    [allCats, isPinned],
   );
   const showRemainingPills =
     !hasSearch &&
-    favouriteCats.length > 0 &&
+    pinnedCats.length > 0 &&
     !showAllCategories &&
     remainingCats.length > 0;
-  const activeCat = allCats.find((c) => c.id === activeCategory);
+  const activeCat = allCats.find((c) => c.code === activeCategory);
 
   const { data: discoverData, isLoading: discoverLoading } = useDiscoverRecommendations(undefined, {
     enabled: !hasSearch,
@@ -227,7 +214,7 @@ const DiscoverView = ({
                 {
                   id: 'category',
                   label: filterCategory
-                    ? (allCats.find((c) => c.id === filterCategory)?.label ?? 'Category')
+                    ? (allCats.find((c) => c.code === filterCategory)?.label ?? 'Category')
                     : 'Category',
                   Icon: Tag,
                   active: !!filterCategory,
@@ -321,14 +308,14 @@ const DiscoverView = ({
                     <TouchableOpacity
                       key={c.id}
                       onPress={() => {
-                        setFilterCategory(filterCategory === c.id ? null : c.id);
+                        setFilterCategory(filterCategory === c.code ? null : c.code);
                         setActiveFilter(null);
                       }}
-                      className={`flex-row items-center gap-1 px-3 py-1.5 rounded-full border ${filterCategory === c.id ? 'bg-primary border-primary' : 'bg-muted/50 border-border'}`}
+                      className={`flex-row items-center gap-1 px-3 py-1.5 rounded-full border ${filterCategory === c.code ? 'bg-primary border-primary' : 'bg-muted/50 border-border'}`}
                     >
                       <Text style={{ fontSize: 12 }}>{c.emoji}</Text>
                       <Text
-                        className={`text-xs font-medium ${filterCategory === c.id ? 'text-primary-foreground' : 'text-muted-foreground'}`}
+                        className={`text-xs font-medium ${filterCategory === c.code ? 'text-primary-foreground' : 'text-muted-foreground'}`}
                       >
                         {c.label}
                       </Text>
@@ -363,7 +350,7 @@ const DiscoverView = ({
       )}
 
       {/* ── Pinned categories ──────────────────────────────────────────────── */}
-      {!hasSearch && favouriteCats.length > 0 && (
+      {!hasSearch && pinnedCats.length > 0 && (
         <View className="mb-5">
           <View className="flex-row items-center justify-between mb-3">
             <View className="flex-row items-center gap-2">
@@ -372,33 +359,35 @@ const DiscoverView = ({
                 Your Categories
               </Text>
             </View>
-            <TouchableOpacity onPress={() => setEditingFavourites(!editingFavourites)}>
+            <TouchableOpacity onPress={() => setEditingPinned((v) => !v)}>
               <Text className="text-xs text-primary font-medium">
-                {editingFavourites ? 'Done' : 'Edit'}
+                {editingPinned ? 'Done' : 'Edit'}
               </Text>
             </TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row gap-2 pb-1">
-              {favouriteCats.map((cat) => {
-                const isActive = activeCategory === cat.id;
+              {pinnedCats.map((cat) => {
+                const isActive = activeCategory === cat.code;
                 return (
                   <TouchableOpacity
                     key={cat.id}
-                    onPress={() =>
-                      editingFavourites
-                        ? toggleFavourite(cat.id)
-                        : setActiveCategory(cat.id === activeCategory ? 'all' : cat.id)
-                    }
-                    className={`flex-row items-center gap-1.5 px-3.5 py-2 rounded-xl border ${isActive && !editingFavourites ? 'border-primary/40 bg-primary/10' : 'bg-card border-border'}`}
+                    onPress={() => {
+                      if (editingPinned) {
+                        if (cat.serverId) togglePin(cat.serverId, true);
+                      } else {
+                        setActiveCategory(cat.code === activeCategory ? 'all' : cat.code);
+                      }
+                    }}
+                    className={`flex-row items-center gap-1.5 px-3.5 py-2 rounded-xl border ${isActive && !editingPinned ? 'border-primary/40 bg-primary/10' : 'bg-card border-border'}`}
                   >
                     <Text style={{ fontSize: 18 }}>{cat.emoji}</Text>
                     <Text
-                      className={`text-xs font-semibold ${isActive && !editingFavourites ? 'text-foreground' : 'text-muted-foreground'}`}
+                      className={`text-xs font-semibold ${isActive && !editingPinned ? 'text-foreground' : 'text-muted-foreground'}`}
                     >
                       {cat.label}
                     </Text>
-                    {editingFavourites && (
+                    {editingPinned && (
                       <Text className="ml-1 text-destructive font-bold">×</Text>
                     )}
                   </TouchableOpacity>
@@ -413,9 +402,9 @@ const DiscoverView = ({
         <View className="mb-8 w-full">
           <View className="flex-row items-center justify-between mb-3">
             <Text className="text-sm font-display font-semibold text-foreground">
-              {favouriteCats.length > 0 ? 'All Categories' : 'Browse by Category'}
+              {pinnedCats.length > 0 ? 'All Categories' : 'Browse by Category'}
             </Text>
-            {favouriteCats.length > 0 && (
+            {pinnedCats.length > 0 && (
               <TouchableOpacity
                 onPress={() => setShowAllCategories((v) => !v)}
                 activeOpacity={0.7}
@@ -435,7 +424,7 @@ const DiscoverView = ({
 
           {showRemainingPills ? (
             <DiscoverRemainingCategoryPills
-              categories={remainingCats}
+              categories={remainingCats.map((c) => ({ id: c.code, label: c.label, emoji: c.emoji }))}
               activeCategoryId={activeCategory}
               onSelectCategory={(id) => setActiveCategory(id === activeCategory ? 'all' : id)}
             />
@@ -443,12 +432,14 @@ const DiscoverView = ({
             <>
               <View className="w-full flex-row flex-wrap justify-center gap-3">
                 {allCats.map((cat) => {
-                  const isActive = activeCategory === cat.id;
-                  const isFav = favourites.includes(cat.id);
+                  const isActive = activeCategory === cat.code;
+                  const pinned = isPinned(cat);
                   return (
                     <View key={cat.id} className="relative" style={{ width: 230 }}>
                       <TouchableOpacity
-                        onPress={() => setActiveCategory(cat.id === activeCategory ? 'all' : cat.id)}
+                        onPress={() =>
+                          setActiveCategory(cat.code === activeCategory ? 'all' : cat.code)
+                        }
                         activeOpacity={0.8}
                         style={{ width: 230, height: 74 }}
                         className={`flex-col items-center justify-center gap-1 rounded-2xl border ${
@@ -465,14 +456,17 @@ const DiscoverView = ({
                         </Text>
                       </TouchableOpacity>
                       <DiscoverCategoryPinButton
-                        isPinned={isFav}
-                        onPress={() => toggleFavourite(cat.id)}
+                        isPinned={pinned}
+                        disabled={!cat.serverId || isTogglingPin}
+                        onPress={() => {
+                          if (cat.serverId) togglePin(cat.serverId, pinned);
+                        }}
                       />
                     </View>
                   );
                 })}
               </View>
-              {favouriteCats.length === 0 && (
+              {pinnedCats.length === 0 && (
                 <View className="mt-3 flex-row items-center justify-center gap-1.5">
                   <DiscoverCategoryPinHintIcon />
                   <Text className="shrink text-xs text-muted-foreground text-center">

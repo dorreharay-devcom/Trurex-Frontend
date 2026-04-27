@@ -39,6 +39,7 @@ export type CategoryCreateConfig = {
 };
 
 export type DbCategoryRow = {
+  id: string;
   code: string;
   display_name: string;
   sort_order: number;
