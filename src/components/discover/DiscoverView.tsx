@@ -1,7 +1,22 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { TrendingUp, Star, DollarSign, Clock, Users, Tag, PlusCircle } from 'lucide-react-native';
+import {
+  TrendingUp,
+  Star,
+  DollarSign,
+  Clock,
+  Users,
+  Tag,
+  PlusCircle,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react-native';
+import {
+  DiscoverCategoryPinButton,
+  DiscoverCategoryPinHintIcon,
+} from '~/components/discover/DiscoverCategoryPin';
+import { DiscoverRemainingCategoryPills } from '~/components/discover/DiscoverRemainingCategoryPills';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import { webContainerStyle } from '~/utils';
 import RecommendationCard, { Recommendation } from '~/components/recommendation/RecommendationCard';
@@ -122,14 +137,23 @@ const DiscoverView = ({
       return activeCategoryRows.map((row) => ({
         id: row.code,
         label: row.display_name,
-        emoji: row.icon || '', // No more hardcoded fallback
+        emoji: row.icon || '',
         color: categoryPillColor(row.code),
       }));
     }
-    return []; // No more fallback categories
+    return [];
   }, [activeCategoryRows]);
 
   const favouriteCats = allCats.filter((c) => favourites.includes(c.id));
+  const remainingCats = useMemo(
+    () => allCats.filter((c) => !favourites.includes(c.id)),
+    [allCats, favourites],
+  );
+  const showRemainingPills =
+    !hasSearch &&
+    favouriteCats.length > 0 &&
+    !showAllCategories &&
+    remainingCats.length > 0;
   const activeCat = allCats.find((c) => c.id === activeCategory);
 
   const { data: discoverData, isLoading: discoverLoading } = useDiscoverRecommendations(undefined, {
@@ -385,40 +409,81 @@ const DiscoverView = ({
         </View>
       )}
 
-      <View className="mb-8 ">
-        <View className="flex-row items-center justify-between mb-4">
-          <Text className="text-sm font-display font-semibold text-foreground">
-            Browse by Category
-          </Text>
-        </View>
-
-        <View className="flex-row flex-wrap gap-3">
-          {allCats.map((cat) => {
-            const isActive = activeCategory === cat.id;
-            const isFav = favourites.includes(cat.id);
-            return (
+      {!hasSearch && allCats.length > 0 && (
+        <View className="mb-8 w-full">
+          <View className="flex-row items-center justify-between mb-3">
+            <Text className="text-sm font-display font-semibold text-foreground">
+              {favouriteCats.length > 0 ? 'All Categories' : 'Browse by Category'}
+            </Text>
+            {favouriteCats.length > 0 && (
               <TouchableOpacity
-                key={cat.id}
-                onPress={() => setActiveCategory(cat.id === activeCategory ? 'all' : cat.id)}
-                activeOpacity={0.8}
-                style={{ width: 230, height: 74 }}
-                className={`flex-col items-center justify-center gap-1 rounded-2xl border ${
-                  isActive ? 'bg-primary/10 border-primary/40' : 'bg-white border-gray-200'
-                }`}
+                onPress={() => setShowAllCategories((v) => !v)}
+                activeOpacity={0.7}
+                className="flex-row items-center gap-1"
               >
-                <Text style={{ fontSize: 24 }}>{cat.emoji}</Text>
-                <Text
-                  className={`text-[11px] font-bold tracking-tight ${
-                    isActive ? 'text-primary' : 'text-gray-700'
-                  }`}
-                >
-                  {cat.label}
+                <Text className="text-xs text-muted-foreground">
+                  {showAllCategories ? 'Show less' : `Show all ${allCats.length}`}
                 </Text>
+                {showAllCategories ? (
+                  <ChevronUp size={14} color={Theme.colors.muted} />
+                ) : (
+                  <ChevronDown size={14} color={Theme.colors.muted} />
+                )}
               </TouchableOpacity>
-            );
-          })}
+            )}
+          </View>
+
+          {showRemainingPills ? (
+            <DiscoverRemainingCategoryPills
+              categories={remainingCats}
+              activeCategoryId={activeCategory}
+              onSelectCategory={(id) => setActiveCategory(id === activeCategory ? 'all' : id)}
+            />
+          ) : (
+            <>
+              <View className="w-full flex-row flex-wrap justify-center gap-3">
+                {allCats.map((cat) => {
+                  const isActive = activeCategory === cat.id;
+                  const isFav = favourites.includes(cat.id);
+                  return (
+                    <View key={cat.id} className="relative" style={{ width: 230 }}>
+                      <TouchableOpacity
+                        onPress={() => setActiveCategory(cat.id === activeCategory ? 'all' : cat.id)}
+                        activeOpacity={0.8}
+                        style={{ width: 230, height: 74 }}
+                        className={`flex-col items-center justify-center gap-1 rounded-2xl border ${
+                          isActive ? 'bg-primary/10 border-primary/40' : 'bg-white border-gray-200'
+                        }`}
+                      >
+                        <Text style={{ fontSize: 24 }}>{cat.emoji}</Text>
+                        <Text
+                          className={`text-[11px] font-bold tracking-tight ${
+                            isActive ? 'text-primary' : 'text-gray-700'
+                          }`}
+                        >
+                          {cat.label}
+                        </Text>
+                      </TouchableOpacity>
+                      <DiscoverCategoryPinButton
+                        isPinned={isFav}
+                        onPress={() => toggleFavourite(cat.id)}
+                      />
+                    </View>
+                  );
+                })}
+              </View>
+              {favouriteCats.length === 0 && (
+                <View className="mt-3 flex-row items-center justify-center gap-1.5">
+                  <DiscoverCategoryPinHintIcon />
+                  <Text className="shrink text-xs text-muted-foreground text-center">
+                    Tap the pin on categories you use most to add them to your quick-access bar
+                  </Text>
+                </View>
+              )}
+            </>
+          )}
         </View>
-      </View>
+      )}
 
       {/* ── Feed title ──────────────────────────────────────────────────────── */}
       <Text className="text-sm font-display font-semibold text-foreground mb-4">
