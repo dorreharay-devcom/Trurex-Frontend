@@ -1,36 +1,47 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Backend, unwrap } from '~/services/AuthService';
-import type { RexComment, RexCommentRow } from '~/types/recommendation/rexComment';
+import { likeRexComment, unlikeRexComment } from '~/api/rexLikesApi';
+import type { RexComment, RexCommentRpcNode } from '~/types/recommendation/rexComment';
 
-type UserLite = {
-  id: string;
-  display_name: string | null;
-  avatar_url: string | null;
-};
+function mapRpcNodeToComment(node: RexCommentRpcNode): RexComment {
+  return {
+    id: node.id,
+    rex_id: node.rex_id,
+    parent_comment_id: node.parent_comment_id,
+    author_id: node.author_id,
+    body: node.body,
+    created_at: node.created_at,
+    updated_at: node.updated_at,
+    like_count: node.like_count,
+    liked_by_me: node.liked_by_me,
+    profile: {
+      display_name: node.author_display_name,
+      avatar_url: node.author_profile_picture_url,
+    },
+    replies: (node.subcomments ?? []).map(mapRpcNodeToComment),
+  };
+}
 
-function buildThreadedTree(flat: RexComment[]): RexComment[] {
-  const byId = new Map(flat.map((c) => [c.id, c]));
-  const roots: RexComment[] = [];
-  for (const c of flat) {
-    const pid = c.parent_comment_id;
-    if (pid) {
-      const parent = byId.get(pid);
-      if (parent) {
-        parent.replies = parent.replies ?? [];
-        parent.replies.push(c);
-      } else {
-        roots.push(c);
-      }
-    } else {
-      roots.push(c);
+function updateCommentInTree(
+  items: RexComment[],
+  commentId: string,
+  map: (c: RexComment) => RexComment,
+): RexComment[] {
+  return items.map((c) => {
+    if (c.id === commentId) {
+      return map(c);
     }
-  }
-  return roots;
+    if (c.replies?.length) {
+      return { ...c, replies: updateCommentInTree(c.replies, commentId, map) };
+    }
+    return c;
+  });
 }
 
 export function useRexComments(rexId: string | undefined) {
   const [comments, setComments] = useState<RexComment[]>([]);
   const [loading, setLoading] = useState(true);
+  const commentLikeInFlight = useRef(new Set<string>());
 
   const fetchComments = useCallback(async () => {
     if (!rexId) {
@@ -40,45 +51,13 @@ export function useRexComments(rexId: string | undefined) {
     }
     setLoading(true);
     try {
-      const { data, error } = await Backend.from('rex_comments')
-        .select('*')
-        .eq('rex_id', rexId)
-        .order('created_at', { ascending: true });
-
-      if (error) {
-        console.warn('[useRexComments]', error.message);
-        setComments([]);
-        setLoading(false);
-        return;
-      }
-
-      const rows = (data ?? []) as RexCommentRow[];
-      if (rows.length === 0) {
-        setComments([]);
-        setLoading(false);
-        return;
-      }
-
-      const authorIds = [...new Set(rows.map((r) => r.author_id))];
-      const { data: usersData } = await Backend.from('users')
-        .select('id, display_name, avatar_url')
-        .in('id', authorIds);
-
-      const userMap = new Map((usersData as UserLite[] | null)?.map((u) => [u.id, u]) ?? []);
-
-      const withProfiles: RexComment[] = rows.map((r) => {
-        const u = userMap.get(r.author_id);
-        return {
-          ...r,
-          profile: u
-            ? { display_name: u.display_name, avatar_url: u.avatar_url }
-            : { display_name: null, avatar_url: null },
-          replies: [] as RexComment[],
-        };
-      });
-
-      const hasThreading = rows.some((r) => r.parent_comment_id);
-      setComments(hasThreading ? buildThreadedTree(withProfiles) : withProfiles);
+      const data = unwrap(
+        await Backend.rpc('get_rex_comments', {
+          input_rex_id: rexId,
+        }),
+      ) as RexCommentRpcNode[] | null;
+      const list = Array.isArray(data) ? data : [];
+      setComments(list.map(mapRpcNodeToComment));
     } catch (e) {
       console.warn('[useRexComments]', e);
       setComments([]);
@@ -121,21 +100,13 @@ export function useRexComments(rexId: string | undefined) {
       if (!trimmed) return;
 
       try {
-        if (parentCommentId) {
-          const { error } = await Backend.from('rex_comments').insert({
-            rex_id: rexId,
-            body: trimmed,
-            parent_comment_id: parentCommentId,
-          });
-          if (error) throw error;
-        } else {
-          unwrap(
-            await Backend.rpc('add_rex_comment', {
-              input_rex_id: rexId,
-              input_body: trimmed,
-            }),
-          );
-        }
+        unwrap(
+          await Backend.rpc('add_rex_comment', {
+            input_rex_id: rexId,
+            input_body: trimmed,
+            input_parent_comment_id: parentCommentId ?? null,
+          }),
+        );
         await fetchComments();
       } catch (e: unknown) {
         const msg =
@@ -164,5 +135,49 @@ export function useRexComments(rexId: string | undefined) {
     [fetchComments],
   );
 
-  return { comments, loading, refetch: fetchComments, addComment, deleteComment };
+  const toggleCommentLike = useCallback(async (commentId: string, currentlyLiked: boolean) => {
+    if (commentLikeInFlight.current.has(commentId)) {
+      return;
+    }
+    commentLikeInFlight.current.add(commentId);
+
+    const nextLiked = !currentlyLiked;
+    const delta = nextLiked ? 1 : -1;
+
+    setComments((prev) =>
+      updateCommentInTree(prev, commentId, (c) => ({
+        ...c,
+        liked_by_me: nextLiked,
+        like_count: Math.max(0, (c.like_count ?? 0) + delta),
+      })),
+    );
+
+    try {
+      if (nextLiked) {
+        await likeRexComment(commentId);
+      } else {
+        await unlikeRexComment(commentId);
+      }
+    } catch (e) {
+      setComments((prev) =>
+        updateCommentInTree(prev, commentId, (c) => ({
+          ...c,
+          liked_by_me: currentlyLiked,
+          like_count: Math.max(0, (c.like_count ?? 0) - delta),
+        })),
+      );
+      throw e;
+    } finally {
+      commentLikeInFlight.current.delete(commentId);
+    }
+  }, []);
+
+  return {
+    comments,
+    loading,
+    refetch: fetchComments,
+    addComment,
+    deleteComment,
+    toggleCommentLike,
+  };
 }

@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import type { RexComment } from '~/types/recommendation/rexComment';
 import { formatCompactRelativeTime } from '~/utils/date';
-import { DeleteAction, ReplyAction } from './CommentActions';
+import { DeleteAction, LikeAction, ReplyAction } from './CommentActions';
 
 export type CommentRowProps = {
   comment: RexComment;
@@ -12,6 +12,7 @@ export type CommentRowProps = {
   isReply?: boolean;
   onReply: (id: string) => void;
   onDelete: (id: string) => void;
+  onToggleLike: (commentId: string, currentlyLiked: boolean) => void;
 };
 
 export const CommentRow: React.FC<CommentRowProps> = ({
@@ -21,6 +22,7 @@ export const CommentRow: React.FC<CommentRowProps> = ({
   isReply,
   onReply,
   onDelete,
+  onToggleLike,
 }) => {
   const canDelete =
     (currentUserId && currentUserId === comment.author_id) ||
@@ -42,9 +44,17 @@ export const CommentRow: React.FC<CommentRowProps> = ({
           </Text>
         </View>
         <Text className="mt-0.5 text-sm leading-relaxed text-foreground/90">{comment.body}</Text>
-        <View className="mt-1 flex-row items-center gap-3">
-          {!isReply ? <ReplyAction onPress={() => onReply(comment.id)} /> : null}
-          {canDelete ? <DeleteAction onPress={() => onDelete(comment.id)} /> : null}
+        <View className="mt-1.5 flex-row flex-wrap items-center gap-2">
+          <LikeAction
+            count={comment.like_count ?? 0}
+            liked={comment.liked_by_me ?? false}
+            disabled={!currentUserId}
+            onPress={() => onToggleLike(comment.id, comment.liked_by_me ?? false)}
+          />
+          <View className="flex-row items-center gap-1.5">
+            {!isReply ? <ReplyAction onPress={() => onReply(comment.id)} /> : null}
+            {canDelete ? <DeleteAction onPress={() => onDelete(comment.id)} /> : null}
+          </View>
         </View>
       </View>
     </View>
