@@ -1,9 +1,10 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Platform } from 'react-native';
 import { Image } from 'expo-image';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { cn } from '~/utils/general';
 import { isHttpUrl } from '~/utils/recommendation/rexMediaPaths';
+import { Theme } from '~/theme/Theme';
 
 type Props = {
   bucket: string;
@@ -20,25 +21,40 @@ export function SignedStorageImage({
   className,
   accessibilityLabel,
 }: Props) {
-  const http = remoteUri?.trim() && isHttpUrl(remoteUri.trim()) ? remoteUri.trim() : null;
-  const path = storagePath?.trim() ?? '';
-
-  const { uri } = useSignedStorageUrl(bucket, http ? '' : path);
-
+  const t = (storagePath ?? '').trim();
+  const r = (remoteUri ?? '').trim();
+  const http: string | null = r && isHttpUrl(r) ? r : t && isHttpUrl(t) ? t : null;
+  const path = http ? '' : t;
+  const { uri, loading } = useSignedStorageUrl(bucket, path);
   const displayUri = http ?? uri;
+
+  if (path && !http && loading) {
+    return (
+      <View
+        className={cn('relative items-center justify-center overflow-hidden bg-muted', className)}
+        accessibilityLabel={accessibilityLabel}
+        accessibilityRole="image"
+      >
+        <ActivityIndicator color={Theme.colors.primary} />
+      </View>
+    );
+  }
 
   if (!displayUri) {
     return <View className={cn('bg-muted', className)} />;
   }
 
   return (
-    <Image
-      source={{ uri: displayUri }}
-      className={className}
-      contentFit="cover"
-      transition={200}
-      cachePolicy="memory-disk"
-      accessibilityLabel={accessibilityLabel}
-    />
+    <View className={cn('relative overflow-hidden', className)}>
+      <Image
+        accessibilityLabel={accessibilityLabel}
+        contentFit="cover"
+        source={{ uri: displayUri }}
+        style={StyleSheet.absoluteFillObject}
+        cachePolicy={Platform.select({ web: 'memory', default: 'memory-disk' })}
+        transition={120}
+        recyclingKey={displayUri}
+      />
+    </View>
   );
 }

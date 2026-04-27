@@ -56,6 +56,13 @@ type Result<T> = {
   realIndex: number;
   onScroll: (e: NativeSyntheticEvent<NativeScrollEvent>) => void;
   onMomentumScrollEnd: (e: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  onListContentSizeChange: () => void;
+  getItemLayout:
+    | undefined
+    | ((
+        data: ArrayLike<T> | null | undefined,
+        index: number,
+      ) => { length: number; offset: number; index: number });
   goToReal: (r: number) => void;
   listIndexToReal: (listIndex: number) => number;
 };
@@ -110,6 +117,17 @@ export function useInfiniteHorizontalCarousel<T>({
     },
     [syncIndexFromOffset],
   );
+
+  const onListContentSizeChange = useCallback(() => {
+    if (itemWidth <= 0) return;
+    if (!isInfinite) return;
+    if (n < 2) return;
+    const run = () => {
+      listRef.current?.scrollToOffset({ offset: itemWidth, animated: false });
+    };
+    run();
+    requestAnimationFrame(run);
+  }, [isInfinite, itemWidth, n]);
 
   const onMomentumScrollEnd = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -180,6 +198,15 @@ export function useInfiniteHorizontalCarousel<T>({
     [n],
   );
 
+  const getItemLayout = useCallback(
+    (_data: ArrayLike<T> | null | undefined, index: number) => ({
+      length: itemWidth,
+      offset: itemWidth * index,
+      index,
+    }),
+    [itemWidth],
+  );
+
   return {
     listRef,
     listData,
@@ -188,6 +215,8 @@ export function useInfiniteHorizontalCarousel<T>({
     realIndex,
     onScroll,
     onMomentumScrollEnd,
+    onListContentSizeChange,
+    getItemLayout: itemWidth > 0 ? getItemLayout : undefined,
     goToReal,
     listIndexToReal,
   };

@@ -1,13 +1,15 @@
 import React, { useMemo, useState } from 'react';
-import { View, FlatList, Pressable } from 'react-native';
+import { View, FlatList, Pressable, useWindowDimensions } from 'react-native';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
+import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { useInfiniteHorizontalCarousel } from '~/hooks/useInfiniteHorizontalCarousel';
 import { Theme } from '~/theme/Theme';
 import { cn } from '~/utils/general';
 
 const ASPECT = 16 / 9;
+const HERO_H_PAD = 40;
 
 function resolvePaths(paths: string[]) {
   return paths
@@ -26,7 +28,12 @@ export function RexImageCarousel({
   className,
   accessibilityLabelBase = 'Photo',
 }: Props) {
-  const [itemWidth, setItemWidth] = useState(0);
+  const { width: winW } = useWindowDimensions();
+  const [measuredW, setMeasuredW] = useState(0);
+  const itemWidth = useMemo(() => {
+    if (measuredW > 0) return measuredW;
+    return Math.max(1, Math.min(winW, CREATE_REC_MODAL_MAX_W) - HERO_H_PAD);
+  }, [measuredW, winW]);
   const resolvedPaths = useMemo(() => resolvePaths(paths), [paths]);
 
   const {
@@ -37,6 +44,8 @@ export function RexImageCarousel({
     realIndex,
     onScroll,
     onMomentumScrollEnd,
+    onListContentSizeChange,
+    getItemLayout,
     goToReal,
     listIndexToReal,
   } = useInfiniteHorizontalCarousel({ items: resolvedPaths, itemWidth });
@@ -69,10 +78,13 @@ export function RexImageCarousel({
   return (
     <View
       className={cn('relative w-full', className)}
-      onLayout={(e) => setItemWidth(e.nativeEvent.layout.width)}
+      onLayout={(e) => {
+        const w = e.nativeEvent.layout.width;
+        if (w > 0) setMeasuredW(w);
+      }}
     >
       <View className="overflow-hidden rounded-xl">
-        {itemWidth > 0 && itemH > 0 ? (
+        {itemH > 0 ? (
           <FlatList
             ref={listRef}
             data={listData}
@@ -84,6 +96,8 @@ export function RexImageCarousel({
             removeClippedSubviews={false}
             showsHorizontalScrollIndicator={false}
             decelerationRate="fast"
+            getItemLayout={getItemLayout}
+            onContentSizeChange={onListContentSizeChange}
             onScroll={onScroll}
             scrollEventThrottle={16}
             onMomentumScrollEnd={onMomentumScrollEnd}
