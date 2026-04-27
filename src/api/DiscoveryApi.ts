@@ -10,7 +10,7 @@ export interface DiscoverQueryParams {
 export interface SearchRexesParams {
   search_term?: string | null;
   category_filter?: string | null;
-  value_for_money_filter?: number | null;
+  value_for_money_filters?: number[] | null;
   created_from?: string | null;
   created_to?: string | null;
   result_limit?: number;
@@ -39,7 +39,9 @@ export const DiscoveryApi = {
       await Backend.rpc('search_rexes', {
         search_term: params.search_term ?? null,
         category_filter: params.category_filter ?? null,
-        value_for_money_filter: params.value_for_money_filter ?? null,
+        value_for_money_filters: params.value_for_money_filters?.length
+          ? params.value_for_money_filters
+          : null,
         created_from: params.created_from ?? null,
         created_to: params.created_to ?? null,
         result_limit: params.result_limit ?? 20,
