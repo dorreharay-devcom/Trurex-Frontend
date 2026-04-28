@@ -10,8 +10,10 @@ import {
   Platform,
   type ViewStyle,
 } from 'react-native';
-import { Bell, CheckCheck, ShieldCheck } from 'lucide-react-native';
+import { Bell, CheckCheck, ShieldCheck, UserPlus, UserCheck } from 'lucide-react-native';
+import { useMutation } from '@tanstack/react-query';
 import { useNotifications } from '~/hooks/useNotifications';
+import { followUser } from '~/api/usersApi';
 import { Theme } from '~/theme/Theme';
 import { formatCompactRelativeTime } from '~/utils/date';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
@@ -40,11 +42,21 @@ const typeConfig: Record<string, { verb: string }> = {
   message: { verb: 'sent you a message' },
 };
 
+const FOLLOWABLE_TYPES = new Set(['follow', 'new_follower']);
+
 export const NotificationBell: React.FC = () => {
   const { notifications, unreadCount, loading, markAllAsRead } = useNotifications();
   const [open, setOpen] = useState(false);
   const [anchor, setAnchor] = useState<{ top: number; right: number } | null>(null);
   const bellWrapRef = useRef<View>(null);
+  const [followedIds, setFollowedIds] = useState<Set<string>>(new Set());
+
+  const followMutation = useMutation({
+    mutationFn: followUser,
+    onSuccess: (_data, actorId) => {
+      setFollowedIds((prev) => new Set(prev).add(actorId));
+    },
+  });
 
   const close = useCallback(() => setOpen(false), []);
 
@@ -229,6 +241,23 @@ export const NotificationBell: React.FC = () => {
                                   Trusted
                                 </Text>
                               </View>
+                            ) : null}
+                            {FOLLOWABLE_TYPES.has(n.type) && n.actor_id ? (
+                              followedIds.has(n.actor_id) ? (
+                                <View className="mt-1.5 flex-row items-center gap-1 self-start rounded-full border border-border bg-muted px-2.5 py-1">
+                                  <UserCheck size={11} color={Theme.colors.secondaryText} />
+                                  <Text className="text-[11px] text-muted-foreground">Following</Text>
+                                </View>
+                              ) : (
+                                <Pressable
+                                  onPress={() => followMutation.mutate(n.actor_id!)}
+                                  disabled={followMutation.isPending}
+                                  className="mt-1.5 flex-row items-center gap-1 self-start rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 active:opacity-70"
+                                >
+                                  <UserPlus size={11} color={Theme.colors.primary} />
+                                  <Text className="text-[11px] font-medium text-primary">Follow Back</Text>
+                                </Pressable>
+                              )
                             ) : null}
                             <Text className="mt-0.5 text-xs text-muted-foreground">
                               {formatNotificationTime(n.created_at)}

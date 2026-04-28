@@ -21,7 +21,7 @@ import { useMyCollections, useAddRexToCollection } from '~/hooks/useCollections'
 import { useFollowUser } from '~/hooks/useFollowUser';
 import { useSavedRexes } from '~/hooks/useGems';
 import { useMyRexes } from '~/hooks/useDiscovery';
-import { ChevronLeft } from 'lucide-react-native';
+import { ChevronLeft, UserX } from 'lucide-react-native';
 import CollectionDetailView from '~/components/faves/CollectionDetailView';
 import { OverlayModal } from '~/components/common/OverlayModal';
 import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
@@ -72,6 +72,7 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated, onBack, onRexPress }
   const { user: authUser, signOut } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState<ProfileTab>(ProfileTab.Recs);
   const [avatarUploading, setAvatarUploading] = useState(false);
@@ -120,9 +121,14 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated, onBack, onRexPress }
     }
     try {
       const data = await ProfileApi.getProfile({ userId: targetId });
-      setProfile(data);
+      if (!data.userId) {
+        setNotFound(true);
+      } else {
+        setProfile(data);
+      }
     } catch (e) {
       console.error('[ProfileView] Failed to fetch profile:', e);
+      setNotFound(true);
     } finally {
       setLoading(false);
     }
@@ -164,6 +170,28 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated, onBack, onRexPress }
     return (
       <View className="flex-1 items-center justify-center">
         <ActivityIndicator color={Theme.colors.primary} />
+      </View>
+    );
+  }
+
+  if (notFound) {
+    return (
+      <View className="flex-1 items-center justify-center gap-3 px-8">
+        {onBack && (
+          <TouchableOpacity
+            onPress={onBack}
+            className="absolute left-4 top-4 flex-row items-center gap-1"
+            activeOpacity={0.7}
+          >
+            <ChevronLeft size={20} color={Theme.colors.foreground} />
+            <Text className="text-sm font-medium text-foreground">Back</Text>
+          </TouchableOpacity>
+        )}
+        <UserX size={48} color={Theme.colors.secondaryText} />
+        <Text className="text-lg font-semibold text-foreground">User not found</Text>
+        <Text className="text-center text-sm text-muted-foreground">
+          This profile doesn't exist or may have been removed.
+        </Text>
       </View>
     );
   }
