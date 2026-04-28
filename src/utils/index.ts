@@ -19,7 +19,8 @@ export const formatCurrency = (amount: number, currency: string = 'USD') => {
   }).format(amount);
 };
 
-export const getRedirectUrl = () => (isWeb ? window.location.origin : Linking.createURL('/'));
+export const getRedirectUrl = () =>
+  isWeb ? `${window.location.origin}/auth/callback` : Linking.createURL('/auth/callback');
 
 export const isFiniteNumber = (value: unknown): value is number => {
   return typeof value === 'number' && Number.isFinite(value);

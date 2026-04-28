@@ -11,9 +11,14 @@ import type {
   RecommendationOpenOptions,
 } from '~/types/recommendation/recommendation';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export default function UserProfilePage() {
-  const { userId } = useLocalSearchParams<{ userId: string }>();
+  const { userId: slug } = useLocalSearchParams<{ userId: string }>();
   const router = useRouter();
+  const isUuid = UUID_RE.test(slug ?? '');
+  const userId = isUuid ? slug : undefined;
+  const handle = !isUuid ? slug?.replace(/^@/, '') : undefined;
   const [avatarRefreshKey] = useState(0);
   const [previewRecommendation, setPreviewRecommendation] = useState<Recommendation | null>(null);
   const [previewOptions, setPreviewOptions] = useState<RecommendationOpenOptions>({});
@@ -49,8 +54,10 @@ export default function UserProfilePage() {
         <View className="flex-1">
           <ProfileView
             userId={userId}
+            handle={handle}
             onBack={() => router.replace('/')}
             onRexPress={openPreview}
+            onSignUp={() => router.navigate('/(auth)/login')}
           />
         </View>
       </View>

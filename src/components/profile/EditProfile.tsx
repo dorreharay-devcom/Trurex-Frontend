@@ -16,6 +16,7 @@ import { ProfileApi } from '~/api/ProfileApi';
 import { Theme } from '~/theme/Theme';
 import { Button } from '~/components/common/Button';
 import Input from '~/components/common/Input';
+import { toastError } from '~/utils/appToast';
 
 interface EditProfileProps {
   onClose: () => void;
@@ -110,9 +111,9 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
         currently_reading: currently.reading || null,
       });
       onClose();
-    } catch (e) {
-      const error = e as Error;
-      Alert.alert('Error saving profile', error.message);
+    } catch (e: any) {
+      const message = e?.message || 'Failed to save profile';
+      toastError(message);
     } finally {
       setSaving(false);
     }

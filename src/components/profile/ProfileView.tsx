@@ -1,18 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert,
-  useWindowDimensions,
-  Animated,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Platform,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, useWindowDimensions, Animated, Modal, Pressable, StyleSheet, Platform } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Routes } from '~/constants/routes';
 import * as ImagePicker from 'expo-image-picker';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
@@ -76,18 +65,28 @@ const CollectionSkeleton: React.FC = () => {
 
 interface ProfileViewProps {
   userId?: string;
+  handle?: string;
   onAvatarUpdated?: () => void;
   onBack?: () => void;
   onRexPress?: (rec: Recommendation) => void;
+  onSignUp?: () => void;
 }
 
-const ProfileView = ({
-  userId: propUserId,
-  onAvatarUpdated,
-  onBack,
-  onRexPress,
-}: ProfileViewProps) => {
+const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, onBack, onRexPress, onSignUp }: ProfileViewProps) => {
   const { user: authUser, signOut } = useAuth();
+  const router = useRouter();
+  const isGuest = !authUser;
+
+  const handleGuestAction = useCallback(() => {
+    Alert.alert(
+      'Sign up to continue',
+      'Create an account to follow users and unlock all features.',
+      [
+        { text: 'Later', style: 'cancel' },
+        { text: 'Sign in / Sign up', onPress: () => onSignUp ? onSignUp() : router.navigate(Routes.Login) },
+      ],
+    );
+  }, [router, onSignUp]);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -139,12 +138,14 @@ const ProfileView = ({
 
   const fetchProfile = useCallback(async () => {
     const targetId = propUserId || authUser?.id;
-    if (!targetId) {
+    if (!targetId && !propHandle) {
       setLoading(false);
       return;
     }
     try {
-      const data = await ProfileApi.getProfile({ userId: targetId });
+      const data = await ProfileApi.getProfile(
+        propHandle ? { handle: propHandle } : { userId: targetId },
+      );
       if (!data.userId) {
         setNotFound(true);
       } else {
@@ -156,7 +157,7 @@ const ProfileView = ({
     } finally {
       setLoading(false);
     }
-  }, [propUserId, authUser?.id]);
+  }, [propUserId, propHandle, authUser?.id]);
 
   const { follow, unfollow } = useFollowUser(propUserId ?? '', fetchProfile);
 
@@ -264,12 +265,14 @@ const ProfileView = ({
             <ProfileHeader
               profile={profile}
               isOwnProfile={isOwnProfile}
+              isGuest={isGuest}
               onEditProfile={() => setIsEditing(true)}
               onSignOut={signOut}
               onAvatarPress={handleAvatarPress}
               avatarUploading={avatarUploading}
               onFollow={() => follow.mutate()}
               onUnfollow={() => unfollow.mutate()}
+              onGuestAction={handleGuestAction}
               followLoading={follow.isPending || unfollow.isPending}
             />
           )}
@@ -278,7 +281,12 @@ const ProfileView = ({
 
           <View className="flex-row border-b border-border">
             {TABS.map((tab) => {
-              const label = tab.id === ProfileTab.Recs ? `Rex's (${rexTabCount})` : tab.label;
+              const label =
+                tab.id === ProfileTab.Recs
+                  ? `Rex's (${rexTabCount})`
+                  : tab.id === ProfileTab.Collections
+                    ? `Collections (${myCollections.length})`
+                    : tab.label;
               return (
                 <TouchableOpacity
                   key={tab.id}
@@ -369,6 +377,23 @@ const ProfileView = ({
           </View>
         </View>
       </ScrollView>
+
+      {isGuest && (
+        <View className="absolute bottom-0 left-0 right-0 border-t border-border bg-card">
+          <View style={webContainerStyle} className="flex-row items-center justify-between px-4 py-3">
+            <Text className="text-xs text-muted-foreground flex-1 mr-3">
+              You have limited access. Sign up to see everything.
+            </Text>
+            <TouchableOpacity
+              onPress={() => onSignUp ? onSignUp() : router.replace('/')}
+              activeOpacity={0.8}
+              className="px-4 py-2 rounded-lg bg-primary"
+            >
+              <Text className="text-xs font-bold text-primary-foreground">Sign up</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
 
       <OverlayModal
         visible={openCollectionId != null}

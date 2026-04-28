@@ -8,6 +8,7 @@ import {
   Star,
   MapPin,
   DollarSign,
+  X,
 } from 'lucide-react-native';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
@@ -34,18 +35,20 @@ interface RecommendationCardProps {
   recommendation: Recommendation;
   onTap?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
   onSave?: (rec: Recommendation) => void;
+  onRemove?: () => void;
 }
 
 const RecommendationCard: React.FC<RecommendationCardProps> = ({
   recommendation: rec,
   onTap,
   onSave,
+  onRemove,
 }) => {
   const { user } = useAuth();
   const { shareRecommendation } = useShareRex();
   const [liked, setLiked] = useState(rec.isLiked);
   const [likes, setLikes] = useState(rec.likes);
-  const [saved, setSaved] = useState(rec.isSaved);
+
   const likeBusy = useRef(false);
 
   useEffect(() => {
@@ -113,6 +116,11 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
         <View className="rounded-full border border-border/80 bg-border/40 px-2.5 py-1">
           <Text className="text-xs font-medium capitalize text-foreground">{rec.category}</Text>
         </View>
+        {onRemove && (
+          <TouchableOpacity onPress={onRemove} className="w-7 h-7 rounded-full bg-destructive items-center justify-center">
+            <X size={13} color="white" />
+          </TouchableOpacity>
+        )}
       </View>
 
       <View className="mx-4 rounded-lg overflow-hidden bg-gray-100 aspect-[4/3]">
@@ -213,21 +221,8 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          onPress={() => {
-            if (onSave) {
-              setSaved(true);
-              onSave(rec);
-            } else {
-              setSaved((v) => !v);
-            }
-          }}
-        >
-          <Bookmark
-            size={20}
-            color={saved ? Theme.colors.primary : Theme.colors.muted}
-            fill={saved ? Theme.colors.primary : 'transparent'}
-          />
+        <TouchableOpacity onPress={() => onSave?.(rec)}>
+          <Bookmark size={20} color={Theme.colors.muted} fill="transparent" />
         </TouchableOpacity>
       </View>
     </Wrapper>

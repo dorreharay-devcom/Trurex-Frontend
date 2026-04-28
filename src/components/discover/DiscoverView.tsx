@@ -1,11 +1,10 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ScrollView, useWindowDimensions } from 'react-native';
 import { TrendingUp, Star, PlusCircle, ChevronDown, ChevronUp } from 'lucide-react-native';
 import {
   DiscoverCategoryPinButton,
   DiscoverCategoryPinHintIcon,
 } from '~/components/discover/DiscoverCategoryPin';
-import { DiscoverRemainingCategoryPills } from '~/components/discover/DiscoverRemainingCategoryPills';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import { isWeb, webContainerStyle } from '~/utils';
 import RecommendationCard, { Recommendation } from '~/components/recommendation/RecommendationCard';
@@ -22,6 +21,8 @@ import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
 import { Theme } from '~/theme/Theme';
 import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
 import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
+import { useAuth } from '~/services/AuthContext';
+import { toastError } from '~/utils/appToast';
 
 const TRENDING_TAGS = ['pasta', 'speakeasy', 'santorini', 'memoir'];
 
@@ -72,12 +73,33 @@ const DiscoverView = ({
   onCreateRex,
 }: DiscoverViewProps) => {
   const onOpenRec = onRecommendationPress ?? onTapRec;
+  const { user } = useAuth();
   const { pinnedCategoryIds, togglePin, isTogglingPin } = usePinnedCategoryIds();
 
   const [activeCategory, setActiveCategory] = useState('all');
   const [saveTarget, setSaveTarget] = useState<RecSummary | null>(null);
+
+  const handleSavePress = useCallback(
+    (rec: Recommendation) => {
+      if (rec.authorId && user && rec.authorId === user.id) {
+        toastError("You can't save your own rex");
+        return;
+      }
+      setSaveTarget({
+        id: rec.id,
+        place_name: rec.title,
+        category_code: rec.categoryId,
+        location: rec.location,
+      });
+    },
+    [user],
+  );
   const [editingPinned, setEditingPinned] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
+
+  const { width: screenWidth } = useWindowDimensions();
+  const colCount = isWeb ? (screenWidth >= 1024 ? 5 : screenWidth >= 640 ? 4 : 3) : 3;
+  const itemPct = `${(100 / colCount).toFixed(4)}%` as `${number}%`;
 
   const { data: activeCategoryRows } = useActiveCategories(true);
   const allCats = useMemo((): Category[] => {
@@ -118,8 +140,6 @@ const DiscoverView = ({
 
   const pinnedCats = useMemo(() => allCats.filter(isPinned), [allCats, isPinned]);
   const remainingCats = useMemo(() => allCats.filter((c) => !isPinned(c)), [allCats, isPinned]);
-  const showRemainingPills =
-    !hasSearch && pinnedCats.length > 0 && !showAllCategories && remainingCats.length > 0;
   const activeCat = allCats.find((c) => c.code === activeCategory);
 
   const { data: discoverData, isLoading: discoverLoading } = useDiscoverRecommendations(undefined, {
@@ -283,7 +303,7 @@ const DiscoverView = ({
             </TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View className="flex-row gap-2 pb-1">
+            <View className="flex-row flex-nowrap gap-2 pb-1">
               {pinnedCats.map((cat) => {
                 const isActive = activeCategory === cat.code;
                 return (
@@ -337,63 +357,76 @@ const DiscoverView = ({
             )}
           </View>
 
-          {showRemainingPills ? (
-            <DiscoverRemainingCategoryPills
-              categories={remainingCats.map((c) => ({
-                id: c.code,
-                label: c.label,
-                emoji: c.emoji,
-              }))}
-              activeCategoryId={activeCategory}
-              onSelectCategory={(id) => setActiveCategory(id === activeCategory ? 'all' : id)}
-            />
-          ) : (
-            <>
-              <View className="w-full flex-row flex-wrap justify-center gap-3">
-                {allCats.map((cat) => {
-                  const isActive = activeCategory === cat.code;
-                  const pinned = isPinned(cat);
-                  return (
-                    <View key={cat.id} className="relative" style={{ width: 230 }}>
-                      <TouchableOpacity
-                        onPress={() =>
-                          setActiveCategory(cat.code === activeCategory ? 'all' : cat.code)
-                        }
-                        activeOpacity={0.8}
-                        style={{ width: 230, height: 74 }}
-                        className={`flex-col items-center justify-center gap-1 rounded-2xl border ${
-                          isActive ? 'bg-primary/10 border-primary/40' : 'bg-white border-gray-200'
+          {pinnedCats.length === 0 || showAllCategories ? (
+            <View className="w-full flex-row flex-wrap">
+              {allCats.map((cat) => {
+                const isActive = activeCategory === cat.code;
+                const pinned = isPinned(cat);
+                return (
+                  <View key={cat.id} className="relative" style={{ width: itemPct, padding: 6 }}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        setActiveCategory(cat.code === activeCategory ? 'all' : cat.code)
+                      }
+                      activeOpacity={0.8}
+                      style={{ width: '100%', height: 74 }}
+                      className={`flex-col items-center justify-center gap-1 rounded-2xl border ${
+                        isActive ? 'bg-primary/10 border-primary/40' : 'bg-white border-gray-200'
+                      }`}
+                    >
+                      <Text style={{ fontSize: 24 }}>{cat.emoji}</Text>
+                      <Text
+                        numberOfLines={2}
+                        className={`text-[10px] font-bold tracking-tight text-center leading-tight px-1 ${
+                          isActive ? 'text-primary' : 'text-gray-700'
                         }`}
                       >
-                        <Text style={{ fontSize: 24 }}>{cat.emoji}</Text>
-                        <Text
-                          className={`text-[11px] font-bold tracking-tight ${
-                            isActive ? 'text-primary' : 'text-gray-700'
-                          }`}
-                        >
-                          {cat.label}
-                        </Text>
-                      </TouchableOpacity>
-                      <DiscoverCategoryPinButton
-                        isPinned={pinned}
-                        disabled={!cat.serverId || isTogglingPin}
-                        onPress={() => {
-                          if (cat.serverId) togglePin(cat.serverId, pinned);
-                        }}
-                      />
-                    </View>
+                        {cat.label}
+                      </Text>
+                    </TouchableOpacity>
+                    <DiscoverCategoryPinButton
+                      isPinned={pinned}
+                      disabled={!cat.serverId || isTogglingPin}
+                      onPress={() => {
+                        if (cat.serverId) togglePin(cat.serverId, pinned);
+                      }}
+                    />
+                  </View>
+                );
+              })}
+            </View>
+          ) : (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View className="flex-row flex-nowrap gap-2 pb-1">
+                {remainingCats.map((cat) => {
+                  const isActive = activeCategory === cat.code;
+                  return (
+                    <TouchableOpacity
+                      key={cat.id}
+                      onPress={() => setActiveCategory(cat.code === activeCategory ? 'all' : cat.code)}
+                      activeOpacity={0.8}
+                      className={`flex-row items-center gap-1.5 px-3 py-2 rounded-xl border ${
+                        isActive ? 'border-primary/40 bg-primary/10' : 'bg-card border-border'
+                      }`}
+                    >
+                      <Text style={{ fontSize: 16 }}>{cat.emoji}</Text>
+                      <Text className={`text-[10px] font-semibold whitespace-nowrap ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>
+                        {cat.label}
+                      </Text>
+                    </TouchableOpacity>
                   );
                 })}
               </View>
-              {pinnedCats.length === 0 && (
-                <View className="mt-3 flex-row items-center justify-center gap-1.5">
-                  <DiscoverCategoryPinHintIcon />
-                  <Text className="shrink text-xs text-muted-foreground text-center">
-                    Tap the pin on categories you use most to add them to your quick-access bar
-                  </Text>
-                </View>
-              )}
-            </>
+            </ScrollView>
+          )}
+
+          {pinnedCats.length === 0 && (
+            <View className="mt-3 flex-row items-center justify-center gap-1.5">
+              <DiscoverCategoryPinHintIcon />
+              <Text className="shrink text-xs text-muted-foreground text-center">
+                Tap the pin on categories you use most to add them to your quick-access bar
+              </Text>
+            </View>
           )}
         </View>
       )}
@@ -407,19 +440,9 @@ const DiscoverView = ({
       </Text>
 
       {isLoading && (
-        <View className="gap-4">
+        <View className="gap-3">
           {[1, 2, 3].map((i) => (
-            <View key={i} className="bg-card border border-border rounded-xl p-4 gap-3">
-              <View className="flex-row items-center gap-3">
-                <View className="w-9 h-9 rounded-full bg-muted" />
-                <View className="gap-1.5">
-                  <View className="h-3.5 w-24 bg-muted rounded" />
-                  <View className="h-3 w-32 bg-muted rounded" />
-                </View>
-              </View>
-              <View className="w-full aspect-[4/3] rounded-lg bg-muted" />
-              <View className="h-4 w-3/4 bg-muted rounded" />
-            </View>
+            <View key={i} className="h-16 rounded-xl bg-muted" />
           ))}
         </View>
       )}
@@ -466,15 +489,7 @@ const DiscoverView = ({
             <RecommendationCard
               recommendation={item}
               onTap={onOpenRec}
-              onSave={(rec) =>
-                setSaveTarget({
-                  id: rec.id,
-                  place_name: rec.title,
-                  category_code: rec.categoryId,
-                  location: rec.location,
-                  isSaved: rec.isSaved,
-                })
-              }
+              onSave={handleSavePress}
             />
           </View>
         )}

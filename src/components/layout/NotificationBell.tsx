@@ -44,7 +44,11 @@ const typeConfig: Record<string, { verb: string }> = {
 
 const FOLLOWABLE_TYPES = new Set(['follow', 'new_follower']);
 
-export const NotificationBell: React.FC = () => {
+interface NotificationBellProps {
+  onUserPress?: (userId: string) => void;
+}
+
+export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress }) => {
   const { notifications, unreadCount, loading, markAllAsRead } = useNotifications();
   const [open, setOpen] = useState(false);
   const [anchor, setAnchor] = useState<{ top: number; right: number } | null>(null);
@@ -65,7 +69,6 @@ export const NotificationBell: React.FC = () => {
       const winW = Dimensions.get('window').width;
       setAnchor({ top: y + h + 8, right: winW - x - w });
       setOpen(true);
-      void markAllAsRead();
     });
   }, [markAllAsRead]);
 
@@ -194,10 +197,8 @@ export const NotificationBell: React.FC = () => {
                     notifications.map((n) => {
                       const cfg = typeConfig[n.type] ?? typeConfig.reaction;
                       const actorName =
-                        n.actor_profile?.display_name?.trim() ||
-                        (n.actor_profile?.handle
-                          ? `@${n.actor_profile.handle.replace(/^@/, '')}`
-                          : null) ||
+                        n.actor_display_name?.trim() ||
+                        (n.actor_handle ? `@${n.actor_handle.replace(/^@/, '')}` : null) ||
                         'Someone';
                       const data = n.data;
                       const recTitle =
@@ -206,11 +207,13 @@ export const NotificationBell: React.FC = () => {
                           : '';
                       const isTrusted = n.type === 'trusted';
 
-                      const description = isTrusted
-                        ? `${actorName} is now Trusted`
-                        : recTitle
-                          ? `${actorName} ${cfg.verb} — ${recTitle}`
-                          : `${actorName} ${cfg.verb}`;
+                      const description = n.title
+                        ?? (isTrusted
+                          ? `${actorName} is now Trusted`
+                          : recTitle
+                            ? `${actorName} ${cfg.verb} — ${recTitle}`
+                            : `${actorName} ${cfg.verb}`);
+
 
                       return (
                         <View
@@ -219,29 +222,23 @@ export const NotificationBell: React.FC = () => {
                             !n.is_read ? 'bg-primary/5' : ''
                           }`}
                         >
-                          <View
-                            className={`h-9 w-9 shrink-0 overflow-hidden rounded-full ${
-                              isTrusted ? 'bg-primary/10 ring-2 ring-primary/20' : ''
-                            }`}
+                          <Pressable
+                            onPress={n.actor_id && onUserPress ? () => { close(); onUserPress(n.actor_id!); } : undefined}
+                            className="shrink-0 active:opacity-70"
                           >
-                            <SignedUserAvatar
-                              name={actorName}
-                              avatar={n.actor_profile?.avatar_url ?? undefined}
-                              className="h-9 w-9 border-0"
-                            />
-                          </View>
+                            <View className="h-9 w-9 rounded-full overflow-hidden">
+                              <SignedUserAvatar
+                                name={actorName}
+                                avatar={n.actor_avatar_url ?? undefined}
+                                className="h-9 w-9 border-0"
+                              />
+                            </View>
+
+                          </Pressable>
                           <View className="min-w-0 flex-1">
                             <Text className="text-sm text-foreground" numberOfLines={3}>
                               {description}
                             </Text>
-                            {isTrusted ? (
-                              <View className="mt-1 flex-row items-center gap-1 self-start rounded-full border border-primary/25 bg-primary/10 px-2 py-0.5">
-                                <ShieldCheck size={10} color={Theme.colors.primary} />
-                                <Text className="text-[10px] font-semibold text-primary">
-                                  Trusted
-                                </Text>
-                              </View>
-                            ) : null}
                             {FOLLOWABLE_TYPES.has(n.type) && n.actor_id ? (
                               followedIds.has(n.actor_id) ? (
                                 <View className="mt-1.5 flex-row items-center gap-1 self-start rounded-full border border-border bg-muted px-2.5 py-1">
@@ -263,9 +260,17 @@ export const NotificationBell: React.FC = () => {
                                 </Pressable>
                               )
                             ) : null}
-                            <Text className="mt-0.5 text-xs text-muted-foreground">
-                              {formatNotificationTime(n.created_at)}
-                            </Text>
+                            <View className="flex-row items-center gap-2 mt-0.5">
+                              <Text className="text-xs text-muted-foreground">
+                                {formatNotificationTime(n.created_at)}
+                              </Text>
+                              {isTrusted && (
+                                <View className="flex-row items-center gap-1 rounded-full border border-primary/25 bg-primary/10 px-2 py-0.5">
+                                  <ShieldCheck size={10} color={Theme.colors.primary} />
+                                  <Text className="text-[10px] font-semibold text-primary">Trusted</Text>
+                                </View>
+                              )}
+                            </View>
                           </View>
                           {!n.is_read ? (
                             <View className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />

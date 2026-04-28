@@ -24,6 +24,7 @@ interface HeaderProps {
   onSearchChange: (text: string) => void;
   onProfilePress: () => void;
   onAddPress: () => void;
+  onUserPress?: (userId: string) => void;
   isProfileActive?: boolean;
   avatarRefreshKey?: number;
 }
@@ -33,6 +34,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSearchChange,
   onProfilePress,
   onAddPress,
+  onUserPress,
   isProfileActive,
   avatarRefreshKey = 0,
 }) => {
@@ -104,7 +106,7 @@ export const Header: React.FC<HeaderProps> = ({
             </TouchableOpacity>
           )}
 
-          <NotificationBell />
+          <NotificationBell onUserPress={onUserPress} />
 
           <TouchableOpacity
             onPress={() => Auth.signOut()}

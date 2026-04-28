@@ -1,5 +1,6 @@
 import 'react-native-url-polyfill/auto';
 import { createClient } from '@supabase/supabase-js';
+import { Platform } from 'react-native';
 import { StorageService } from './StorageService';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
@@ -13,7 +14,7 @@ const client = createClient(BACKEND_URL, BACKEND_KEY, {
     storage: StorageService,
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: false,
+    detectSessionInUrl: Platform.OS === 'web',
   },
 });
 

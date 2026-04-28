@@ -33,6 +33,11 @@ export interface CollectionRexEntry {
   category_icon?: string;
   added_at: string;
   photo_path: string | null;
+  location?: string | null;
+  score_value_for_money?: number | null;
+  rating?: number | null;
+  recommender_name?: string | null;
+  recommender_handle?: string | null;
 }
 
 export interface CollectionDetailRow {
@@ -80,6 +85,17 @@ export const CollectionsApi = {
     );
   },
 
+  removeRexFromCollection: async (params: {
+    collection_id: string;
+    rex_id: string;
+  }): Promise<void> => {
+    const { error } = await Backend.rpc('remove_rex_from_collection', {
+      input_collection_id: params.collection_id,
+      input_rex_id: params.rex_id,
+    });
+    if (error) throw error;
+  },
+
   addRexToCollection: async (params: {
     collection_id: string;
     rex_id: string;
@@ -109,10 +125,8 @@ export const CollectionsApi = {
   },
 
   myCollectionIdsForRex: async (rexId: string): Promise<string[]> => {
-    const rows = unwrap(
-      await Backend.rpc('my_collection_ids_for_rex', { input_rex_id: rexId }),
-    ) as { collection_id: string }[];
-    return (rows || []).map((r) => r.collection_id);
+    const result = unwrap(await Backend.rpc('my_collection_ids_for_rex', { input_rex_id: rexId }));
+    return Array.isArray(result) ? result as string[] : [];
   },
 
   collectionDetail: async (collectionId: string): Promise<CollectionDetailRow> => {
@@ -122,6 +136,10 @@ export const CollectionsApi = {
       }),
     ) as CollectionDetailRow[];
     return rows[0];
+  },
+
+  deleteCollection: async (collectionId: string): Promise<void> => {
+    unwrap(await Backend.rpc('delete_collection', { input_collection_id: collectionId }));
   },
 
   saveRex: async (_userId: string, rexId: string): Promise<void> => {
