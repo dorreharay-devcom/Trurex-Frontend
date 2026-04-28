@@ -77,6 +77,7 @@ export default function HomeScreen() {
         onSearchChange={setSearchQuery}
         onProfilePress={() => handleTabChange('profile')}
         onAddPress={() => setCreateRecommendationOpen(true)}
+        onUserPress={openUserProfile}
         avatarRefreshKey={avatarRefreshKey}
       />
 
