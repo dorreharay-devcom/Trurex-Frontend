@@ -1,11 +1,11 @@
 import type { CircleApiRow } from '~/api/circlesApi';
 import type { CreateRecCircle } from '~/constants/recommendation/createCircles';
 
-const SYSTEM_KIND_STYLE: Record<string, { accent: string; iconBg: string }> = {
-  inner_circle: { accent: '#7c3aed', iconBg: '#ede9fe' },
-  trusted: { accent: '#ec4899', iconBg: '#fce7f3' },
-  close_friends: { accent: '#db2777', iconBg: '#fce7f3' },
-  broader_network: { accent: '#0ea5e9', iconBg: '#dbeafe' },
+const SYSTEM_KIND_COLOR_FALLBACK: Record<string, string> = {
+  inner_circle: '#7C3AED',
+  trusted: '#EC4899',
+  close_friends: '#EC4899',
+  broader_network: '#0EA5E9',
 };
 
 const USER_CIRCLE_PALETTE: { accent: string; iconBg: string }[] = [
@@ -45,17 +45,18 @@ function colorsForCircleRow(
   colors: { accent: string; iconBg: string };
   nextUserPaletteIndex: number;
 } {
-  const kind = row.system_kind;
-  if (kind && kind in SYSTEM_KIND_STYLE) {
-    return { colors: SYSTEM_KIND_STYLE[kind], nextUserPaletteIndex: userPaletteIndex };
-  }
-  const customHex = parseCircleAccentHex(row);
-  if (customHex) {
+  const fromApi = parseCircleAccentHex(row);
+  if (fromApi) {
     return {
-      colors: {
-        accent: customHex,
-        iconBg: hexToSoftIconBackground(customHex),
-      },
+      colors: { accent: fromApi, iconBg: hexToSoftIconBackground(fromApi) },
+      nextUserPaletteIndex: userPaletteIndex,
+    };
+  }
+  const kind = row.system_kind;
+  if (kind && kind in SYSTEM_KIND_COLOR_FALLBACK) {
+    const accent = SYSTEM_KIND_COLOR_FALLBACK[kind]!;
+    return {
+      colors: { accent, iconBg: hexToSoftIconBackground(accent) },
       nextUserPaletteIndex: userPaletteIndex,
     };
   }
@@ -78,12 +79,7 @@ export function circleTabIconKind(row: CircleApiRow): CircleTabIconKind {
 export function defaultCircleSubtitle(row: CircleApiRow): string {
   const d = row.description?.trim();
   if (d) return d;
-  const kind = row.system_kind;
-  if (kind === 'inner_circle') return 'Your closest, most trusted people';
-  if (kind === 'trusted' || kind === 'close_friends')
-    return 'People you trust and who trust you back';
-  if (kind === 'broader_network') return 'Public circle';
-  return 'Private circle';
+  return row.system_kind == null ? 'Private circle' : '';
 }
 
 export type CircleTabRow = {
@@ -108,20 +104,36 @@ function isUserCreatedCircle(row: CircleApiRow): boolean {
 }
 
 export function sortCirclesForTabList(rows: CircleApiRow[]): CircleApiRow[] {
-  return [...rows].sort((a, b) => {
-    const aCustom = isUserCreatedCircle(a);
-    const bCustom = isUserCreatedCircle(b);
-    if (aCustom !== bCustom) {
-      return aCustom ? 1 : -1;
-    }
-    if (!aCustom && !bCustom) {
-      const ao = SYSTEM_KIND_ORDER[a.system_kind!] ?? 50;
-      const bo = SYSTEM_KIND_ORDER[b.system_kind!] ?? 50;
-      if (ao !== bo) return ao - bo;
-      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+  const hasServerOrder = rows.some((r) => typeof r.sort_rank === 'number');
+
+  const sortUserCircles = (a: CircleApiRow, b: CircleApiRow) => {
+    if (hasServerOrder) {
+      const ar = a.sort_rank ?? 999;
+      const br = b.sort_rank ?? 999;
+      if (ar !== br) return ar - br;
     }
     return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-  });
+  };
+
+  const sortSystemCircles = (a: CircleApiRow, b: CircleApiRow) => {
+    if (hasServerOrder) {
+      const ar = a.sort_rank ?? 999;
+      const br = b.sort_rank ?? 999;
+      if (ar !== br) return ar - br;
+      const am = a.member_count ?? 0;
+      const bm = b.member_count ?? 0;
+      if (am !== bm) return am - bm;
+    }
+    const ao = SYSTEM_KIND_ORDER[a.system_kind ?? ''] ?? 50;
+    const bo = SYSTEM_KIND_ORDER[b.system_kind ?? ''] ?? 50;
+    if (ao !== bo) return ao - bo;
+    return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+  };
+
+  const systemRows = rows.filter((r) => !isUserCreatedCircle(r)).sort(sortSystemCircles);
+  const userRows = rows.filter((r) => isUserCreatedCircle(r)).sort(sortUserCircles);
+
+  return [...systemRows, ...userRows];
 }
 
 export function mapApiCirclesToTabRows(rows: CircleApiRow[]): CircleTabRow[] {

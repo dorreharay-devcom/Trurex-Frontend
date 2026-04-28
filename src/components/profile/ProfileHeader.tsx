@@ -12,6 +12,8 @@ import type { ProfileData } from '~/types/profile';
 
 export type { ProfileData };
 
+const PUBLIC_APP_ORIGIN = 'https://trurex.netlify.app';
+
 interface ProfileHeaderProps {
   profile: ProfileData;
   isOwnProfile?: boolean;
@@ -203,7 +205,10 @@ const ProfileHeader = ({
                   className={`flex-1 py-2.5 rounded-lg items-center justify-center ${isFollowing && !isGuest ? 'border border-border bg-card' : 'bg-primary'}`}
                 >
                   {followLoading ? (
-                    <ActivityIndicator size="small" color={isFollowing ? Theme.colors.foreground : Theme.colors.primaryForeground} />
+                    <ActivityIndicator
+                      size="small"
+                      color={isFollowing ? Theme.colors.foreground : Theme.colors.primaryForeground}
+                    />
                   ) : (
                     <Text className={`text-sm font-bold ${isFollowing && !isGuest ? 'text-foreground' : 'text-primary-foreground'}`}>
                       {isGuest ? 'Follow' : isFollowing ? 'Following' : 'Follow'}

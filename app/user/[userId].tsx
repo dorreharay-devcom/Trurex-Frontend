@@ -6,7 +6,10 @@ import ProfileView from '~/components/profile/ProfileView';
 import { Header } from '~/components/layout/Header';
 import { TabBar, Tab } from '~/components/layout/TabBar';
 import { RecommendationDetailModal } from '~/components/recommendation/RecommendationDetailModal';
-import type { Recommendation, RecommendationOpenOptions } from '~/types/recommendation/recommendation';
+import type {
+  Recommendation,
+  RecommendationOpenOptions,
+} from '~/types/recommendation/recommendation';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -20,9 +23,12 @@ export default function UserProfilePage() {
   const [previewRecommendation, setPreviewRecommendation] = useState<Recommendation | null>(null);
   const [previewOptions, setPreviewOptions] = useState<RecommendationOpenOptions>({});
 
-  const handleTabChange = useCallback((_tab: Tab) => {
-    router.replace('/');
-  }, [router]);
+  const handleTabChange = useCallback(
+    (_tab: Tab) => {
+      router.replace('/');
+    },
+    [router],
+  );
 
   const openPreview = useCallback((rec: Recommendation, options?: RecommendationOpenOptions) => {
     setPreviewOptions(options ?? {});

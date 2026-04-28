@@ -5,10 +5,16 @@ import {
   createCircle,
   deleteCircle,
   fetchCircleMembers,
+  fetchMyCircleMemberAssignments,
   removeCircleMember,
   updateCircle,
 } from '~/api/circlesApi';
-import { fetchTrustedUsers, fetchUserFollowers, fetchUserFollowing } from '~/api/usersApi';
+import {
+  fetchTrustedUsers,
+  fetchUserFollowers,
+  fetchUserFollowing,
+  filterOneWayFollowing,
+} from '~/api/usersApi';
 import { useAuth } from '~/services/AuthContext';
 import {
   mapApiCirclesToTabRows,
@@ -19,7 +25,6 @@ import {
   CIRCLE_COLOR_PRESETS,
   type CirclePresetColor,
   confirmDeleteCircle,
-  selectFollowersNotFollowedBack,
 } from '~/utils/circleTabUtils';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { useMyCircles } from '~/hooks/useMyCircles';
@@ -82,24 +87,52 @@ export function useCirclesViewModel(isActive: boolean) {
     enabled: connectionsEnabled && !!user?.id,
   });
 
-  const { data: followingAll = [], isLoading: followingLoading } = useQuery({
-    queryKey: ['circleConnections', 'following', user?.id],
-    queryFn: () => fetchUserFollowing(user!.id),
-    enabled: connectionsEnabled && !!user?.id,
-  });
-
   const { data: followerRows = [], isLoading: followersLoading } = useQuery({
     queryKey: ['circleConnections', 'followers', user?.id],
     queryFn: () => fetchUserFollowers(user!.id),
     enabled: connectionsEnabled && !!user?.id,
   });
 
-  const followersNotFollowedBack = useMemo(
-    () => selectFollowersNotFollowedBack(followerRows, followingAll),
-    [followerRows, followingAll],
-  );
+  const { data: followingAll = [], isLoading: followingLoading } = useQuery({
+    queryKey: ['circleConnections', 'following', user?.id],
+    queryFn: () => fetchUserFollowing(user!.id),
+    enabled: connectionsEnabled && !!user?.id,
+  });
 
-  const loadingFollowBackLists = followingLoading || followersLoading;
+  const followingOneWay = useMemo(() => filterOneWayFollowing(followingAll), [followingAll]);
+
+  const { data: circleMemberAssignments = [], isLoading: circleAssignmentsLoading } = useQuery({
+    queryKey: ['circleMemberAssignments', user?.id],
+    queryFn: fetchMyCircleMemberAssignments,
+    enabled: connectionsEnabled && !!user?.id,
+  });
+
+  const circleIdsByMemberUserId = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const a of circleMemberAssignments) {
+      let set = map.get(a.member_user_id);
+      if (!set) {
+        set = new Set<string>();
+        map.set(a.member_user_id, set);
+      }
+      set.add(a.circle_id);
+    }
+    return map;
+  }, [circleMemberAssignments]);
+
+  const circleForMemberUserId = useMemo(() => {
+    const sorted = sortCirclesForTabList(circles);
+    const idOrder = new Map(sorted.map((c, i) => [c.id, i]));
+    const m = new Map<string, (typeof circles)[number]>();
+    for (const a of circleMemberAssignments) {
+      const c = circles.find((x) => x.id === a.circle_id);
+      if (!c) continue;
+      const rank = idOrder.get(c.id) ?? 999;
+      const prev = m.get(a.member_user_id);
+      if (!prev || rank < (idOrder.get(prev.id) ?? 999)) m.set(a.member_user_id, c);
+    }
+    return m;
+  }, [circleMemberAssignments, circles]);
 
   const addMemberMutation = useMutation({
     mutationFn: async (vars: { circleId: string; userId: string }) => {
@@ -108,6 +141,8 @@ export function useCirclesViewModel(isActive: boolean) {
     },
     onSuccess: (_, v) => {
       queryClient.invalidateQueries({ queryKey: ['circleMembers', v.circleId] });
+      queryClient.invalidateQueries({ queryKey: ['circleMemberAssignments'] });
+      queryClient.invalidateQueries({ queryKey: ['myCircles'] });
       toastSuccess('Added to circle');
     },
     onError: (e: Error) => toastError('Could not add to circle', e.message),
@@ -121,6 +156,8 @@ export function useCirclesViewModel(isActive: boolean) {
     },
     onSuccess: (_, v) => {
       queryClient.invalidateQueries({ queryKey: ['circleMembers', v.circleId] });
+      queryClient.invalidateQueries({ queryKey: ['circleMemberAssignments'] });
+      queryClient.invalidateQueries({ queryKey: ['myCircles'] });
       toastSuccess('Removed from circle');
     },
     onError: (e: Error) => toastError('Could not remove from circle', e.message),
@@ -238,8 +275,11 @@ export function useCirclesViewModel(isActive: boolean) {
     trustedLoading,
     followerRows,
     followersLoading,
-    followersNotFollowedBack,
-    loadingFollowBackLists,
+    followingOneWay,
+    followingLoading,
+    circleForMemberUserId,
+    circleIdsByMemberUserId,
+    circleAssignmentsLoading,
     addingMemberId,
     removingMemberId,
     createMutation,

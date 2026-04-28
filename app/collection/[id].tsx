@@ -22,7 +22,7 @@ export default function CollectionPage() {
       <View className="flex-1">
         <CollectionDetailView
           collectionId={id}
-          onBack={() => router.canGoBack() ? router.back() : router.replace('/')}
+          onBack={() => (router.canGoBack() ? router.back() : router.replace('/'))}
           onAddItem={() => {}}
         />
       </View>

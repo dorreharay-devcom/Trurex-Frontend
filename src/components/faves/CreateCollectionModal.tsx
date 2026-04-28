@@ -20,7 +20,11 @@ import { Image } from 'expo-image';
 import { useAuth } from '~/services/AuthContext';
 import { useCreateCollection } from '~/hooks/useCollections';
 import { toastSuccess, toastError } from '~/utils/appToast';
-import { fetchUriAsBlob, uploadBlobToStorageBucket, resizeForUpload } from '~/utils/photos/storageUpload';
+import {
+  fetchUriAsBlob,
+  uploadBlobToStorageBucket,
+  resizeForUpload,
+} from '~/utils/photos/storageUpload';
 import { generateRexImageStoragePath } from '~/utils/photos/photoUtils';
 import { isWeb, webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';

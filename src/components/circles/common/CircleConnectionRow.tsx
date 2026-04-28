@@ -10,9 +10,10 @@ type Props = {
   onAdd: () => void;
   isMember: boolean;
   isAdding: boolean;
+  allowAdd?: boolean;
 };
 
-export function CircleConnectionRow({ row, onAdd, isMember, isAdding }: Props) {
+export function CircleConnectionRow({ row, onAdd, isMember, isAdding, allowAdd = true }: Props) {
   const label = row.display_name || 'Member';
   return (
     <View className="flex-row items-center gap-3 rounded-xl border border-border bg-card p-3">
@@ -27,26 +28,34 @@ export function CircleConnectionRow({ row, onAdd, isMember, isAdding }: Props) {
           </Text>
         ) : null}
       </View>
-      <Pressable
-        onPress={onAdd}
-        disabled={isMember || isAdding}
-        className={`flex-row items-center gap-1 rounded-lg border px-3 py-2 ${
-          isMember
-            ? 'border-border bg-muted opacity-70'
-            : 'border-border bg-background active:opacity-90'
-        }`}
-      >
-        {isAdding ? (
-          <ActivityIndicator size="small" color={Theme.colors.primary} />
-        ) : isMember ? (
-          <Text className="text-xs font-medium text-muted-foreground">In circle</Text>
-        ) : (
-          <>
-            <UserPlus size={14} color={Theme.colors.foreground} />
-            <Text className="text-xs font-medium text-foreground">Add</Text>
-          </>
-        )}
-      </Pressable>
+      {allowAdd ? (
+        <Pressable
+          onPress={onAdd}
+          disabled={isMember || isAdding}
+          className={`flex-row items-center gap-1 rounded-lg border px-3 py-2 ${
+            isMember
+              ? 'border-border bg-muted opacity-70'
+              : 'border-border bg-background active:opacity-90'
+          }`}
+        >
+          {isAdding ? (
+            <ActivityIndicator size="small" color={Theme.colors.primary} />
+          ) : isMember ? (
+            <Text className="text-xs font-medium" style={{ color: Theme.colors.foreground }}>
+              In circle
+            </Text>
+          ) : (
+            <>
+              <UserPlus size={14} color={Theme.colors.foreground} />
+              <Text className="text-xs font-medium text-foreground">Add to circle</Text>
+            </>
+          )}
+        </Pressable>
+      ) : (
+        <View className="rounded-full border border-border bg-muted px-2.5 py-1.5">
+          <Text className="text-[10px] font-medium text-muted-foreground">Following</Text>
+        </View>
+      )}
     </View>
   );
 }

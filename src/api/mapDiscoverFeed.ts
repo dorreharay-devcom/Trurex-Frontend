@@ -97,7 +97,14 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
   const authorId = optStr(o, 'user_id', 'author_id', 'author_user_id') ?? undefined;
   const authorName = optStr(o, 'author_display_name', 'author_name', 'user_name') ?? 'Member';
   const authorHandle = normalizeHandle(optStr(o, 'author_handle', 'handle') ?? '');
-  const avatarRaw = optStr(o, 'author_profile_picture_url', 'author_avatar_url', 'author_avatar', 'avatar_url', 'avatar');
+  const avatarRaw = optStr(
+    o,
+    'author_profile_picture_url',
+    'author_avatar_url',
+    'author_avatar',
+    'avatar_url',
+    'avatar',
+  );
 
   const created = o.created_at ?? o.createdAt;
 

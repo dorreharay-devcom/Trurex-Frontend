@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { ContentReportReasonCode, ContentReportTarget } from '~/constants/recommendation/contentReport';
+import type {
+  ContentReportReasonCode,
+  ContentReportTarget,
+} from '~/constants/recommendation/contentReport';
 import { MAX_CONTENT_REPORT_DETAILS } from '~/constants/recommendation/contentReport';
 
 type Params = {

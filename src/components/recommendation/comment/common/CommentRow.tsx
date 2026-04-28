@@ -34,10 +34,9 @@ export const CommentRow: React.FC<CommentRowProps> = ({
     (currentUserId && currentUserId === comment.author_id) ||
     (currentUserId && rexOwnerId && currentUserId === rexOwnerId);
   const name = comment.profile?.display_name?.trim() || 'Member';
-  const canReport =
-    Boolean(
-      onReport && currentUserId && comment.author_id && currentUserId !== comment.author_id,
-    );
+  const canReport = Boolean(
+    onReport && currentUserId && comment.author_id && currentUserId !== comment.author_id,
+  );
 
   const goToProfile = () => comment.author_id && onUserPress?.(comment.author_id);
 

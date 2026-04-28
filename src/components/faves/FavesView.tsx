@@ -47,7 +47,8 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
   const [addToCollectionRec, setAddToCollectionRec] = useState<RecSummary | null>(null);
 
   const { data: myCollections = [], isLoading: loadingMine } = useMyCollections(user?.id);
-  const { data: savedCollections = [], isLoading: loadingSavedCollections } = useMySavedCollections();
+  const { data: savedCollections = [], isLoading: loadingSavedCollections } =
+    useMySavedCollections();
   const collections = [...myCollections, ...savedCollections];
   const loadingCollections = loadingMine || loadingSavedCollections;
   const { data: savedRexes = [], isLoading: loadingSaved } = useSavedRexes({ uncollected: true });
@@ -127,7 +128,11 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-6">
           <View className="flex-row gap-3">
             {[1, 2, 3].map((i) => (
-              <View key={i} style={{ width: 160, height: 204, borderRadius: 12 }} className="bg-muted" />
+              <View
+                key={i}
+                style={{ width: 160, height: 204, borderRadius: 12 }}
+                className="bg-muted"
+              />
             ))}
           </View>
         </ScrollView>
@@ -138,7 +143,11 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
           contentContainerClassName="gap-3 pb-1 mb-6"
         >
           {filteredCollections.map((col) => (
-            <CollectionCard key={col.id} collection={col} onPress={() => setOpenCollectionId(col.id)} />
+            <CollectionCard
+              key={col.id}
+              collection={col}
+              onPress={() => setOpenCollectionId(col.id)}
+            />
           ))}
         </ScrollView>
       ) : (
@@ -152,13 +161,19 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
               <View
                 key={idx}
                 className={`w-12 h-16 rounded-xl ${item.bg} items-center justify-center`}
-                style={{ marginLeft: idx === 0 ? 0 : -8, zIndex: idx, transform: [{ rotate: `${(idx - 1) * 6}deg` }] }}
+                style={{
+                  marginLeft: idx === 0 ? 0 : -8,
+                  zIndex: idx,
+                  transform: [{ rotate: `${(idx - 1) * 6}deg` }],
+                }}
               >
                 <Text className="text-2xl">{item.emoji}</Text>
               </View>
             ))}
           </View>
-          <Text className="text-base font-display font-bold text-foreground mb-1">No collections yet</Text>
+          <Text className="text-base font-display font-bold text-foreground mb-1">
+            No collections yet
+          </Text>
           <Text className="text-sm text-muted-foreground text-center mb-4">
             Group your saved Rex into collections — by vibe, city, or whoever you'd share them with.
           </Text>
@@ -180,12 +195,16 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
             className="flex-row items-center gap-2 px-5 py-2.5 rounded-xl bg-primary"
           >
             <Plus size={16} color={Theme.colors.primaryForeground} />
-            <Text className="text-sm font-semibold text-primary-foreground">Create first collection</Text>
+            <Text className="text-sm font-semibold text-primary-foreground">
+              Create first collection
+            </Text>
           </TouchableOpacity>
         </View>
       )}
 
-      <Text className="text-base font-display font-medium text-foreground mb-1">Uncollected Rex</Text>
+      <Text className="text-base font-display font-medium text-foreground mb-1">
+        Uncollected Rex
+      </Text>
       <Text className="text-xs text-muted-foreground mb-4">
         Rex you've saved but haven't added to a collection yet
       </Text>
@@ -295,7 +314,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
         onCreated={(id) => {
           setShowCreateCollection(false);
           queryClient.invalidateQueries({ queryKey: ['my-collections'] });
-          onOpenCollection(id);
+          setOpenCollectionId(id);
         }}
       />
 
@@ -310,6 +329,5 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
     </>
   );
 };
-
 
 export default FavesView;

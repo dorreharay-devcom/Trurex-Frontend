@@ -77,9 +77,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   const handleCopyLink = async () => {
     setShowMenu(false);
     const base =
-      typeof window !== 'undefined'
-        ? window.location.origin
-        : 'https://trurex.netlify.app';
+      typeof window !== 'undefined' ? window.location.origin : 'https://trurex.netlify.app';
     await Clipboard.setStringAsync(`${base}/collection/${collectionId}`);
     toastSuccess('Link copied!');
   };
@@ -104,9 +102,18 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
         <TouchableOpacity
           ref={menuButtonRef as any}
           onPress={() => {
-            menuButtonRef.current?.measure((_x: number, _y: number, width: number, height: number, pageX: number, pageY: number) => {
-              setMenuPos({ top: pageY + height + 4, right: screenWidth - pageX - width });
-            });
+            menuButtonRef.current?.measure(
+              (
+                _x: number,
+                _y: number,
+                width: number,
+                height: number,
+                pageX: number,
+                pageY: number,
+              ) => {
+                setMenuPos({ top: pageY + height + 4, right: screenWidth - pageX - width });
+              },
+            );
             setShowMenu((v) => !v);
           }}
           className="p-2"
@@ -231,7 +238,10 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
           {detail.is_my_collection ? (
             <>
               <TouchableOpacity
-                onPress={() => { setShowEdit(true); setShowMenu(false); }}
+                onPress={() => {
+                  setShowEdit(true);
+                  setShowMenu(false);
+                }}
                 className="flex-row items-center gap-3 px-4 py-2.5"
               >
                 <Pencil size={15} color={Theme.colors.foreground} />
@@ -246,7 +256,10 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
               </TouchableOpacity>
               <View className="h-px bg-border mx-2 my-1" />
               <TouchableOpacity
-                onPress={() => { setShowDeleteConfirm(true); setShowMenu(false); }}
+                onPress={() => {
+                  setShowDeleteConfirm(true);
+                  setShowMenu(false);
+                }}
                 className="flex-row items-center gap-3 px-4 py-2.5"
               >
                 <Trash2 size={15} color={Theme.colors.destructive} />
@@ -275,10 +288,11 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                 }}
                 className="flex-row items-center gap-3 px-4 py-2.5"
               >
-                {isSaved
-                  ? <BookmarkMinus size={15} color={Theme.colors.destructive} />
-                  : <BookmarkPlus size={15} color={Theme.colors.foreground} />
-                }
+                {isSaved ? (
+                  <BookmarkMinus size={15} color={Theme.colors.destructive} />
+                ) : (
+                  <BookmarkPlus size={15} color={Theme.colors.foreground} />
+                )}
                 <Text className={`text-sm ${isSaved ? 'text-destructive' : 'text-foreground'}`}>
                   {isSaved ? 'Remove from saved' : 'Save to my collections'}
                 </Text>
@@ -317,7 +331,9 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
           >
             <View style={webContainerStyle} className="px-4">
               <View className="items-center mb-4">
-                <View className={`w-10 h-1 rounded-full bg-muted-foreground/30 ${isWeb ? 'hidden' : ''}`} />
+                <View
+                  className={`w-10 h-1 rounded-full bg-muted-foreground/30 ${isWeb ? 'hidden' : ''}`}
+                />
               </View>
               <View className="w-12 h-12 rounded-full bg-destructive/10 items-center justify-center mb-4 self-center">
                 <Trash2 size={22} color={Theme.colors.destructive} />
