@@ -407,19 +407,9 @@ const DiscoverView = ({
       </Text>
 
       {isLoading && (
-        <View className="gap-4">
+        <View className="gap-3">
           {[1, 2, 3].map((i) => (
-            <View key={i} className="bg-card border border-border rounded-xl p-4 gap-3">
-              <View className="flex-row items-center gap-3">
-                <View className="w-9 h-9 rounded-full bg-muted" />
-                <View className="gap-1.5">
-                  <View className="h-3.5 w-24 bg-muted rounded" />
-                  <View className="h-3 w-32 bg-muted rounded" />
-                </View>
-              </View>
-              <View className="w-full aspect-[4/3] rounded-lg bg-muted" />
-              <View className="h-4 w-3/4 bg-muted rounded" />
-            </View>
+            <View key={i} className="h-16 rounded-xl bg-muted" />
           ))}
         </View>
       )}
