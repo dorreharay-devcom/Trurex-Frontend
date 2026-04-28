@@ -141,10 +141,7 @@ export const useDeleteCollection = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (collectionId: string) => {
-      const { error } = await Backend.from('user_collections').delete().eq('id', collectionId);
-      if (error) throw error;
-    },
+    mutationFn: (collectionId: string) => CollectionsApi.deleteCollection(collectionId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-collections'] });
       toastSuccess('Collection deleted');

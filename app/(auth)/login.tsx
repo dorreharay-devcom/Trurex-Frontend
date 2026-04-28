@@ -45,10 +45,11 @@ export default function LoginScreen() {
   };
 
   const handleOAuth = async (provider: 'google' | 'apple') => {
+    const redirectUrl = getRedirectUrl();
     try {
-      const data = await AuthApi.signInWithOAuth(provider);
+      const data = await AuthApi.signInWithOAuth(provider, redirectUrl);
       if (!isWeb && data?.url) {
-        await WebBrowser.openAuthSessionAsync(data.url, getRedirectUrl());
+        await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
       }
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);

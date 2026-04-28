@@ -15,31 +15,38 @@ export type { ProfileData };
 interface ProfileHeaderProps {
   profile: ProfileData;
   isOwnProfile?: boolean;
+  isGuest?: boolean;
   onEditProfile?: () => void;
   onSignOut?: () => void;
   onAvatarPress?: () => void;
   avatarUploading?: boolean;
   onFollow?: () => void;
   onUnfollow?: () => void;
+  onGuestAction?: () => void;
   followLoading?: boolean;
 }
 
 const ProfileHeader = ({
   profile,
   isOwnProfile = false,
+  isGuest = false,
   onEditProfile,
   onSignOut,
   onAvatarPress,
   avatarUploading = false,
   onFollow,
   onUnfollow,
+  onGuestAction,
   followLoading = false,
 }: ProfileHeaderProps) => {
   const handleShare = async () => {
+    const slug = profile.handle
+      ? profile.handle.replace(/^@/, '')
+      : profile.userId;
     const url =
       Platform.OS === 'web'
-        ? `${typeof window !== 'undefined' ? window.location.origin : ''}/user/${profile.userId}`
-        : Linking.createURL(`/user/${profile.userId}`);
+        ? `${typeof window !== 'undefined' ? window.location.origin : ''}/user/${slug}`
+        : Linking.createURL(`/user/${slug}`);
     const name = profile.displayName || 'someone';
     try {
       if (Platform.OS === 'web') {
@@ -102,12 +109,28 @@ const ProfileHeader = ({
         {/* Name & info */}
         <View className="mt-3">
           <View className="flex-row items-center gap-2 flex-wrap">
-            <Text className="text-xl font-display font-bold text-foreground">
+            <Text className="text-xl font-bold text-foreground">
               {profile.displayName}
             </Text>
             {profile.relationshipStatus && (
-              <View className="px-1.5 py-0.5 rounded-full bg-secondary">
-                <Text className="text-[10px] font-bold text-secondary-foreground uppercase">
+              <View
+                className="px-1.5 py-0.5 rounded-full"
+                style={{
+                  backgroundColor:
+                    profile.relationshipStatus === 'trusted'
+                      ? Theme.colors.primary
+                      : Theme.colors.secondary,
+                }}
+              >
+                <Text
+                  className="text-[10px] font-bold uppercase"
+                  style={{
+                    color:
+                      profile.relationshipStatus === 'trusted'
+                        ? Theme.colors.primaryForeground
+                        : Theme.colors.secondaryForeground,
+                  }}
+                >
                   {profile.relationshipStatus.replace('_', ' ')}
                 </Text>
               </View>
@@ -174,16 +197,16 @@ const ProfileHeader = ({
                 profile.relationshipStatus === 'trusted';
               return (
                 <TouchableOpacity
-                  onPress={isFollowing ? onUnfollow : onFollow}
+                  onPress={isGuest ? onGuestAction : isFollowing ? onUnfollow : onFollow}
                   disabled={followLoading}
                   activeOpacity={0.8}
-                  className={`flex-1 py-2.5 rounded-lg items-center justify-center ${isFollowing ? 'border border-border bg-card' : 'bg-primary'}`}
+                  className={`flex-1 py-2.5 rounded-lg items-center justify-center ${isFollowing && !isGuest ? 'border border-border bg-card' : 'bg-primary'}`}
                 >
                   {followLoading ? (
                     <ActivityIndicator size="small" color={isFollowing ? Theme.colors.foreground : Theme.colors.primaryForeground} />
                   ) : (
-                    <Text className={`text-sm font-bold ${isFollowing ? 'text-foreground' : 'text-primary-foreground'}`}>
-                      {isFollowing ? 'Following' : 'Follow'}
+                    <Text className={`text-sm font-bold ${isFollowing && !isGuest ? 'text-foreground' : 'text-primary-foreground'}`}>
+                      {isGuest ? 'Follow' : isFollowing ? 'Following' : 'Follow'}
                     </Text>
                   )}
                 </TouchableOpacity>

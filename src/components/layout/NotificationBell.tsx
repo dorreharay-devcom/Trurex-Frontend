@@ -206,11 +206,12 @@ export const NotificationBell: React.FC = () => {
                           : '';
                       const isTrusted = n.type === 'trusted';
 
-                      const description = isTrusted
-                        ? `${actorName} is now Trusted`
-                        : recTitle
-                          ? `${actorName} ${cfg.verb} — ${recTitle}`
-                          : `${actorName} ${cfg.verb}`;
+                      const description = n.title
+                        ?? (isTrusted
+                          ? `${actorName} is now Trusted`
+                          : recTitle
+                            ? `${actorName} ${cfg.verb} — ${recTitle}`
+                            : `${actorName} ${cfg.verb}`);
 
                       return (
                         <View

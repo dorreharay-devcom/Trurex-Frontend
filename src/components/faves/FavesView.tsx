@@ -14,6 +14,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { Plus, PackageOpen, Search } from 'lucide-react-native';
+import { CollectionsApi } from '~/api/CollectionsApi';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { rexCoverStoragePathFromRecommendation, rexCoverRemoteHttpUrl } from '~/utils/recommendation/recContentDisplay';
@@ -111,6 +112,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
             queryClient.invalidateQueries({ queryKey: ['my-saved-rexes'] });
           }}
           onAddItem={(id) => setAddToCollectionId(id)}
+          onRecommendationPress={onRecommendationPress}
         />
         <Modal
           visible={sheetVisible}
@@ -306,12 +308,19 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
         ListHeaderComponent={ListHeader}
         renderItem={({ item }) => (
           <View
-            className="px-4 mb-4"
+            className="px-4"
             style={isWeb ? { maxWidth: 680, width: '100%', alignSelf: 'center' } : undefined}
           >
             <RecommendationCard
               recommendation={item}
               onTap={onRecommendationPress}
+              onRemove={() =>
+                CollectionsApi.unsaveRex(user!.id, item.id).then(() => {
+                  queryClient.invalidateQueries({ queryKey: ['my-saved-ids'] });
+                  queryClient.invalidateQueries({ queryKey: ['my-saved'] });
+                  queryClient.invalidateQueries({ queryKey: ['my-saved-rexes'] });
+                })
+              }
               onSave={(rec) =>
                 setAddToCollectionRec({
                   id: rec.id,

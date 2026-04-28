@@ -14,12 +14,12 @@ import {
   useWindowDimensions,
   Animated,
 } from 'react-native';
-import { Plus, Check, Image as ImageIcon, AlertCircle, MapPin } from 'lucide-react-native';
+import { Plus, Check, Image as ImageIcon, AlertCircle } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { useQueryClient } from '@tanstack/react-query';
 import { CollectionsApi, UserCollection } from '~/api/CollectionsApi';
 import { useAuth } from '~/services/AuthContext';
-import { toastSuccess } from '~/utils/appToast';
+import { toastSuccess, toastError } from '~/utils/appToast';
 import { webContainerStyle } from '~/utils';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
@@ -30,34 +30,33 @@ export interface RecSummary {
   place_name: string;
   category_code: string;
   location?: string;
-  isSaved?: boolean;
+  isSaved?: boolean | null;
 }
 
 interface CollectionWithCount extends UserCollection {
   item_count: number;
-  alreadyHasRec: boolean;
 }
 
 export interface AddToCollectionSheetProps {
   open: boolean;
   rec: RecSummary | null;
   onClose: () => void;
+  onRemove?: () => void;
 }
 
 const CollectionRow: React.FC<{
   col: CollectionWithCount;
-  isAdded: boolean;
-  isJustAdded: boolean;
+  selected: boolean;
   onPress: () => void;
-}> = ({ col, isAdded, isJustAdded, onPress }) => {
+}> = ({ col, selected, onPress }) => {
   const { uri: coverUri } = useSignedStorageUrl(REX_IMAGES_BUCKET, col.cover_image_path ?? '');
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={isAdded ? 1 : 0.7}
-      disabled={isAdded}
-      className={`w-full flex-row items-center gap-3 p-3 rounded-xl ${isAdded ? 'opacity-70' : ''}`}
+      activeOpacity={0.7}
+      style={selected ? { backgroundColor: `${Theme.colors.primary}14` } : undefined}
+      className="w-full flex-row items-center gap-3 p-3 rounded-xl"
     >
       <View className="w-10 h-10 rounded-lg bg-muted overflow-hidden items-center justify-center shrink-0">
         {coverUri ? (
@@ -70,47 +69,36 @@ const CollectionRow: React.FC<{
         <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
           {col.display_name}
         </Text>
-        <Text className="text-xs text-muted-foreground">
-          {isAdded && !isJustAdded
-            ? 'Already added'
-            : `${col.item_count} item${col.item_count !== 1 ? 's' : ''}`}
+        <Text
+          className="text-xs font-medium"
+          style={{ color: selected ? Theme.colors.primary : Theme.colors.muted }}
+        >
+          {selected ? 'In collection' : `${col.item_count} item${col.item_count !== 1 ? 's' : ''}`}
         </Text>
       </View>
-      {isAdded && <Check size={18} color={Theme.colors.primary} />}
+      {selected && <Check size={18} color={Theme.colors.primary} />}
     </TouchableOpacity>
   );
 };
 
-const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, onClose }) => {
+const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, onClose, onRemove }) => {
   const { user } = useAuth();
   const { height } = useWindowDimensions();
   const queryClient = useQueryClient();
 
   const [visible, setVisible] = useState(false);
   const [collections, setCollections] = useState<CollectionWithCount[]>([]);
-  const [addedTo, setAddedTo] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [original, setOriginal] = useState<Set<string>>(new Set());
+  const [isInAnyCollection, setIsInAnyCollection] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showNewCollection, setShowNewCollection] = useState(false);
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
 
-  const handleDone = async () => {
-    if (!addedTo && rec) {
-      if (rec.isSaved) {
-        toastSuccess('Already in your saved rexes');
-      } else {
-        try {
-          await CollectionsApi.saveRex(user!.id, rec.id);
-          queryClient.invalidateQueries({ queryKey: ['my-saved-ids'] });
-          queryClient.invalidateQueries({ queryKey: ['my-saved'] });
-          toastSuccess('Saved to uncollected');
-        } catch {}
-      }
-    }
-    onClose();
-  };
-
+  const suppressSaveToast = useRef(false);
   const backdropOpacity = useRef(new Animated.Value(0)).current;
   const sheetTranslateY = useRef(new Animated.Value(600)).current;
 
@@ -119,12 +107,7 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
       setVisible(true);
       Animated.parallel([
         Animated.timing(backdropOpacity, { toValue: 1, duration: 250, useNativeDriver: true }),
-        Animated.spring(sheetTranslateY, {
-          toValue: 0,
-          damping: 20,
-          stiffness: 200,
-          useNativeDriver: true,
-        }),
+        Animated.spring(sheetTranslateY, { toValue: 0, damping: 20, stiffness: 200, useNativeDriver: true }),
       ]).start();
     } else if (!open) {
       Animated.parallel([
@@ -143,20 +126,11 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
         CollectionsApi.userCollections(user.id),
         CollectionsApi.myCollectionIdsForRex(rec.id),
       ]);
-      if (!cols.length) {
-        setCollections([]);
-        setLoading(false);
-        return;
-      }
-
       const existingSet = new Set(existingIds);
-      setCollections(
-        cols.map((c) => ({
-          ...c,
-          item_count: c.rex_count ?? 0,
-          alreadyHasRec: existingSet.has(c.id),
-        })),
-      );
+      setOriginal(existingSet);
+      setSelected(new Set(existingSet));
+      setIsInAnyCollection(existingIds.length > 0);
+      setCollections(cols.map((c) => ({ ...c, item_count: c.rex_count ?? 0 })));
     } catch {
       setError('Failed to load collections');
     }
@@ -165,24 +139,58 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
 
   useEffect(() => {
     if (open && rec) {
-      setAddedTo(null);
+      setSelected(new Set());
+      setOriginal(new Set());
       setShowNewCollection(false);
       setNewName('');
       setError(null);
       loadCollections();
+
+      if (!rec.isSaved) {
+        suppressSaveToast.current = false;
+        CollectionsApi.saveRex(user!.id, rec.id)
+          .then(() => {
+            queryClient.invalidateQueries({ queryKey: ['my-saved-ids'] });
+            queryClient.invalidateQueries({ queryKey: ['my-saved'] });
+            if (!suppressSaveToast.current) toastSuccess('Saved to uncollected');
+          })
+          .catch((e: any) => {
+            toastError(e?.message || 'Failed to save');
+            onClose();
+          });
+      }
     }
   }, [open, rec, loadCollections]);
 
-  const handleAdd = async (collectionId: string, collectionTitle: string) => {
-    if (!user || !rec) return;
+  const toggleCollection = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleDone = async () => {
+    if (!rec) { onClose(); return; }
+    const toAdd = [...selected].filter((id) => !original.has(id));
+    const toRemove = [...original].filter((id) => !selected.has(id));
+    if (toAdd.length === 0 && toRemove.length === 0) { onClose(); return; }
+
+    setSaving(true);
     try {
-      await CollectionsApi.addRexToCollection({ collection_id: collectionId, rex_id: rec.id });
-      setAddedTo(collectionId);
-      toastSuccess(`Added to ${collectionTitle}`);
-      setTimeout(onClose, 800);
+      await Promise.all([
+        ...toAdd.map((id) => CollectionsApi.addRexToCollection({ collection_id: id, rex_id: rec.id })),
+        ...toRemove.map((id) => CollectionsApi.removeRexFromCollection({ collection_id: id, rex_id: rec.id })),
+      ]);
+      queryClient.invalidateQueries({ queryKey: ['my-collections'] });
+      queryClient.invalidateQueries({ queryKey: ['collection-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['my-saved-rexes'] });
     } catch {
-      setError('Failed to add — tap to retry');
+      toastError('Failed to update collections');
     }
+    setSaving(false);
+    onClose();
   };
 
   const handleCreateAndAdd = async () => {
@@ -192,9 +200,10 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
     try {
       const collection = await CollectionsApi.createCollection({ display_name: newName.trim() });
       await CollectionsApi.addRexToCollection({ collection_id: collection.id, rex_id: rec.id });
+      queryClient.invalidateQueries({ queryKey: ['my-collections'] });
       toastSuccess(`Added to ${collection.display_name}`);
       setCreating(false);
-      setTimeout(onClose, 800);
+      onClose();
     } catch {
       setError('Failed to create collection');
       setCreating(false);
@@ -228,44 +237,25 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
               style={{ maxHeight: height * 0.75 }}
               className="bg-card rounded-t-2xl border-t border-border flex flex-col"
             >
-              {/* Handle bar */}
               <View style={webContainerStyle} className="items-center py-3">
                 <View className="w-10 h-1 rounded-full bg-muted-foreground/30" />
               </View>
 
-              {/* Heading */}
               <View style={[{ paddingHorizontal: 16, paddingBottom: 8 }, webContainerStyle]} className="flex-row items-center justify-between">
                 <Text className="text-base font-display font-medium text-foreground">
                   Add to collection
                 </Text>
-                <TouchableOpacity onPress={handleDone} activeOpacity={0.7}>
-                  <Text className="text-sm font-semibold text-primary">Done</Text>
+                <TouchableOpacity onPress={handleDone} activeOpacity={0.7} disabled={saving}>
+                  {saving ? (
+                    <ActivityIndicator size="small" color={Theme.colors.primary} />
+                  ) : (
+                    <Text className="text-sm font-semibold text-primary">Done</Text>
+                  )}
                 </TouchableOpacity>
               </View>
 
-              {/* Rex summary */}
-              {rec && (
-                <View style={[{ paddingHorizontal: 16, paddingBottom: 12 }, webContainerStyle]}>
-                  <View className="flex-row items-center gap-2 flex-wrap">
-                    <Text className="text-sm font-semibold text-foreground">{rec.place_name}</Text>
-                    <View className="px-2 py-0.5 rounded-full bg-muted">
-                      <Text className="text-[10px] font-medium text-muted-foreground capitalize">
-                        {rec.category_code}
-                      </Text>
-                    </View>
-                    {rec.location && (
-                      <View className="flex-row items-center gap-0.5">
-                        <MapPin size={10} color={Theme.colors.muted} />
-                        <Text className="text-[11px] text-muted-foreground">{rec.location}</Text>
-                      </View>
-                    )}
-                  </View>
-                </View>
-              )}
-
               <View className="h-px bg-border" style={webContainerStyle} />
 
-              {/* Scrollable list */}
               <ScrollView
                 style={styles.list}
                 showsVerticalScrollIndicator={false}
@@ -293,23 +283,17 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
                     You have no collections yet
                   </Text>
                 ) : (
-                  collections.map((c) => {
-                    const isAdded = addedTo === c.id || c.alreadyHasRec;
-                    const isJustAdded = addedTo === c.id;
-                    return (
-                      <CollectionRow
-                        key={c.id}
-                        col={c}
-                        isAdded={isAdded}
-                        isJustAdded={isJustAdded}
-                        onPress={() => handleAdd(c.id, c.display_name)}
-                      />
-                    );
-                  })
+                  collections.map((c) => (
+                    <CollectionRow
+                      key={c.id}
+                      col={c}
+                      selected={selected.has(c.id)}
+                      onPress={() => toggleCollection(c.id)}
+                    />
+                  ))
                 )}
               </ScrollView>
 
-              {/* Create new collection — pinned to bottom */}
               <View className="border-t border-border">
                 <View style={[{ padding: 16 }, webContainerStyle]}>
                   {showNewCollection ? (
@@ -337,14 +321,29 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
                       </TouchableOpacity>
                     </View>
                   ) : (
-                    <TouchableOpacity
-                      onPress={() => setShowNewCollection(true)}
-                      activeOpacity={0.7}
-                      className="w-full flex-row items-center justify-center gap-1.5 py-2.5 rounded-lg border border-border"
-                    >
-                      <Plus size={14} color={Theme.colors.foreground} />
-                      <Text className="text-sm font-medium text-foreground">Create new collection</Text>
-                    </TouchableOpacity>
+                    <View className="gap-2">
+                      <TouchableOpacity
+                        onPress={() => setShowNewCollection(true)}
+                        activeOpacity={0.7}
+                        className="w-full flex-row items-center justify-center gap-1.5 py-2.5 rounded-lg border border-border"
+                      >
+                        <Plus size={14} color={Theme.colors.foreground} />
+                        <Text className="text-sm font-medium text-foreground">Create new collection</Text>
+                      </TouchableOpacity>
+
+                      {onRemove && !isInAnyCollection && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            suppressSaveToast.current = true;
+                            onRemove();
+                          }}
+                          activeOpacity={0.7}
+                          className="w-full flex-row items-center justify-center py-2.5 rounded-lg"
+                        >
+                          <Text className="text-sm font-medium text-destructive">Remove from uncollected</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
                   )}
                 </View>
               </View>

@@ -33,7 +33,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     Auth.getSession()
       .then(({ data: { session }, error }) => {
-        if (error) console.warn('[Auth]', error.message);
+        if (error) {
+          console.warn('[Auth]', error.message);
+          if ((error as any).code === 'refresh_token_not_found') {
+            Auth.signOut().catch(() => {});
+          }
+        }
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);

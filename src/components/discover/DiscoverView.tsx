@@ -22,6 +22,10 @@ import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
 import { Theme } from '~/theme/Theme';
 import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
 import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
+import { CollectionsApi } from '~/api/CollectionsApi';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '~/services/AuthContext';
+import { toastError } from '~/utils/appToast';
 
 const TRENDING_TAGS = ['pasta', 'speakeasy', 'santorini', 'memoir'];
 
@@ -72,10 +76,28 @@ const DiscoverView = ({
   onCreateRex,
 }: DiscoverViewProps) => {
   const onOpenRec = onRecommendationPress ?? onTapRec;
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { pinnedCategoryIds, togglePin, isTogglingPin } = usePinnedCategoryIds();
 
   const [activeCategory, setActiveCategory] = useState('all');
   const [saveTarget, setSaveTarget] = useState<RecSummary | null>(null);
+
+  const handleSavePress = useCallback(
+    (rec: Recommendation) => {
+      if (rec.authorId && user && rec.authorId === user.id) {
+        toastError("You can't save your own rex");
+        return;
+      }
+      setSaveTarget({
+        id: rec.id,
+        place_name: rec.title,
+        category_code: rec.categoryId,
+        location: rec.location,
+      });
+    },
+    [user],
+  );
   const [editingPinned, setEditingPinned] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
 
@@ -456,15 +478,7 @@ const DiscoverView = ({
             <RecommendationCard
               recommendation={item}
               onTap={onOpenRec}
-              onSave={(rec) =>
-                setSaveTarget({
-                  id: rec.id,
-                  place_name: rec.title,
-                  category_code: rec.categoryId,
-                  location: rec.location,
-                  isSaved: rec.isSaved,
-                })
-              }
+              onSave={handleSavePress}
             />
           </View>
         )}
@@ -474,6 +488,16 @@ const DiscoverView = ({
         open={!!saveTarget}
         onClose={() => setSaveTarget(null)}
         rec={saveTarget}
+        onRemove={() => {
+          if (!saveTarget) return;
+          CollectionsApi.unsaveRex(user!.id, saveTarget.id)
+            .then(() => {
+              setSaveTarget(null);
+              queryClient.invalidateQueries({ queryKey: ['my-saved-ids'] });
+              queryClient.invalidateQueries({ queryKey: ['my-saved'] });
+            })
+            .catch(() => {});
+        }}
       />
     </View>
   );

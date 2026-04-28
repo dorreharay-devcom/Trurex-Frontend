@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Modal, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Modal, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { ArrowLeft, Plus, MoreVertical, X, Trash2, Pencil, Link, BookmarkPlus, BookmarkMinus } from 'lucide-react-native';
+import { ArrowLeft, Plus, MoreVertical, Trash2, Pencil, Link, BookmarkPlus, BookmarkMinus } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import ImageColors from 'react-native-image-colors';
 import { isWeb, webContainerStyle } from '~/utils';
@@ -17,32 +17,51 @@ import EditCollectionModal from '~/components/faves/EditCollectionModal';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { toastSuccess } from '~/utils/appToast';
+import RecommendationCard from '~/components/recommendation/RecommendationCard';
+import type { Recommendation, RecommendationOpenOptions } from '~/types/recommendation/recommendation';
+import type { CollectionRexEntry } from '~/api/CollectionsApi';
+import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 
-const RexThumb: React.FC<{ photoPath: string | null }> = ({ photoPath }) => {
-  const { uri } = useSignedStorageUrl(REX_IMAGES_BUCKET, photoPath ?? '');
-
-  return (
-    <View className="w-20 h-20 bg-muted rounded-xl overflow-hidden">
-      {uri && <Image source={{ uri }} style={{ width: 80, height: 80 }} contentFit="cover" />}
-    </View>
-  );
-};
+function entryToRec(entry: CollectionRexEntry): Recommendation {
+  return {
+    id: entry.rex_id,
+    title: entry.place_name,
+    categoryId: entry.category_code,
+    category: entry.category_name ?? entry.category_code,
+    photoPath: entry.photo_path,
+    location: entry.location ?? undefined,
+    rating: entry.rating ?? undefined,
+    scoreValueForMoney: entry.score_value_for_money ?? undefined,
+    user: (entry.recommender_name || entry.recommender_handle)
+      ? { name: entry.recommender_name ?? '', handle: entry.recommender_handle ?? '', avatar: '' }
+      : null,
+    timeAgo: '',
+    likes: 0,
+    comments: 0,
+    saves: 0,
+    isLiked: false,
+    isSaved: true,
+  };
+}
 
 export interface CollectionDetailViewProps {
   collectionId: string;
   onBack: () => void;
   onAddItem: (collectionId: string) => void;
+  onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
 }
 
 const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   collectionId,
   onBack,
   onAddItem,
+  onRecommendationPress,
 }) => {
   const { width: screenWidth } = useWindowDimensions();
   const { data: detail, isLoading } = useCollectionDetail(collectionId);
   const { uri: coverUri } = useSignedStorageUrl(REX_IMAGES_BUCKET, detail?.cover_image_path ?? '');
   const [coverBg, setCoverBg] = useState('#1a1a1a');
+  const [saveTarget, setSaveTarget] = useState<RecSummary | null>(null);
 
   useEffect(() => {
     if (!coverUri) return;
@@ -92,18 +111,13 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
     );
   }
 
-  return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={webContainerStyle}
-      contentContainerClassName="px-4 pb-24"
-    >
+  const ListHeader = (
+    <View style={webContainerStyle} className="px-4">
       <View className="flex-row items-center justify-between py-4">
         <TouchableOpacity onPress={onBack} className="flex-row items-center gap-1">
           <ArrowLeft size={16} color={Theme.colors.muted} />
           <Text className="text-sm text-muted-foreground">Back</Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           ref={menuButtonRef as any}
           onPress={() => {
@@ -119,15 +133,9 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
       </View>
 
       {coverUri && (
-        <View
-          style={{ width: '100%', height: 220, borderRadius: 12, overflow: 'hidden', marginBottom: 12 }}
-        >
+        <View style={{ width: '100%', height: 220, borderRadius: 12, overflow: 'hidden', marginBottom: 12 }}>
           <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: coverBg, opacity: 0.15 }} />
-          <Image
-            source={{ uri: coverUri }}
-            style={{ width: '100%', height: '100%' }}
-            contentFit="contain"
-          />
+          <Image source={{ uri: coverUri }} style={{ width: '100%', height: '100%' }} contentFit="contain" />
         </View>
       )}
 
@@ -147,35 +155,52 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
       ) : (
         <View className="h-px bg-border my-4" />
       )}
+    </View>
+  );
 
-      <View className="gap-3">
-        {detail.rexes.map((rex) => (
-          <View
-            key={rex.rex_id}
-            className="bg-card border border-border rounded-xl overflow-hidden flex-row items-stretch"
-          >
-            <RexThumb photoPath={rex.photo_path} />
-            <View className="flex-1 px-4 py-3 justify-center">
-              <Text className="text-sm font-semibold text-foreground" numberOfLines={2}>{rex.place_name}</Text>
-              <Text className="text-xs text-muted-foreground mt-0.5">{rex.category_name ?? rex.category_code}</Text>
-            </View>
-            {detail.is_my_collection && (
-              <TouchableOpacity onPress={() => removeMutation.mutate(rex.rex_id)} className="px-4 items-center justify-center">
-                <X size={16} color={Theme.colors.muted} />
-              </TouchableOpacity>
-            )}
+  return (
+    <>
+      <FlatList
+        data={detail.rexes}
+        keyExtractor={(item) => item.rex_id}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={webContainerStyle}
+        contentContainerClassName="pb-24"
+        ListHeaderComponent={ListHeader}
+        ListEmptyComponent={
+          <View className="items-center py-10 gap-2 px-4">
+            <Text className="text-sm text-muted-foreground text-center">No rexes in this collection yet.</Text>
           </View>
-        ))}
-      </View>
+        }
+        renderItem={({ item }) => (
+          <View
+            className="px-4"
+            style={isWeb ? { maxWidth: 680, width: '100%', alignSelf: 'center' } : undefined}
+          >
+            <RecommendationCard
+              recommendation={entryToRec(item)}
+              onTap={onRecommendationPress}
+              onRemove={detail.is_my_collection ? () => removeMutation.mutate(item.rex_id) : undefined}
+              onSave={() =>
+                setSaveTarget({
+                  id: item.rex_id,
+                  place_name: item.place_name,
+                  category_code: item.category_code,
+                  location: item.location ?? undefined,
+                  isSaved: true,
+                })
+              }
+            />
+          </View>
+        )}
+      />
 
-      <Modal
-        visible={showMenu}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowMenu(false)}
-      >
+      <Modal visible={showMenu} transparent animationType="fade" onRequestClose={() => setShowMenu(false)}>
         <Pressable style={StyleSheet.absoluteFill} onPress={() => setShowMenu(false)} />
-        <View style={{ position: 'absolute', top: menuPos.top, right: menuPos.right, minWidth: 200 }} className="bg-card border border-border rounded-xl shadow-lg p-2">
+        <View
+          style={{ position: 'absolute', top: menuPos.top, right: menuPos.right, minWidth: 200 }}
+          className="bg-card border border-border rounded-xl shadow-lg p-2"
+        >
           {detail.is_my_collection ? (
             <>
               <TouchableOpacity
@@ -267,18 +292,15 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
               <View className="items-center mb-4">
                 <View className={`w-10 h-1 rounded-full bg-muted-foreground/30 ${isWeb ? 'hidden' : ''}`} />
               </View>
-
               <View className="w-12 h-12 rounded-full bg-destructive/10 items-center justify-center mb-4 self-center">
                 <Trash2 size={22} color={Theme.colors.destructive} />
               </View>
-
               <Text className="text-lg font-display font-bold text-foreground text-center mb-1">
                 Delete collection?
               </Text>
               <Text className="text-sm text-muted-foreground text-center mb-6">
                 "{detail.display_name}" will be permanently deleted. This cannot be undone.
               </Text>
-
               <View className="flex-row gap-3">
                 <TouchableOpacity
                   onPress={() => setShowDeleteConfirm(false)}
@@ -299,7 +321,13 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
           </Pressable>
         </Pressable>
       </Modal>
-    </ScrollView>
+
+      <AddToCollectionSheet
+        open={!!saveTarget}
+        rec={saveTarget}
+        onClose={() => setSaveTarget(null)}
+      />
+    </>
   );
 };
 

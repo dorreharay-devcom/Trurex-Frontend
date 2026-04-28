@@ -3,6 +3,7 @@ export interface AppNotification {
   user_id: string;
   actor_id: string | null;
   type: string;
+  title?: string | null;
   data: Record<string, unknown> | null;
   is_read: boolean;
   created_at: string;

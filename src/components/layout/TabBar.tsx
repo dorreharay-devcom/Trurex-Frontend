@@ -33,7 +33,7 @@ export const TabBar: React.FC<TabBarProps> = ({ currentTab, onTabChange }) => {
       <TouchableOpacity
         key={id}
         onPress={() => onTabChange(id)}
-        className={`flex-row items-center gap-2 pr-6 py-3 border-b-2 ${active ? 'border-primary' : 'border-transparent'}`}
+        className={`flex-row items-center gap-2 px-5 py-3 border-b-2 ${active ? 'border-primary' : 'border-transparent'}`}
       >
         <Icon size={16} color={active ? Theme.colors.foreground : Theme.colors.muted} />
         <Text className={`text-sm ${active ? 'font-medium text-foreground' : 'text-muted'}`}>
@@ -50,13 +50,9 @@ export const TabBar: React.FC<TabBarProps> = ({ currentTab, onTabChange }) => {
           {NAV_ITEMS.map(renderItem)}
         </View>
       ) : (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerClassName="pl-4"
-        >
-          <View className="flex-row">{NAV_ITEMS.map(renderItem)}</View>
-        </ScrollView>
+        <View className="flex-row justify-center">
+          {NAV_ITEMS.map(renderItem)}
+        </View>
       )}
     </View>
   );
