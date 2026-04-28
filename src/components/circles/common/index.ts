@@ -4,5 +4,6 @@ export { CircleMemberRow } from './CircleMemberRow';
 export { FollowingEmptyState } from './FollowingEmptyState';
 export { MembersEmptyState } from './MembersEmptyState';
 export { NetworkPreviewRow } from './NetworkPreviewRow';
+export { NetworkConnectionRow } from './NetworkConnectionRow';
 export { SectionSpinner } from './SectionSpinner';
 export { TrustedEmptyState } from './TrustedEmptyState';

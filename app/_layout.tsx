@@ -15,9 +15,7 @@ const queryClient = new QueryClient();
 const toastBase = { alignSelf: 'flex-end' as const, marginRight: 16, borderLeftColor: '#E9560C' };
 
 const toastConfig = {
-  success: (props: ToastRowProps) => (
-    <SuccessToast {...props} style={[toastBase, props.style]} />
-  ),
+  success: (props: ToastRowProps) => <SuccessToast {...props} style={[toastBase, props.style]} />,
   error: (props: ComponentProps<typeof ErrorToast>) => (
     <ErrorToast {...props} style={[toastBase, props.style]} />
   ),

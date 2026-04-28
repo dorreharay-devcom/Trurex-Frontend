@@ -1,7 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Modal, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Modal,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+} from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { ArrowLeft, Plus, MoreVertical, X, Trash2, Pencil, Link, BookmarkPlus, BookmarkMinus } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  Plus,
+  MoreVertical,
+  X,
+  Trash2,
+  Pencil,
+  Link,
+  BookmarkPlus,
+  BookmarkMinus,
+} from 'lucide-react-native';
 import { Image } from 'expo-image';
 import ImageColors from 'react-native-image-colors';
 import { isWeb, webContainerStyle } from '~/utils';
@@ -75,9 +95,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   const handleCopyLink = async () => {
     setShowMenu(false);
     const base =
-      typeof window !== 'undefined'
-        ? window.location.origin
-        : 'https://trurex.netlify.app';
+      typeof window !== 'undefined' ? window.location.origin : 'https://trurex.netlify.app';
     await Clipboard.setStringAsync(`${base}/collection/${collectionId}`);
     toastSuccess('Link copied!');
   };
@@ -107,9 +125,18 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
         <TouchableOpacity
           ref={menuButtonRef as any}
           onPress={() => {
-            menuButtonRef.current?.measure((_x: number, _y: number, width: number, height: number, pageX: number, pageY: number) => {
-              setMenuPos({ top: pageY + height + 4, right: screenWidth - pageX - width });
-            });
+            menuButtonRef.current?.measure(
+              (
+                _x: number,
+                _y: number,
+                width: number,
+                height: number,
+                pageX: number,
+                pageY: number,
+              ) => {
+                setMenuPos({ top: pageY + height + 4, right: screenWidth - pageX - width });
+              },
+            );
             setShowMenu((v) => !v);
           }}
           className="p-2"
@@ -120,9 +147,17 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
 
       {coverUri && (
         <View
-          style={{ width: '100%', height: 220, borderRadius: 12, overflow: 'hidden', marginBottom: 12 }}
+          style={{
+            width: '100%',
+            height: 220,
+            borderRadius: 12,
+            overflow: 'hidden',
+            marginBottom: 12,
+          }}
         >
-          <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: coverBg, opacity: 0.15 }} />
+          <View
+            style={{ ...StyleSheet.absoluteFillObject, backgroundColor: coverBg, opacity: 0.15 }}
+          />
           <Image
             source={{ uri: coverUri }}
             style={{ width: '100%', height: '100%' }}
@@ -156,11 +191,18 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
           >
             <RexThumb photoPath={rex.photo_path} />
             <View className="flex-1 px-4 py-3 justify-center">
-              <Text className="text-sm font-semibold text-foreground" numberOfLines={2}>{rex.place_name}</Text>
-              <Text className="text-xs text-muted-foreground mt-0.5">{rex.category_name ?? rex.category_code}</Text>
+              <Text className="text-sm font-semibold text-foreground" numberOfLines={2}>
+                {rex.place_name}
+              </Text>
+              <Text className="text-xs text-muted-foreground mt-0.5">
+                {rex.category_name ?? rex.category_code}
+              </Text>
             </View>
             {detail.is_my_collection && (
-              <TouchableOpacity onPress={() => removeMutation.mutate(rex.rex_id)} className="px-4 items-center justify-center">
+              <TouchableOpacity
+                onPress={() => removeMutation.mutate(rex.rex_id)}
+                className="px-4 items-center justify-center"
+              >
                 <X size={16} color={Theme.colors.muted} />
               </TouchableOpacity>
             )}
@@ -175,11 +217,17 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
         onRequestClose={() => setShowMenu(false)}
       >
         <Pressable style={StyleSheet.absoluteFill} onPress={() => setShowMenu(false)} />
-        <View style={{ position: 'absolute', top: menuPos.top, right: menuPos.right, minWidth: 200 }} className="bg-card border border-border rounded-xl shadow-lg p-2">
+        <View
+          style={{ position: 'absolute', top: menuPos.top, right: menuPos.right, minWidth: 200 }}
+          className="bg-card border border-border rounded-xl shadow-lg p-2"
+        >
           {detail.is_my_collection ? (
             <>
               <TouchableOpacity
-                onPress={() => { setShowEdit(true); setShowMenu(false); }}
+                onPress={() => {
+                  setShowEdit(true);
+                  setShowMenu(false);
+                }}
                 className="flex-row items-center gap-3 px-4 py-2.5"
               >
                 <Pencil size={15} color={Theme.colors.foreground} />
@@ -194,7 +242,10 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
               </TouchableOpacity>
               <View className="h-px bg-border mx-2 my-1" />
               <TouchableOpacity
-                onPress={() => { setShowDeleteConfirm(true); setShowMenu(false); }}
+                onPress={() => {
+                  setShowDeleteConfirm(true);
+                  setShowMenu(false);
+                }}
                 className="flex-row items-center gap-3 px-4 py-2.5"
               >
                 <Trash2 size={15} color={Theme.colors.destructive} />
@@ -223,10 +274,11 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                 }}
                 className="flex-row items-center gap-3 px-4 py-2.5"
               >
-                {isSaved
-                  ? <BookmarkMinus size={15} color={Theme.colors.destructive} />
-                  : <BookmarkPlus size={15} color={Theme.colors.foreground} />
-                }
+                {isSaved ? (
+                  <BookmarkMinus size={15} color={Theme.colors.destructive} />
+                ) : (
+                  <BookmarkPlus size={15} color={Theme.colors.foreground} />
+                )}
                 <Text className={`text-sm ${isSaved ? 'text-destructive' : 'text-foreground'}`}>
                   {isSaved ? 'Remove from saved' : 'Save to my collections'}
                 </Text>
@@ -265,7 +317,9 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
           >
             <View style={webContainerStyle} className="px-4">
               <View className="items-center mb-4">
-                <View className={`w-10 h-1 rounded-full bg-muted-foreground/30 ${isWeb ? 'hidden' : ''}`} />
+                <View
+                  className={`w-10 h-1 rounded-full bg-muted-foreground/30 ${isWeb ? 'hidden' : ''}`}
+                />
               </View>
 
               <View className="w-12 h-12 rounded-full bg-destructive/10 items-center justify-center mb-4 self-center">

@@ -246,7 +246,9 @@ export const NotificationBell: React.FC = () => {
                               followedIds.has(n.actor_id) ? (
                                 <View className="mt-1.5 flex-row items-center gap-1 self-start rounded-full border border-border bg-muted px-2.5 py-1">
                                   <UserCheck size={11} color={Theme.colors.secondaryText} />
-                                  <Text className="text-[11px] text-muted-foreground">Following</Text>
+                                  <Text className="text-[11px] text-muted-foreground">
+                                    Following
+                                  </Text>
                                 </View>
                               ) : (
                                 <Pressable
@@ -255,7 +257,9 @@ export const NotificationBell: React.FC = () => {
                                   className="mt-1.5 flex-row items-center gap-1 self-start rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 active:opacity-70"
                                 >
                                   <UserPlus size={11} color={Theme.colors.primary} />
-                                  <Text className="text-[11px] font-medium text-primary">Follow Back</Text>
+                                  <Text className="text-[11px] font-medium text-primary">
+                                    Follow Back
+                                  </Text>
                                 </Pressable>
                               )
                             ) : null}

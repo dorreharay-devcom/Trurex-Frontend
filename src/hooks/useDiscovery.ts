@@ -135,7 +135,13 @@ export const useMyRexes = (userId?: string) => {
   return useQuery<Recommendation[]>({
     queryKey: ['my-rexes', userId],
     queryFn: async () => {
-      const raw = unwrap(await Backend.rpc('user_rexes', { input_user_id: userId, result_limit: 50, result_offset: 0 }));
+      const raw = unwrap(
+        await Backend.rpc('user_rexes', {
+          input_user_id: userId,
+          result_limit: 50,
+          result_offset: 0,
+        }),
+      );
       if (!Array.isArray(raw)) return [];
       return raw.flatMap((row) => {
         const rec = mapDiscoverFeedRowSafe(row);

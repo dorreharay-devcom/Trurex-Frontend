@@ -20,7 +20,11 @@ import { Image } from 'expo-image';
 import { useUpdateCollection } from '~/hooks/useCollections';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { toastError } from '~/utils/appToast';
-import { fetchUriAsBlob, uploadBlobToStorageBucket, resizeForUpload } from '~/utils/photos/storageUpload';
+import {
+  fetchUriAsBlob,
+  uploadBlobToStorageBucket,
+  resizeForUpload,
+} from '~/utils/photos/storageUpload';
 import { generateRexImageStoragePath } from '~/utils/photos/photoUtils';
 import { isWeb, webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
@@ -147,9 +151,7 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
         display_name: name.trim(),
         description: description.trim() || null,
         update_cover_image_path: coverChanged,
-        cover_image_path: coverChanged
-          ? (newCoverStoragePath ?? null)
-          : undefined,
+        cover_image_path: coverChanged ? (newCoverStoragePath ?? null) : undefined,
       },
       { onSuccess: onUpdated },
     );
@@ -241,9 +243,7 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
 
                 {/* Name */}
                 <View>
-                  <Text className="text-xs font-semibold text-muted-foreground mb-1.5">
-                    Name *
-                  </Text>
+                  <Text className="text-xs font-semibold text-muted-foreground mb-1.5">Name *</Text>
                   <TextInput
                     value={name}
                     onChangeText={(v) => setName(v.slice(0, 60))}

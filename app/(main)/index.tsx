@@ -98,7 +98,14 @@ export default function HomeScreen() {
           <ProfileView
             userId={viewingUserId}
             onAvatarUpdated={() => setAvatarRefreshKey((k) => k + 1)}
-            onBack={viewingUserId ? () => { setViewingUserId(undefined); setCurrentTab('discover'); } : undefined}
+            onBack={
+              viewingUserId
+                ? () => {
+                    setViewingUserId(undefined);
+                    setCurrentTab('discover');
+                  }
+                : undefined
+            }
             onRexPress={openPreview}
           />
         )}

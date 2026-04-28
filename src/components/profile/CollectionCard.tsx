@@ -60,7 +60,9 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
       />
 
       <View className="absolute top-2.5 right-2.5">
-        <View className={`px-2 py-0.5 rounded-full ${collection.is_my_collection ? 'bg-primary/80' : 'bg-black/50'}`}>
+        <View
+          className={`px-2 py-0.5 rounded-full ${collection.is_my_collection ? 'bg-primary/80' : 'bg-black/50'}`}
+        >
           <Text className="text-[10px] font-semibold text-white">
             {collection.is_my_collection ? 'Mine' : 'Saved'}
           </Text>

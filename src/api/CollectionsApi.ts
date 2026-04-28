@@ -109,7 +109,9 @@ export const CollectionsApi = {
   },
 
   myCollectionIdsForRex: async (rexId: string): Promise<string[]> => {
-    const rows = unwrap(await Backend.rpc('my_collection_ids_for_rex', { input_rex_id: rexId })) as { collection_id: string }[];
+    const rows = unwrap(
+      await Backend.rpc('my_collection_ids_for_rex', { input_rex_id: rexId }),
+    ) as { collection_id: string }[];
     return (rows || []).map((r) => r.collection_id);
   },
 

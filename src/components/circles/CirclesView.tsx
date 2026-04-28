@@ -1,19 +1,23 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { ChevronRight, Plus, Users, X } from 'lucide-react-native';
+import { CircleAssignmentSheet } from '~/components/circles/CircleAssignmentSheet';
 import { CircleDetailScreen } from '~/components/circles/CircleDetailScreen';
+import { PeopleYouMayKnowSection } from '~/components/circles/PeopleYouMayKnowSection';
+import { ShareProfileCard } from '~/components/circles/ShareProfileCard';
 import {
   CircleGlyphIcon,
   FollowingEmptyState,
-  NetworkPreviewRow,
+  NetworkConnectionRow,
   TrustedEmptyState,
 } from '~/components/circles/common';
 import { type CirclesViewModel, useCirclesViewModel } from '~/hooks/circles/useCirclesViewModel';
 import { Theme } from '~/theme/Theme';
-import type { NetworkUserRow } from '~/types/network';
 import { webContainerStyle } from '~/utils';
 
 type Props = { isActive: boolean };
+
+type ConnTab = 'followers' | 'following' | 'trusted';
 
 const CirclesView = ({ isActive }: Props) => {
   const vm = useCirclesViewModel(isActive);
@@ -26,201 +30,264 @@ const CirclesView = ({ isActive }: Props) => {
 };
 
 function CirclesListContent({ vm, isActive }: { vm: CirclesViewModel; isActive: boolean }) {
+  const [connTab, setConnTab] = useState<ConnTab>('followers');
+  const [circleSheet, setCircleSheet] = useState<{ id: string; name: string } | null>(null);
+
+  const sheetMemberCircleIds = useMemo(() => {
+    if (!circleSheet?.id) return new Set<string>();
+    return vm.circleIdsByMemberUserId.get(circleSheet.id) ?? new Set<string>();
+  }, [circleSheet?.id, vm.circleIdsByMemberUserId]);
+
   return (
-    <ScrollView
-      className="flex-1 w-full"
-      contentContainerStyle={webContainerStyle}
-      contentContainerClassName="w-full p-4 pb-24"
-      keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={false}
-    >
-      <Text className="mb-3 text-base font-semibold text-foreground">My Circles</Text>
+    <>
+      <ScrollView
+        className="flex-1 w-full"
+        contentContainerStyle={webContainerStyle}
+        contentContainerClassName="w-full p-4 pb-24"
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <ShareProfileCard isActive={isActive} />
+        <Text className="mb-3 text-base font-semibold text-foreground">My Circles</Text>
 
-      <View className="mb-3 flex-row items-center justify-between">
-        <Text className="text-sm font-medium text-foreground">Trust Circles</Text>
-        <Pressable
-          onPress={() => vm.setShowCreate((v) => !v)}
-          className="flex-row items-center gap-1 rounded-lg bg-primary px-3 py-2 active:opacity-90"
-        >
-          <Plus size={14} color={Theme.colors.primaryForeground} />
-          <Text className="text-xs font-semibold text-primary-foreground">New Circle</Text>
-        </Pressable>
-      </View>
-
-      {vm.showCreate && (
-        <View className="mb-6 rounded-xl border border-border bg-card p-4">
-          <View className="mb-3 flex-row items-center justify-between">
-            <Text className="text-sm font-semibold text-foreground">Create a new circle</Text>
-            <Pressable
-              onPress={() => vm.setShowCreate(false)}
-              hitSlop={8}
-              className="p-1 active:opacity-70"
-            >
-              <X size={16} color={Theme.colors.muted} />
-            </Pressable>
-          </View>
-          <TextInput
-            placeholder="Circle name..."
-            placeholderTextColor={Theme.colors.muted}
-            value={vm.newName}
-            onChangeText={vm.setNewName}
-            maxLength={40}
-            className="mb-3 rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground"
-          />
-          <TextInput
-            placeholder="Description (optional)"
-            placeholderTextColor={Theme.colors.muted}
-            value={vm.newDesc}
-            onChangeText={vm.setNewDesc}
-            maxLength={100}
-            multiline
-            className="mb-3 min-h-[44px] rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground"
-          />
-          <Text className="mb-2 text-xs text-muted-foreground">Color</Text>
-          <View className="mb-4 flex-row flex-wrap gap-2">
-            {vm.colorPresets.map((c) => (
-              <Pressable
-                key={c}
-                onPress={() => vm.setSelectedColor(c)}
-                className="h-7 w-7 rounded-full"
-                style={{
-                  backgroundColor: c,
-                  borderWidth: vm.selectedColor === c ? 3 : 0,
-                  borderColor: Theme.colors.foreground,
-                }}
-              />
-            ))}
-          </View>
+        <View className="mb-3 flex-row items-center justify-between">
+          <Text className="text-sm font-medium text-foreground">Trust Circles</Text>
           <Pressable
-            onPress={() => {
-              if (!vm.newName.trim() || vm.createMutation.isPending) return;
-              vm.createMutation.mutate();
-            }}
-            disabled={!vm.newName.trim() || vm.createMutation.isPending}
-            className={`items-center rounded-xl py-3 ${
-              vm.newName.trim() && !vm.createMutation.isPending ? 'bg-primary' : 'bg-primary/40'
-            }`}
+            onPress={() => vm.setShowCreate((v) => !v)}
+            className="flex-row items-center gap-1 rounded-lg bg-primary px-3 py-2 active:opacity-90"
           >
-            {vm.createMutation.isPending ? (
-              <ActivityIndicator color={Theme.colors.primaryForeground} />
-            ) : (
-              <Text className="text-sm font-semibold text-primary-foreground">Create Circle</Text>
-            )}
+            <Plus size={14} color={Theme.colors.primaryForeground} />
+            <Text className="text-xs font-semibold text-primary-foreground">New Circle</Text>
           </Pressable>
         </View>
-      )}
 
-      {vm.isLoading ? (
-        <View className="items-center py-12">
-          <ActivityIndicator color={Theme.colors.primary} />
-        </View>
-      ) : vm.isError ? (
-        <View className="rounded-xl border border-destructive/30 bg-destructive/5 p-4">
-          <Text className="text-center text-sm text-foreground">
-            Could not load circles. Check your connection and try again.
-          </Text>
-        </View>
-      ) : vm.tabRows.length === 0 ? (
-        <View className="items-center py-12">
-          <Users size={48} color={Theme.colors.muted} style={{ opacity: 0.45 }} />
-          <Text className="mt-3 text-sm font-medium text-muted-foreground">No circles yet</Text>
-          <Text className="mt-1 max-w-xs text-center text-xs text-muted-foreground">
-            Create a circle and add people from Trusted, Following, or Followers.
-          </Text>
-        </View>
-      ) : (
-        <View className="gap-3">
-          {vm.tabRows.map((row) => (
+        {vm.showCreate && (
+          <View className="mb-6 rounded-xl border border-border bg-card p-4">
+            <View className="mb-3 flex-row items-center justify-between">
+              <Text className="text-sm font-semibold text-foreground">Create a new circle</Text>
+              <Pressable
+                onPress={() => vm.setShowCreate(false)}
+                hitSlop={8}
+                className="p-1 active:opacity-70"
+              >
+                <X size={16} color={Theme.colors.muted} />
+              </Pressable>
+            </View>
+            <TextInput
+              placeholder="Circle name..."
+              placeholderTextColor={Theme.colors.muted}
+              value={vm.newName}
+              onChangeText={vm.setNewName}
+              maxLength={40}
+              className="mb-3 rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground"
+            />
+            <TextInput
+              placeholder="Description (optional)"
+              placeholderTextColor={Theme.colors.muted}
+              value={vm.newDesc}
+              onChangeText={vm.setNewDesc}
+              maxLength={100}
+              multiline
+              className="mb-3 min-h-[44px] rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground"
+            />
+            <Text className="mb-2 text-xs text-muted-foreground">Color</Text>
+            <View className="mb-4 flex-row flex-wrap gap-2">
+              {vm.colorPresets.map((c) => (
+                <Pressable
+                  key={c}
+                  onPress={() => vm.setSelectedColor(c)}
+                  className="h-7 w-7 rounded-full"
+                  style={{
+                    backgroundColor: c,
+                    borderWidth: vm.selectedColor === c ? 3 : 0,
+                    borderColor: Theme.colors.foreground,
+                  }}
+                />
+              ))}
+            </View>
             <Pressable
-              key={row.id}
-              onPress={() => vm.setSelectedCircleId(row.id)}
-              className="flex-row items-center gap-3 rounded-xl border border-border bg-card p-4 shadow-sm active:opacity-95"
+              onPress={() => {
+                if (!vm.newName.trim() || vm.createMutation.isPending) return;
+                vm.createMutation.mutate();
+              }}
+              disabled={!vm.newName.trim() || vm.createMutation.isPending}
+              className={`items-center rounded-xl py-3 ${
+                vm.newName.trim() && !vm.createMutation.isPending ? 'bg-primary' : 'bg-primary/40'
+              }`}
             >
-              <CircleGlyphIcon
-                iconKind={row.iconKind}
-                color={row.accent}
-                bg={row.iconBg}
-                size={20}
-              />
-              <View className="min-w-0 flex-1">
-                <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
-                  {row.title}
-                </Text>
-                <Text className="text-xs text-muted-foreground" numberOfLines={1}>
-                  {row.subtitle}
-                </Text>
-              </View>
-              <ChevronRight size={16} color={Theme.colors.muted} />
+              {vm.createMutation.isPending ? (
+                <ActivityIndicator color={Theme.colors.primaryForeground} />
+              ) : (
+                <Text className="text-sm font-semibold text-primary-foreground">Create Circle</Text>
+              )}
             </Pressable>
-          ))}
-        </View>
-      )}
+          </View>
+        )}
 
-      {vm.user && isActive ? (
-        <View className="mt-10 gap-8">
-          <HomeConnectionsBlock
-            title="Followers"
-            count={vm.followerRows.length}
-            loading={vm.followersLoading}
-            empty={
+        {vm.isLoading ? (
+          <View className="items-center py-12">
+            <ActivityIndicator color={Theme.colors.primary} />
+          </View>
+        ) : vm.isError ? (
+          <View className="rounded-xl border border-destructive/30 bg-destructive/5 p-4">
+            <Text className="text-center text-sm text-foreground">
+              Could not load circles. Check your connection and try again.
+            </Text>
+          </View>
+        ) : vm.tabRows.length === 0 ? (
+          <View className="items-center py-12">
+            <Users size={48} color={Theme.colors.muted} style={{ opacity: 0.45 }} />
+            <Text className="mt-3 text-sm font-medium text-muted-foreground">No circles yet</Text>
+            <Text className="mt-1 max-w-xs text-center text-xs text-muted-foreground">
+              Create a circle and add people from Followers or Trusted.
+            </Text>
+          </View>
+        ) : (
+          <View className="gap-3">
+            {vm.tabRows.map((row) => (
+              <Pressable
+                key={row.id}
+                onPress={() => vm.setSelectedCircleId(row.id)}
+                className="flex-row items-center gap-3 rounded-xl border border-border bg-card p-4 shadow-sm active:opacity-95"
+              >
+                <CircleGlyphIcon
+                  iconKind={row.iconKind}
+                  color={row.accent}
+                  bg={row.iconBg}
+                  size={20}
+                />
+                <View className="min-w-0 flex-1">
+                  <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
+                    {row.title}
+                  </Text>
+                  <Text className="text-xs text-muted-foreground" numberOfLines={1}>
+                    {row.subtitle}
+                  </Text>
+                </View>
+                <ChevronRight size={16} color={Theme.colors.muted} />
+              </Pressable>
+            ))}
+          </View>
+        )}
+
+        {vm.user && isActive ? (
+          <View className="mt-10">
+            <Text className="mb-3 text-base font-semibold text-foreground">Connections</Text>
+
+            <View className="mb-4 flex-row flex-wrap gap-2">
+              {(
+                [
+                  ['followers', `Followers · ${vm.followerRows.length}`],
+                  ['following', `Following · ${vm.followingOneWay.length}`],
+                  ['trusted', `Trusted · ${vm.trustedRows.length}`],
+                ] as const
+              ).map(([id, label]) => {
+                const active = connTab === id;
+                return (
+                  <Pressable
+                    key={id}
+                    onPress={() => setConnTab(id)}
+                    className={`flex-row items-center rounded-xl border px-3 py-2 ${
+                      active ? 'border-primary/40 bg-primary/10' : 'border-border bg-card'
+                    }`}
+                  >
+                    <Text
+                      className={`text-xs font-semibold ${active ? 'text-primary' : 'text-muted-foreground'}`}
+                    >
+                      {label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            {connTab === 'followers' ? (
+              vm.followersLoading ? (
+                <View className="items-center py-8">
+                  <ActivityIndicator color={Theme.colors.primary} />
+                </View>
+              ) : vm.followerRows.length === 0 ? (
+                <View className="items-center py-10">
+                  <Text className="text-center text-sm text-muted-foreground">
+                    No followers yet.
+                  </Text>
+                </View>
+              ) : (
+                <View className="gap-2">
+                  {vm.followerRows.map((row) => (
+                    <NetworkConnectionRow
+                      key={row.user_id}
+                      row={row}
+                      circle={vm.circleForMemberUserId.get(row.user_id)}
+                      onAddToCircle={() =>
+                        setCircleSheet({
+                          id: row.user_id,
+                          name: row.display_name || 'Member',
+                        })
+                      }
+                    />
+                  ))}
+                </View>
+              )
+            ) : connTab === 'following' ? (
+              vm.followingLoading ? (
+                <View className="items-center py-8">
+                  <ActivityIndicator color={Theme.colors.primary} />
+                </View>
+              ) : vm.followingOneWay.length === 0 ? (
+                <FollowingEmptyState containerClassName="" />
+              ) : (
+                <View className="gap-2">
+                  {vm.followingOneWay.map((row) => (
+                    <NetworkConnectionRow
+                      key={row.user_id}
+                      row={row}
+                      circle={vm.circleForMemberUserId.get(row.user_id)}
+                      allowAddToCircle={false}
+                    />
+                  ))}
+                </View>
+              )
+            ) : vm.trustedLoading ? (
               <View className="items-center py-8">
-                <Text className="text-center text-sm text-muted-foreground">No followers yet.</Text>
+                <ActivityIndicator color={Theme.colors.primary} />
               </View>
-            }
-            rows={vm.followerRows}
-          />
-          <HomeConnectionsBlock
-            title="Following"
-            count={vm.followersNotFollowedBack.length}
-            loading={vm.loadingFollowBackLists}
-            empty={<FollowingEmptyState containerClassName="" />}
-            rows={vm.followersNotFollowedBack}
-          />
-          <HomeConnectionsBlock
-            title="Trusted"
-            count={vm.trustedRows.length}
-            loading={vm.trustedLoading}
-            empty={<TrustedEmptyState containerClassName="" />}
-            rows={vm.trustedRows}
-          />
-        </View>
-      ) : null}
-    </ScrollView>
-  );
-}
+            ) : vm.trustedRows.length === 0 ? (
+              <TrustedEmptyState containerClassName="" />
+            ) : (
+              <View className="gap-2">
+                {vm.trustedRows.map((row) => (
+                  <NetworkConnectionRow
+                    key={row.user_id}
+                    row={row}
+                    circle={vm.circleForMemberUserId.get(row.user_id)}
+                    onAddToCircle={() =>
+                      setCircleSheet({
+                        id: row.user_id,
+                        name: row.display_name || 'Member',
+                      })
+                    }
+                  />
+                ))}
+              </View>
+            )}
 
-function HomeConnectionsBlock({
-  title,
-  count,
-  loading,
-  empty,
-  rows,
-}: {
-  title: string;
-  count: number;
-  loading: boolean;
-  empty: React.ReactNode;
-  rows: NetworkUserRow[];
-}) {
-  return (
-    <View>
-      <Text className="mb-2 text-sm font-semibold text-foreground">
-        {title} <Text className="text-sm font-normal text-muted-foreground">({count})</Text>
-      </Text>
-      {loading ? (
-        <View className="items-center py-6">
-          <ActivityIndicator color={Theme.colors.primary} />
-        </View>
-      ) : rows.length === 0 ? (
-        empty
-      ) : (
-        <View className="gap-2">
-          {rows.map((row) => (
-            <NetworkPreviewRow key={row.user_id} row={row} />
-          ))}
-        </View>
-      )}
-    </View>
+            <PeopleYouMayKnowSection />
+          </View>
+        ) : null}
+      </ScrollView>
+
+      <CircleAssignmentSheet
+        open={!!circleSheet}
+        onClose={() => setCircleSheet(null)}
+        memberId={circleSheet?.id ?? ''}
+        memberName={circleSheet?.name ?? ''}
+        circles={vm.circles}
+        circlesLoading={vm.isLoading}
+        memberCircleIds={sheetMemberCircleIds}
+        membershipsLoading={vm.circleAssignmentsLoading}
+      />
+    </>
   );
 }
 

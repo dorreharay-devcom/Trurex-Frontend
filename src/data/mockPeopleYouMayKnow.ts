@@ -1,0 +1,40 @@
+import type { SuggestedUser } from '~/types/network';
+
+export const MOCK_PEOPLE_YOU_MAY_KNOW: SuggestedUser[] = [
+  {
+    user_id: 'a1000000-0000-4000-8000-000000000001',
+    display_name: 'Jordan Lee',
+    handle: 'jordan_media',
+    avatar_url: null,
+    location: 'Austin',
+    bio: 'Film & vinyl.',
+    is_private: false,
+    degree: 2,
+    mutualCount: 3,
+    mutualProfiles: [],
+  },
+  {
+    user_id: 'a1000000-0000-4000-8000-000000000002',
+    display_name: 'Sam Rivera',
+    handle: 'sam_reads',
+    avatar_url: null,
+    location: null,
+    bio: 'Chef · hiking on weekends',
+    is_private: false,
+    degree: 3,
+    mutualCount: 1,
+    mutualProfiles: [],
+  },
+  {
+    user_id: 'a1000000-0000-4000-8000-000000000003',
+    display_name: 'Alex Kim',
+    handle: 'alexkim',
+    avatar_url: null,
+    location: 'Seattle',
+    bio: null,
+    is_private: false,
+    degree: 2,
+    mutualCount: 5,
+    mutualProfiles: [],
+  },
+];

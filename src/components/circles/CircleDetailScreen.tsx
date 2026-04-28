@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ActivityIndicator,
   Modal,
@@ -13,7 +13,6 @@ import {
   CircleConnectionRow,
   CircleGlyphIcon,
   CircleMemberRow,
-  FollowingEmptyState,
   MembersEmptyState,
   SectionSpinner,
   TrustedEmptyState,
@@ -25,11 +24,18 @@ import { webContainerStyle } from '~/utils';
 
 type Props = { vm: CirclesViewModel };
 
+type AddConnTab = 'followers' | 'trusted';
+
 export function CircleDetailScreen({ vm }: Props) {
+  const [addConnTab, setAddConnTab] = useState<AddConnTab>('followers');
+
   if (!vm.selectedCircle || !vm.selectedTab) return null;
 
   const subtitle = vm.selectedCircle.description?.trim() || vm.selectedTab.subtitle;
-  const memberLabel = vm.members.length === 1 ? '1 member' : `${vm.members.length} members`;
+  const selfId = vm.user?.id;
+  const membersListed = selfId ? vm.members.filter((m) => m.user_id !== selfId) : vm.members;
+  const listedCount = membersListed.length;
+  const memberLabel = listedCount === 1 ? '1 member' : `${listedCount} members`;
   const canManage = canEditOrDeleteUserCircle(vm.selectedCircle, vm.user?.id);
 
   return (
@@ -77,19 +83,15 @@ export function CircleDetailScreen({ vm }: Props) {
           Members
         </Text>
 
-        {vm.members.length === 0 ? (
+        {listedCount === 0 ? (
           <MembersEmptyState />
         ) : (
-          <View className="mb-4 gap-2">
-            {vm.members.map((m) => (
+          <View className="mb-6 gap-2">
+            {membersListed.map((m) => (
               <CircleMemberRow
                 key={m.user_id}
                 member={m}
-                onRemove={
-                  canManage && m.user_id !== vm.user?.id
-                    ? () => vm.removeFromSelectedCircle(m.user_id)
-                    : undefined
-                }
+                onRemove={canManage ? () => vm.removeFromSelectedCircle(m.user_id) : undefined}
                 removing={vm.removingMemberId === m.user_id}
               />
             ))}
@@ -100,54 +102,59 @@ export function CircleDetailScreen({ vm }: Props) {
           Add to this circle
         </Text>
 
-        <CountHeading label="Trusted" count={vm.trustedRows.length} />
-        {vm.trustedLoading ? (
-          <SectionSpinner />
+        <View className="mb-4 flex-row flex-wrap gap-2">
+          {(
+            [
+              ['followers', `Followers · ${vm.followerRows.length}`],
+              ['trusted', `Trusted · ${vm.trustedRows.length}`],
+            ] as const
+          ).map(([id, label]) => {
+            const active = addConnTab === id;
+            return (
+              <Pressable
+                key={id}
+                onPress={() => setAddConnTab(id)}
+                className={`flex-row items-center rounded-xl border px-3 py-2 ${
+                  active ? 'border-primary/40 bg-primary/10' : 'border-border bg-card'
+                }`}
+              >
+                <Text
+                  className={`text-xs font-semibold ${active ? 'text-primary' : 'text-muted-foreground'}`}
+                >
+                  {label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
+        {addConnTab === 'followers' ? (
+          vm.followersLoading ? (
+            <SectionSpinner className="mb-8 items-center py-4" />
+          ) : vm.followerRows.length === 0 ? (
+            <View className="mb-8 items-center py-8">
+              <Text className="text-center text-sm text-muted-foreground">No followers yet.</Text>
+            </View>
+          ) : (
+            <View className="mb-8 gap-2">
+              {vm.followerRows.map((row) => (
+                <CircleConnectionRow
+                  key={row.user_id}
+                  row={row}
+                  isMember={vm.memberIdSet.has(row.user_id)}
+                  isAdding={vm.addingMemberId === row.user_id}
+                  onAdd={() => vm.addToSelectedCircle(row.user_id)}
+                />
+              ))}
+            </View>
+          )
+        ) : vm.trustedLoading ? (
+          <SectionSpinner className="mb-8 items-center py-4" />
         ) : vm.trustedRows.length === 0 ? (
           <TrustedEmptyState />
         ) : (
-          <View className="mb-6 gap-2">
-            {vm.trustedRows.map((row) => (
-              <CircleConnectionRow
-                key={row.user_id}
-                row={row}
-                isMember={vm.memberIdSet.has(row.user_id)}
-                isAdding={vm.addingMemberId === row.user_id}
-                onAdd={() => vm.addToSelectedCircle(row.user_id)}
-              />
-            ))}
-          </View>
-        )}
-
-        <CountHeading label="Following" count={vm.followersNotFollowedBack.length} />
-        {vm.loadingFollowBackLists ? (
-          <SectionSpinner />
-        ) : vm.followersNotFollowedBack.length === 0 ? (
-          <FollowingEmptyState />
-        ) : (
-          <View className="mb-6 gap-2">
-            {vm.followersNotFollowedBack.map((row) => (
-              <CircleConnectionRow
-                key={row.user_id}
-                row={row}
-                isMember={vm.memberIdSet.has(row.user_id)}
-                isAdding={vm.addingMemberId === row.user_id}
-                onAdd={() => vm.addToSelectedCircle(row.user_id)}
-              />
-            ))}
-          </View>
-        )}
-
-        <CountHeading label="Followers" count={vm.followerRows.length} />
-        {vm.followersLoading ? (
-          <SectionSpinner className="mb-8 items-center py-4" />
-        ) : vm.followerRows.length === 0 ? (
-          <View className="mb-8 items-center py-8">
-            <Text className="text-center text-sm text-muted-foreground">No followers yet.</Text>
-          </View>
-        ) : (
           <View className="mb-8 gap-2">
-            {vm.followerRows.map((row) => (
+            {vm.trustedRows.map((row) => (
               <CircleConnectionRow
                 key={row.user_id}
                 row={row}
@@ -228,14 +235,6 @@ function DetailToolbar({
         </View>
       ) : null}
     </View>
-  );
-}
-
-function CountHeading({ label, count }: { label: string; count: number }) {
-  return (
-    <Text className="mb-2 text-sm font-semibold text-foreground">
-      {label} <Text className="text-sm font-normal text-muted-foreground">({count})</Text>
-    </Text>
   );
 }
 

@@ -21,7 +21,9 @@ export function useImageContentFit(uri: string | null | undefined): ContentFit {
         if (!cancelled) setFit('cover');
       },
     );
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [uri]);
 
   return fit;

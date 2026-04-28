@@ -3,11 +3,10 @@ import { Backend } from '~/services/AuthService';
 import { generateRexImageStoragePath } from './photoUtils';
 
 export async function resizeForUpload(uri: string, maxWidth = 1200): Promise<string> {
-  const result = await ImageManipulator.manipulateAsync(
-    uri,
-    [{ resize: { width: maxWidth } }],
-    { compress: 0.82, format: ImageManipulator.SaveFormat.JPEG },
-  );
+  const result = await ImageManipulator.manipulateAsync(uri, [{ resize: { width: maxWidth } }], {
+    compress: 0.82,
+    format: ImageManipulator.SaveFormat.JPEG,
+  });
   return result.uri;
 }
 

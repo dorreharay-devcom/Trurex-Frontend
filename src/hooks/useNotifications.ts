@@ -19,7 +19,11 @@ async function markNotificationsRead(ids?: string[]): Promise<void> {
 export function useNotifications() {
   const queryClient = useQueryClient();
 
-  const { data: notifications = [], isLoading: loading, refetch } = useQuery<AppNotification[]>({
+  const {
+    data: notifications = [],
+    isLoading: loading,
+    refetch,
+  } = useQuery<AppNotification[]>({
     queryKey: ['notifications'],
     queryFn: fetchNotifications,
     staleTime: 30_000,
@@ -30,8 +34,9 @@ export function useNotifications() {
   const markAllAsRead = useMutation({
     mutationFn: () => markNotificationsRead(),
     onSuccess: () => {
-      queryClient.setQueryData<AppNotification[]>(['notifications'], (prev) =>
-        prev?.map((n) => ({ ...n, is_read: true })) ?? [],
+      queryClient.setQueryData<AppNotification[]>(
+        ['notifications'],
+        (prev) => prev?.map((n) => ({ ...n, is_read: true })) ?? [],
       );
     },
   });

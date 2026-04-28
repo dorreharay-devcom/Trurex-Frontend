@@ -1,5 +1,18 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, useWindowDimensions, Animated, Modal, Pressable, StyleSheet, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  useWindowDimensions,
+  Animated,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Platform,
+} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
@@ -45,7 +58,7 @@ const CollectionSkeleton: React.FC = () => {
       Animated.sequence([
         Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: true }),
         Animated.timing(opacity, { toValue: 0.4, duration: 700, useNativeDriver: true }),
-      ])
+      ]),
     ).start();
   }, [opacity]);
   return (
@@ -68,7 +81,12 @@ interface ProfileViewProps {
   onRexPress?: (rec: Recommendation) => void;
 }
 
-const ProfileView = ({ userId: propUserId, onAvatarUpdated, onBack, onRexPress }: ProfileViewProps) => {
+const ProfileView = ({
+  userId: propUserId,
+  onAvatarUpdated,
+  onBack,
+  onRexPress,
+}: ProfileViewProps) => {
   const { user: authUser, signOut } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -94,7 +112,8 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated, onBack, onRexPress }
   const targetUserId = propUserId || authUser?.id;
   const isOwnProfile = !propUserId || propUserId === authUser?.id;
   const { data: myRexes = [], isLoading: rexesLoading } = useMyRexes(targetUserId);
-  const { data: myCollections = [], isLoading: collectionsLoading } = useMyCollections(targetUserId);
+  const { data: myCollections = [], isLoading: collectionsLoading } =
+    useMyCollections(targetUserId);
   const { data: savedRexes = [] } = useSavedRexes();
   const { mutate: addRex } = useAddRexToCollection();
 
@@ -103,7 +122,12 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated, onBack, onRexPress }
       setAddSheetVisible(true);
       Animated.parallel([
         Animated.timing(backdropOpacity, { toValue: 1, duration: 250, useNativeDriver: true }),
-        Animated.spring(addSheetTranslateY, { toValue: 0, damping: 20, stiffness: 200, useNativeDriver: true }),
+        Animated.spring(addSheetTranslateY, {
+          toValue: 0,
+          damping: 20,
+          stiffness: 200,
+          useNativeDriver: true,
+        }),
       ]).start();
     } else {
       Animated.parallel([
@@ -370,27 +394,45 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated, onBack, onRexPress }
         onRequestClose={() => setAddToCollectionId(null)}
       >
         <Animated.View
-          style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', opacity: backdropOpacity }]}
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: 'rgba(0,0,0,0.5)', opacity: backdropOpacity },
+          ]}
           pointerEvents="box-none"
         >
           <Pressable style={StyleSheet.absoluteFill} onPress={() => setAddToCollectionId(null)} />
         </Animated.View>
 
-        <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }} pointerEvents="box-none">
+        <View
+          style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }}
+          pointerEvents="box-none"
+        >
           <Animated.View style={{ width: '100%', transform: [{ translateY: addSheetTranslateY }] }}>
-            <View className="bg-card rounded-t-2xl border-t border-border" style={{ maxHeight: 400 }}>
+            <View
+              className="bg-card rounded-t-2xl border-t border-border"
+              style={{ maxHeight: 400 }}
+            >
               <View style={webContainerStyle} className="items-center py-3">
                 <View className="w-10 h-1 rounded-full bg-muted-foreground/30" />
               </View>
               <View style={[{ paddingHorizontal: 16, paddingBottom: 12 }, webContainerStyle]}>
-                <Text className="text-base font-display font-medium text-foreground">Pick a saved rex</Text>
+                <Text className="text-base font-display font-medium text-foreground">
+                  Pick a saved rex
+                </Text>
               </View>
               <View className="h-px bg-border mb-1" />
               <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
                 {savedRexes.length === 0 ? (
-                  <Text className="text-sm text-muted-foreground text-center py-6">No saved rexes</Text>
+                  <Text className="text-sm text-muted-foreground text-center py-6">
+                    No saved rexes
+                  </Text>
                 ) : (
-                  <View style={[{ paddingHorizontal: 16, paddingVertical: 8, gap: 4 }, webContainerStyle]}>
+                  <View
+                    style={[
+                      { paddingHorizontal: 16, paddingVertical: 8, gap: 4 },
+                      webContainerStyle,
+                    ]}
+                  >
                     {savedRexes.map((rec) => (
                       <TouchableOpacity
                         key={rec.id}
@@ -402,7 +444,9 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated, onBack, onRexPress }
                             {
                               onSuccess: () => {
                                 setAddToCollectionId(null);
-                                queryClient.invalidateQueries({ queryKey: ['collection-detail', openCollectionId] });
+                                queryClient.invalidateQueries({
+                                  queryKey: ['collection-detail', openCollectionId],
+                                });
                               },
                             },
                           );
@@ -419,7 +463,9 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated, onBack, onRexPress }
                           />
                         </View>
                         <View className="flex-1">
-                          <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>{rec.title}</Text>
+                          <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
+                            {rec.title}
+                          </Text>
                           <Text className="text-xs text-muted-foreground">{rec.category}</Text>
                         </View>
                       </TouchableOpacity>
