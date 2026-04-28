@@ -8,6 +8,7 @@ export {
 export { useActiveCategories } from '../useActiveCategories';
 export { useMyCircles } from '../useMyCircles';
 export { useRexComments } from './useRexComments';
+export { useContentReportFlow } from './useContentReportFlow';
 export {
   useShareRex,
   buildRexShareContent,

@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
+import { Flag } from 'lucide-react-native';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import type { RexComment } from '~/types/recommendation/rexComment';
 import { formatCompactRelativeTime } from '~/utils/date';
+import { Theme } from '~/theme/Theme';
 import { DeleteAction, LikeAction, ReplyAction } from './CommentActions';
 
 export type CommentRowProps = {
@@ -13,6 +15,7 @@ export type CommentRowProps = {
   onReply: (id: string) => void;
   onDelete: (id: string) => void;
   onToggleLike: (commentId: string, currentlyLiked: boolean) => void;
+  onReport?: (commentId: string) => void;
 };
 
 export const CommentRow: React.FC<CommentRowProps> = ({
@@ -23,11 +26,16 @@ export const CommentRow: React.FC<CommentRowProps> = ({
   onReply,
   onDelete,
   onToggleLike,
+  onReport,
 }) => {
   const canDelete =
     (currentUserId && currentUserId === comment.author_id) ||
     (currentUserId && rexOwnerId && currentUserId === rexOwnerId);
   const name = comment.profile?.display_name?.trim() || 'Member';
+  const canReport =
+    Boolean(
+      onReport && currentUserId && comment.author_id && currentUserId !== comment.author_id,
+    );
 
   return (
     <View className={`flex-row gap-2.5 ${isReply ? 'ml-10' : ''}`}>
@@ -51,9 +59,20 @@ export const CommentRow: React.FC<CommentRowProps> = ({
             disabled={!currentUserId}
             onPress={() => onToggleLike(comment.id, comment.liked_by_me ?? false)}
           />
-          <View className="flex-row items-center gap-1.5">
+          <View className="flex-row flex-wrap items-center gap-1.5">
             {!isReply ? <ReplyAction onPress={() => onReply(comment.id)} /> : null}
             {canDelete ? <DeleteAction onPress={() => onDelete(comment.id)} /> : null}
+            {canReport ? (
+              <Pressable
+                onPress={() => onReport?.(comment.id)}
+                className="h-7 w-7 items-center justify-center rounded-md active:opacity-80"
+                hitSlop={6}
+                accessibilityLabel="Report comment"
+                accessibilityRole="button"
+              >
+                <Flag size={12} color={Theme.colors.foreground} strokeWidth={1.5} />
+              </Pressable>
+            ) : null}
           </View>
         </View>
       </View>

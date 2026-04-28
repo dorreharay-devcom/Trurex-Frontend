@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Star, MapPin, Quote, Plus } from 'lucide-react-native';
+import { ArrowLeft, Star, MapPin, Quote, Plus, Flag } from 'lucide-react-native';
 import { RexCommentsSection } from '~/components/recommendation/comment';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
@@ -19,6 +19,10 @@ import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
 import { fetchRexDetail } from '~/api/rexDetailApi';
+import { ReportContentDialog } from '~/components/recommendation/report/ReportContentDialog';
+import { useAuth } from '~/services/AuthContext';
+import type { ContentReportTarget } from '~/constants/recommendation/contentReport';
+import { toastInfo } from '~/utils/appToast';
 import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
 import { Theme } from '~/theme/Theme';
 import type { Recommendation } from '~/types/recommendation/recommendation';
@@ -54,9 +58,35 @@ export const RecommendationDetailModal: React.FC<Props> = ({
 }) => {
   const { height: windowHeight } = useWindowDimensions();
   const { layout } = modalConfig;
+  const { user: authUser } = useAuth();
+  const [reportTarget, setReportTarget] = useState<ContentReportTarget | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const commentsSectionWrapRef = useRef<View>(null);
   const composerAnchorRef = useRef<View>(null);
+
+  const setReport = useCallback((t: ContentReportTarget | null) => setReportTarget(t), []);
+  const openRexReport = useCallback(() => {
+    if (!recommendation) return;
+    if (!authUser) {
+      toastInfo('Sign in', 'Sign in to report this recommendation.');
+      return;
+    }
+    if (recommendation.authorId != null && authUser.id === recommendation.authorId) {
+      return;
+    }
+    setReport({ kind: 'recommendation', rexId: recommendation.id });
+  }, [recommendation, authUser, setReport]);
+  const openCommentReport = useCallback(
+    (commentId: string) => {
+      if (!recommendation) return;
+      if (!authUser) {
+        toastInfo('Sign in', 'Sign in to report this comment.');
+        return;
+      }
+      setReport({ kind: 'comment', rexId: recommendation.id, commentId });
+    },
+    [recommendation, authUser, setReport],
+  );
 
   const { sheetTranslateY, handleClose } = useOverlaySheetPresentation({
     visible: visible && recommendation != null,
@@ -178,6 +208,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   const user = recommendation.user ?? { name: 'Member', handle: '', avatar: '' };
 
   return (
+    <>
     <OverlayModal
       visible={visible && !!recommendation}
       onRequestClose={handleClose}
@@ -201,7 +232,26 @@ export const RecommendationDetailModal: React.FC<Props> = ({
             <Text className="min-w-0 flex-1 text-center text-lg font-display font-semibold text-foreground">
               Recommendation
             </Text>
-            <View className="w-[60px]" />
+            <View className="w-[60px] items-end justify-center">
+              {authUser &&
+              (recommendation.authorId == null || authUser.id !== recommendation.authorId) ? (
+                <Pressable
+                  onPress={openRexReport}
+                  accessibilityLabel="Report this recommendation"
+                  accessibilityRole="button"
+                  className="h-8 flex-row items-center gap-1 rounded-full border-2 border-destructive bg-destructive/10 px-2.5 active:opacity-90"
+                >
+                  <Flag size={12} color={Theme.colors.destructive} fill={Theme.colors.destructive} />
+                  <Text
+                    className="text-xs font-semibold"
+                    style={{ color: Theme.colors.destructive }}
+                    numberOfLines={1}
+                  >
+                    Report
+                  </Text>
+                </Pressable>
+              ) : null}
+            </View>
           </View>
         </View>
 
@@ -345,6 +395,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                 onCommentTotalChange={onCommentCountChange}
                 composerAnchorRef={composerAnchorRef}
                 autoFocusComposer={scrollToComments === true}
+                onReportComment={openCommentReport}
               />
             </View>
 
@@ -353,5 +404,13 @@ export const RecommendationDetailModal: React.FC<Props> = ({
         </ScrollView>
       </View>
     </OverlayModal>
+    <ReportContentDialog
+      open={reportTarget != null}
+      onOpenChange={(o) => {
+        if (!o) setReportTarget(null);
+      }}
+      target={reportTarget}
+    />
+  </>
   );
 };
