@@ -16,4 +16,24 @@ export interface RexCommentAuthor {
 export interface RexComment extends RexCommentRow {
   profile?: RexCommentAuthor;
   replies?: RexComment[];
+  like_count?: number;
+  liked_by_me?: boolean;
 }
+
+export type RexCommentRpcNode = {
+  id: string;
+  rex_id: string;
+  parent_comment_id: string | null;
+  author_id: string;
+  author_display_name: string;
+  author_username: string | null;
+  author_profile_picture_url: string | null;
+  author_relationship_status: string | null;
+  body: string;
+  created_at: string;
+  updated_at: string;
+  like_count: number;
+  liked_by_me: boolean;
+  reply_count: number;
+  subcomments: RexCommentRpcNode[];
+};

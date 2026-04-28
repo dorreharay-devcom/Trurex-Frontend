@@ -16,11 +16,10 @@ import {
 import { Plus, PackageOpen, Search } from 'lucide-react-native';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
-import { rexCoverStoragePathFromRecommendation, rexCoverRemoteHttpUrl } from '~/utils/recommendation/rexMediaPaths';
+import { rexCoverStoragePathFromRecommendation, rexCoverRemoteHttpUrl } from '~/utils/recommendation/recContentDisplay';
 import RecommendationCard from '~/components/recommendation/RecommendationCard';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Backend } from '~/services/AuthService';
-import { useMyCollections, useAddRexToCollection } from '~/hooks/useCollections';
+import { useQueryClient } from '@tanstack/react-query';
+import { useMyCollections, useMySavedCollections, useAddRexToCollection } from '~/hooks/useCollections';
 import { useSavedRexes } from '~/hooks/useGems';
 import { useAuth } from '~/services/AuthContext';
 import { isWeb, webContainerStyle } from '~/utils';
@@ -34,27 +33,15 @@ import CreateCollectionModal from '~/components/faves/CreateCollectionModal';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import CollectionCard from '~/components/profile/CollectionCard';
 
-// ─── skeleton card ────────────────────────────────────────────────────────────
-const SkeletonCard: React.FC<{ width: number }> = ({ width }) => (
-  <View
-    style={{ width, height: Math.round(width * (4 / 3)), borderRadius: 12 }}
-    className="bg-muted"
-  />
-);
-
-
-// ─── main view ───────────────────────────────────────────────────────────────
 type FavesViewProps = {
   commentCountByRexId?: Record<string, number>;
   onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
-  onAuthorPress?: (authorId: string) => void;
 };
 
-const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
+const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  useWindowDimensions(); // triggers re-render on resize
-  const cardMaxWidth = isWeb ? 680 : undefined;
+  useWindowDimensions();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [openCollectionId, setOpenCollectionId] = useState<string | null>(null);
@@ -62,24 +49,14 @@ const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
   const [showCreateCollection, setShowCreateCollection] = useState(false);
   const [addToCollectionRec, setAddToCollectionRec] = useState<RecSummary | null>(null);
 
-  const { data: collections = [], isLoading: loadingCollections } = useMyCollections();
-  const { data: savedRexes = [], isLoading: loadingSaved } = useSavedRexes();
+  const { data: myCollections = [], isLoading: loadingMine } = useMyCollections(user?.id);
+  const { data: savedCollections = [], isLoading: loadingSavedCollections } = useMySavedCollections();
+  const collections = [...myCollections, ...savedCollections];
+  const loadingCollections = loadingMine || loadingSavedCollections;
+  const { data: savedRexes = [], isLoading: loadingSaved } = useSavedRexes({ uncollected: true });
   const { mutate: addRex } = useAddRexToCollection();
 
-  // Rex IDs already in any of the user's collections
-  const { data: collectedIds } = useQuery<Set<string>>({
-    queryKey: ['collected-rex-ids', user?.id],
-    enabled: !!user,
-    queryFn: async () => {
-      const { data } = await Backend.from('user_collection_rexes').select('rex_id');
-      return new Set((data || []).map((r: any) => r.rex_id as string));
-    },
-  });
-
-  const uncollectedRecs = useMemo(
-    () => savedRexes.filter((r) => !collectedIds?.has(r.id)),
-    [savedRexes, collectedIds],
-  );
+  const uncollectedRecs = savedRexes;
 
   const filteredCollections = useMemo(() => {
     if (!searchQuery.trim()) return collections;
@@ -122,7 +99,6 @@ const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
     }
   }, [addToCollectionId]);
 
-  // ── collection detail screen ─────────────────────────────────────────────
   if (openCollectionId) {
     return (
       <>
@@ -131,6 +107,8 @@ const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
           onBack={() => {
             setOpenCollectionId(null);
             queryClient.invalidateQueries({ queryKey: ['my-collections'] });
+            queryClient.invalidateQueries({ queryKey: ['my-saved-collections'] });
+            queryClient.invalidateQueries({ queryKey: ['my-saved-rexes'] });
           }}
           onAddItem={(id) => setAddToCollectionId(id)}
         />
@@ -161,14 +139,9 @@ const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
                   </Text>
                 </View>
                 <View className="h-px bg-border mb-1" style={webContainerStyle} />
-                <ScrollView
-                  showsVerticalScrollIndicator={false}
-                  keyboardShouldPersistTaps="handled"
-                >
+                <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
                   {savedRexes.length === 0 ? (
-                    <Text className="text-sm text-muted-foreground text-center py-6">
-                      No saved rexes
-                    </Text>
+                    <Text className="text-sm text-muted-foreground text-center py-6">No saved rexes</Text>
                   ) : (
                     <View style={[{ paddingHorizontal: 16, paddingVertical: 8, gap: 4 }, webContainerStyle]}>
                       {savedRexes.map((rec) => (
@@ -182,9 +155,6 @@ const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
                               {
                                 onSuccess: () => {
                                   setAddToCollectionId(null);
-                                  queryClient.invalidateQueries({
-                                    queryKey: ['collected-rex-ids'],
-                                  });
                                 },
                               },
                             );
@@ -201,12 +171,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
                             />
                           </View>
                           <View className="flex-1">
-                            <Text
-                              className="text-sm font-semibold text-foreground"
-                              numberOfLines={1}
-                            >
-                              {rec.title}
-                            </Text>
+                            <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>{rec.title}</Text>
                             <Text className="text-xs text-muted-foreground">{rec.category}</Text>
                           </View>
                         </TouchableOpacity>
@@ -223,10 +188,8 @@ const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
     );
   }
 
-  // ── header (everything above the uncollected list) ───────────────────────
   const ListHeader = (
-    <View>
-      {/* Search */}
+    <View className="px-4 pt-6">
       <View className="relative mb-4">
         <View className="absolute left-3 top-0 bottom-0 justify-center z-10">
           <Search size={16} color={Theme.colors.muted} />
@@ -240,7 +203,6 @@ const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
         />
       </View>
 
-      {/* Title row */}
       <View className="flex-row items-center justify-between mb-1">
         <Text className="text-lg font-display font-bold text-foreground">Gems</Text>
         <TouchableOpacity
@@ -256,17 +218,11 @@ const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
         Showing {filteredCollections.length} collection{filteredCollections.length !== 1 ? 's' : ''}
       </Text>
 
-
-      {/* Collections horizontal scroll */}
       {loadingCollections ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-6">
           <View className="flex-row gap-3">
             {[1, 2, 3].map((i) => (
-              <View
-                key={i}
-                style={{ width: 160, height: 204, borderRadius: 12 }}
-                className="bg-muted"
-              />
+              <View key={i} style={{ width: 160, height: 204, borderRadius: 12 }} className="bg-muted" />
             ))}
           </View>
         </ScrollView>
@@ -277,16 +233,11 @@ const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
           contentContainerClassName="gap-3 pb-1 mb-6"
         >
           {filteredCollections.map((col) => (
-            <CollectionCard
-              key={col.id}
-              collection={col}
-              onPress={() => setOpenCollectionId(col.id)}
-            />
+            <CollectionCard key={col.id} collection={col} onPress={() => setOpenCollectionId(col.id)} />
           ))}
         </ScrollView>
       ) : (
         <View className="items-center mb-6 py-6 px-4 rounded-2xl border border-dashed border-border bg-muted/30">
-          {/* Stacked emoji cards */}
           <View className="flex-row mb-5">
             {[
               { emoji: '🍜', bg: 'bg-purple-500' },
@@ -302,15 +253,10 @@ const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
               </View>
             ))}
           </View>
-
-          <Text className="text-base font-display font-bold text-foreground mb-1">
-            No collections yet
-          </Text>
+          <Text className="text-base font-display font-bold text-foreground mb-1">No collections yet</Text>
           <Text className="text-sm text-muted-foreground text-center mb-4">
             Group your saved Rex into collections — by vibe, city, or whoever you'd share them with.
           </Text>
-
-          {/* Suggestion chips */}
           <View className="flex-row flex-wrap justify-center gap-2 mb-5">
             {['Best eats in Tokyo 🍜', 'Weekend escapes 🏕️', 'Hidden bars 🍸'].map((label) => (
               <TouchableOpacity
@@ -323,29 +269,23 @@ const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
               </TouchableOpacity>
             ))}
           </View>
-
           <TouchableOpacity
             onPress={() => setShowCreateCollection(true)}
             activeOpacity={0.8}
             className="flex-row items-center gap-2 px-5 py-2.5 rounded-xl bg-primary"
           >
             <Plus size={16} color={Theme.colors.primaryForeground} />
-            <Text className="text-sm font-semibold text-primary-foreground">
-              Create first collection
-            </Text>
+            <Text className="text-sm font-semibold text-primary-foreground">Create first collection</Text>
           </TouchableOpacity>
         </View>
       )}
 
-      {/* Uncollected section header */}
-      <Text className="text-base font-display font-medium text-foreground mb-1">
-        Uncollected Rex
-      </Text>
+      <Text className="text-base font-display font-medium text-foreground mb-1">Uncollected Rex</Text>
       <Text className="text-xs text-muted-foreground mb-4">
         Rex you've saved but haven't added to a collection yet
       </Text>
 
-      {(loadingSaved || !collectedIds) && (
+      {loadingSaved && (
         <View className="gap-3 mb-3">
           {[1, 2].map((i) => (
             <View key={i} className="h-16 rounded-xl bg-muted" />
@@ -358,32 +298,34 @@ const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
   return (
     <>
       <FlatList
-        data={loadingSaved || !collectedIds ? [] : filteredUncollected}
+        data={loadingSaved ? [] : filteredUncollected}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={webContainerStyle}
-        contentContainerClassName="px-4 pt-6 pb-24"
+        contentContainerClassName="pb-24"
         ListHeaderComponent={ListHeader}
         renderItem={({ item }) => (
           <View
-            className="mb-4"
-            style={cardMaxWidth ? { maxWidth: cardMaxWidth, width: '100%', alignSelf: 'center' } : undefined}
+            className="px-4 mb-4"
+            style={isWeb ? { maxWidth: 680, width: '100%', alignSelf: 'center' } : undefined}
           >
             <RecommendationCard
               recommendation={item}
-              onSave={() =>
+              onTap={onRecommendationPress}
+              onSave={(rec) =>
                 setAddToCollectionRec({
-                  id: item.id,
-                  place_name: item.title,
-                  category_code: item.category,
-                  location: item.location,
+                  id: rec.id,
+                  place_name: rec.title,
+                  category_code: rec.categoryId,
+                  location: rec.location,
+                  isSaved: rec.isSaved,
                 })
               }
             />
           </View>
         )}
         ListEmptyComponent={
-          loadingSaved || !collectedIds ? null : (
+          loadingSaved ? null : (
             <View className="items-center py-10 gap-2">
               <PackageOpen size={28} color={Theme.colors.muted} />
               <Text className="text-sm text-muted-foreground">
@@ -411,7 +353,6 @@ const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
         rec={addToCollectionRec}
         onClose={() => {
           setAddToCollectionRec(null);
-          queryClient.invalidateQueries({ queryKey: ['collected-rex-ids'] });
           queryClient.invalidateQueries({ queryKey: ['my-collections'] });
         }}
       />
@@ -420,14 +361,8 @@ const FavesView: React.FC<FavesViewProps> = ({ onAuthorPress }) => {
 };
 
 const styles = StyleSheet.create({
-  backdrop: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  overlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
+  backdrop: { backgroundColor: 'rgba(0,0,0,0.5)' },
+  overlay: { flex: 1, justifyContent: 'flex-end', alignItems: 'center' },
 });
 
 export default FavesView;

@@ -153,6 +153,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
         display_name: name.trim(),
         description: description.trim() || undefined,
         cover_image_path: coverStoragePath ?? undefined,
+        visibility: privacy,
       },
       {
         onSuccess: (collection) => {
@@ -344,10 +345,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                                 selected ? 'bg-primary/10' : 'bg-muted'
                               }`}
                             >
-                              <Icon
-                                size={16}
-                                color={selected ? Theme.colors.primary : '#737373'}
-                              />
+                              <Icon size={16} color={selected ? Theme.colors.primary : '#737373'} />
                             </View>
                             <View className="flex-1">
                               <Text

@@ -5,7 +5,7 @@ import {
   REAL_ESTATE_CATEGORY_ID,
 } from '~/constants/recommendation/rexCategories';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
-import { countScorecardFilledSlots } from '~/utils/recommendation/scorecardStep';
+import { countScorecardFilledSlots } from '~/utils/recommendation/recCreateFlow';
 import { cn } from '~/utils/general';
 import type {
   CategoryQuestion,

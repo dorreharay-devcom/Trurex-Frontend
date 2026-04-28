@@ -43,6 +43,8 @@ export interface Recommendation {
   description?: string | null;
   image?: string | null;
   photoPath?: string | null;
+  photoPaths?: string[];
+  photoCount?: number;
   categoryId: string;
   category: string;
   authorId?: string;

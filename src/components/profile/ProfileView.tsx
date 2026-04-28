@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, useWindowDimensions, Animated, Modal, Pressable, StyleSheet, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
@@ -7,19 +7,26 @@ import { useAuth } from '~/services/AuthContext';
 import { ProfileApi } from '~/api/ProfileApi';
 import { Theme } from '~/theme/Theme';
 import type { ProfileData } from '~/types/profile';
-import { currentUser } from '~/data/mockData';
+import type { Recommendation } from '~/types/recommendation/recommendation';
 import { webContainerStyle } from '~/utils';
 import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
-} from '~/utils/recommendation/rexMediaPaths';
+} from '~/utils/recommendation/recContentDisplay';
 import ProfileHeader from './ProfileHeader';
 import CurrentlySection from './CurrentlySection';
 import EditProfile from './EditProfile';
 import CollectionCard from './CollectionCard';
-import { useMyCollections } from '~/hooks/useCollections';
+import { useMyCollections, useAddRexToCollection } from '~/hooks/useCollections';
+import { useFollowUser } from '~/hooks/useFollowUser';
+import { useSavedRexes } from '~/hooks/useGems';
 import { useMyRexes } from '~/hooks/useDiscovery';
 import { ChevronLeft } from 'lucide-react-native';
+import CollectionDetailView from '~/components/faves/CollectionDetailView';
+import { OverlayModal } from '~/components/common/OverlayModal';
+import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
+import { modalConfig } from '~/constants/recommendation/modalConfig';
+import { useQueryClient } from '@tanstack/react-query';
 
 enum ProfileTab {
   Recs = 'recs',
@@ -31,48 +38,97 @@ const TABS = [
   { id: ProfileTab.Collections, label: 'Collections' },
 ];
 
+const CollectionSkeleton: React.FC = () => {
+  const opacity = useRef(new Animated.Value(0.4)).current;
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.4, duration: 700, useNativeDriver: true }),
+      ])
+    ).start();
+  }, [opacity]);
+  return (
+    <View className="flex-row gap-3 px-4 py-4">
+      {[1, 2, 3].map((i) => (
+        <Animated.View
+          key={i}
+          style={{ opacity, width: 176, height: 224 }}
+          className="rounded-xl bg-muted"
+        />
+      ))}
+    </View>
+  );
+};
+
 interface ProfileViewProps {
   userId?: string;
   onAvatarUpdated?: () => void;
   onBack?: () => void;
+  onRexPress?: (rec: Recommendation) => void;
 }
 
-const ProfileView = ({ userId: propUserId, onAvatarUpdated, onBack }: ProfileViewProps) => {
+const ProfileView = ({ userId: propUserId, onAvatarUpdated, onBack, onRexPress }: ProfileViewProps) => {
   const { user: authUser, signOut } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState<ProfileTab>(ProfileTab.Recs);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [openCollectionId, setOpenCollectionId] = useState<string | null>(null);
+  const { height: windowHeight } = useWindowDimensions();
+  const { layout } = modalConfig;
+  const { sheetTranslateY, handleClose: handleCollectionClose } = useOverlaySheetPresentation({
+    visible: openCollectionId != null,
+    windowHeight,
+    onClose: () => setOpenCollectionId(null),
+  });
+
+  const queryClient = useQueryClient();
+  const [addToCollectionId, setAddToCollectionId] = useState<string | null>(null);
+  const backdropOpacity = useRef(new Animated.Value(0)).current;
+  const addSheetTranslateY = useRef(new Animated.Value(400)).current;
+  const [addSheetVisible, setAddSheetVisible] = useState(false);
 
   const targetUserId = propUserId || authUser?.id;
   const isOwnProfile = !propUserId || propUserId === authUser?.id;
-  const { data: myRexes = [], isLoading: rexesLoading } = useMyRexes(isOwnProfile ? targetUserId : undefined);
-  const { data: myCollections = [], isLoading: collectionsLoading } = useMyCollections();
+  const { data: myRexes = [], isLoading: rexesLoading } = useMyRexes(targetUserId);
+  const { data: myCollections = [], isLoading: collectionsLoading } = useMyCollections(targetUserId);
+  const { data: savedRexes = [] } = useSavedRexes();
+  const { mutate: addRex } = useAddRexToCollection();
+
+  useEffect(() => {
+    if (addToCollectionId) {
+      setAddSheetVisible(true);
+      Animated.parallel([
+        Animated.timing(backdropOpacity, { toValue: 1, duration: 250, useNativeDriver: true }),
+        Animated.spring(addSheetTranslateY, { toValue: 0, damping: 20, stiffness: 200, useNativeDriver: true }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(backdropOpacity, { toValue: 0, duration: 200, useNativeDriver: true }),
+        Animated.timing(addSheetTranslateY, { toValue: 400, duration: 220, useNativeDriver: true }),
+      ]).start(() => setAddSheetVisible(false));
+    }
+  }, [addToCollectionId]);
 
   const fetchProfile = useCallback(async () => {
-    const targetUserId = propUserId || authUser?.id;
-
-    if (!targetUserId) {
-      setProfile(currentUser);
+    const targetId = propUserId || authUser?.id;
+    if (!targetId) {
       setLoading(false);
       return;
     }
     try {
-      const data = await ProfileApi.getProfile({ userId: targetUserId });
+      const data = await ProfileApi.getProfile({ userId: targetId });
       setProfile(data);
     } catch (e) {
       console.error('[ProfileView] Failed to fetch profile:', e);
-      setProfile({
-        ...currentUser,
-        rexCount: 0,
-        followers: 142,
-        following: 89,
-      });
     } finally {
       setLoading(false);
     }
   }, [propUserId, authUser?.id]);
+
+  const { follow, unfollow } = useFollowUser(propUserId ?? '', fetchProfile);
 
   const handleAvatarPress = useCallback(async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -130,68 +186,70 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated, onBack }: ProfileVie
     );
   }
 
-  const visibleTabs = isOwnProfile ? TABS : TABS.filter((t) => t.id === ProfileTab.Recs);
-  const rexTabCount = isOwnProfile ? myRexes.length : (profile?.rexCount ?? 0);
+  const rexTabCount = myRexes.length;
 
   return (
-    <ScrollView
-      className="flex-1"
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={webContainerStyle}
-      contentContainerClassName="p-4 pb-24"
-    >
-      {onBack && (
-        <TouchableOpacity
-          onPress={onBack}
-          className="flex-row items-center gap-1 mb-3 self-start"
-          activeOpacity={0.7}
-        >
-          <ChevronLeft size={20} color={Theme.colors.foreground} />
-          <Text className="text-sm font-medium text-foreground">Back</Text>
-        </TouchableOpacity>
-      )}
-
-      <View className="bg-card border border-border rounded-xl shadow-card">
-        {profile && (
-          <ProfileHeader
-            profile={profile}
-            isOwnProfile={isOwnProfile}
-            onEditProfile={() => setIsEditing(true)}
-            onSignOut={signOut}
-            onAvatarPress={handleAvatarPress}
-            avatarUploading={avatarUploading}
-          />
+    <>
+      <ScrollView
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={webContainerStyle}
+        contentContainerClassName="p-4 pb-24"
+      >
+        {onBack && (
+          <TouchableOpacity
+            onPress={onBack}
+            className="flex-row items-center gap-1 mb-3 self-start"
+            activeOpacity={0.7}
+          >
+            <ChevronLeft size={20} color={Theme.colors.foreground} />
+            <Text className="text-sm font-medium text-foreground">Back</Text>
+          </TouchableOpacity>
         )}
 
-        {profile?.currently && <CurrentlySection currently={profile.currently} />}
+        <View className="bg-card border border-border rounded-xl shadow-card">
+          {profile && (
+            <ProfileHeader
+              profile={profile}
+              isOwnProfile={isOwnProfile}
+              onEditProfile={() => setIsEditing(true)}
+              onSignOut={signOut}
+              onAvatarPress={handleAvatarPress}
+              avatarUploading={avatarUploading}
+              onFollow={() => follow.mutate()}
+              onUnfollow={() => unfollow.mutate()}
+              followLoading={follow.isPending || unfollow.isPending}
+            />
+          )}
 
-        <View className="flex-row border-b border-border">
-          {visibleTabs.map((tab) => {
-            const label = tab.id === ProfileTab.Recs ? `Rex's (${rexTabCount})` : tab.label;
-            return (
-              <TouchableOpacity
-                key={tab.id}
-                onPress={() => setActiveTab(tab.id)}
-                className="flex-1 py-3 items-center"
-                activeOpacity={0.7}
-              >
-                <Text
-                  className={`text-xs font-medium ${activeTab === tab.id ? 'text-foreground' : 'text-muted-foreground'}`}
+          {profile?.currently && <CurrentlySection currently={profile.currently} />}
+
+          <View className="flex-row border-b border-border">
+            {TABS.map((tab) => {
+              const label = tab.id === ProfileTab.Recs ? `Rex's (${rexTabCount})` : tab.label;
+              return (
+                <TouchableOpacity
+                  key={tab.id}
+                  onPress={() => setActiveTab(tab.id)}
+                  className="flex-1 py-3 items-center"
+                  activeOpacity={0.7}
                 >
-                  {label}
-                </Text>
-                {activeTab === tab.id && (
-                  <View className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
-                )}
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+                  <Text
+                    className={`text-xs font-medium ${activeTab === tab.id ? 'text-foreground' : 'text-muted-foreground'}`}
+                  >
+                    {label}
+                  </Text>
+                  {activeTab === tab.id && (
+                    <View className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
 
-        <View className="pb-4">
-          {activeTab === ProfileTab.Recs &&
-            (isOwnProfile ? (
-              rexesLoading ? (
+          <View className="pb-4">
+            {activeTab === ProfileTab.Recs &&
+              (rexesLoading ? (
                 <View className="items-center py-8">
                   <ActivityIndicator color={Theme.colors.primary} />
                 </View>
@@ -204,8 +262,10 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated, onBack }: ProfileVie
                   </Text>
                   <View className="flex-row flex-wrap gap-3">
                     {myRexes.map((rec) => (
-                      <View
+                      <TouchableOpacity
                         key={rec.id}
+                        activeOpacity={0.8}
+                        onPress={() => onRexPress?.(rec)}
                         className="w-[22%] rounded-xl overflow-hidden shadow-card bg-background border border-border"
                       >
                         <SignedStorageImage
@@ -226,40 +286,125 @@ const ProfileView = ({ userId: propUserId, onAvatarUpdated, onBack }: ProfileVie
                             ★ {rec.rating}
                           </Text>
                         </View>
-                      </View>
+                      </TouchableOpacity>
                     ))}
                   </View>
                 </View>
-              )
-            ) : (
-              <Text className="text-sm text-muted-foreground text-center py-8">
-                {rexTabCount > 0 ? `${rexTabCount} Rex's` : 'No rexes yet'}
-              </Text>
-            ))}
+              ))}
 
-          {activeTab === ProfileTab.Collections &&
-            (collectionsLoading ? (
-              <View className="items-center py-8">
-                <ActivityIndicator color={Theme.colors.primary} />
-              </View>
-            ) : myCollections.length === 0 ? (
-              <Text className="text-sm text-muted-foreground text-center py-8">
-                No collections yet
-              </Text>
-            ) : (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerClassName="gap-3 px-4 py-4"
-              >
-                {myCollections.map((col) => (
-                  <CollectionCard key={col.id} collection={col} />
-                ))}
-              </ScrollView>
-            ))}
+            {activeTab === ProfileTab.Collections &&
+              (collectionsLoading ? (
+                <CollectionSkeleton />
+              ) : myCollections.length === 0 ? (
+                <Text className="text-sm text-muted-foreground text-center py-8">
+                  No collections yet
+                </Text>
+              ) : (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerClassName="gap-3 px-4 py-4"
+                >
+                  {myCollections.map((col) => (
+                    <CollectionCard
+                      key={col.id}
+                      collection={col}
+                      onPress={() => setOpenCollectionId(col.id)}
+                    />
+                  ))}
+                </ScrollView>
+              ))}
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+
+      <OverlayModal
+        visible={openCollectionId != null}
+        onRequestClose={handleCollectionClose}
+        contentTranslateY={sheetTranslateY}
+        backdropBackground={layout.backdropBackground}
+      >
+        {openCollectionId && (
+          <CollectionDetailView
+            collectionId={openCollectionId}
+            onBack={handleCollectionClose}
+            onAddItem={(id) => setAddToCollectionId(id)}
+          />
+        )}
+      </OverlayModal>
+
+      <Modal
+        visible={addSheetVisible}
+        transparent
+        animationType="none"
+        presentationStyle={Platform.OS === 'ios' ? 'overFullScreen' : undefined}
+        statusBarTranslucent={Platform.OS === 'android'}
+        onRequestClose={() => setAddToCollectionId(null)}
+      >
+        <Animated.View
+          style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', opacity: backdropOpacity }]}
+          pointerEvents="box-none"
+        >
+          <Pressable style={StyleSheet.absoluteFill} onPress={() => setAddToCollectionId(null)} />
+        </Animated.View>
+
+        <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }} pointerEvents="box-none">
+          <Animated.View style={{ width: '100%', transform: [{ translateY: addSheetTranslateY }] }}>
+            <View className="bg-card rounded-t-2xl border-t border-border" style={{ maxHeight: 400 }}>
+              <View style={webContainerStyle} className="items-center py-3">
+                <View className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+              </View>
+              <View style={[{ paddingHorizontal: 16, paddingBottom: 12 }, webContainerStyle]}>
+                <Text className="text-base font-display font-medium text-foreground">Pick a saved rex</Text>
+              </View>
+              <View className="h-px bg-border mb-1" />
+              <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+                {savedRexes.length === 0 ? (
+                  <Text className="text-sm text-muted-foreground text-center py-6">No saved rexes</Text>
+                ) : (
+                  <View style={[{ paddingHorizontal: 16, paddingVertical: 8, gap: 4 }, webContainerStyle]}>
+                    {savedRexes.map((rec) => (
+                      <TouchableOpacity
+                        key={rec.id}
+                        activeOpacity={0.7}
+                        onPress={() => {
+                          if (!addToCollectionId) return;
+                          addRex(
+                            { collection_id: addToCollectionId, rex_id: rec.id },
+                            {
+                              onSuccess: () => {
+                                setAddToCollectionId(null);
+                                queryClient.invalidateQueries({ queryKey: ['collection-detail', openCollectionId] });
+                              },
+                            },
+                          );
+                        }}
+                        className="flex-row items-center gap-3 p-3 rounded-xl"
+                      >
+                        <View className="w-10 h-10 rounded-lg overflow-hidden bg-muted">
+                          <SignedStorageImage
+                            bucket={REX_IMAGES_BUCKET}
+                            storagePath={rexCoverStoragePathFromRecommendation(rec)}
+                            remoteUri={rexCoverRemoteHttpUrl(rec)}
+                            className="w-full h-full"
+                            accessibilityLabel={rec.title}
+                          />
+                        </View>
+                        <View className="flex-1">
+                          <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>{rec.title}</Text>
+                          <Text className="text-xs text-muted-foreground">{rec.category}</Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+                <View className="h-4" />
+              </ScrollView>
+            </View>
+          </Animated.View>
+        </View>
+      </Modal>
+    </>
   );
 };
 

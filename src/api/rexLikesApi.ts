@@ -22,3 +22,19 @@ export async function unlikeRex(rexId: string): Promise<boolean> {
   );
   return data === true;
 }
+
+export async function likeRexComment(commentId: string): Promise<void> {
+  unwrap(
+    await Backend.rpc('like_rex_comment', {
+      input_comment_id: commentId,
+    }),
+  );
+}
+
+export async function unlikeRexComment(commentId: string): Promise<void> {
+  unwrap(
+    await Backend.rpc('unlike_rex_comment', {
+      input_comment_id: commentId,
+    }),
+  );
+}

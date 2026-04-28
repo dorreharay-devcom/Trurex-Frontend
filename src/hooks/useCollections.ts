@@ -3,15 +3,48 @@ import { Backend } from '~/services/AuthService';
 import {
   CollectionsApi,
   UserCollection,
-  UserCollectionRex,
   CollectionDetailRow,
 } from '~/api/CollectionsApi';
 import { toastSuccess, toastError } from '~/utils/appToast';
 
-export const useMyCollections = () => {
+export const useMyCollections = (userId?: string) => {
   return useQuery<UserCollection[]>({
-    queryKey: ['my-collections'],
-    queryFn: () => CollectionsApi.myCollections(),
+    queryKey: ['my-collections', userId],
+    queryFn: () => CollectionsApi.userCollections(userId!),
+    enabled: !!userId,
+  });
+};
+
+export const useMySavedCollections = () => {
+  return useQuery<UserCollection[]>({
+    queryKey: ['my-saved-collections'],
+    queryFn: () => CollectionsApi.mySavedCollections(),
+  });
+};
+
+export const useSaveCollection = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (collectionId: string) => CollectionsApi.saveCollection(collectionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-saved-collections'] });
+    },
+    onError: (error: any) => {
+      toastError('Failed to save collection', error.message);
+    },
+  });
+};
+
+export const useUnsaveCollection = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (collectionId: string) => CollectionsApi.unsaveCollection(collectionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-saved-collections'] });
+    },
+    onError: (error: any) => {
+      toastError('Failed to unsave collection', error.message);
+    },
   });
 };
 
@@ -31,6 +64,7 @@ export const useCreateCollection = () => {
       display_name: string;
       description?: string | null;
       cover_image_path?: string | null;
+      visibility?: 'private' | 'shared' | 'public';
     }) => CollectionsApi.createCollection(params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-collections'] });
@@ -84,13 +118,17 @@ export const useRemoveRexFromCollection = (collectionId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (rexId: string) =>
-      Backend.from('user_collection_rexes')
-        .delete()
-        .eq('collection_id', collectionId)
-        .eq('rex_id', rexId),
+    mutationFn: async (rexId: string) => {
+      const { error } = await Backend.rpc('remove_rex_from_collection', {
+        input_collection_id: collectionId,
+        input_rex_id: rexId,
+      });
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['collection-detail', collectionId] });
+      queryClient.invalidateQueries({ queryKey: ['my-collections'] });
+      queryClient.invalidateQueries({ queryKey: ['my-saved-collections'] });
       toastSuccess('Removed from collection');
     },
     onError: (error: any) => {
@@ -103,8 +141,10 @@ export const useDeleteCollection = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (collectionId: string) =>
-      Backend.from('user_collections').delete().eq('id', collectionId),
+    mutationFn: async (collectionId: string) => {
+      const { error } = await Backend.from('user_collections').delete().eq('id', collectionId);
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-collections'] });
       toastSuccess('Collection deleted');
@@ -112,14 +152,6 @@ export const useDeleteCollection = () => {
     onError: (error: any) => {
       toastError('Failed to delete collection', error.message);
     },
-  });
-};
-
-export const useSavedRexIds = (userId: string | undefined) => {
-  return useQuery({
-    queryKey: ['my-saved-ids', userId],
-    queryFn: () => CollectionsApi.getMySavedRexIds(userId!),
-    enabled: !!userId,
   });
 };
 

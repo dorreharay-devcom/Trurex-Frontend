@@ -5,7 +5,7 @@ import { useMyCircles } from '~/hooks/useMyCircles';
 import { PUBLIC_CIRCLE_ROW } from '~/constants/recommendation/createCircles';
 import { isSensitiveRexSubcategory } from '~/constants/recommendation/sensitiveRexSubcategories';
 import { getRexCategoryApiCode } from '~/constants/recommendation/rexCategories';
-import { mapApiCirclesToDisplayRows } from '~/utils/recommendation/circlePresentation';
+import { mapApiCirclesToDisplayRows } from '~/utils/recommendation/recCircles';
 import { mapSubcategoriesFromConfig } from '~/data/rexSubcategoryCatalog';
 import type {
   CategoryCreateConfig,

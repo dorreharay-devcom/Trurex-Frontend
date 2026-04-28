@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,10 @@ import {
   useWindowDimensions,
   findNodeHandle,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
-import { ArrowLeft, Star, MapPin, Quote, Plus, ChevronRight } from 'lucide-react-native';
+import { useQuery } from '@tanstack/react-query';
+import { ArrowLeft, Star, MapPin, Quote, Plus, ChevronRight, Flag } from 'lucide-react-native';
 import { RexCommentsSection } from '~/components/recommendation/comment';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
@@ -16,21 +18,32 @@ import { OverlayModal } from '~/components/common/OverlayModal';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
+import { fetchRexDetail } from '~/api/rexDetailApi';
+import { ReportContentDialog } from '~/components/recommendation/report/ReportContentDialog';
+import { useAuth } from '~/services/AuthContext';
+import type { ContentReportTarget } from '~/constants/recommendation/contentReport';
+import { toastInfo } from '~/utils/appToast';
 import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
 import { Theme } from '~/theme/Theme';
 import type { Recommendation } from '~/types/recommendation/recommendation';
-import { buildDetailRatingRows } from '~/utils/recommendation/recommendationDetailRatings';
+import {
+  buildAddYourOwnRecSource,
+  type AddYourOwnRecSource,
+} from '~/utils/recommendation/recCreateFlow';
+import { buildDetailRatingRows } from '~/utils/recommendation/recContentDisplay';
 import { cn } from '~/utils/general';
+import { RexImageCarousel } from './RexImageCarousel';
 import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
-} from '~/utils/recommendation/rexMediaPaths';
+  rexPhotoStoragePathsFromRecommendation,
+} from '~/utils/recommendation/recContentDisplay';
 
 type Props = {
   visible: boolean;
   recommendation: Recommendation | null;
   onClose: () => void;
-  onAddYourOwn?: () => void;
+  onAddYourOwn?: (source: AddYourOwnRecSource) => void;
   onCommentCountChange?: (total: number) => void;
   scrollToComments?: boolean;
   onAuthorPress?: (authorId: string) => void;
@@ -49,9 +62,35 @@ export const RecommendationDetailModal: React.FC<Props> = ({
 }) => {
   const { height: windowHeight } = useWindowDimensions();
   const { layout } = modalConfig;
+  const { user: authUser } = useAuth();
+  const [reportTarget, setReportTarget] = useState<ContentReportTarget | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const commentsSectionWrapRef = useRef<View>(null);
   const composerAnchorRef = useRef<View>(null);
+
+  const setReport = useCallback((t: ContentReportTarget | null) => setReportTarget(t), []);
+  const openRexReport = useCallback(() => {
+    if (!recommendation) return;
+    if (!authUser) {
+      toastInfo('Sign in', 'Sign in to report this recommendation.');
+      return;
+    }
+    if (recommendation.authorId != null && authUser.id === recommendation.authorId) {
+      return;
+    }
+    setReport({ kind: 'recommendation', rexId: recommendation.id });
+  }, [recommendation, authUser, setReport]);
+  const openCommentReport = useCallback(
+    (commentId: string) => {
+      if (!recommendation) return;
+      if (!authUser) {
+        toastInfo('Sign in', 'Sign in to report this comment.');
+        return;
+      }
+      setReport({ kind: 'comment', rexId: recommendation.id, commentId });
+    },
+    [recommendation, authUser, setReport],
+  );
 
   const { sheetTranslateY, handleClose } = useOverlaySheetPresentation({
     visible: visible && recommendation != null,
@@ -110,21 +149,70 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     };
   }, [visible, scrollToComments, recommendation?.id]);
 
+  const { data: rexDetail, isLoading: detailLoading } = useQuery({
+    queryKey: ['rexDetail', recommendation?.id] as const,
+    queryFn: async ({ queryKey }) => {
+      const id = queryKey[1];
+      if (typeof id !== 'string') {
+        throw new Error('Missing rex id');
+      }
+      return fetchRexDetail(id);
+    },
+    enabled: visible && typeof recommendation?.id === 'string',
+    staleTime: 0,
+    refetchOnMount: 'always',
+  });
+
   const mockRatings = useMemo(
     () => (recommendation ? buildDetailRatingRows(recommendation.rating ?? undefined) : []),
     [recommendation],
   );
+
+  const galleryPaths = useMemo(() => {
+    if (!recommendation) return [];
+    const normalize = (s: string) => {
+      const t = s.trim();
+      if (!t || t === 'null' || t === 'undefined') {
+        return null;
+      }
+      return t;
+    };
+    const fromDetail =
+      rexDetail?.photo_paths
+        ?.map((p) => normalize(String(p)))
+        .filter((p): p is string => p != null) ?? [];
+    if (fromDetail.length > 0) {
+      return fromDetail;
+    }
+    return rexPhotoStoragePathsFromRecommendation(recommendation);
+  }, [rexDetail, recommendation]);
+
+  const coverPath = useMemo(
+    () => (recommendation ? rexCoverStoragePathFromRecommendation(recommendation) : null),
+    [recommendation],
+  );
+  const coverHttp = useMemo(
+    () => (recommendation ? rexCoverRemoteHttpUrl(recommendation) : null),
+    [recommendation],
+  );
+  const showHero = useMemo(
+    () => galleryPaths.length > 0 || !!(coverPath || coverHttp),
+    [galleryPaths, coverPath, coverHttp],
+  );
+  const showDetailHeroLoading =
+    Boolean(visible && recommendation) &&
+    detailLoading &&
+    galleryPaths.length === 0 &&
+    !(coverPath || coverHttp);
 
   if (!recommendation) {
     return null;
   }
 
   const user = recommendation.user ?? { name: 'Member', handle: '', avatar: '' };
-  const coverPath = rexCoverStoragePathFromRecommendation(recommendation);
-  const coverHttp = rexCoverRemoteHttpUrl(recommendation);
-  const showHero = !!(coverPath || coverHttp);
 
   return (
+    <>
     <OverlayModal
       visible={visible && !!recommendation}
       onRequestClose={handleClose}
@@ -148,7 +236,26 @@ export const RecommendationDetailModal: React.FC<Props> = ({
             <Text className="min-w-0 flex-1 text-center text-lg font-display font-semibold text-foreground">
               Recommendation
             </Text>
-            <View className="w-[60px]" />
+            <View className="w-[60px] items-end justify-center">
+              {authUser &&
+              (recommendation.authorId == null || authUser.id !== recommendation.authorId) ? (
+                <Pressable
+                  onPress={openRexReport}
+                  accessibilityLabel="Report this recommendation"
+                  accessibilityRole="button"
+                  className="h-8 flex-row items-center gap-1 rounded-full border-2 border-destructive bg-destructive/10 px-2.5 active:opacity-90"
+                >
+                  <Flag size={12} color={Theme.colors.destructive} fill={Theme.colors.destructive} />
+                  <Text
+                    className="text-xs font-semibold"
+                    style={{ color: Theme.colors.destructive }}
+                    numberOfLines={1}
+                  >
+                    Report
+                  </Text>
+                </Pressable>
+              ) : null}
+            </View>
           </View>
         </View>
 
@@ -160,13 +267,26 @@ export const RecommendationDetailModal: React.FC<Props> = ({
           contentContainerClassName="items-center pb-8"
         >
           <View className={cn(CREATE_REC_STEP_INNER, 'gap-6')}>
-            {showHero ? (
-              <View className="overflow-hidden rounded-xl">
+            {showDetailHeroLoading ? (
+              <View
+                className="aspect-[16/9] w-full items-center justify-center overflow-hidden rounded-xl border border-border bg-muted"
+                accessibilityLabel="Loading photos"
+              >
+                <ActivityIndicator color={Theme.colors.primary} />
+              </View>
+            ) : galleryPaths.length > 0 ? (
+              <RexImageCarousel
+                paths={galleryPaths}
+                accessibilityLabelBase={recommendation.title}
+              />
+            ) : showHero && (coverPath || coverHttp) ? (
+              <View className="overflow-hidden rounded-xl bg-gray-100 aspect-[4/3]">
                 <SignedStorageImage
                   bucket={REX_IMAGES_BUCKET}
                   storagePath={coverPath}
                   remoteUri={coverHttp}
-                  className="aspect-[16/9] w-full"
+                  className="w-full h-full"
+                  contentFit="contain"
                   accessibilityLabel={recommendation.title}
                 />
               </View>
@@ -273,7 +393,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
 
             {onAddYourOwn ? (
               <Pressable
-                onPress={() => onAddYourOwn()}
+                onPress={() => onAddYourOwn(buildAddYourOwnRecSource(recommendation, rexDetail))}
                 accessibilityRole="button"
                 accessibilityLabel="Add your own rec for this place"
                 className="h-12 w-full flex-row items-center justify-center gap-2 rounded-xl bg-primary px-4 active:bg-primary/90"
@@ -293,6 +413,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                 composerAnchorRef={composerAnchorRef}
                 autoFocusComposer={scrollToComments === true}
                 onUserPress={onUserPress}
+                onReportComment={openCommentReport}
               />
             </View>
 
@@ -301,5 +422,13 @@ export const RecommendationDetailModal: React.FC<Props> = ({
         </ScrollView>
       </View>
     </OverlayModal>
+    <ReportContentDialog
+      open={reportTarget != null}
+      onOpenChange={(o) => {
+        if (!o) setReportTarget(null);
+      }}
+      target={reportTarget}
+    />
+  </>
   );
 };

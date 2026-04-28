@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, useWindowDimensions } from 'react-native';
-import { Sparkles, Bookmark, Orbit, MapPinned, UserCircle2 } from 'lucide-react-native';
+import { Sparkles, Gem, Orbit, MapPinned, UserCircle2 } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
 import { isWeb } from '~/utils';
 
@@ -12,7 +12,7 @@ export const NAV_ITEMS: {
   icon: React.ComponentType<{ size: number; color: string }>;
 }[] = [
   { id: 'discover', label: 'Discover', icon: Sparkles },
-  { id: 'faves', label: 'My Faves', icon: Bookmark },
+  { id: 'faves', label: 'Gems', icon: Gem },
   { id: 'circles', label: 'Circles', icon: Orbit },
   { id: 'map', label: 'Map', icon: MapPinned },
   { id: 'profile', label: 'Profile', icon: UserCircle2 },

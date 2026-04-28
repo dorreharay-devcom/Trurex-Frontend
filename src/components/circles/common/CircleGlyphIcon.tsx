@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Globe, Heart, Lock, Users } from 'lucide-react-native';
-import type { CircleTabIconKind } from '~/utils/recommendation/circlePresentation';
+import type { CircleTabIconKind } from '~/utils/recommendation/recCircles';
 
 const GLYPH_ICONS: Record<CircleTabIconKind, typeof Lock> = {
   lock: Lock,

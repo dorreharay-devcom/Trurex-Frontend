@@ -1,5 +1,6 @@
 import { Backend } from '~/services/AuthService';
-import type { NetworkUserRow, PublicUserRow, UserProfileRow } from '~/types/network';
+import type { NetworkUserRow, PublicUserRow, UserConfigRow, UserProfileRow } from '~/types/network';
+import { isPlainObject } from '~/utils';
 
 const DEFAULT_LIMIT = 50;
 
@@ -210,4 +211,28 @@ export async function unfollowUser(input_followed_user_id: string): Promise<void
 
 export function filterOneWayFollowing(rows: NetworkUserRow[]): NetworkUserRow[] {
   return rows.filter((r) => r.relationship_status === 'following');
+}
+
+const emptyUserConfig = (): UserConfigRow => ({
+  avatar_url: null,
+  pinned_category_ids: [],
+});
+
+function normalizeUserConfigResponse(data: unknown): UserConfigRow {
+  if (data == null) {
+    return emptyUserConfig();
+  }
+  if (Array.isArray(data) && isPlainObject(data[0])) {
+    return data[0] as UserConfigRow;
+  }
+  if (isPlainObject(data) && 'pinned_category_ids' in data) {
+    return data as UserConfigRow;
+  }
+  return emptyUserConfig();
+}
+
+export async function fetchUserConfig(): Promise<UserConfigRow> {
+  const { data, error } = await Backend.rpc('user_config');
+  if (error) throw error;
+  return normalizeUserConfigResponse(data);
 }

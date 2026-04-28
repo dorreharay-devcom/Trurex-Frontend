@@ -14,7 +14,7 @@ import {
   mapApiCirclesToTabRows,
   parseCircleAccentHex,
   sortCirclesForTabList,
-} from '~/utils/recommendation/circlePresentation';
+} from '~/utils/recommendation/recCircles';
 import {
   CIRCLE_COLOR_PRESETS,
   type CirclePresetColor,

@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { Plus, Check, Image as ImageIcon, AlertCircle, MapPin } from 'lucide-react-native';
 import { Image } from 'expo-image';
-import { Backend } from '~/services/AuthService';
+import { useQueryClient } from '@tanstack/react-query';
 import { CollectionsApi, UserCollection } from '~/api/CollectionsApi';
 import { useAuth } from '~/services/AuthContext';
 import { toastSuccess } from '~/utils/appToast';
@@ -84,6 +84,7 @@ const CollectionRow: React.FC<{
 const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, onClose }) => {
   const { user } = useAuth();
   const { height } = useWindowDimensions();
+  const queryClient = useQueryClient();
 
   const [visible, setVisible] = useState(false);
   const [collections, setCollections] = useState<CollectionWithCount[]>([]);
@@ -93,6 +94,22 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
   const [showNewCollection, setShowNewCollection] = useState(false);
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
+
+  const handleDone = async () => {
+    if (!addedTo && rec) {
+      if (rec.isSaved) {
+        toastSuccess('Already in your saved rexes');
+      } else {
+        try {
+          await CollectionsApi.saveRex(user!.id, rec.id);
+          queryClient.invalidateQueries({ queryKey: ['my-saved-ids'] });
+          queryClient.invalidateQueries({ queryKey: ['my-saved'] });
+          toastSuccess('Saved to uncollected');
+        } catch {}
+      }
+    }
+    onClose();
+  };
 
   const backdropOpacity = useRef(new Animated.Value(0)).current;
   const sheetTranslateY = useRef(new Animated.Value(600)).current;
@@ -122,32 +139,21 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
     setLoading(true);
     setError(null);
     try {
-      const cols = await CollectionsApi.myCollections();
+      const [cols, existingIds] = await Promise.all([
+        CollectionsApi.userCollections(user.id),
+        CollectionsApi.myCollectionIdsForRex(rec.id),
+      ]);
       if (!cols.length) {
         setCollections([]);
         setLoading(false);
         return;
       }
 
-      const colIds = cols.map((c) => c.id);
-      const [{ data: allItems }, { data: existing }] = await Promise.all([
-        Backend.from('user_collection_rexes').select('collection_id').in('collection_id', colIds),
-        Backend.from('user_collection_rexes')
-          .select('collection_id')
-          .eq('rex_id', rec.id)
-          .in('collection_id', colIds),
-      ]);
-
-      const countMap = new Map<string, number>();
-      (allItems || []).forEach((i: any) =>
-        countMap.set(i.collection_id, (countMap.get(i.collection_id) || 0) + 1),
-      );
-
-      const existingSet = new Set((existing || []).map((e: any) => e.collection_id as string));
+      const existingSet = new Set(existingIds);
       setCollections(
         cols.map((c) => ({
           ...c,
-          item_count: countMap.get(c.id) || 0,
+          item_count: c.rex_count ?? 0,
           alreadyHasRec: existingSet.has(c.id),
         })),
       );
@@ -228,10 +234,13 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
               </View>
 
               {/* Heading */}
-              <View style={[{ paddingHorizontal: 16, paddingBottom: 8 }, webContainerStyle]}>
+              <View style={[{ paddingHorizontal: 16, paddingBottom: 8 }, webContainerStyle]} className="flex-row items-center justify-between">
                 <Text className="text-base font-display font-medium text-foreground">
                   Add to collection
                 </Text>
+                <TouchableOpacity onPress={handleDone} activeOpacity={0.7}>
+                  <Text className="text-sm font-semibold text-primary">Done</Text>
+                </TouchableOpacity>
               </View>
 
               {/* Rex summary */}

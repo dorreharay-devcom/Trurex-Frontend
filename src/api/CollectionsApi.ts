@@ -8,6 +8,9 @@ export interface UserCollection {
   cover_image_path: string | null;
   created_at: string;
   updated_at: string;
+  rex_count?: number;
+  is_my_collection: boolean;
+  is_saved?: boolean;
 }
 
 export interface UserCollectionRex {
@@ -38,6 +41,8 @@ export interface CollectionDetailRow {
   description: string | null;
   cover_image_path: string | null;
   rexes: CollectionRexEntry[];
+  is_my_collection: boolean;
+  is_saved: boolean;
 }
 
 export const CollectionsApi = {
@@ -45,12 +50,14 @@ export const CollectionsApi = {
     display_name: string;
     description?: string | null;
     cover_image_path?: string | null;
+    visibility?: 'private' | 'shared' | 'public';
   }): Promise<UserCollection> => {
     return unwrap(
       await Backend.rpc('create_collection', {
         input_display_name: params.display_name,
         input_description: params.description ?? null,
         input_cover_image_path: params.cover_image_path ?? null,
+        input_visibility: params.visibility ?? 'private',
       }),
     );
   },
@@ -85,8 +92,25 @@ export const CollectionsApi = {
     );
   },
 
-  myCollections: async (): Promise<UserCollection[]> => {
-    return unwrap(await Backend.rpc('my_collections'));
+  userCollections: async (userId: string): Promise<UserCollection[]> => {
+    return unwrap(await Backend.rpc('user_collections', { input_user_id: userId }));
+  },
+
+  saveCollection: async (collectionId: string): Promise<void> => {
+    unwrap(await Backend.rpc('save_collection', { input_collection_id: collectionId }));
+  },
+
+  unsaveCollection: async (collectionId: string): Promise<void> => {
+    unwrap(await Backend.rpc('unsave_collection', { input_collection_id: collectionId }));
+  },
+
+  mySavedCollections: async (): Promise<UserCollection[]> => {
+    return unwrap(await Backend.rpc('my_saved_collections'));
+  },
+
+  myCollectionIdsForRex: async (rexId: string): Promise<string[]> => {
+    const rows = unwrap(await Backend.rpc('my_collection_ids_for_rex', { input_rex_id: rexId })) as { collection_id: string }[];
+    return (rows || []).map((r) => r.collection_id);
   },
 
   collectionDetail: async (collectionId: string): Promise<CollectionDetailRow> => {
@@ -96,14 +120,6 @@ export const CollectionsApi = {
       }),
     ) as CollectionDetailRow[];
     return rows[0];
-  },
-
-  getMySavedRexIds: async (userId: string): Promise<string[]> => {
-    const { data, error } = await Backend.from('saved_rexes')
-      .select('rex_id')
-      .eq('user_id', userId);
-    if (error) throw error;
-    return (data || []).map((row: any) => row.rex_id);
   },
 
   saveRex: async (_userId: string, rexId: string): Promise<void> => {

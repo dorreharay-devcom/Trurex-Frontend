@@ -27,6 +27,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
     REX_IMAGES_BUCKET,
     collection.cover_image_path ?? '',
   );
+
   return (
     <TouchableOpacity
       activeOpacity={0.85}
@@ -58,10 +59,23 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
         className="absolute inset-0"
       />
 
+      <View className="absolute top-2.5 right-2.5">
+        <View className={`px-2 py-0.5 rounded-full ${collection.is_my_collection ? 'bg-primary/80' : 'bg-black/50'}`}>
+          <Text className="text-[10px] font-semibold text-white">
+            {collection.is_my_collection ? 'Mine' : 'Saved'}
+          </Text>
+        </View>
+      </View>
+
       <View className="absolute bottom-0 left-0 right-0 p-4">
         <Text className="text-sm font-bold text-white leading-tight" numberOfLines={2}>
           {collection.display_name}
         </Text>
+        {collection.rex_count != null && (
+          <Text className="text-xs text-white/70 mt-0.5">
+            {collection.rex_count} {collection.rex_count === 1 ? 'Rex' : "Rex's"}
+          </Text>
+        )}
       </View>
     </TouchableOpacity>
   );

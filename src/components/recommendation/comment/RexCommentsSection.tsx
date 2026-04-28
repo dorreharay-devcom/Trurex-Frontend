@@ -16,6 +16,7 @@ export type RexCommentsSectionProps = {
   composerAnchorRef?: React.RefObject<View | null>;
   autoFocusComposer?: boolean;
   onUserPress?: (userId: string) => void;
+  onReportComment?: (commentId: string) => void;
 };
 
 export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
@@ -25,9 +26,10 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
   composerAnchorRef,
   autoFocusComposer,
   onUserPress,
+  onReportComment,
 }) => {
   const { user } = useAuth();
-  const { comments, loading, addComment, deleteComment } = useRexComments(rexId);
+  const { comments, loading, addComment, deleteComment, toggleCommentLike } = useRexComments(rexId);
   const [text, setText] = useState('');
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const inputRef = useRef<TextInput | null>(null);
@@ -72,6 +74,18 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
     inputRef.current?.focus();
   }, []);
 
+  const handleToggleLike = useCallback(
+    async (commentId: string, currentlyLiked: boolean) => {
+      if (!user) return;
+      try {
+        await toggleCommentLike(commentId, currentlyLiked);
+      } catch (e) {
+        toastError('Could not update like', e instanceof Error ? e.message : undefined);
+      }
+    },
+    [user, toggleCommentLike],
+  );
+
   return (
     <View className="gap-4 pt-2">
       <View className="flex-row items-center gap-1.5">
@@ -100,6 +114,8 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
               onReply={startReply}
               onDelete={handleDelete}
               onUserPress={onUserPress}
+              onToggleLike={handleToggleLike}
+              onReport={onReportComment}
             />
           ))}
         </View>

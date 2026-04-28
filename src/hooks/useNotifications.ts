@@ -1,38 +1,46 @@
-import { useCallback, useMemo, useState } from 'react';
-import { getMockNotificationsDemo } from '~/data/mockNotificationsDemo';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Backend, unwrap } from '~/services/AuthService';
 import type { AppNotification } from '~/types/notification/appNotification';
 
-export const USE_MOCK_NOTIFICATIONS = true;
+async function fetchNotifications(): Promise<AppNotification[]> {
+  const raw = unwrap(
+    await Backend.rpc('user_notifications', { result_limit: 50, result_offset: 0 }),
+  );
+  if (!Array.isArray(raw)) return [];
+  return raw as AppNotification[];
+}
 
-function cloneNotifications(list: AppNotification[]): AppNotification[] {
-  return list.map((n) => ({ ...n, data: n.data ? { ...n.data } : null }));
+async function markNotificationsRead(ids?: string[]): Promise<void> {
+  const params = ids?.length ? { input_ids: ids } : {};
+  const { error } = await Backend.rpc('mark_notifications_read', params);
+  if (error) throw error;
 }
 
 export function useNotifications() {
-  const [notifications, setNotifications] = useState<AppNotification[]>(() =>
-    USE_MOCK_NOTIFICATIONS ? cloneNotifications(getMockNotificationsDemo()) : [],
-  );
+  const queryClient = useQueryClient();
 
-  const unreadCount = useMemo(
-    () => notifications.filter((n) => !n.is_read).length,
-    [notifications],
-  );
+  const { data: notifications = [], isLoading: loading, refetch } = useQuery<AppNotification[]>({
+    queryKey: ['notifications'],
+    queryFn: fetchNotifications,
+    staleTime: 30_000,
+  });
 
-  const markAllAsRead = useCallback(async () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-  }, []);
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
-  const refetch = useCallback(async () => {
-    if (USE_MOCK_NOTIFICATIONS) {
-      setNotifications(cloneNotifications(getMockNotificationsDemo()));
-    }
-  }, []);
+  const markAllAsRead = useMutation({
+    mutationFn: () => markNotificationsRead(),
+    onSuccess: () => {
+      queryClient.setQueryData<AppNotification[]>(['notifications'], (prev) =>
+        prev?.map((n) => ({ ...n, is_read: true })) ?? [],
+      );
+    },
+  });
 
   return {
     notifications,
     unreadCount,
-    loading: false,
-    markAllAsRead,
+    loading,
+    markAllAsRead: () => markAllAsRead.mutate(),
     refetch,
   };
 }

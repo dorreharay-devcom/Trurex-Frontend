@@ -11,6 +11,7 @@ import { TabBar, Tab } from '~/components/layout/TabBar';
 import { CreateModal } from '~/components/recommendation/create/CreateModal';
 import { RecommendationDetailModal } from '~/components/recommendation/RecommendationDetailModal';
 import { Theme } from '~/theme/Theme';
+import type { AddYourOwnRecSource } from '~/utils/recommendation/recCreateFlow';
 import type {
   Recommendation,
   RecommendationOpenOptions,
@@ -20,6 +21,7 @@ export default function HomeScreen() {
   const [currentTab, setCurrentTab] = useState<Tab>('discover');
   const [searchQuery, setSearchQuery] = useState('');
   const [createRecommendationOpen, setCreateRecommendationOpen] = useState(false);
+  const [addYourOwnPrefill, setAddYourOwnPrefill] = useState<AddYourOwnRecSource | null>(null);
   const [previewRecommendation, setPreviewRecommendation] = useState<Recommendation | null>(null);
   const [previewOptions, setPreviewOptions] = useState<RecommendationOpenOptions>({});
   const [commentCountByRexId, setCommentCountByRexId] = useState<Record<string, number>>({});
@@ -28,9 +30,11 @@ export default function HomeScreen() {
 
   const handleCloseCreate = useCallback(() => {
     setCreateRecommendationOpen(false);
+    setAddYourOwnPrefill(null);
   }, []);
 
-  const openCreateFromDetail = useCallback(() => {
+  const openCreateFromDetail = useCallback((source: AddYourOwnRecSource) => {
+    setAddYourOwnPrefill(source);
     setCreateRecommendationOpen(true);
     setPreviewRecommendation(null);
     setPreviewOptions({});
@@ -80,10 +84,7 @@ export default function HomeScreen() {
 
       <View className="flex-1">
         {currentTab === 'discover' && (
-          <DiscoverView
-            searchQuery={searchQuery}
-            onRecommendationPress={openPreview}
-          />
+          <DiscoverView searchQuery={searchQuery} onRecommendationPress={openPreview} />
         )}
         {currentTab === 'faves' && (
           <FavesView
@@ -98,13 +99,17 @@ export default function HomeScreen() {
             userId={viewingUserId}
             onAvatarUpdated={() => setAvatarRefreshKey((k) => k + 1)}
             onBack={viewingUserId ? () => { setViewingUserId(undefined); setCurrentTab('discover'); } : undefined}
+            onRexPress={openPreview}
           />
         )}
       </View>
 
       {currentTab === 'discover' && (
         <TouchableOpacity
-          onPress={() => setCreateRecommendationOpen(true)}
+          onPress={() => {
+            setAddYourOwnPrefill(null);
+            setCreateRecommendationOpen(true);
+          }}
           accessibilityRole="button"
           accessibilityLabel="Add Rex"
           className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-primary items-center justify-center hover:opacity-90 active:opacity-75 cursor-pointer"
@@ -120,7 +125,11 @@ export default function HomeScreen() {
         </TouchableOpacity>
       )}
 
-      <CreateModal visible={createRecommendationOpen} onClose={handleCloseCreate} />
+      <CreateModal
+        visible={createRecommendationOpen}
+        onClose={handleCloseCreate}
+        addYourOwnPrefill={addYourOwnPrefill}
+      />
 
       <RecommendationDetailModal
         visible={previewRecommendation != null}

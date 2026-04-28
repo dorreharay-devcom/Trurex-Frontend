@@ -23,8 +23,12 @@ export const getRedirectUrl = () => (isWeb ? window.location.origin : Linking.cr
 
 export const isFiniteNumber = (value: unknown): value is number => {
   return typeof value === 'number' && Number.isFinite(value);
-}
+};
 
-export const isPlainObject = (value: unknown): value is Record<string, unknown>  => {
+export const isNonEmptyString = (value: unknown): value is string => {
+  return typeof value === 'string' && value.length > 0;
+};
+
+export const isPlainObject = (value: unknown): value is Record<string, unknown> => {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
-}
+};
