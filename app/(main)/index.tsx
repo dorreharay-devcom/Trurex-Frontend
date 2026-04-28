@@ -24,7 +24,6 @@ export default function HomeScreen() {
   const [addYourOwnPrefill, setAddYourOwnPrefill] = useState<AddYourOwnRecSource | null>(null);
   const [previewRecommendation, setPreviewRecommendation] = useState<Recommendation | null>(null);
   const [previewOptions, setPreviewOptions] = useState<RecommendationOpenOptions>({});
-  const [commentCountByRexId, setCommentCountByRexId] = useState<Record<string, number>>({});
   const [avatarRefreshKey, setAvatarRefreshKey] = useState(0);
   const [viewingUserId, setViewingUserId] = useState<string | undefined>(undefined);
 
@@ -57,13 +56,7 @@ export default function HomeScreen() {
     setCurrentTab('profile');
   }, []);
 
-  const handleCommentCountChange = useCallback(
-    (total: number) => {
-      const id = previewRecommendation?.id;
-      if (id) setCommentCountByRexId((prev) => ({ ...prev, [id]: total }));
-    },
-    [previewRecommendation?.id],
-  );
+  const handleCommentCountChange = useCallback((_total: number) => {}, []);
 
   const handleTabChange = useCallback((tab: Tab) => {
     if (tab === 'profile') setViewingUserId(undefined);
@@ -89,7 +82,7 @@ export default function HomeScreen() {
         )}
         {currentTab === 'faves' && (
           <FavesView
-            commentCountByRexId={commentCountByRexId}
+            commentCountByRexId={{}}
             onRecommendationPress={openPreview}
           />
         )}
@@ -113,7 +106,7 @@ export default function HomeScreen() {
           }}
           accessibilityRole="button"
           accessibilityLabel="Add Rex"
-          className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-primary items-center justify-center hover:opacity-90 active:opacity-75 cursor-pointer"
+          className="absolute right-6 bottom-6 w-14 h-14 rounded-full bg-primary items-center justify-center hover:opacity-90 active:opacity-75 cursor-pointer"
           style={{
             elevation: 4,
             shadowColor: '#000',

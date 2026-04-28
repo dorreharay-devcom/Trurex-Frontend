@@ -23,7 +23,8 @@ export const DiscoverCategoryPinButton = React.memo(function DiscoverCategoryPin
       accessibilityState={{ disabled }}
       accessibilityLabel={isPinned ? 'Unpin category' : 'Pin category'}
       onPress={onPress}
-      className={`absolute right-1 top-1 z-10 p-1 ${disabled ? 'opacity-40' : ''}`}
+      className={`absolute z-10 p-1 ${disabled ? 'opacity-40' : ''}`}
+      style={{ top: 8, right: 8 }}
     >
       <Pin
         size={12}

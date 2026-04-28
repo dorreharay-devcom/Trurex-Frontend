@@ -1,9 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Modal, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { ArrowLeft, Plus, MoreVertical, Trash2, Pencil, Link, BookmarkPlus, BookmarkMinus } from 'lucide-react-native';
+import { ArrowLeft, Plus, MoreVertical, Trash2, Pencil, Link2, BookmarkPlus, BookmarkMinus, MapPin, Star, DollarSign, X } from 'lucide-react-native';
 import { Image } from 'expo-image';
-import ImageColors from 'react-native-image-colors';
 import { isWeb, webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
 import {
@@ -17,8 +16,10 @@ import EditCollectionModal from '~/components/faves/EditCollectionModal';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { toastSuccess } from '~/utils/appToast';
-import RecommendationCard from '~/components/recommendation/RecommendationCard';
+import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import type { Recommendation, RecommendationOpenOptions } from '~/types/recommendation/recommendation';
+
+const VALUE_LABELS = ['Total Steal', 'Budget-Friendly', 'Good Value', 'Worth It', 'Splurge'];
 import type { CollectionRexEntry } from '~/api/CollectionsApi';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 
@@ -60,25 +61,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   const { width: screenWidth } = useWindowDimensions();
   const { data: detail, isLoading } = useCollectionDetail(collectionId);
   const { uri: coverUri } = useSignedStorageUrl(REX_IMAGES_BUCKET, detail?.cover_image_path ?? '');
-  const [coverBg, setCoverBg] = useState('#1a1a1a');
   const [saveTarget, setSaveTarget] = useState<RecSummary | null>(null);
-
-  useEffect(() => {
-    if (!coverUri) return;
-    ImageColors.getColors(coverUri, { fallback: '#1a1a1a', cache: true, key: coverUri })
-      .then((colors) => {
-        const color =
-          colors.platform === 'ios'
-            ? colors.primary
-            : colors.platform === 'android'
-              ? colors.dominant
-              : colors.platform === 'web'
-                ? colors.dominant
-                : '#1a1a1a';
-        setCoverBg(color ?? '#1a1a1a');
-      })
-      .catch(() => {});
-  }, [coverUri]);
 
   const removeMutation = useRemoveRexFromCollection(collectionId);
   const deleteMutation = useDeleteCollection();
@@ -133,9 +116,8 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
       </View>
 
       {coverUri && (
-        <View style={{ width: '100%', height: 220, borderRadius: 12, overflow: 'hidden', marginBottom: 12 }}>
-          <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: coverBg, opacity: 0.15 }} />
-          <Image source={{ uri: coverUri }} style={{ width: '100%', height: '100%' }} contentFit="contain" />
+        <View className="rounded-xl overflow-hidden mb-4" style={{ height: 144 }}>
+          <Image source={{ uri: coverUri }} className="w-full h-full" contentFit="cover" />
         </View>
       )}
 
@@ -173,24 +155,69 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
           </View>
         }
         renderItem={({ item }) => (
-          <View
-            className="px-4"
-            style={isWeb ? { maxWidth: 680, width: '100%', alignSelf: 'center' } : undefined}
-          >
-            <RecommendationCard
-              recommendation={entryToRec(item)}
-              onTap={onRecommendationPress}
-              onRemove={detail.is_my_collection ? () => removeMutation.mutate(item.rex_id) : undefined}
-              onSave={() =>
-                setSaveTarget({
-                  id: item.rex_id,
-                  place_name: item.place_name,
-                  category_code: item.category_code,
-                  location: item.location ?? undefined,
-                  isSaved: true,
-                })
-              }
-            />
+          <View className="px-4 mb-3">
+            <View className="bg-card border border-border rounded-xl overflow-hidden flex-row">
+              <Pressable
+                onPress={() => onRecommendationPress?.(entryToRec(item))}
+                className="flex-1 flex-row gap-3 p-3"
+              >
+                <View className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                  <SignedStorageImage
+                    bucket={REX_IMAGES_BUCKET}
+                    storagePath={item.photo_path ?? ''}
+                    className="w-full h-full"
+                    accessibilityLabel={item.place_name}
+                  />
+                </View>
+                <View className="flex-1 min-w-0">
+                  <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
+                    {item.place_name}
+                  </Text>
+                  <Text className="text-xs text-muted-foreground">
+                    {item.category_name || item.category_code}
+                  </Text>
+                  <View className="flex-row items-center gap-2 mt-1 flex-wrap">
+                    {item.location && (
+                      <View className="flex-row items-center gap-0.5">
+                        <MapPin size={10} color={Theme.colors.muted} />
+                        <Text className="text-[11px] text-muted-foreground">{item.location}</Text>
+                      </View>
+                    )}
+                    {!!item.rating && (
+                      <View className="flex-row items-center gap-0.5">
+                        <Star size={10} color={Theme.colors.primary} fill={Theme.colors.primary} />
+                        <Text className="text-[11px] text-muted-foreground">{item.rating}</Text>
+                      </View>
+                    )}
+                    {!!item.score_value_for_money && (
+                      <View className="flex-row items-center gap-0.5">
+                        <DollarSign size={10} color={Theme.colors.muted} />
+                        <Text className="text-[11px] text-muted-foreground">
+                          {VALUE_LABELS[(item.score_value_for_money ?? 1) - 1]}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                  {item.recommender_name && (
+                    <Text className="text-[10px] text-primary font-medium mt-0.5">
+                      Rec'd by {item.recommender_name}
+                    </Text>
+                  )}
+                </View>
+              </Pressable>
+              {detail.is_my_collection && (
+                <Pressable
+                  onPress={() => removeMutation.mutate(item.rex_id)}
+                  className="px-3 justify-center"
+                >
+                  {({ hovered, pressed }: { hovered?: boolean; pressed?: boolean }) => (
+                    <View className={`w-6 h-6 rounded-full items-center justify-center ${hovered || pressed ? 'bg-destructive/10' : ''}`}>
+                      <X size={12} color={hovered || pressed ? Theme.colors.destructive : Theme.colors.foreground} />
+                    </View>
+                  )}
+                </Pressable>
+              )}
+            </View>
           </View>
         )}
       />
@@ -214,7 +241,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                 onPress={handleCopyLink}
                 className="flex-row items-center gap-3 px-4 py-2.5"
               >
-                <Link size={15} color={Theme.colors.foreground} />
+                <Link2 size={15} color={Theme.colors.foreground} />
                 <Text className="text-sm text-foreground">Copy link</Text>
               </TouchableOpacity>
               <View className="h-px bg-border mx-2 my-1" />
@@ -232,7 +259,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                 onPress={handleCopyLink}
                 className="flex-row items-center gap-3 px-4 py-2.5"
               >
-                <Link size={15} color={Theme.colors.foreground} />
+                <Link2 size={15} color={Theme.colors.foreground} />
                 <Text className="text-sm text-foreground">Copy link</Text>
               </TouchableOpacity>
               <TouchableOpacity
