@@ -1,4 +1,5 @@
 import { Backend } from '~/services/AuthService';
+import type { NetworkUserRow } from '~/types/network';
 
 export type CircleApiRow = {
   id: string;
@@ -178,6 +179,15 @@ export type CircleMemberProfile = {
   handle: string | null;
   avatar_url: string | null;
 };
+
+export function circleMemberFromTrustedRow(row: NetworkUserRow): CircleMemberProfile {
+  return {
+    user_id: row.user_id,
+    display_name: row.display_name,
+    handle: row.handle,
+    avatar_url: row.avatar_url,
+  };
+}
 
 export async function fetchCircleMembers(circleId: string): Promise<CircleMemberProfile[]> {
   const { data: membershipRows, error: me } = await Backend.from('circle_members')

@@ -85,7 +85,7 @@ function normalizeUserProfileRow(r: Record<string, unknown>): UserProfileRow {
 
 async function fetchUserFollowingInternal(inputUserId: string): Promise<NetworkUserRow[]> {
   const { data, error } = await Backend.rpc('user_following', {
-    input_limit: 100,
+    input_limit: DEFAULT_LIMIT,
     input_offset: 0,
     input_user_id: inputUserId,
   });

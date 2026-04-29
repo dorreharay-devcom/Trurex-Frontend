@@ -45,7 +45,7 @@ const POLICY_BY_SYSTEM_KIND = {
   },
   trusted: {
     showConnectionsAddPanel: false,
-    allowOwnerRemoveMemberRpc: true,
+    allowOwnerRemoveMemberRpc: false,
   },
   broader_network: {
     showConnectionsAddPanel: false,

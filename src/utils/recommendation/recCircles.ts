@@ -98,7 +98,7 @@ const SYSTEM_KIND_ORDER: Record<string, number> = {
   broader_network: 2,
 };
 
-function isUserCreatedCircle(row: CircleApiRow): boolean {
+export function isUserCreatedCircle(row: CircleApiRow): boolean {
   const k = row.system_kind;
   return k == null || k === '';
 }

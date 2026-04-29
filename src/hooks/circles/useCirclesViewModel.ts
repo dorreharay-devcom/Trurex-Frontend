@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  type CircleMemberProfile,
   addCircleMember,
+  circleMemberFromTrustedRow,
   createCircle,
   deleteCircle,
   fetchCircleMembers,
@@ -73,31 +75,90 @@ export function useCirclesViewModel(isActive: boolean) {
   const detailOpen = !!user && isActive && !!selectedCircleId;
   const connectionsEnabled = !!user && isActive;
 
-  const { data: members = [] } = useQuery({
-    queryKey: ['circleMembers', selectedCircleId],
-    queryFn: () => fetchCircleMembers(selectedCircleId!),
-    enabled: detailOpen,
-  });
-
-  const memberIdSet = useMemo(() => new Set(members.map((m) => m.user_id)), [members]);
-
-  const { data: trustedRows = [], isLoading: trustedLoading } = useQuery({
-    queryKey: ['circleConnections', 'trusted', user?.id],
+  const {
+    data: trustedRows = [],
+    isLoading: trustedLoading,
+    refetch: refetchTrustedUsers,
+  } = useQuery({
+    queryKey: ['trusted_users', user?.id],
     queryFn: () => fetchTrustedUsers(user!.id),
     enabled: connectionsEnabled && !!user?.id,
   });
 
-  const { data: followerRows = [], isLoading: followersLoading } = useQuery({
-    queryKey: ['circleConnections', 'followers', user?.id],
+  useEffect(() => {
+    if (detailOpen && selectedCircle?.system_kind === 'trusted' && user?.id) {
+      void refetchTrustedUsers();
+    }
+  }, [detailOpen, selectedCircleId, selectedCircle?.system_kind, user?.id, refetchTrustedUsers]);
+
+  const { data: rpcCircleMembers = [], isLoading: rpcCircleMembersLoading } = useQuery({
+    queryKey: ['circleMembers', selectedCircleId],
+    queryFn: () => fetchCircleMembers(selectedCircleId!),
+    enabled:
+      detailOpen &&
+      !!selectedCircleId &&
+      selectedCircle?.system_kind !== 'trusted' &&
+      selectedCircle?.system_kind !== 'broader_network',
+  });
+
+  const {
+    data: followerRows = [],
+    isLoading: followersLoading,
+    refetch: refetchFollowers,
+  } = useQuery({
+    queryKey: ['user_followers', user?.id],
     queryFn: () => fetchUserFollowers(user!.id),
     enabled: connectionsEnabled && !!user?.id,
   });
 
   const { data: followingAll = [], isLoading: followingLoading } = useQuery({
-    queryKey: ['circleConnections', 'following', user?.id],
+    queryKey: ['user_following', user?.id],
     queryFn: () => fetchUserFollowing(user!.id),
     enabled: connectionsEnabled && !!user?.id,
   });
+
+  useEffect(() => {
+    if (detailOpen && selectedCircle?.system_kind === 'broader_network' && user?.id) {
+      void refetchFollowers();
+    }
+  }, [detailOpen, selectedCircleId, selectedCircle?.system_kind, user?.id, refetchFollowers]);
+
+  const members: CircleMemberProfile[] = useMemo(() => {
+    if (!detailOpen || !selectedCircleId || !selectedCircle) return [];
+    if (selectedCircle.system_kind === 'trusted') {
+      return trustedRows.map(circleMemberFromTrustedRow);
+    }
+    if (selectedCircle.system_kind === 'broader_network') {
+      return followerRows.map(circleMemberFromTrustedRow);
+    }
+    return rpcCircleMembers;
+  }, [
+    detailOpen,
+    selectedCircleId,
+    selectedCircle,
+    trustedRows,
+    followerRows,
+    rpcCircleMembers,
+  ]);
+
+  const membersLoading = useMemo(() => {
+    if (selectedCircle?.system_kind === 'trusted') {
+      return trustedLoading && trustedRows.length === 0;
+    }
+    if (selectedCircle?.system_kind === 'broader_network') {
+      return followersLoading && followerRows.length === 0;
+    }
+    return rpcCircleMembersLoading;
+  }, [
+    selectedCircle?.system_kind,
+    trustedLoading,
+    trustedRows.length,
+    followersLoading,
+    followerRows.length,
+    rpcCircleMembersLoading,
+  ]);
+
+  const memberIdSet = useMemo(() => new Set(members.map((m) => m.user_id)), [members]);
 
   const followingOneWay = useMemo(() => filterOneWayFollowing(followingAll), [followingAll]);
 
@@ -270,6 +331,7 @@ export function useCirclesViewModel(isActive: boolean) {
     editColor,
     setEditColor,
     members,
+    membersLoading,
     memberIdSet,
     trustedRows,
     trustedLoading,
