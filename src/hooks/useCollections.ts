@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Backend } from '~/services/AuthService';
-import { CollectionsApi, UserCollection, CollectionDetailRow } from '~/api/CollectionsApi';
+import { CollectionsApi, UserCollection, CollectionDetailRow, CollectionVisibility } from '~/api/CollectionsApi';
 import { toastSuccess, toastError } from '~/utils/appToast';
 
 export const useMyCollections = (userId?: string) => {
@@ -82,6 +82,7 @@ export const useUpdateCollection = () => {
       description?: string | null;
       update_cover_image_path?: boolean;
       cover_image_path?: string | null;
+      visibility?: CollectionVisibility;
     }) => CollectionsApi.updateCollection(params),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['my-collections'] });

@@ -1,11 +1,14 @@
 import { Backend, unwrap } from '~/services/AuthService';
 
+export type CollectionVisibility = 'private' | 'shared' | 'public';
+
 export interface UserCollection {
   id: string;
   user_id: string;
   display_name: string;
   description: string | null;
   cover_image_path: string | null;
+  visibility?: CollectionVisibility;
   created_at: string;
   updated_at: string;
   rex_count?: number;
@@ -45,6 +48,7 @@ export interface CollectionDetailRow {
   display_name: string;
   description: string | null;
   cover_image_path: string | null;
+  visibility?: CollectionVisibility;
   rexes: CollectionRexEntry[];
   is_my_collection: boolean;
   is_saved: boolean;
@@ -73,6 +77,7 @@ export const CollectionsApi = {
     description?: string | null;
     update_cover_image_path?: boolean;
     cover_image_path?: string | null;
+    visibility?: CollectionVisibility;
   }): Promise<UserCollection> => {
     return unwrap(
       await Backend.rpc('update_collection', {
@@ -81,6 +86,7 @@ export const CollectionsApi = {
         input_description: params.description ?? null,
         input_update_cover_image_path: params.update_cover_image_path ?? false,
         input_cover_image_path: params.cover_image_path ?? null,
+        ...(params.visibility ? { input_visibility: params.visibility } : {}),
       }),
     );
   },

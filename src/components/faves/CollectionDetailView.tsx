@@ -311,6 +311,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
           display_name: detail.display_name,
           description: detail.description ?? null,
           cover_image_path: detail.cover_image_path ?? null,
+          visibility: detail.visibility,
         }}
       />
 

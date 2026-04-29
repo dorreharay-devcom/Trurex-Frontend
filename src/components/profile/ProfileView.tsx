@@ -55,7 +55,7 @@ const CollectionSkeleton: React.FC = () => {
       {[1, 2, 3].map((i) => (
         <Animated.View
           key={i}
-          style={{ opacity, width: 176, height: 224 }}
+          style={{ opacity, width: 140, height: 178 }}
           className="rounded-xl bg-muted"
         />
       ))}
@@ -94,7 +94,7 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
   const [activeTab, setActiveTab] = useState<ProfileTab>(ProfileTab.Recs);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [openCollectionId, setOpenCollectionId] = useState<string | null>(null);
-  const { height: windowHeight } = useWindowDimensions();
+  const { height: windowHeight, width: windowWidth } = useWindowDimensions();
   const { layout } = modalConfig;
   const { sheetTranslateY, handleClose: handleCollectionClose } = useOverlaySheetPresentation({
     visible: openCollectionId != null,
@@ -240,6 +240,8 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
   }
 
   const rexTabCount = myRexes.length;
+  const numCols = windowWidth < 500 ? 2 : windowWidth < 900 ? 3 : 4;
+  const cardWidth = (windowWidth - 64 - 12 * (numCols - 1)) / numCols;
 
   return (
     <>
@@ -317,16 +319,14 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
                 <Text className="text-sm text-muted-foreground text-center py-8">No rexes yet</Text>
               ) : (
                 <View className="p-4">
-                  <Text className="text-xs font-medium text-muted-foreground mb-3">
-                    {myRexes.length} {myRexes.length === 1 ? 'Rex' : 'Rexes'}
-                  </Text>
-                  <View className="flex-row flex-wrap gap-3">
+<View className="flex-row flex-wrap" style={{ gap: 12 }}>
                     {myRexes.map((rec) => (
                       <TouchableOpacity
                         key={rec.id}
                         activeOpacity={0.8}
                         onPress={() => onRexPress?.(rec)}
-                        className="w-[22%] rounded-xl overflow-hidden shadow-card bg-background border border-border"
+                        style={{ width: cardWidth }}
+                        className="rounded-xl overflow-hidden shadow-card bg-background border border-border"
                       >
                         <SignedStorageImage
                           bucket={REX_IMAGES_BUCKET}
@@ -342,7 +342,7 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
                           <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
                             {rec.location || rec.category}
                           </Text>
-                          <Text className="text-[10px] font-medium" style={{ color: '#f97316' }}>
+                          <Text className="text-[10px] font-medium text-primary">
                             ★ {rec.rating}
                           </Text>
                         </View>
@@ -369,6 +369,7 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
                     <CollectionCard
                       key={col.id}
                       collection={col}
+                      width={140}
                       onPress={() => setOpenCollectionId(col.id)}
                     />
                   ))}

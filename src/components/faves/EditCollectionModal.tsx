@@ -14,7 +14,8 @@ import {
   useWindowDimensions,
   Animated,
 } from 'react-native';
-import { X, Upload } from 'lucide-react-native';
+import { X, Upload, Lock, Users, Globe } from 'lucide-react-native';
+import type { CollectionVisibility } from '~/api/CollectionsApi';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { useUpdateCollection } from '~/hooks/useCollections';
@@ -31,6 +32,12 @@ import { Theme } from '~/theme/Theme';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { useAuth } from '~/services/AuthContext';
 
+const VISIBILITY_OPTIONS: { value: CollectionVisibility; label: string; sublabel: string; Icon: React.ComponentType<any> }[] = [
+  { value: 'private', label: 'Private', sublabel: 'Only you', Icon: Lock },
+  { value: 'shared', label: 'Circles', sublabel: 'Your circles', Icon: Users },
+  { value: 'public', label: 'Public', sublabel: 'Everyone', Icon: Globe },
+];
+
 export interface EditCollectionModalProps {
   open: boolean;
   onClose: () => void;
@@ -40,6 +47,7 @@ export interface EditCollectionModalProps {
     display_name: string;
     description: string | null;
     cover_image_path: string | null;
+    visibility?: CollectionVisibility;
   };
 }
 
@@ -79,9 +87,11 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
   // Sync form fields when collection changes (e.g. modal reopened for different collection)
   const [name, setName] = useState(collection.display_name);
   const [description, setDescription] = useState(collection.description ?? '');
+  const [visibility, setVisibility] = useState<CollectionVisibility>(collection.visibility ?? 'private');
   useEffect(() => {
     setName(collection.display_name);
     setDescription(collection.description ?? '');
+    setVisibility(collection.visibility ?? 'private');
     setNewCoverPreview(null);
     setNewCoverStoragePath(null);
     setCoverRemoved(false);
@@ -152,6 +162,7 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
         description: description.trim() || null,
         update_cover_image_path: coverChanged,
         cover_image_path: coverChanged ? (newCoverStoragePath ?? null) : undefined,
+        visibility,
       },
       { onSuccess: onUpdated },
     );
@@ -254,6 +265,28 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">
                     {name.length}/60
                   </Text>
+                </View>
+
+                {/* Visibility */}
+                <View>
+                  <Text className="text-xs font-semibold text-muted-foreground mb-1.5">Visibility</Text>
+                  <View className="flex-row gap-2">
+                    {VISIBILITY_OPTIONS.map(({ value, label, sublabel, Icon }) => {
+                      const active = visibility === value;
+                      return (
+                        <TouchableOpacity
+                          key={value}
+                          onPress={() => setVisibility(value)}
+                          activeOpacity={0.7}
+                          className={`flex-1 items-center py-3 rounded-xl border ${active ? 'bg-primary/10 border-primary' : 'bg-muted border-border'}`}
+                        >
+                          <Icon size={16} color={active ? Theme.colors.primary : Theme.colors.secondaryText} />
+                          <Text className={`text-xs font-semibold mt-1 ${active ? 'text-primary' : 'text-foreground'}`}>{label}</Text>
+                          <Text className={`text-[10px] mt-0.5 ${active ? 'text-primary/70' : 'text-muted-foreground'}`}>{sublabel}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
                 </View>
 
                 {/* Description */}
