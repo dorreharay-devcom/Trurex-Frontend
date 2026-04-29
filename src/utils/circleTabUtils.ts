@@ -23,6 +23,50 @@ export function canEditOrDeleteUserCircle(
   return !!userId && circle.owner_id === userId && circle.system_kind === null;
 }
 
+export type CircleUiPolicy = {
+  showConnectionsAddPanel: boolean;
+  allowOwnerRemoveMemberRpc: boolean;
+};
+
+const USER_CREATED_POLICY: CircleUiPolicy = {
+  showConnectionsAddPanel: true,
+  allowOwnerRemoveMemberRpc: true,
+};
+
+const UNKNOWN_SYSTEM_POLICY: CircleUiPolicy = {
+  showConnectionsAddPanel: false,
+  allowOwnerRemoveMemberRpc: true,
+};
+
+const POLICY_BY_SYSTEM_KIND = {
+  inner_circle: {
+    showConnectionsAddPanel: true,
+    allowOwnerRemoveMemberRpc: true,
+  },
+  trusted: {
+    showConnectionsAddPanel: false,
+    allowOwnerRemoveMemberRpc: true,
+  },
+  broader_network: {
+    showConnectionsAddPanel: false,
+    allowOwnerRemoveMemberRpc: false,
+  },
+} as const satisfies Record<string, CircleUiPolicy>;
+
+type CanonicalSystemKind = keyof typeof POLICY_BY_SYSTEM_KIND;
+
+const SYSTEM_KIND_ALIASES: Record<string, CanonicalSystemKind> = {
+  close_friends: 'trusted',
+};
+
+export function getCircleUiPolicy(circle: CircleApiRow): CircleUiPolicy {
+  const sk = circle.system_kind;
+  if (sk == null || sk === '') return USER_CREATED_POLICY;
+  const key = (SYSTEM_KIND_ALIASES[sk] ?? sk) as CanonicalSystemKind;
+  const preset = POLICY_BY_SYSTEM_KIND[key];
+  return preset ?? UNKNOWN_SYSTEM_POLICY;
+}
+
 export function getInviteOrigin(): string {
   if (isWeb && typeof window !== 'undefined' && window.location?.origin) {
     return window.location.origin;

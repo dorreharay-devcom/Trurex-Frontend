@@ -28,7 +28,7 @@ function PeopleYouMayKnowCard({
   return (
     <View
       style={cardStyle}
-      className={`relative shrink-0 flex-col rounded-xl border border-border bg-card p-4 shadow-sm ${
+      className={`relative shrink-0 flex-col rounded-xl border border-border bg-card p-3 shadow-sm ${
         layout === 'stack' ? 'w-full max-w-full self-auto' : 'self-stretch'
       }`}
     >
@@ -40,11 +40,7 @@ function PeopleYouMayKnowCard({
         <X size={14} color={Theme.colors.muted} />
       </Pressable>
 
-      <View
-        className={`flex-row items-start gap-3 pr-6 ${
-          layout === 'carousel' ? 'min-h-0 flex-1' : ''
-        }`}
-      >
+      <View className="flex-row items-start gap-3 pr-6">
         <SignedUserAvatar
           name={label}
           avatar={suggestion.avatar_url}
@@ -67,15 +63,15 @@ function PeopleYouMayKnowCard({
         </View>
       </View>
 
-      <View className={`flex-row justify-end ${layout === 'carousel' ? 'mt-auto pt-3' : 'mt-3'}`}>
+      <View className="mt-1.5 flex-row justify-end">
         {followed ? (
-          <View className="rounded-lg border border-border bg-muted px-3 py-2">
+          <View className="rounded-lg border border-border bg-muted px-3 py-1.5">
             <Text className="text-xs font-medium text-muted-foreground">Following</Text>
           </View>
         ) : (
           <Pressable
             onPress={onMockFollow}
-            className="flex-row items-center gap-1.5 rounded-lg bg-primary px-3 py-2 active:opacity-90"
+            className="flex-row items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 active:opacity-90"
           >
             <UserPlus size={14} color={Theme.colors.primaryForeground} />
             <Text className="text-xs font-semibold text-primary-foreground">Follow</Text>

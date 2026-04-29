@@ -30,7 +30,7 @@ const CirclesView = ({ isActive }: Props) => {
 };
 
 function CirclesListContent({ vm, isActive }: { vm: CirclesViewModel; isActive: boolean }) {
-  const [connTab, setConnTab] = useState<ConnTab>('followers');
+  const [connTab, setConnTab] = useState<ConnTab>('trusted');
   const [circleSheet, setCircleSheet] = useState<{ id: string; name: string } | null>(null);
 
   const sheetMemberCircleIds = useMemo(() => {
@@ -177,9 +177,9 @@ function CirclesListContent({ vm, isActive }: { vm: CirclesViewModel; isActive: 
             <View className="mb-4 flex-row flex-wrap gap-2">
               {(
                 [
+                  ['trusted', `Trusted · ${vm.trustedRows.length}`],
                   ['followers', `Followers · ${vm.followerRows.length}`],
                   ['following', `Following · ${vm.followingOneWay.length}`],
-                  ['trusted', `Trusted · ${vm.trustedRows.length}`],
                 ] as const
               ).map(([id, label]) => {
                 const active = connTab === id;
@@ -201,7 +201,31 @@ function CirclesListContent({ vm, isActive }: { vm: CirclesViewModel; isActive: 
               })}
             </View>
 
-            {connTab === 'followers' ? (
+            {connTab === 'trusted' ? (
+              vm.trustedLoading ? (
+                <View className="items-center py-8">
+                  <ActivityIndicator color={Theme.colors.primary} />
+                </View>
+              ) : vm.trustedRows.length === 0 ? (
+                <TrustedEmptyState containerClassName="" />
+              ) : (
+                <View className="gap-2">
+                  {vm.trustedRows.map((row) => (
+                    <NetworkConnectionRow
+                      key={row.user_id}
+                      row={row}
+                      circle={vm.circleForMemberUserId.get(row.user_id)}
+                      onAddToCircle={() =>
+                        setCircleSheet({
+                          id: row.user_id,
+                          name: row.display_name || 'Member',
+                        })
+                      }
+                    />
+                  ))}
+                </View>
+              )
+            ) : connTab === 'followers' ? (
               vm.followersLoading ? (
                 <View className="items-center py-8">
                   <ActivityIndicator color={Theme.colors.primary} />
@@ -229,44 +253,20 @@ function CirclesListContent({ vm, isActive }: { vm: CirclesViewModel; isActive: 
                   ))}
                 </View>
               )
-            ) : connTab === 'following' ? (
-              vm.followingLoading ? (
-                <View className="items-center py-8">
-                  <ActivityIndicator color={Theme.colors.primary} />
-                </View>
-              ) : vm.followingOneWay.length === 0 ? (
-                <FollowingEmptyState containerClassName="" />
-              ) : (
-                <View className="gap-2">
-                  {vm.followingOneWay.map((row) => (
-                    <NetworkConnectionRow
-                      key={row.user_id}
-                      row={row}
-                      circle={vm.circleForMemberUserId.get(row.user_id)}
-                      allowAddToCircle={false}
-                    />
-                  ))}
-                </View>
-              )
-            ) : vm.trustedLoading ? (
+            ) : vm.followingLoading ? (
               <View className="items-center py-8">
                 <ActivityIndicator color={Theme.colors.primary} />
               </View>
-            ) : vm.trustedRows.length === 0 ? (
-              <TrustedEmptyState containerClassName="" />
+            ) : vm.followingOneWay.length === 0 ? (
+              <FollowingEmptyState containerClassName="" />
             ) : (
               <View className="gap-2">
-                {vm.trustedRows.map((row) => (
+                {vm.followingOneWay.map((row) => (
                   <NetworkConnectionRow
                     key={row.user_id}
                     row={row}
                     circle={vm.circleForMemberUserId.get(row.user_id)}
-                    onAddToCircle={() =>
-                      setCircleSheet({
-                        id: row.user_id,
-                        name: row.display_name || 'Member',
-                      })
-                    }
+                    allowAddToCircle={false}
                   />
                 ))}
               </View>
