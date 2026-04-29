@@ -1,8 +1,17 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, useWindowDimensions, type LayoutChangeEvent } from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  Platform,
+  useWindowDimensions,
+  type LayoutChangeEvent,
+} from 'react-native';
+import { Minus, Plus } from 'lucide-react-native';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 import type { MapMarkerItem, MapRecenterTarget } from '~/types/map/mapMarker';
-import { MAP_VIEW_MIN_HEIGHT } from '~/constants/map/mapUi';
+import { MAP_ACTION_INSET, MAP_VIEW_MIN_HEIGHT, MAP_ZOOM_CONTROLS_BOTTOM } from '~/constants/map/mapUi';
+import { Theme } from '~/theme/Theme';
 import {
   createWebMapPinIconUrl,
   WEB_MAP_DEFAULT_CENTER,
@@ -82,6 +91,8 @@ const MarkerMapWithLoader: React.FC<InnerProps> = ({
 
   const mapRef = useRef<google.maps.Map | null>(null);
   const [mapReady, setMapReady] = useState(false);
+  const validMarkersRef = useRef(validMarkers);
+  validMarkersRef.current = validMarkers;
 
   const fitBounds = useMemo(() => createFitBoundsHandler(validMarkers), [validMarkers]);
 
@@ -143,11 +154,28 @@ const MarkerMapWithLoader: React.FC<InnerProps> = ({
     if (!mapReady) return;
     const map = mapRef.current;
     if (!map || !recenterTo) return;
+    if (recenterTo.fitMarkers) {
+      const vm = validMarkersRef.current;
+      if (vm.length > 0) {
+        createFitBoundsHandler(vm)(map);
+        requestAnimationFrame(() => triggerGoogleMapResize(map));
+      }
+      return;
+    }
     if (!isValidMapCoordinate(recenterTo.latitude, recenterTo.longitude)) return;
     map.panTo({ lat: recenterTo.latitude, lng: recenterTo.longitude });
     map.setZoom(14);
     requestAnimationFrame(() => triggerGoogleMapResize(map));
   }, [recenterTo, mapReady]);
+
+  const zoomBy = useCallback((delta: number) => {
+    const map = mapRef.current;
+    if (!map) return;
+    const z = map.getZoom() ?? 11;
+    const next = Math.min(22, Math.max(2, z + delta));
+    map.setZoom(next);
+    requestAnimationFrame(() => triggerGoogleMapResize(map));
+  }, []);
 
   if (loadError) {
     return (
@@ -200,6 +228,33 @@ const MarkerMapWithLoader: React.FC<InnerProps> = ({
           />
         ))}
       </GoogleMap>
+
+      <View
+        pointerEvents="box-none"
+        className="absolute z-[1150] flex-col gap-1.5"
+        style={{
+          right: MAP_ACTION_INSET,
+          bottom: MAP_ZOOM_CONTROLS_BOTTOM,
+          elevation: Platform.OS === 'android' ? 14 : 0,
+        }}
+      >
+        <Pressable
+          onPress={() => zoomBy(1)}
+          className="h-10 w-10 items-center justify-center rounded-xl border border-border bg-card shadow-md active:opacity-90"
+          accessibilityRole="button"
+          accessibilityLabel="Zoom in"
+        >
+          <Plus size={18} color={Theme.colors.foreground} />
+        </Pressable>
+        <Pressable
+          onPress={() => zoomBy(-1)}
+          className="h-10 w-10 items-center justify-center rounded-xl border border-border bg-card shadow-md active:opacity-90"
+          accessibilityRole="button"
+          accessibilityLabel="Zoom out"
+        >
+          <Minus size={18} color={Theme.colors.foreground} />
+        </Pressable>
+      </View>
     </View>
   );
 };

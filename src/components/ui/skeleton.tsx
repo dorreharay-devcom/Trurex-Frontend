@@ -1,5 +1,6 @@
 import { View } from 'react-native';
+import { cn } from '~/utils/general';
 
 export const Skeleton = ({ className }: { className?: string }) => (
-  <View className={`bg-muted/30 rounded-md ${className}`} />
+  <View className={cn('rounded-md bg-muted/30', className)} />
 );

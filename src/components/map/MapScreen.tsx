@@ -14,7 +14,7 @@ import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollec
 import { ListRow } from '~/components/map/common/ListRow';
 import { Theme } from '~/theme/Theme';
 import { MapPin, List, LocateFixed } from 'lucide-react-native';
-import { MAP_ACTION_INSET } from '~/constants/map/mapUi';
+import { MAP_ACTION_INSET, MAP_LOCATION_PROMPT_TOP } from '~/constants/map/mapUi';
 import { deriveMapPinType, formatDistanceKm, haversineKm } from '~/utils/map/mapRecommendationData';
 import { webContainerStyle } from '~/utils';
 
@@ -197,12 +197,12 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
               flow.locatedRexCount === 0 &&
               !flow.searchQuery.trim() ? (
                 <View
-                  className="absolute z-[1000]"
+                  className="absolute z-[1250]"
                   style={{
                     position: 'absolute',
                     left: MAP_ACTION_INSET,
                     right: MAP_ACTION_INSET,
-                    bottom: actionBannerBottom,
+                    top: MAP_LOCATION_PROMPT_TOP,
                   }}
                 >
                   <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
@@ -218,12 +218,12 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
 
               {flow.mapMarkers.length === 0 && flow.searchQuery.trim() ? (
                 <View
-                  className="absolute z-[1000]"
+                  className="absolute z-[1250]"
                   style={{
                     position: 'absolute',
                     left: MAP_ACTION_INSET,
                     right: MAP_ACTION_INSET,
-                    bottom: actionBannerBottom,
+                    top: MAP_LOCATION_PROMPT_TOP,
                   }}
                 >
                   <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">

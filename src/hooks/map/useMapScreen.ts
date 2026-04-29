@@ -9,8 +9,8 @@ import {
   DEFAULT_MAP_BOUNDS,
   filterLocatedRecommendations,
   filterRecommendationsByPinLayers,
-  filterRecommendationsByRexTitle,
-  recommendationToMapMarker,
+  mapPinRowToMapMarkerItem,
+  pinRowPassesLayerVisibility,
 } from '~/utils/map/mapRecommendationData';
 import { MapApi } from '~/api/MapApi';
 import { useAuth } from '~/services/AuthContext';
@@ -22,12 +22,14 @@ type Params = {
 };
 
 const BOUNDS_DEBOUNCE_MS = 450;
+const SEARCH_DEBOUNCE_MS = 400;
 
 export function useMapScreen({ onRecommendationPress }: Params) {
   const { user } = useAuth();
   const userId = user?.id ?? null;
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [bounds, setBounds] = useState<LatLngBounds>(DEFAULT_MAP_BOUNDS);
   const [debouncedBounds, setDebouncedBounds] = useState<LatLngBounds>(DEFAULT_MAP_BOUNDS);
 
@@ -46,6 +48,11 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     const t = setTimeout(() => setDebouncedBounds(bounds), BOUNDS_DEBOUNCE_MS);
     return () => clearTimeout(t);
   }, [bounds]);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchQuery.trim()), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
 
   useEffect(() => {
     let cancelled = false;
@@ -106,22 +113,49 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     fallbackCached();
   }, [applyLocatedCoords]);
 
+  const boundsQueryParams = useMemo(
+    () => ({
+      ...debouncedBounds,
+      search_term: debouncedSearch.length > 0 ? debouncedSearch : null,
+    }),
+    [debouncedBounds, debouncedSearch],
+  );
+
+  const queryKeyBase = [
+    boundsQueryParams.min_lat,
+    boundsQueryParams.max_lat,
+    boundsQueryParams.min_lng,
+    boundsQueryParams.max_lng,
+    boundsQueryParams.search_term ?? '',
+  ] as const;
+
   const {
     data: fetchedRecs = [],
-    isLoading,
+    isLoading: rexesLoading,
     isError,
-    refetch,
+    refetch: refetchRexes,
   } = useQuery({
-    queryKey: [
-      'mapRexesInBounds',
-      debouncedBounds.min_lat,
-      debouncedBounds.max_lat,
-      debouncedBounds.min_lng,
-      debouncedBounds.max_lng,
-    ],
-    queryFn: () => MapApi.mapRexesInBounds(debouncedBounds),
+    queryKey: ['mapRexesInBounds', ...queryKeyBase],
+    queryFn: () => MapApi.mapRexesInBounds(boundsQueryParams),
     placeholderData: keepPreviousData,
   });
+
+  const {
+    data: pinRows = [],
+    isLoading: pinsLoading,
+    refetch: refetchPins,
+  } = useQuery({
+    queryKey: ['mapRexPins', ...queryKeyBase],
+    queryFn: () => MapApi.mapRexPins(boundsQueryParams),
+    placeholderData: keepPreviousData,
+  });
+
+  const refetch = useCallback(() => {
+    void refetchRexes();
+    void refetchPins();
+  }, [refetchRexes, refetchPins]);
+
+  const isLoading = rexesLoading || pinsLoading;
 
   const locatedRecs = useMemo(() => filterLocatedRecommendations(fetchedRecs), [fetchedRecs]);
 
@@ -130,18 +164,10 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     [locatedRecs, layers, userId],
   );
 
-  const titleFiltered = useMemo(
-    () => filterRecommendationsByRexTitle(layerFiltered, searchQuery),
-    [layerFiltered, searchQuery],
-  );
-
-  const mapMarkers: MapMarkerItem[] = useMemo(
-    () =>
-      titleFiltered
-        .map((r) => recommendationToMapMarker(r, userId))
-        .filter((m): m is MapMarkerItem => m != null),
-    [titleFiltered, userId],
-  );
+  const mapMarkers: MapMarkerItem[] = useMemo(() => {
+    const filteredPins = pinRows.filter((row) => pinRowPassesLayerVisibility(row, layers));
+    return filteredPins.map(mapPinRowToMapMarkerItem);
+  }, [pinRows, layers]);
 
   const [debouncedSearchSuggest, setDebouncedSearchSuggest] = useState('');
 
@@ -190,7 +216,25 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     setSelectedRecId(id);
   }, []);
 
-  const clearSelection = useCallback(() => setSelectedRecId(null), []);
+  const clearSelection = useCallback(() => setSelectedRecId(null), {});
+
+  const fittedForSearchRef = useRef<string | null>(null);
+  useEffect(() => {
+    fittedForSearchRef.current = null;
+  }, [debouncedSearch]);
+
+  useEffect(() => {
+    if (!debouncedSearch.trim()) return;
+    if (mapMarkers.length === 0) return;
+    if (fittedForSearchRef.current === debouncedSearch) return;
+    fittedForSearchRef.current = debouncedSearch;
+    setRecenterTo({
+      latitude: 0,
+      longitude: 0,
+      nonce: Date.now(),
+      fitMarkers: true,
+    });
+  }, [debouncedSearch, mapMarkers]);
 
   const locatedRexCount = locatedRecs.length;
 
@@ -218,6 +262,6 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     recenterTo,
     locateMe,
     focusOnRecommendation,
-    locatedRecsForList: titleFiltered,
+    locatedRecsForList: layerFiltered,
   };
 }
