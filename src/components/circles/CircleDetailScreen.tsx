@@ -19,7 +19,7 @@ import {
 } from '~/components/circles/common';
 import type { CirclesViewModel } from '~/hooks/circles/useCirclesViewModel';
 import { Theme } from '~/theme/Theme';
-import { canEditOrDeleteUserCircle } from '~/utils/circleTabUtils';
+import { canEditOrDeleteUserCircle, getCircleUiPolicy } from '~/utils/circleTabUtils';
 import { webContainerStyle } from '~/utils';
 
 type Props = { vm: CirclesViewModel };
@@ -27,7 +27,7 @@ type Props = { vm: CirclesViewModel };
 type AddConnTab = 'followers' | 'trusted';
 
 export function CircleDetailScreen({ vm }: Props) {
-  const [addConnTab, setAddConnTab] = useState<AddConnTab>('followers');
+  const [addConnTab, setAddConnTab] = useState<AddConnTab>('trusted');
 
   if (!vm.selectedCircle || !vm.selectedTab) return null;
 
@@ -37,6 +37,9 @@ export function CircleDetailScreen({ vm }: Props) {
   const listedCount = membersListed.length;
   const memberLabel = listedCount === 1 ? '1 member' : `${listedCount} members`;
   const canManage = canEditOrDeleteUserCircle(vm.selectedCircle, vm.user?.id);
+  const circleUi = getCircleUiPolicy(vm.selectedCircle);
+  const showAddToCircleSection = circleUi.showConnectionsAddPanel;
+  const allowRemoveMember = circleUi.allowOwnerRemoveMemberRpc;
 
   return (
     <>
@@ -91,80 +94,88 @@ export function CircleDetailScreen({ vm }: Props) {
               <CircleMemberRow
                 key={m.user_id}
                 member={m}
-                onRemove={canManage ? () => vm.removeFromSelectedCircle(m.user_id) : undefined}
+                onRemove={
+                  canManage && allowRemoveMember
+                    ? () => vm.removeFromSelectedCircle(m.user_id)
+                    : undefined
+                }
                 removing={vm.removingMemberId === m.user_id}
               />
             ))}
           </View>
         )}
 
-        <Text className="mb-3 mt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Add to this circle
-        </Text>
+        {showAddToCircleSection ? (
+          <>
+            <Text className="mb-3 mt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Add to this circle
+            </Text>
 
-        <View className="mb-4 flex-row flex-wrap gap-2">
-          {(
-            [
-              ['followers', `Followers · ${vm.followerRows.length}`],
-              ['trusted', `Trusted · ${vm.trustedRows.length}`],
-            ] as const
-          ).map(([id, label]) => {
-            const active = addConnTab === id;
-            return (
-              <Pressable
-                key={id}
-                onPress={() => setAddConnTab(id)}
-                className={`flex-row items-center rounded-xl border px-3 py-2 ${
-                  active ? 'border-primary/40 bg-primary/10' : 'border-border bg-card'
-                }`}
-              >
-                <Text
-                  className={`text-xs font-semibold ${active ? 'text-primary' : 'text-muted-foreground'}`}
-                >
-                  {label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+            <View className="mb-4 flex-row flex-wrap gap-2">
+              {(
+                [
+                  ['trusted', `Trusted · ${vm.trustedRows.length}`],
+                  ['followers', `Followers · ${vm.followerRows.length}`],
+                ] as const
+              ).map(([id, label]) => {
+                const active = addConnTab === id;
+                return (
+                  <Pressable
+                    key={id}
+                    onPress={() => setAddConnTab(id)}
+                    className={`flex-row items-center rounded-xl border px-3 py-2 ${
+                      active ? 'border-primary/40 bg-primary/10' : 'border-border bg-card'
+                    }`}
+                  >
+                    <Text
+                      className={`text-xs font-semibold ${active ? 'text-primary' : 'text-muted-foreground'}`}
+                    >
+                      {label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
 
-        {addConnTab === 'followers' ? (
-          vm.followersLoading ? (
-            <SectionSpinner className="mb-8 items-center py-4" />
-          ) : vm.followerRows.length === 0 ? (
-            <View className="mb-8 items-center py-8">
-              <Text className="text-center text-sm text-muted-foreground">No followers yet.</Text>
-            </View>
-          ) : (
-            <View className="mb-8 gap-2">
-              {vm.followerRows.map((row) => (
-                <CircleConnectionRow
-                  key={row.user_id}
-                  row={row}
-                  isMember={vm.memberIdSet.has(row.user_id)}
-                  isAdding={vm.addingMemberId === row.user_id}
-                  onAdd={() => vm.addToSelectedCircle(row.user_id)}
-                />
-              ))}
-            </View>
-          )
-        ) : vm.trustedLoading ? (
-          <SectionSpinner className="mb-8 items-center py-4" />
-        ) : vm.trustedRows.length === 0 ? (
-          <TrustedEmptyState />
-        ) : (
-          <View className="mb-8 gap-2">
-            {vm.trustedRows.map((row) => (
-              <CircleConnectionRow
-                key={row.user_id}
-                row={row}
-                isMember={vm.memberIdSet.has(row.user_id)}
-                isAdding={vm.addingMemberId === row.user_id}
-                onAdd={() => vm.addToSelectedCircle(row.user_id)}
-              />
-            ))}
-          </View>
-        )}
+            {addConnTab === 'trusted' ? (
+              vm.trustedLoading ? (
+                <SectionSpinner className="mb-8 items-center py-4" />
+              ) : vm.trustedRows.length === 0 ? (
+                <TrustedEmptyState />
+              ) : (
+                <View className="mb-8 gap-2">
+                  {vm.trustedRows.map((row) => (
+                    <CircleConnectionRow
+                      key={row.user_id}
+                      row={row}
+                      isMember={vm.memberIdSet.has(row.user_id)}
+                      isAdding={vm.addingMemberId === row.user_id}
+                      onAdd={() => vm.addToSelectedCircle(row.user_id)}
+                    />
+                  ))}
+                </View>
+              )
+            ) : vm.followersLoading ? (
+              <SectionSpinner className="mb-8 items-center py-4" />
+            ) : vm.followerRows.length === 0 ? (
+              <View className="mb-8 items-center py-8">
+                <Text className="text-center text-sm text-muted-foreground">No followers yet.</Text>
+              </View>
+            ) : (
+              <View className="mb-8 gap-2">
+                {vm.followerRows.map((row) => (
+                  <CircleConnectionRow
+                    key={row.user_id}
+                    row={row}
+                    isMember={vm.memberIdSet.has(row.user_id)}
+                    isAdding={vm.addingMemberId === row.user_id}
+                    onAdd={() => vm.addToSelectedCircle(row.user_id)}
+                  />
+                ))}
+              </View>
+            )}
+          </>
+        ) : null}
       </ScrollView>
 
       <EditCircleModal

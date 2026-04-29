@@ -46,20 +46,6 @@ type ListCirclesResponse = {
   circles: CircleApiRow[];
 };
 
-export type AddCircleMemberResponse = {
-  membership: Record<string, unknown>;
-};
-
-export type RemoveCircleMemberResponse = {
-  success: true;
-};
-
-export type CirclesEdgeMemberBody = {
-  action: 'remove_member';
-  circleId: string;
-  userId: string;
-};
-
 export async function fetchMyCircles(): Promise<CircleApiRow[]> {
   const { data, error } = await Backend.functions.invoke<ListCirclesResponse>('circles', {
     method: 'GET',
@@ -75,20 +61,6 @@ export async function fetchMyCircles(): Promise<CircleApiRow[]> {
   }
 }
 
-export async function invokeCirclesMemberAction(
-  body: CirclesEdgeMemberBody,
-): Promise<AddCircleMemberResponse | RemoveCircleMemberResponse | unknown> {
-  const { data, error } = await Backend.functions.invoke('circles', {
-    body: {
-      action: body.action,
-      circleId: body.circleId,
-      userId: body.userId,
-    },
-  });
-  if (error) throw error;
-  return data;
-}
-
 export async function addCircleMember(circleId: string, userId: string): Promise<unknown> {
   const { data, error } = await Backend.rpc('add_user_to_circle', {
     input_circle_id: circleId,
@@ -98,8 +70,13 @@ export async function addCircleMember(circleId: string, userId: string): Promise
   return data;
 }
 
-export function removeCircleMember(circleId: string, userId: string) {
-  return invokeCirclesMemberAction({ action: 'remove_member', circleId, userId });
+export async function removeCircleMember(circleId: string, userId: string): Promise<boolean> {
+  const { data, error } = await Backend.rpc('remove_user_from_circle', {
+    input_circle_id: circleId,
+    input_user_id: userId,
+  });
+  if (error) throw error;
+  return data === true;
 }
 
 export type CreateCircleParams = {

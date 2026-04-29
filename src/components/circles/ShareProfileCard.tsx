@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { Platform, Pressable, Text, View } from 'react-native';
 import { Check, Copy, Share2 } from 'lucide-react-native';
 import { useQuery } from '@tanstack/react-query';
 import * as Clipboard from 'expo-clipboard';
+import * as Linking from 'expo-linking';
 import { fetchPublicUserById } from '~/api/usersApi';
 import { useAuth } from '~/services/AuthContext';
 import { Theme } from '~/theme/Theme';
 import { toastSuccess } from '~/utils/appToast';
-
-const PUBLIC_APP_ORIGIN = 'https://trurex.netlify.app';
 
 type Props = { isActive: boolean };
 
@@ -22,7 +21,13 @@ export function ShareProfileCard({ isActive }: Props) {
     enabled: !!user?.id && isActive,
   });
 
-  const shareUrl = user?.id ? `${PUBLIC_APP_ORIGIN}/user/${user.id}` : '';
+  const shareUrl = useMemo(() => {
+    if (!user?.id) return '';
+    const slug = publicUser?.handle ? publicUser.handle.replace(/^@/, '') : user.id;
+    return Platform.OS === 'web'
+      ? `${typeof window !== 'undefined' ? window.location.origin : ''}/user/${slug}`
+      : Linking.createURL(`/user/${slug}`);
+  }, [user?.id, publicUser?.handle]);
   const hasHandle = Boolean(publicUser?.handle?.trim());
 
   const copyLink = async () => {
