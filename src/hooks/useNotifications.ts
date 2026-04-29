@@ -41,11 +41,22 @@ export function useNotifications() {
     },
   });
 
+  const markOneAsRead = useMutation({
+    mutationFn: (id: string) => markNotificationsRead([id]),
+    onSuccess: (_data, id) => {
+      queryClient.setQueryData<AppNotification[]>(
+        ['notifications'],
+        (prev) => prev?.map((n) => (n.id === id ? { ...n, is_read: true } : n)) ?? [],
+      );
+    },
+  });
+
   return {
     notifications,
     unreadCount,
     loading,
     markAllAsRead: () => markAllAsRead.mutate(),
+    markOneAsRead: (id: string) => markOneAsRead.mutate(id),
     refetch,
   };
 }

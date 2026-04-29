@@ -41,6 +41,7 @@ export interface CollectionRexEntry {
   rating?: number | null;
   recommender_name?: string | null;
   recommender_handle?: string | null;
+  note?: string | null;
 }
 
 export interface CollectionDetailRow {
@@ -155,6 +156,19 @@ export const CollectionsApi = {
 
   unsaveRex: async (_userId: string, rexId: string): Promise<void> => {
     const { error } = await Backend.rpc('unsave_rex', { input_rex_id: rexId });
+    if (error) throw error;
+  },
+
+  updateRexNote: async (params: {
+    collection_id: string;
+    rex_id: string;
+    note: string | null;
+  }): Promise<void> => {
+    const { error } = await Backend.rpc('update_collection_rex_note', {
+      input_collection_id: params.collection_id,
+      input_rex_id: params.rex_id,
+      input_note: params.note,
+    });
     if (error) throw error;
   },
 };

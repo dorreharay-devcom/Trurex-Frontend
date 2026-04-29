@@ -34,9 +34,11 @@ const UNREAD_DOT_OFFSET = -4;
 const typeConfig: Record<string, { verb: string }> = {
   reaction: { verb: 'hearted your Rex' },
   comment: { verb: 'commented on your Rex' },
-  reply: { verb: 'replied to your comment on' },
+  comment_reply: { verb: 'replied to your comment' },
+  reply: { verb: 'replied to your comment' },
   save: { verb: 'saved your Rex' },
   follow: { verb: 'started following you' },
+  following: { verb: 'started following you' },
   new_follower: { verb: 'started following you' },
   follow_request: { verb: 'wants to follow you' },
   follow_request_accepted: { verb: 'accepted your follow request' },
@@ -44,14 +46,14 @@ const typeConfig: Record<string, { verb: string }> = {
   message: { verb: 'sent you a message' },
 };
 
-const FOLLOWABLE_TYPES = new Set(['follow', 'new_follower']);
+const FOLLOWABLE_TYPES = new Set(['follow', 'following', 'new_follower']);
 
 interface NotificationBellProps {
   onUserPress?: (userId: string) => void;
 }
 
 export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress }) => {
-  const { notifications, unreadCount, loading, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, loading, markAllAsRead, markOneAsRead } = useNotifications();
   const [open, setOpen] = useState(false);
   const [anchor, setAnchor] = useState<{ top: number; right: number } | null>(null);
   const bellWrapRef = useRef<View>(null);
@@ -133,9 +135,10 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress 
               : `${actorName} ${cfg.verb}`);
 
         return (
-          <View
+          <Pressable
             key={n.id}
-            className={`flex-row items-start gap-3 border-b border-border/60 px-4 py-3 ${!n.is_read ? 'bg-primary/5' : ''}`}
+            onPress={() => { if (!n.is_read) markOneAsRead(n.id); }}
+            className={`flex-row items-start gap-3 border-b border-border/60 px-4 py-3 active:opacity-70 ${!n.is_read ? 'bg-primary/5' : ''}`}
           >
             <Pressable
               onPress={n.actor_id && onUserPress ? () => { close(); onUserPress(n.actor_id!); } : undefined}
@@ -187,7 +190,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress 
             ) : (
               <View className="w-2 shrink-0" />
             )}
-          </View>
+          </Pressable>
         );
       })}
     </>

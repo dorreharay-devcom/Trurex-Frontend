@@ -55,7 +55,13 @@ export const useDiscoverRecommendations = (
   options?: DiscoverRecommendationsOptions,
 ) => {
   return useQuery({
-    queryKey: ['discover-recommendations', params],
+    queryKey: [
+      'discover-recommendations',
+      params?.category_filter ?? null,
+      [...(params?.tag_filters ?? [])].sort().join(','),
+      params?.result_limit ?? 20,
+      params?.result_offset ?? 0,
+    ],
     queryFn: () => DiscoveryApi.getDiscoverRecommendations(params),
     enabled: options?.enabled ?? true,
   });

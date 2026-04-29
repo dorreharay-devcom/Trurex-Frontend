@@ -149,6 +149,32 @@ export const useDeleteCollection = () => {
   });
 };
 
+export const useUpdateCollectionRexNote = (collectionId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (params: { rex_id: string; note: string | null }) =>
+      CollectionsApi.updateRexNote({ collection_id: collectionId, ...params }),
+    onSuccess: (_data, variables) => {
+      queryClient.setQueryData<CollectionDetailRow>(
+        ['collection-detail', collectionId],
+        (prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            rexes: prev.rexes.map((r) =>
+              r.rex_id === variables.rex_id ? { ...r, note: variables.note } : r,
+            ),
+          };
+        },
+      );
+    },
+    onError: (error: any) => {
+      toastError('Failed to save note', error.message);
+    },
+  });
+};
+
 export const useToggleSave = () => {
   const queryClient = useQueryClient();
 

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Modal, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Modal, Pressable, StyleSheet, useWindowDimensions, TextInput } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { ArrowLeft, Plus, MoreVertical, Trash2, Pencil, Link2, BookmarkPlus, BookmarkMinus, MapPin, Star, DollarSign, X } from 'lucide-react-native';
+import { ArrowLeft, Plus, MoreVertical, Trash2, Pencil, Link2, BookmarkPlus, BookmarkMinus, MapPin, Star, DollarSign, X, StickyNote, Lock, Globe, Users } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { isWeb, webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
@@ -11,6 +11,7 @@ import {
   useDeleteCollection,
   useSaveCollection,
   useUnsaveCollection,
+  useUpdateCollectionRexNote,
 } from '~/hooks/useCollections';
 import EditCollectionModal from '~/components/faves/EditCollectionModal';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
@@ -67,6 +68,23 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   const deleteMutation = useDeleteCollection();
   const { mutate: save } = useSaveCollection();
   const { mutate: unsave } = useUnsaveCollection();
+  const updateNote = useUpdateCollectionRexNote(collectionId);
+
+  const [noteItemId, setNoteItemId] = useState<string | null>(null);
+  const [noteText, setNoteText] = useState('');
+
+  const openNoteEditor = (rexId: string, existing: string | null | undefined) => {
+    setNoteItemId(rexId);
+    setNoteText(existing ?? '');
+  };
+  const closeNoteEditor = () => {
+    setNoteItemId(null);
+    setNoteText('');
+  };
+  const saveNote = (rexId: string) => {
+    updateNote.mutate({ rex_id: rexId, note: noteText.trim() || null });
+    closeNoteEditor();
+  };
 
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -132,6 +150,24 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
       {detail.description && (
         <Text className="text-sm text-muted-foreground mt-1">{detail.description}</Text>
       )}
+      <View className="flex-row items-center gap-3 mt-2">
+        {detail.visibility && (() => {
+          const cfg = detail.visibility === 'public'
+            ? { Icon: Globe, label: 'Public' }
+            : detail.visibility === 'shared'
+              ? { Icon: Link2, label: 'Shared' }
+              : { Icon: Lock, label: 'Private' };
+          return (
+            <View className="flex-row items-center gap-1">
+              <cfg.Icon size={12} color={Theme.colors.muted} />
+              <Text className="text-xs text-muted-foreground">{cfg.label}</Text>
+            </View>
+          );
+        })()}
+        <Text className="text-xs text-muted-foreground">
+          {detail.rexes.length} rex{detail.rexes.length !== 1 ? 'es' : ''}
+        </Text>
+      </View>
 
       {detail.is_my_collection ? (
         <TouchableOpacity
@@ -163,66 +199,108 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
         }
         renderItem={({ item }) => (
           <View className="px-4 mb-3">
-            <View className="bg-card border border-border rounded-xl overflow-hidden flex-row">
-              <Pressable
-                onPress={() => onRecommendationPress?.(entryToRec(item))}
-                className="flex-1 flex-row gap-3 p-3"
-              >
-                <View className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-                  <SignedStorageImage
-                    bucket={REX_IMAGES_BUCKET}
-                    storagePath={item.photo_path ?? ''}
-                    className="w-full h-full"
-                    accessibilityLabel={item.place_name}
-                  />
-                </View>
-                <View className="flex-1 min-w-0">
-                  <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
-                    {item.place_name}
-                  </Text>
-                  <Text className="text-xs text-muted-foreground">
-                    {item.category_name || item.category_code}
-                  </Text>
-                  <View className="flex-row items-center gap-2 mt-1 flex-wrap">
-                    {item.location && (
-                      <View className="flex-row items-center gap-0.5">
-                        <MapPin size={10} color={Theme.colors.muted} />
-                        <Text className="text-[11px] text-muted-foreground">{item.location}</Text>
-                      </View>
-                    )}
-                    {!!item.rating && (
-                      <View className="flex-row items-center gap-0.5">
-                        <Star size={10} color={Theme.colors.primary} fill={Theme.colors.primary} />
-                        <Text className="text-[11px] text-muted-foreground">{item.rating}</Text>
-                      </View>
-                    )}
-                    {!!item.score_value_for_money && (
-                      <View className="flex-row items-center gap-0.5">
-                        <DollarSign size={10} color={Theme.colors.muted} />
-                        <Text className="text-[11px] text-muted-foreground">
-                          {VALUE_LABELS[(item.score_value_for_money ?? 1) - 1]}
-                        </Text>
-                      </View>
+            <View className="bg-card border border-border rounded-xl overflow-hidden">
+              <View className="flex-row">
+                <Pressable
+                  onPress={() => onRecommendationPress?.(entryToRec(item))}
+                  className="flex-1 flex-row gap-3 p-3"
+                >
+                  <View className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                    <SignedStorageImage
+                      bucket={REX_IMAGES_BUCKET}
+                      storagePath={item.photo_path ?? ''}
+                      className="w-full h-full"
+                      accessibilityLabel={item.place_name}
+                    />
+                  </View>
+                  <View className="flex-1 min-w-0">
+                    <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
+                      {item.place_name}
+                    </Text>
+                    <Text className="text-xs text-muted-foreground">
+                      {item.category_name || item.category_code}
+                    </Text>
+                    <View className="flex-row items-center gap-2 mt-1 flex-wrap">
+                      {item.location && (
+                        <View className="flex-row items-center gap-0.5">
+                          <MapPin size={10} color={Theme.colors.muted} />
+                          <Text className="text-[11px] text-muted-foreground">{item.location}</Text>
+                        </View>
+                      )}
+                      {!!item.rating && (
+                        <View className="flex-row items-center gap-0.5">
+                          <Star size={10} color={Theme.colors.primary} fill={Theme.colors.primary} />
+                          <Text className="text-[11px] text-muted-foreground">{item.rating}</Text>
+                        </View>
+                      )}
+                      {!!item.score_value_for_money && (
+                        <View className="flex-row items-center gap-0.5">
+                          <DollarSign size={10} color={Theme.colors.muted} />
+                          <Text className="text-[11px] text-muted-foreground">
+                            {VALUE_LABELS[(item.score_value_for_money ?? 1) - 1]}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                    {item.recommender_name && (
+                      <Text className="text-[10px] text-primary font-medium mt-0.5">
+                        Rec'd by {item.recommender_name}
+                      </Text>
                     )}
                   </View>
-                  {item.recommender_name && (
-                    <Text className="text-[10px] text-primary font-medium mt-0.5">
-                      Rec'd by {item.recommender_name}
-                    </Text>
+                </Pressable>
+                <View className="flex-col items-center justify-center px-2 gap-2">
+                  {detail.is_my_collection && (
+                    <Pressable onPress={() => openNoteEditor(item.rex_id, item.note)} className="p-1">
+                      <StickyNote
+                        size={15}
+                        color={item.note ? Theme.colors.primary : Theme.colors.muted}
+                        fill={item.note ? Theme.colors.primary : 'transparent'}
+                      />
+                    </Pressable>
+                  )}
+                  {detail.is_my_collection && (
+                    <Pressable onPress={() => removeMutation.mutate(item.rex_id)} className="p-1">
+                      {({ hovered, pressed }: { hovered?: boolean; pressed?: boolean }) => (
+                        <View className={`w-6 h-6 rounded-full items-center justify-center ${hovered || pressed ? 'bg-destructive/10' : ''}`}>
+                          <X size={12} color={hovered || pressed ? Theme.colors.destructive : Theme.colors.foreground} />
+                        </View>
+                      )}
+                    </Pressable>
                   )}
                 </View>
-              </Pressable>
-              {detail.is_my_collection && (
-                <Pressable
-                  onPress={() => removeMutation.mutate(item.rex_id)}
-                  className="px-3 justify-center"
-                >
-                  {({ hovered, pressed }: { hovered?: boolean; pressed?: boolean }) => (
-                    <View className={`w-6 h-6 rounded-full items-center justify-center ${hovered || pressed ? 'bg-destructive/10' : ''}`}>
-                      <X size={12} color={hovered || pressed ? Theme.colors.destructive : Theme.colors.foreground} />
+              </View>
+
+              {item.note && noteItemId !== item.rex_id && (
+                <View className="mx-3 mb-3 flex-row items-start gap-1.5 bg-muted/50 rounded-lg px-2.5 py-1.5">
+                  <Text className="text-xs text-muted-foreground">💬</Text>
+                  <Text className="text-xs text-muted-foreground italic flex-1">{item.note}</Text>
+                </View>
+              )}
+
+              {noteItemId === item.rex_id && (
+                <View className="mx-3 mb-3">
+                  <TextInput
+                    value={noteText}
+                    onChangeText={(t) => setNoteText(t.slice(0, 140))}
+                    placeholder="Add a personal note…"
+                    placeholderTextColor={Theme.colors.muted}
+                    multiline
+                    maxLength={140}
+                    className="bg-muted/50 rounded-lg px-3 py-2 text-xs text-foreground min-h-[56px]"
+                  />
+                  <View className="flex-row items-center justify-between mt-2">
+                    <Text className="text-[10px] text-muted-foreground">{noteText.length}/140</Text>
+                    <View className="flex-row gap-2">
+                      <TouchableOpacity onPress={closeNoteEditor} className="px-3 py-1.5 rounded-lg bg-muted">
+                        <Text className="text-xs text-muted-foreground">Cancel</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => saveNote(item.rex_id)} className="px-3 py-1.5 rounded-lg bg-primary">
+                        <Text className="text-xs font-medium text-primary-foreground">Save</Text>
+                      </TouchableOpacity>
                     </View>
-                  )}
-                </Pressable>
+                  </View>
+                </View>
               )}
             </View>
           </View>

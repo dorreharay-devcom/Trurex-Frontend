@@ -23,8 +23,7 @@ import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
 import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
 import { useAuth } from '~/services/AuthContext';
 import { toastError } from '~/utils/appToast';
-
-const TRENDING_TAGS = ['pasta', 'speakeasy', 'santorini', 'memoir'];
+import { useTrendingTags } from '~/hooks/useTags';
 
 const searchFilterPill = 'flex-row items-center gap-1.5 px-3 py-1.5 rounded-full border';
 
@@ -77,6 +76,7 @@ const DiscoverView = ({
   const { pinnedCategoryIds, togglePin, isTogglingPin } = usePinnedCategoryIds();
 
   const [activeCategory, setActiveCategory] = useState('all');
+  const [activeTag, setActiveTag] = useState<string | null>(null);
   const [saveTarget, setSaveTarget] = useState<RecSummary | null>(null);
 
   const handleSavePress = useCallback(
@@ -97,6 +97,7 @@ const DiscoverView = ({
   const [editingPinned, setEditingPinned] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
 
+  const { data: trendingTags = [] } = useTrendingTags();
   const { width: screenWidth } = useWindowDimensions();
   const colCount = isWeb ? (screenWidth >= 1024 ? 5 : screenWidth >= 640 ? 4 : 3) : 3;
   const itemPct = `${(100 / colCount).toFixed(4)}%` as `${number}%`;
@@ -142,20 +143,18 @@ const DiscoverView = ({
   const remainingCats = useMemo(() => allCats.filter((c) => !isPinned(c)), [allCats, isPinned]);
   const activeCat = allCats.find((c) => c.code === activeCategory);
 
-  const { data: discoverData, isLoading: discoverLoading } = useDiscoverRecommendations(undefined, {
-    enabled: !hasSearch,
-  });
+  const { data: discoverData, isLoading: discoverLoading } = useDiscoverRecommendations(
+    {
+      category_filter: activeCategory !== 'all' ? activeCategory : null,
+      tag_filters: activeTag ? [activeTag] : null,
+    },
+    { enabled: !hasSearch },
+  );
 
   const filtered = useMemo(() => {
-    if (hasSearch) {
-      return searchRows;
-    }
-    const base = discoverData?.length ? discoverData : MOCK_RECS;
-    if (activeCategory === 'all') {
-      return base;
-    }
-    return base.filter((r) => r.categoryId === activeCategory);
-  }, [hasSearch, searchRows, discoverData, activeCategory]);
+    if (hasSearch) return searchRows;
+    return discoverData?.length ? discoverData : MOCK_RECS;
+  }, [hasSearch, searchRows, discoverData]);
 
   const isLoading = hasSearch ? searchLoading : discoverLoading;
 
@@ -275,14 +274,21 @@ const DiscoverView = ({
             <Text className="text-sm font-display font-semibold text-foreground">Trending Now</Text>
           </View>
           <View className="flex-row flex-wrap gap-2">
-            {TRENDING_TAGS.map((tag) => (
-              <TouchableOpacity
-                key={tag}
-                className="px-3 py-1.5 rounded-full bg-card border border-border"
-              >
-                <Text className="text-xs text-muted-foreground">#{tag}</Text>
-              </TouchableOpacity>
-            ))}
+            {trendingTags.map((tag) => {
+              const active = activeTag === tag.slug;
+              return (
+                <TouchableOpacity
+                  key={tag.id}
+                  onPress={() => setActiveTag(active ? null : tag.slug)}
+                  activeOpacity={0.7}
+                  className={`px-3 py-1.5 rounded-full border ${active ? 'bg-primary border-primary' : 'bg-card border-border'}`}
+                >
+                  <Text className={`text-xs ${active ? 'text-primary-foreground font-semibold' : 'text-muted-foreground'}`}>
+                    #{tag.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
       )}

@@ -54,6 +54,7 @@ export interface Recommendation {
   rating?: number | null;
   scoreValueForMoney?: number | null;
   tags?: string[] | null;
+  savedAt?: string | null;
   user?: { name: string; handle: string; avatar: string } | null;
   timeAgo: string;
   likes: number;
