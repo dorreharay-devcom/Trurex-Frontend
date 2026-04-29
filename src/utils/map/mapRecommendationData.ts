@@ -1,4 +1,5 @@
 import type { Region } from 'react-native-maps';
+import type { MapPinRow } from '~/types/map/mapPinRow';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import type { MapMarkerItem } from '~/types/map/mapMarker';
 import type { MapPinType, PinVisibility } from '~/types/map/mapPin';
@@ -115,6 +116,37 @@ export function filterRecommendationsByCategoryId(
 ): Recommendation[] {
   if (categoryId === 'all') return recs;
   return recs.filter((r) => r.categoryId === categoryId);
+}
+
+export function apiPinTypeToMapPinType(
+  pinType: MapPinRow['pin_type'],
+  row: Pick<MapPinRow, 'is_saved'>,
+): MapPinType {
+  if (pinType === 'overlap') return 'overlap';
+  if (pinType === 'saved') return 'saved';
+  if (pinType === 'been_there') return 'beenHere';
+  if (pinType === 'trusted') return 'network';
+  if (row.is_saved) return 'saved';
+  return 'network';
+}
+
+export function mapPinRowToMapMarkerItem(row: MapPinRow): MapMarkerItem {
+  const pinType = apiPinTypeToMapPinType(row.pin_type, row);
+  return {
+    id: row.rex_id,
+    latitude: row.latitude,
+    longitude: row.longitude,
+    title: row.place_name || 'Place',
+    subtitle: row.place_name,
+    pinType,
+    glyph: MAP_PIN_GLYPH[pinType],
+    pinColor: row.category_color?.trim() ? row.category_color : MAP_PIN_COLOR[pinType],
+  };
+}
+
+export function pinRowPassesLayerVisibility(row: MapPinRow, layers: PinVisibility): boolean {
+  const pinType = apiPinTypeToMapPinType(row.pin_type, row);
+  return pinTypeVisible(pinType, layers);
 }
 
 export function deriveMapPinType(

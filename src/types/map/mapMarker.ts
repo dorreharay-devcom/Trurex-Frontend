@@ -17,4 +17,5 @@ export type MapRecenterTarget = {
   latitude: number;
   longitude: number;
   nonce: number;
+  fitMarkers?: boolean;
 };

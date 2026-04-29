@@ -96,7 +96,9 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
 
   const authorId = optStr(o, 'user_id', 'author_id', 'author_user_id') ?? undefined;
   const authorName = optStr(o, 'author_display_name', 'author_name', 'user_name') ?? 'Member';
-  const authorHandle = normalizeHandle(optStr(o, 'author_handle', 'handle') ?? '');
+  const authorHandle = normalizeHandle(
+    optStr(o, 'author_username', 'author_handle', 'handle') ?? '',
+  );
   const avatarRaw = optStr(
     o,
     'author_profile_picture_url',
@@ -109,6 +111,7 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
   const created = o.created_at ?? o.createdAt;
 
   const categoryCode = optStr(o, 'category_code', 'category_id') ?? '';
+  const categoryIcon = optStr(o, 'category_icon');
   const categoryLabel =
     (
       optStr(o, 'category_name', 'category_display_name', 'category') ??
@@ -137,6 +140,7 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
     photoCount,
     categoryId: categoryCode || 'all',
     category: categoryLabel,
+    categoryIcon,
     location: optStr(o, 'location', 'place_address') ?? undefined,
     latitude: typeof o.latitude === 'number' ? o.latitude : undefined,
     longitude: typeof o.longitude === 'number' ? o.longitude : undefined,

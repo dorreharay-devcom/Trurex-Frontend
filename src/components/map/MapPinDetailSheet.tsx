@@ -57,7 +57,9 @@ export const MapPinDetailSheet: React.FC<Props> = ({
         <View className="mb-3 flex-row items-start justify-between">
           <View className="min-w-0 flex-1 pr-2">
             <View className="mb-1 flex-row items-center gap-2">
-              <Text className="text-sm">📍</Text>
+              {pin.categoryIcon?.trim() ? (
+                <Text className="text-base leading-none">{pin.categoryIcon.trim()}</Text>
+              ) : null}
               <Text className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                 {pin.category}
               </Text>
