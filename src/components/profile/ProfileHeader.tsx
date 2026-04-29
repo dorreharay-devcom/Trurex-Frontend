@@ -2,17 +2,15 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Share, Platform, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Share2, Camera, LogOut } from 'lucide-react-native';
-import * as Linking from 'expo-linking';
 import * as Clipboard from 'expo-clipboard';
 import { toastSuccess } from '~/utils/appToast';
+import { buildProfileShareUrl, profileShareSlug } from '~/utils/profileShareUrl';
 import { Theme } from '~/theme/Theme';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
 import type { ProfileData } from '~/types/profile';
 
 export type { ProfileData };
-
-const PUBLIC_APP_ORIGIN = 'https://trurex.netlify.app';
 
 interface ProfileHeaderProps {
   profile: ProfileData;
@@ -42,13 +40,8 @@ const ProfileHeader = ({
   followLoading = false,
 }: ProfileHeaderProps) => {
   const handleShare = async () => {
-    const slug = profile.handle
-      ? profile.handle.replace(/^@/, '')
-      : profile.userId;
-    const url =
-      Platform.OS === 'web'
-        ? `${typeof window !== 'undefined' ? window.location.origin : ''}/user/${slug}`
-        : Linking.createURL(`/user/${slug}`);
+    const slug = profileShareSlug(profile);
+    const url = buildProfileShareUrl(slug);
     const name = profile.displayName || 'someone';
     try {
       if (Platform.OS === 'web') {

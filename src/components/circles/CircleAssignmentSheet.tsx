@@ -23,6 +23,7 @@ import {
   defaultCircleSubtitle,
   hexToSoftIconBackground,
   parseCircleAccentHex,
+  isUserCreatedCircle,
   sortCirclesForTabList,
 } from '~/utils/recommendation/recCircles';
 
@@ -83,7 +84,9 @@ export function CircleAssignmentSheet({
   const assignableCircles = useMemo(() => {
     const sorted = sortCirclesForTabList(circles);
     const already = memberCircleIds ?? new Set<string>();
-    return sorted.filter((c) => !already.has(c.id));
+    return sorted.filter(
+      (c) => (c.system_kind === 'inner_circle' || isUserCreatedCircle(c)) && !already.has(c.id),
+    );
   }, [circles, memberCircleIds]);
 
   const assignMutation = useMutation({

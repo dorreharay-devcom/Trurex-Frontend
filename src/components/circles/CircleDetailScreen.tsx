@@ -86,7 +86,9 @@ export function CircleDetailScreen({ vm }: Props) {
           Members
         </Text>
 
-        {listedCount === 0 ? (
+        {vm.membersLoading ? (
+          <SectionSpinner className="mb-6 items-center py-6" />
+        ) : listedCount === 0 ? (
           <MembersEmptyState />
         ) : (
           <View className="mb-6 gap-2">
