@@ -47,7 +47,6 @@ export interface Recommendation {
   photoCount?: number;
   categoryId: string;
   category: string;
-  /** Emoji or short icon string from API (e.g. category_icon on feed rows). */
   categoryIcon?: string | null;
   authorId?: string;
   location?: string;

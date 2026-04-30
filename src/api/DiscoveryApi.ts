@@ -23,6 +23,7 @@ export const DiscoveryApi = {
   getDiscoverRecommendations: async (
     params: DiscoverQueryParams = {},
   ): Promise<Recommendation[]> => {
+    const tags = params.tag_filters?.filter((t) => t.trim().length > 0);
     const raw = unwrap(
       await Backend.rpc('recommendation_feed', {
         category_filter: params.category_filter ?? null,
