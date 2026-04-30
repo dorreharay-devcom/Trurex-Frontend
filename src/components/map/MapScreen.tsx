@@ -6,6 +6,7 @@ import type { Recommendation } from '~/types/recommendation/recommendation';
 import MarkerMap from '~/components/map/MarkerMap';
 import { useMapScreen } from '~/hooks/map/useMapScreen';
 import { MapSearchBar } from '~/components/map/MapSearchBar';
+import { MapSearchRow } from '~/components/map/MapSearchRow';
 import { MapLegend } from '~/components/map/MapLegend';
 import { MapLayerToggle } from '~/components/map/MapLayerToggle';
 import { MapPinDetailSheet } from '~/components/map/MapPinDetailSheet';
@@ -108,6 +109,16 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
 
   const actionBannerBottom = MAP_ACTION_INSET + 112;
 
+  const mapViewVisible = !flow.listView;
+  const mapDataReady = !flow.isLoading && !flow.isError;
+  const hasSearchQuery = flow.searchQuery.trim().length > 0;
+
+  const showEmptyMapAreaBanner =
+    mapViewVisible && mapDataReady && flow.locatedRexCount === 0 && !hasSearchQuery;
+
+  const showNoSearchMatchBanner =
+    mapViewVisible && flow.mapMarkers.length === 0 && hasSearchQuery;
+
   return (
     <View className="relative min-h-0 w-full flex-1 bg-background pt-4">
       <View className="relative min-h-0 w-full flex-1 px-4 pb-5" style={webContainerStyle}>
@@ -192,50 +203,6 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
                 </View>
               ) : null}
 
-              {!flow.isLoading &&
-              !flow.isError &&
-              flow.locatedRexCount === 0 &&
-              !flow.searchQuery.trim() ? (
-                <View
-                  className="absolute z-[1250]"
-                  style={{
-                    position: 'absolute',
-                    left: MAP_ACTION_INSET,
-                    right: MAP_ACTION_INSET,
-                    top: MAP_LOCATION_PROMPT_TOP,
-                  }}
-                >
-                  <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
-                    <Text className="text-sm font-medium text-foreground">
-                      Nothing in this area yet
-                    </Text>
-                    <Text className="mt-1 text-xs text-muted-foreground">
-                      Pan the map or zoom out to load more Rex.
-                    </Text>
-                  </View>
-                </View>
-              ) : null}
-
-              {flow.mapMarkers.length === 0 && flow.searchQuery.trim() ? (
-                <View
-                  className="absolute z-[1250]"
-                  style={{
-                    position: 'absolute',
-                    left: MAP_ACTION_INSET,
-                    right: MAP_ACTION_INSET,
-                    top: MAP_LOCATION_PROMPT_TOP,
-                  }}
-                >
-                  <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
-                    <Text className="text-sm font-medium text-foreground">
-                      No Rex match that name
-                    </Text>
-                    <Text className="mt-1 text-xs text-muted-foreground">
-                      Try another title or clear the search.
-                    </Text>
-                  </View>
-                </View>
-              ) : null}
             </View>
 
             {flow.selectedRec && (
@@ -296,16 +263,61 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
           </ScrollView>
         )}
 
+        {showEmptyMapAreaBanner ? (
+          <View pointerEvents="box-none" style={styles.mapSearchEmptyBannerShell}>
+            <MapSearchRow
+              trailingSlot="preserve-width"
+              field={
+                <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
+                  <Text className="text-sm font-medium text-foreground">
+                    Nothing in this area yet
+                  </Text>
+                  <Text className="mt-1 text-xs text-muted-foreground">
+                    Pan the map or zoom out to load more Rex.
+                  </Text>
+                </View>
+              }
+            />
+          </View>
+        ) : null}
+
+        {showNoSearchMatchBanner ? (
+          <View pointerEvents="box-none" style={styles.mapSearchEmptyBannerShell}>
+            <MapSearchRow
+              trailingSlot="preserve-width"
+              field={
+                <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
+                  <Text className="text-sm font-medium text-foreground">No Rex match that name</Text>
+                  <Text className="mt-1 text-xs text-muted-foreground">
+                    Try another title or clear the search.
+                  </Text>
+                </View>
+              }
+            />
+          </View>
+        ) : null}
+
         <MapSearchBar
           value={flow.searchQuery}
           onChangeText={flow.setSearchQuery}
           suggestions={flow.suggestions}
-          onSelectSuggestion={flow.setSearchQuery}
+          onSelectSuggestion={(rec) => flow.focusOnRecommendation(rec)}
           trailing={searchTrailing}
         />
       </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  mapSearchEmptyBannerShell: {
+    position: 'absolute',
+    left: MAP_ACTION_INSET,
+    right: MAP_ACTION_INSET,
+    top: MAP_LOCATION_PROMPT_TOP,
+    zIndex: 1250,
+    elevation: Platform.OS === 'android' ? 14 : 0,
+  },
+});
 
 export default MapScreen;
