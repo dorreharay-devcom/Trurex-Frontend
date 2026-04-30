@@ -27,7 +27,7 @@ export const DiscoveryApi = {
     const raw = unwrap(
       await Backend.rpc('recommendation_feed', {
         category_filter: params.category_filter ?? null,
-        tag_filters: tags != null && tags.length > 0 ? tags : null,
+        tag_filters: params.tag_filters?.length ? params.tag_filters : null,
         result_limit: params.result_limit ?? 20,
         result_offset: params.result_offset ?? 0,
       }),

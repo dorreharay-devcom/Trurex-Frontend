@@ -147,6 +147,7 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
     rating,
     scoreValueForMoney: optionalScoreValueForMoney(o),
     tags: parseTags(o),
+    savedAt: optStr(o, 'saved_at') ?? null,
     user: {
       name: authorName,
       handle: authorHandle,

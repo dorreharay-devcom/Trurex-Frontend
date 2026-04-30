@@ -240,8 +240,6 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
   }
 
   const rexTabCount = myRexes.length;
-  const numCols = windowWidth < 500 ? 2 : windowWidth < 900 ? 3 : 4;
-  const cardWidth = (windowWidth - 64 - 12 * (numCols - 1)) / numCols;
 
   return (
     <>
@@ -319,36 +317,43 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
                 <Text className="text-sm text-muted-foreground text-center py-8">No rexes yet</Text>
               ) : (
                 <View className="p-4">
-<View className="flex-row flex-wrap" style={{ gap: 12 }}>
-                    {myRexes.map((rec) => (
-                      <TouchableOpacity
-                        key={rec.id}
-                        activeOpacity={0.8}
-                        onPress={() => onRexPress?.(rec)}
-                        style={{ width: cardWidth }}
-                        className="rounded-xl overflow-hidden shadow-card bg-background border border-border"
-                      >
-                        <SignedStorageImage
-                          bucket={REX_IMAGES_BUCKET}
-                          storagePath={rexCoverStoragePathFromRecommendation(rec)}
-                          remoteUri={rexCoverRemoteHttpUrl(rec)}
-                          className="aspect-square w-full"
-                          accessibilityLabel={rec.title}
-                        />
-                        <View className="p-2.5">
-                          <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>
-                            {rec.title}
-                          </Text>
-                          <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
-                            {rec.location || rec.category}
-                          </Text>
-                          <Text className="text-[10px] font-medium text-primary">
-                            ★ {rec.rating}
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
+                  {(() => {
+                    const gw = Math.min(windowWidth, 1280) - 66;
+                    const numCols = gw < 400 ? 1 : gw < 700 ? 2 : 4;
+                    const cw = Math.floor((gw - 12 * (numCols - 1)) / numCols);
+                    return (
+                      <View className="flex-row flex-wrap" style={{ gap: 12 }}>
+                        {myRexes.map((rec) => (
+                          <TouchableOpacity
+                            key={rec.id}
+                            activeOpacity={0.8}
+                            onPress={() => onRexPress?.(rec)}
+                            style={{ width: cw }}
+                            className="rounded-xl overflow-hidden shadow-card bg-background border border-border"
+                          >
+                            <SignedStorageImage
+                              bucket={REX_IMAGES_BUCKET}
+                              storagePath={rexCoverStoragePathFromRecommendation(rec)}
+                              remoteUri={rexCoverRemoteHttpUrl(rec)}
+                              className="aspect-square w-full"
+                              accessibilityLabel={rec.title}
+                            />
+                            <View className="p-2.5">
+                              <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>
+                                {rec.title}
+                              </Text>
+                              <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
+                                {rec.location || rec.category}
+                              </Text>
+                              <Text className="text-[10px] font-medium text-primary">
+                                ★ {rec.rating}
+                              </Text>
+                            </View>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    );
+                  })()}
                 </View>
               ))}
 

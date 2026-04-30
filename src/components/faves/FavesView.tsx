@@ -9,7 +9,7 @@ import {
   Pressable,
   useWindowDimensions,
 } from 'react-native';
-import { Plus, PackageOpen, Search, MapPin, X } from 'lucide-react-native';
+import { Plus, PackageOpen, Search, MapPin, X, Calendar } from 'lucide-react-native';
 import { CollectionsApi } from '~/api/CollectionsApi';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
@@ -257,8 +257,22 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
                     </View>
                   )}
                 </View>
+                {item.description ? (
+                  <Text className="text-xs text-foreground/70 mt-1" numberOfLines={1}>
+                    {item.description}
+                  </Text>
+                ) : null}
               </View>
-              <View className="flex-row items-center gap-2 flex-shrink-0">
+              <View className="flex-col items-end gap-1.5 flex-shrink-0">
+                {item.savedAt ? (
+                  <View className="flex-row items-center gap-0.5">
+                    <Calendar size={10} color={Theme.colors.muted} />
+                    <Text className="text-[10px] text-muted-foreground">
+                      {new Date(item.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </Text>
+                  </View>
+                ) : null}
+              <View className="flex-row items-center gap-2">
                 <TouchableOpacity
                   onPress={() =>
                     setAddToCollectionRec({
@@ -293,7 +307,8 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
               </View>
             </View>
           </View>
-        )}
+        </View>
+      )}
         ListEmptyComponent={
           loadingSaved ? null : (
             <View className="items-center py-10 gap-2">
