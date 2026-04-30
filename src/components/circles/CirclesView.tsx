@@ -12,6 +12,8 @@ import {
 } from '~/components/circles/common';
 import { type CirclesViewModel, useCirclesViewModel } from '~/hooks/circles/useCirclesViewModel';
 import {
+  connectionFallbackInitialLoading,
+  connectionFallbackRows,
   connectionRowsForDisplay,
   scopedConnectionListPhase,
   useScopedConnectionUserSearch,
@@ -42,23 +44,8 @@ function CirclesListContent({ vm, isActive }: { vm: CirclesViewModel; isActive: 
     Boolean(vm.user && isActive),
   );
 
-  const connFallbackRows = useMemo(() => {
-    switch (connTab) {
-      case 'trusted':
-        return vm.trustedRows;
-      case 'followers':
-        return vm.followerRows;
-      default:
-        return vm.followingRows;
-    }
-  }, [connTab, vm.trustedRows, vm.followerRows, vm.followingRows]);
-
-  const connFallbackLoading =
-    connTab === 'trusted'
-      ? vm.trustedLoading && vm.trustedRows.length === 0
-      : connTab === 'followers'
-        ? vm.followersLoading && vm.followerRows.length === 0
-        : vm.followingLoading && vm.followingRows.length === 0;
+  const connFallbackRows = connectionFallbackRows(connTab, vm);
+  const connFallbackLoading = connectionFallbackInitialLoading(connTab, vm);
 
   const connPhase = scopedConnectionListPhase({
     tab: connTab,

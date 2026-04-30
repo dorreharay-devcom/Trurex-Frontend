@@ -19,6 +19,8 @@ import {
 } from '~/components/circles/common';
 import type { CirclesViewModel } from '~/hooks/circles/useCirclesViewModel';
 import {
+  connectionFallbackInitialLoading,
+  connectionFallbackRows,
   connectionRowsForDisplay,
   scopedConnectionListPhase,
   useScopedConnectionUserSearch,
@@ -58,19 +60,8 @@ export function CircleDetailScreen({ vm }: Props) {
   const showAddToCircleSection = circleUi.showConnectionsAddPanel;
   const allowRemoveMember = circleUi.allowOwnerRemoveMemberRpc;
 
-  const addFallbackRows =
-    addConnTab === 'trusted'
-      ? vm.trustedRows
-      : addConnTab === 'followers'
-        ? vm.followerRows
-        : vm.followingRows;
-
-  const addFallbackLoading =
-    addConnTab === 'trusted'
-      ? vm.trustedLoading && vm.trustedRows.length === 0
-      : addConnTab === 'followers'
-        ? vm.followersLoading && vm.followerRows.length === 0
-        : vm.followingLoading && vm.followingRows.length === 0;
+  const addFallbackRows = connectionFallbackRows(addConnTab, vm);
+  const addFallbackLoading = connectionFallbackInitialLoading(addConnTab, vm);
 
   const addPhase = scopedConnectionListPhase({
     tab: addConnTab,

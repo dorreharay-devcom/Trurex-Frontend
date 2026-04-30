@@ -10,13 +10,12 @@ import type {
   Recommendation,
   RecommendationOpenOptions,
 } from '~/types/recommendation/recommendation';
-
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+import { isHexUuidString } from '~/utils/guards';
 
 export default function UserProfilePage() {
   const { userId: slug } = useLocalSearchParams<{ userId: string }>();
   const router = useRouter();
-  const isUuid = UUID_RE.test(slug ?? '');
+  const isUuid = isHexUuidString(slug ?? '');
   const userId = isUuid ? slug : undefined;
   const handle = !isUuid ? slug?.replace(/^@/, '') : undefined;
   const [avatarRefreshKey] = useState(0);

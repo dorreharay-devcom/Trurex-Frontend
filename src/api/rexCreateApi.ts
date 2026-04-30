@@ -5,7 +5,7 @@ import type {
   CreateRexRpcParams,
 } from '~/types/recommendation/rexCategoryCreateConfig';
 import type { DiscardDraftRexDataResult } from '~/types/recommendation/rexApi';
-import { isFiniteNumber, isPlainObject } from '~/utils';
+import { isFiniteNumber, isPlainObject } from '~/utils/guards';
 
 export type { DiscardDraftRexDataResult };
 

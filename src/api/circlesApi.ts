@@ -1,4 +1,5 @@
 import { Backend } from '~/services/AuthService';
+import { coerceNonEmptyId, isPlainObject, optStr, stringifyOrNull } from '~/utils/guards';
 
 export type CircleApiRow = {
   id: string;
@@ -164,15 +165,14 @@ export type CircleMemberProfile = {
 };
 
 function mapGetCircleMembersRow(raw: unknown): CircleMemberProfile | null {
-  if (raw == null || typeof raw !== 'object') return null;
-  const r = raw as Record<string, unknown>;
-  const user_id = typeof r.user_id === 'string' ? r.user_id : '';
-  if (!user_id) return null;
+  if (!isPlainObject(raw)) return null;
+  const user_id = coerceNonEmptyId(raw.user_id);
+  if (user_id == null) return null;
   return {
     user_id,
-    display_name: typeof r.display_name === 'string' ? r.display_name : null,
-    handle: r.handle == null ? null : String(r.handle),
-    avatar_url: r.avatar_url == null ? null : String(r.avatar_url),
+    display_name: optStr(raw.display_name),
+    handle: stringifyOrNull(raw.handle),
+    avatar_url: stringifyOrNull(raw.avatar_url),
   };
 }
 

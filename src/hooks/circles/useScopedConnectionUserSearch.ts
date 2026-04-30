@@ -57,6 +57,43 @@ export function connectionRowsForDisplay(args: {
   return args.searchActive ? args.searchRows : args.fallbackRows;
 }
 
+export type ConnectionFallbackVmSlice = {
+  trustedRows: NetworkUserRow[];
+  followerRows: NetworkUserRow[];
+  followingRows: NetworkUserRow[];
+  trustedLoading: boolean;
+  followersLoading: boolean;
+  followingLoading: boolean;
+};
+
+export function connectionFallbackRows(
+  tab: ConnectionScopeTab,
+  vm: ConnectionFallbackVmSlice,
+): NetworkUserRow[] {
+  switch (tab) {
+    case 'trusted':
+      return vm.trustedRows;
+    case 'followers':
+      return vm.followerRows;
+    case 'following':
+      return vm.followingRows;
+  }
+}
+
+export function connectionFallbackInitialLoading(
+  tab: ConnectionScopeTab,
+  vm: ConnectionFallbackVmSlice,
+): boolean {
+  switch (tab) {
+    case 'trusted':
+      return vm.trustedLoading && vm.trustedRows.length === 0;
+    case 'followers':
+      return vm.followersLoading && vm.followerRows.length === 0;
+    case 'following':
+      return vm.followingLoading && vm.followingRows.length === 0;
+  }
+}
+
 export function useScopedConnectionUserSearch(
   tab: ConnectionScopeTab,
   subjectUserId: string | undefined,

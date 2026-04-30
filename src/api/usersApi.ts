@@ -1,6 +1,14 @@
 import { Backend } from '~/services/AuthService';
 import type { NetworkUserRow, PublicUserRow, UserConfigRow, UserProfileRow } from '~/types/network';
-import { isPlainObject } from '~/utils';
+import {
+  coerceId,
+  finiteNum,
+  isFiniteNumber,
+  isPlainObject,
+  optStr,
+  optStrUndef,
+  unknownAsArray,
+} from '~/utils/guards';
 
 const DEFAULT_LIMIT = 50;
 
@@ -11,34 +19,11 @@ function normalizeHandleForLookup(handle: string): string {
   return handle.trim().replace(/^@/, '');
 }
 
-function asArray<T>(data: unknown): T[] {
-  if (Array.isArray(data)) return data as T[];
-  if (data == null) return [];
-  return [data as T];
-}
-
 function isTrustedUsersRpcUnavailable(error: { code?: string; message?: string }): boolean {
   return (
     error.code === 'PGRST202' ||
     (typeof error.message === 'string' && error.message.includes('Could not find the function'))
   );
-}
-
-function coerceId(v: unknown): string {
-  if (v == null) return '';
-  return typeof v === 'string' ? v : String(v);
-}
-
-function optStr(v: unknown): string | null {
-  return typeof v === 'string' ? v : null;
-}
-
-function optStrUndef(v: unknown): string | undefined {
-  return typeof v === 'string' ? v : undefined;
-}
-
-function finiteNum(v: unknown, fallback = 0): number {
-  return typeof v === 'number' && Number.isFinite(v) ? v : fallback;
 }
 
 type RelTriplet = 'follows_you' | 'following' | 'trusted';
@@ -58,9 +43,9 @@ function normalizeNetworkRow(r: Record<string, unknown>): NetworkUserRow {
     followed_at: optStrUndef(r.followed_at),
     bio: optStr(r.bio),
   };
-  if (typeof r.followers_count === 'number') row.followers_count = r.followers_count;
-  if (typeof r.following_count === 'number') row.following_count = r.following_count;
-  if (typeof r.rexes_created_count === 'number') row.rexes_created_count = r.rexes_created_count;
+  if (isFiniteNumber(r.followers_count)) row.followers_count = r.followers_count;
+  if (isFiniteNumber(r.following_count)) row.following_count = r.following_count;
+  if (isFiniteNumber(r.rexes_created_count)) row.rexes_created_count = r.rexes_created_count;
   return row;
 }
 
@@ -90,14 +75,14 @@ async function fetchUserFollowingInternal(inputUserId: string): Promise<NetworkU
     input_user_id: inputUserId,
   });
   if (error) throw error;
-  return asArray<Record<string, unknown>>(data)
+  return unknownAsArray<Record<string, unknown>>(data)
     .map(normalizeNetworkRow)
     .filter((u) => u.user_id);
 }
 
 export async function fetchTrustedUsers(inputUserId: string): Promise<NetworkUserRow[]> {
   const parseRows = (payload: unknown) =>
-    asArray<Record<string, unknown>>(payload)
+    unknownAsArray<Record<string, unknown>>(payload)
       .map(normalizeNetworkRow)
       .filter((u) => u.user_id);
 
@@ -141,7 +126,7 @@ export async function fetchUserFollowers(inputUserId: string): Promise<NetworkUs
     input_user_id: inputUserId,
   });
   if (error) throw error;
-  return asArray<Record<string, unknown>>(data)
+  return unknownAsArray<Record<string, unknown>>(data)
     .map(normalizeNetworkRow)
     .filter((u) => u.user_id);
 }
@@ -172,7 +157,7 @@ export async function searchUsers(params: {
   }
   const { data, error } = await Backend.rpc('search_users', payload);
   if (error) throw error;
-  return asArray<Record<string, unknown>>(data)
+  return unknownAsArray<Record<string, unknown>>(data)
     .map(normalizeNetworkRow)
     .filter((u) => u.user_id);
 }
@@ -190,8 +175,8 @@ export async function getUserProfile(params: {
   if (error) throw error;
   if (data == null) return null;
   const raw = Array.isArray(data) ? data[0] : data;
-  if (raw == null || typeof raw !== 'object') return null;
-  return normalizeUserProfileRow(raw as Record<string, unknown>);
+  if (!isPlainObject(raw)) return null;
+  return normalizeUserProfileRow(raw);
 }
 
 export async function fetchUserByHandle(handle: string): Promise<PublicUserRow | null> {
