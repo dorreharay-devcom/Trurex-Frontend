@@ -3,6 +3,7 @@ import Toast from 'react-native-toast-message';
 const base = {
   position: 'bottom' as const,
   visibilityTime: 3200,
+  bottomOffset: 40,
 };
 
 export function toastSuccess(title: string, message?: string) {

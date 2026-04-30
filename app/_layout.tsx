@@ -4,25 +4,10 @@ import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '~/services/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import type { ComponentProps } from 'react';
-import Toast, { ErrorToast, InfoToast, SuccessToast } from 'react-native-toast-message';
 import { useFonts } from 'expo-font';
-
-type ToastRowProps = ComponentProps<typeof SuccessToast>;
+import { AppToast } from '~/components/toast/AppToast';
 
 const queryClient = new QueryClient();
-
-const toastBase = { alignSelf: 'flex-end' as const, marginRight: 16, borderLeftColor: '#E9560C' };
-
-const toastConfig = {
-  success: (props: ToastRowProps) => <SuccessToast {...props} style={[toastBase, props.style]} />,
-  error: (props: ComponentProps<typeof ErrorToast>) => (
-    <ErrorToast {...props} style={[toastBase, props.style]} />
-  ),
-  info: (props: ComponentProps<typeof InfoToast>) => (
-    <InfoToast {...props} style={[toastBase, props.style]} />
-  ),
-};
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -43,7 +28,7 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <AuthProvider>
           <Stack screenOptions={{ headerShown: false }} />
-          <Toast config={toastConfig} />
+          <AppToast />
         </AuthProvider>
       </SafeAreaProvider>
     </QueryClientProvider>
