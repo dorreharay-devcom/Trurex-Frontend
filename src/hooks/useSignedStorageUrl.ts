@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Backend } from '~/services/AuthService';
-import { isNonEmptyString, isPlainObject } from '~/utils';
+import { isNonEmptyString, isPlainObject } from '~/utils/guards';
 
 type CacheEntry = { url: string; expiresAt: number };
 

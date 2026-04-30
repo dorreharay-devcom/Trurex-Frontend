@@ -1,9 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  type CircleMemberProfile,
   addCircleMember,
-  circleMemberFromTrustedRow,
   createCircle,
   deleteCircle,
   fetchCircleMembers,
@@ -78,33 +76,21 @@ export function useCirclesViewModel(isActive: boolean) {
   const {
     data: trustedRows = [],
     isLoading: trustedLoading,
-    refetch: refetchTrustedUsers,
   } = useQuery({
     queryKey: ['trusted_users', user?.id],
     queryFn: () => fetchTrustedUsers(user!.id),
     enabled: connectionsEnabled && !!user?.id,
   });
 
-  useEffect(() => {
-    if (detailOpen && selectedCircle?.system_kind === 'trusted' && user?.id) {
-      void refetchTrustedUsers();
-    }
-  }, [detailOpen, selectedCircleId, selectedCircle?.system_kind, user?.id, refetchTrustedUsers]);
-
-  const { data: rpcCircleMembers = [], isLoading: rpcCircleMembersLoading } = useQuery({
+  const { data: members = [], isLoading: membersLoading } = useQuery({
     queryKey: ['circleMembers', selectedCircleId],
     queryFn: () => fetchCircleMembers(selectedCircleId!),
-    enabled:
-      detailOpen &&
-      !!selectedCircleId &&
-      selectedCircle?.system_kind !== 'trusted' &&
-      selectedCircle?.system_kind !== 'broader_network',
+    enabled: detailOpen && !!selectedCircleId,
   });
 
   const {
     data: followerRows = [],
     isLoading: followersLoading,
-    refetch: refetchFollowers,
   } = useQuery({
     queryKey: ['user_followers', user?.id],
     queryFn: () => fetchUserFollowers(user!.id),
@@ -116,47 +102,6 @@ export function useCirclesViewModel(isActive: boolean) {
     queryFn: () => fetchUserFollowing(user!.id),
     enabled: connectionsEnabled && !!user?.id,
   });
-
-  useEffect(() => {
-    if (detailOpen && selectedCircle?.system_kind === 'broader_network' && user?.id) {
-      void refetchFollowers();
-    }
-  }, [detailOpen, selectedCircleId, selectedCircle?.system_kind, user?.id, refetchFollowers]);
-
-  const members: CircleMemberProfile[] = useMemo(() => {
-    if (!detailOpen || !selectedCircleId || !selectedCircle) return [];
-    if (selectedCircle.system_kind === 'trusted') {
-      return trustedRows.map(circleMemberFromTrustedRow);
-    }
-    if (selectedCircle.system_kind === 'broader_network') {
-      return followerRows.map(circleMemberFromTrustedRow);
-    }
-    return rpcCircleMembers;
-  }, [
-    detailOpen,
-    selectedCircleId,
-    selectedCircle,
-    trustedRows,
-    followerRows,
-    rpcCircleMembers,
-  ]);
-
-  const membersLoading = useMemo(() => {
-    if (selectedCircle?.system_kind === 'trusted') {
-      return trustedLoading && trustedRows.length === 0;
-    }
-    if (selectedCircle?.system_kind === 'broader_network') {
-      return followersLoading && followerRows.length === 0;
-    }
-    return rpcCircleMembersLoading;
-  }, [
-    selectedCircle?.system_kind,
-    trustedLoading,
-    trustedRows.length,
-    followersLoading,
-    followerRows.length,
-    rpcCircleMembersLoading,
-  ]);
 
   const memberIdSet = useMemo(() => new Set(members.map((m) => m.user_id)), [members]);
 
@@ -337,6 +282,7 @@ export function useCirclesViewModel(isActive: boolean) {
     trustedLoading,
     followerRows,
     followersLoading,
+    followingRows: followingAll,
     followingOneWay,
     followingLoading,
     circleForMemberUserId,

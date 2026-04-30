@@ -8,7 +8,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { ArrowLeft, Pencil, Trash2, X } from 'lucide-react-native';
+import { ArrowLeft, Pencil, Search, Trash2, X } from 'lucide-react-native';
 import {
   CircleConnectionRow,
   CircleGlyphIcon,
@@ -18,28 +18,65 @@ import {
   TrustedEmptyState,
 } from '~/components/circles/common';
 import type { CirclesViewModel } from '~/hooks/circles/useCirclesViewModel';
+import {
+  connectionFallbackInitialLoading,
+  connectionFallbackRows,
+  connectionRowsForDisplay,
+  scopedConnectionListPhase,
+  useScopedConnectionUserSearch,
+  type ConnectionScopeTab,
+} from '~/hooks/circles/useScopedConnectionUserSearch';
 import { Theme } from '~/theme/Theme';
 import { canEditOrDeleteUserCircle, getCircleUiPolicy } from '~/utils/circleTabUtils';
 import { webContainerStyle } from '~/utils';
 
 type Props = { vm: CirclesViewModel };
 
-type AddConnTab = 'followers' | 'trusted';
-
 export function CircleDetailScreen({ vm }: Props) {
-  const [addConnTab, setAddConnTab] = useState<AddConnTab>('trusted');
+  const [addConnTab, setAddConnTab] = useState<ConnectionScopeTab>('trusted');
 
-  if (!vm.selectedCircle || !vm.selectedTab) return null;
+  const selectedCircle = vm.selectedCircle;
+  const selectedTab = vm.selectedTab;
+  const detailReady = Boolean(selectedCircle && selectedTab);
+  const showAddPanel =
+    detailReady &&
+    Boolean(selectedCircle && getCircleUiPolicy(selectedCircle).showConnectionsAddPanel);
 
-  const subtitle = vm.selectedCircle.description?.trim() || vm.selectedTab.subtitle;
+  const addSearch = useScopedConnectionUserSearch(
+    addConnTab,
+    vm.user?.id,
+    Boolean(vm.user?.id && showAddPanel),
+  );
+
+  if (!detailReady || !selectedCircle || !selectedTab) return null;
+
+  const subtitle = selectedCircle.description?.trim() || selectedTab.subtitle;
   const selfId = vm.user?.id;
   const membersListed = selfId ? vm.members.filter((m) => m.user_id !== selfId) : vm.members;
   const listedCount = membersListed.length;
   const memberLabel = listedCount === 1 ? '1 member' : `${listedCount} members`;
-  const canManage = canEditOrDeleteUserCircle(vm.selectedCircle, vm.user?.id);
-  const circleUi = getCircleUiPolicy(vm.selectedCircle);
+  const canManage = canEditOrDeleteUserCircle(selectedCircle, vm.user?.id);
+  const circleUi = getCircleUiPolicy(selectedCircle);
   const showAddToCircleSection = circleUi.showConnectionsAddPanel;
   const allowRemoveMember = circleUi.allowOwnerRemoveMemberRpc;
+
+  const addFallbackRows = connectionFallbackRows(addConnTab, vm);
+  const addFallbackLoading = connectionFallbackInitialLoading(addConnTab, vm);
+
+  const addPhase = scopedConnectionListPhase({
+    tab: addConnTab,
+    searchActive: addSearch.searchActive,
+    searchRows: addSearch.searchRows,
+    searchFetching: addSearch.searchFetching,
+    fallbackRows: addFallbackRows,
+    fallbackLoading: addFallbackLoading,
+  });
+
+  const addDisplayRows = connectionRowsForDisplay({
+    searchActive: addSearch.searchActive,
+    searchRows: addSearch.searchRows,
+    fallbackRows: addFallbackRows,
+  });
 
   return (
     <>
@@ -60,23 +97,23 @@ export function CircleDetailScreen({ vm }: Props) {
 
         <View className="mb-6 flex-row items-start gap-3">
           <CircleGlyphIcon
-            iconKind={vm.selectedTab.iconKind}
-            color={vm.selectedTab.accent}
-            bg={vm.selectedTab.iconBg}
+            iconKind={selectedTab.iconKind}
+            color={selectedTab.accent}
+            bg={selectedTab.iconBg}
             size={22}
             large
           />
           <View className="min-w-0 flex-1">
-            <Text className="text-lg font-semibold text-foreground">{vm.selectedCircle.name}</Text>
+            <Text className="text-lg font-semibold text-foreground">{selectedCircle.name}</Text>
             {subtitle ? (
               <Text className="mt-0.5 text-xs text-muted-foreground">{subtitle}</Text>
             ) : null}
           </View>
           <View
             className="rounded-full px-2.5 py-1"
-            style={{ backgroundColor: vm.selectedTab.iconBg }}
+            style={{ backgroundColor: selectedTab.iconBg }}
           >
-            <Text className="text-xs font-semibold" style={{ color: vm.selectedTab.accent }}>
+            <Text className="text-xs font-semibold" style={{ color: selectedTab.accent }}>
               {memberLabel}
             </Text>
           </View>
@@ -117,6 +154,7 @@ export function CircleDetailScreen({ vm }: Props) {
               {(
                 [
                   ['trusted', `Trusted · ${vm.trustedRows.length}`],
+                  ['following', `Following · ${vm.followingRows.length}`],
                   ['followers', `Followers · ${vm.followerRows.length}`],
                 ] as const
               ).map(([id, label]) => {
@@ -139,33 +177,24 @@ export function CircleDetailScreen({ vm }: Props) {
               })}
             </View>
 
-            {addConnTab === 'trusted' ? (
-              vm.trustedLoading ? (
-                <SectionSpinner className="mb-8 items-center py-4" />
-              ) : vm.trustedRows.length === 0 ? (
-                <TrustedEmptyState />
-              ) : (
-                <View className="mb-8 gap-2">
-                  {vm.trustedRows.map((row) => (
-                    <CircleConnectionRow
-                      key={row.user_id}
-                      row={row}
-                      isMember={vm.memberIdSet.has(row.user_id)}
-                      isAdding={vm.addingMemberId === row.user_id}
-                      onAdd={() => vm.addToSelectedCircle(row.user_id)}
-                    />
-                  ))}
-                </View>
-              )
-            ) : vm.followersLoading ? (
-              <SectionSpinner className="mb-8 items-center py-4" />
-            ) : vm.followerRows.length === 0 ? (
-              <View className="mb-8 items-center py-8">
-                <Text className="text-center text-sm text-muted-foreground">No followers yet.</Text>
+            <View className="relative mb-4 w-full max-w-md self-start">
+              <View className="pointer-events-none absolute left-3 top-0 bottom-0 z-10 justify-center">
+                <Search size={16} color={Theme.colors.muted} />
               </View>
-            ) : (
+              <TextInput
+                value={addSearch.query}
+                onChangeText={addSearch.setQuery}
+                placeholder={addSearch.placeholder}
+                placeholderTextColor={Theme.colors.muted}
+                className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground"
+              />
+            </View>
+
+            {addPhase === 'loading' ? (
+              <SectionSpinner className="mb-8 items-center py-4" />
+            ) : addPhase === 'rows' ? (
               <View className="mb-8 gap-2">
-                {vm.followerRows.map((row) => (
+                {addDisplayRows.map((row) => (
                   <CircleConnectionRow
                     key={row.user_id}
                     row={row}
@@ -174,6 +203,22 @@ export function CircleDetailScreen({ vm }: Props) {
                     onAdd={() => vm.addToSelectedCircle(row.user_id)}
                   />
                 ))}
+              </View>
+            ) : (
+              <View className="mb-8 items-center py-8">
+                {addPhase === 'no_match' ? (
+                  <Text className="text-center text-sm text-muted-foreground">
+                    No one matches your search.
+                  </Text>
+                ) : addPhase === 'trusted_empty' ? (
+                  <TrustedEmptyState />
+                ) : addPhase === 'followers_empty' ? (
+                  <Text className="text-center text-sm text-muted-foreground">No followers yet.</Text>
+                ) : (
+                  <Text className="text-center text-sm text-muted-foreground">
+                    Not following anyone yet.
+                  </Text>
+                )}
               </View>
             )}
           </>

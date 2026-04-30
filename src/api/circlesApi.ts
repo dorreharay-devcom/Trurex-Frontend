@@ -1,5 +1,5 @@
 import { Backend } from '~/services/AuthService';
-import type { NetworkUserRow } from '~/types/network';
+import { coerceNonEmptyId, isPlainObject, optStr, stringifyOrNull } from '~/utils/guards';
 
 export type CircleApiRow = {
   id: string;
@@ -157,22 +157,6 @@ export type CircleMemberAssignment = {
   member_user_id: string;
 };
 
-export async function fetchMyCircleMemberAssignments(): Promise<CircleMemberAssignment[]> {
-  const { data: circlesData, error: ce } = await Backend.from('circles').select('id');
-  if (ce) throw ce;
-  const circleIds = (circlesData ?? []).map((c: { id: string }) => c.id);
-  if (circleIds.length === 0) return [];
-
-  const { data, error } = await Backend.from('circle_members')
-    .select('circle_id, user_id')
-    .in('circle_id', circleIds);
-  if (error) throw error;
-  return (data ?? []).map((row: { circle_id: string; user_id: string }) => ({
-    circle_id: row.circle_id,
-    member_user_id: row.user_id,
-  }));
-}
-
 export type CircleMemberProfile = {
   user_id: string;
   display_name: string | null;
@@ -180,56 +164,44 @@ export type CircleMemberProfile = {
   avatar_url: string | null;
 };
 
-export function circleMemberFromTrustedRow(row: NetworkUserRow): CircleMemberProfile {
+function mapGetCircleMembersRow(raw: unknown): CircleMemberProfile | null {
+  if (!isPlainObject(raw)) return null;
+  const user_id = coerceNonEmptyId(raw.user_id);
+  if (user_id == null) return null;
   return {
-    user_id: row.user_id,
-    display_name: row.display_name,
-    handle: row.handle,
-    avatar_url: row.avatar_url,
+    user_id,
+    display_name: optStr(raw.display_name),
+    handle: stringifyOrNull(raw.handle),
+    avatar_url: stringifyOrNull(raw.avatar_url),
   };
 }
 
 export async function fetchCircleMembers(circleId: string): Promise<CircleMemberProfile[]> {
-  const { data: membershipRows, error: me } = await Backend.from('circle_members')
-    .select('user_id')
-    .eq('circle_id', circleId);
-  if (me) throw me;
-
-  const ids = (membershipRows ?? []).map((r: { user_id: string }) => r.user_id);
-  if (ids.length === 0) return [];
-
-  const { data: userRows, error: ue } = await Backend.from('users')
-    .select('id, display_name, handle, avatar_url')
-    .in('id', ids);
-  if (ue) throw ue;
-
-  const byId = new Map<string, CircleMemberProfile>(
-    (userRows ?? []).map(
-      (u: {
-        id: string;
-        display_name: string | null;
-        handle: string | null;
-        avatar_url: string | null;
-      }) => [
-        u.id,
-        {
-          user_id: u.id,
-          display_name: u.display_name,
-          handle: u.handle,
-          avatar_url: u.avatar_url,
-        },
-      ],
-    ),
-  );
-
-  return ids.map((id) => {
-    const row = byId.get(id);
-    if (row) return row;
-    return {
-      user_id: id,
-      display_name: null,
-      handle: null,
-      avatar_url: null,
-    };
+  const { data, error } = await Backend.rpc('get_circle_members', {
+    input_circle_id: circleId,
   });
+  if (error) throw error;
+  const rows = Array.isArray(data) ? data : [];
+  return rows
+    .map(mapGetCircleMembersRow)
+    .filter((m): m is CircleMemberProfile => m != null);
+}
+
+export async function fetchMyCircleMemberAssignments(): Promise<CircleMemberAssignment[]> {
+  const { data: circlesData, error: ce } = await Backend.from('circles').select('id');
+  if (ce) throw ce;
+  const circleIds = (circlesData ?? []).map((c: { id: string }) => c.id);
+  if (circleIds.length === 0) return [];
+
+  const nested = await Promise.all(
+    circleIds.map(async (circle_id) => {
+      try {
+        const members = await fetchCircleMembers(circle_id);
+        return members.map((m) => ({ circle_id, member_user_id: m.user_id }));
+      } catch {
+        return [];
+      }
+    }),
+  );
+  return nested.flat();
 }

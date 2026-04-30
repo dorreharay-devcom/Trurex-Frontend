@@ -1,23 +1,28 @@
 import React, { useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
-import { ChevronRight, Plus, Users, X } from 'lucide-react-native';
+import { ChevronRight, Plus, Search, Users, X } from 'lucide-react-native';
 import { CircleAssignmentSheet } from '~/components/circles/CircleAssignmentSheet';
 import { CircleDetailScreen } from '~/components/circles/CircleDetailScreen';
 import { PeopleYouMayKnowSection } from '~/components/circles/PeopleYouMayKnowSection';
 import { ShareProfileCard } from '~/components/circles/ShareProfileCard';
 import {
   CircleGlyphIcon,
-  FollowingEmptyState,
   NetworkConnectionRow,
   TrustedEmptyState,
 } from '~/components/circles/common';
 import { type CirclesViewModel, useCirclesViewModel } from '~/hooks/circles/useCirclesViewModel';
+import {
+  connectionFallbackInitialLoading,
+  connectionFallbackRows,
+  connectionRowsForDisplay,
+  scopedConnectionListPhase,
+  useScopedConnectionUserSearch,
+  type ConnectionScopeTab,
+} from '~/hooks/circles/useScopedConnectionUserSearch';
 import { Theme } from '~/theme/Theme';
 import { webContainerStyle } from '~/utils';
 
 type Props = { isActive: boolean };
-
-type ConnTab = 'followers' | 'following' | 'trusted';
 
 const CirclesView = ({ isActive }: Props) => {
   const vm = useCirclesViewModel(isActive);
@@ -30,8 +35,32 @@ const CirclesView = ({ isActive }: Props) => {
 };
 
 function CirclesListContent({ vm, isActive }: { vm: CirclesViewModel; isActive: boolean }) {
-  const [connTab, setConnTab] = useState<ConnTab>('trusted');
+  const [connTab, setConnTab] = useState<ConnectionScopeTab>('trusted');
   const [circleSheet, setCircleSheet] = useState<{ id: string; name: string } | null>(null);
+
+  const connSearch = useScopedConnectionUserSearch(
+    connTab,
+    vm.user?.id,
+    Boolean(vm.user && isActive),
+  );
+
+  const connFallbackRows = connectionFallbackRows(connTab, vm);
+  const connFallbackLoading = connectionFallbackInitialLoading(connTab, vm);
+
+  const connPhase = scopedConnectionListPhase({
+    tab: connTab,
+    searchActive: connSearch.searchActive,
+    searchRows: connSearch.searchRows,
+    searchFetching: connSearch.searchFetching,
+    fallbackRows: connFallbackRows,
+    fallbackLoading: connFallbackLoading,
+  });
+
+  const connDisplayRows = connectionRowsForDisplay({
+    searchActive: connSearch.searchActive,
+    searchRows: connSearch.searchRows,
+    fallbackRows: connFallbackRows,
+  });
 
   const sheetMemberCircleIds = useMemo(() => {
     if (!circleSheet?.id) return new Set<string>();
@@ -179,7 +208,7 @@ function CirclesListContent({ vm, isActive }: { vm: CirclesViewModel; isActive: 
                 [
                   ['trusted', `Trusted · ${vm.trustedRows.length}`],
                   ['followers', `Followers · ${vm.followerRows.length}`],
-                  ['following', `Following · ${vm.followingOneWay.length}`],
+                  ['following', `Following · ${vm.followingRows.length}`],
                 ] as const
               ).map(([id, label]) => {
                 const active = connTab === id;
@@ -201,74 +230,60 @@ function CirclesListContent({ vm, isActive }: { vm: CirclesViewModel; isActive: 
               })}
             </View>
 
-            {connTab === 'trusted' ? (
-              vm.trustedLoading ? (
-                <View className="items-center py-8">
-                  <ActivityIndicator color={Theme.colors.primary} />
-                </View>
-              ) : vm.trustedRows.length === 0 ? (
-                <TrustedEmptyState containerClassName="" />
-              ) : (
-                <View className="gap-2">
-                  {vm.trustedRows.map((row) => (
-                    <NetworkConnectionRow
-                      key={row.user_id}
-                      row={row}
-                      circle={vm.circleForMemberUserId.get(row.user_id)}
-                      onAddToCircle={() =>
-                        setCircleSheet({
-                          id: row.user_id,
-                          name: row.display_name || 'Member',
-                        })
-                      }
-                    />
-                  ))}
-                </View>
-              )
-            ) : connTab === 'followers' ? (
-              vm.followersLoading ? (
-                <View className="items-center py-8">
-                  <ActivityIndicator color={Theme.colors.primary} />
-                </View>
-              ) : vm.followerRows.length === 0 ? (
-                <View className="items-center py-10">
-                  <Text className="text-center text-sm text-muted-foreground">
-                    No followers yet.
-                  </Text>
-                </View>
-              ) : (
-                <View className="gap-2">
-                  {vm.followerRows.map((row) => (
-                    <NetworkConnectionRow
-                      key={row.user_id}
-                      row={row}
-                      circle={vm.circleForMemberUserId.get(row.user_id)}
-                      onAddToCircle={() =>
-                        setCircleSheet({
-                          id: row.user_id,
-                          name: row.display_name || 'Member',
-                        })
-                      }
-                    />
-                  ))}
-                </View>
-              )
-            ) : vm.followingLoading ? (
+            <View className="relative mb-4 w-full max-w-md self-start">
+              <View className="pointer-events-none absolute left-3 top-0 bottom-0 z-10 justify-center">
+                <Search size={16} color={Theme.colors.muted} />
+              </View>
+              <TextInput
+                value={connSearch.query}
+                onChangeText={connSearch.setQuery}
+                placeholder={connSearch.placeholder}
+                placeholderTextColor={Theme.colors.muted}
+                className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground"
+              />
+            </View>
+
+            {connPhase === 'loading' ? (
               <View className="items-center py-8">
                 <ActivityIndicator color={Theme.colors.primary} />
               </View>
-            ) : vm.followingOneWay.length === 0 ? (
-              <FollowingEmptyState containerClassName="" />
-            ) : (
+            ) : connPhase === 'rows' ? (
               <View className="gap-2">
-                {vm.followingOneWay.map((row) => (
+                {connDisplayRows.map((row) => (
                   <NetworkConnectionRow
                     key={row.user_id}
                     row={row}
                     circle={vm.circleForMemberUserId.get(row.user_id)}
-                    allowAddToCircle={false}
+                    allowAddToCircle={connTab !== 'following'}
+                    onAddToCircle={
+                      connTab === 'following'
+                        ? undefined
+                        : () =>
+                            setCircleSheet({
+                              id: row.user_id,
+                              name: row.display_name || 'Member',
+                            })
+                    }
                   />
                 ))}
+              </View>
+            ) : connPhase === 'no_match' ? (
+              <View className="items-center py-10">
+                <Text className="text-center text-sm text-muted-foreground">
+                  No one matches your search.
+                </Text>
+              </View>
+            ) : connPhase === 'trusted_empty' ? (
+              <TrustedEmptyState containerClassName="" />
+            ) : connPhase === 'followers_empty' ? (
+              <View className="items-center py-10">
+                <Text className="text-center text-sm text-muted-foreground">No followers yet.</Text>
+              </View>
+            ) : (
+              <View className="items-center py-10">
+                <Text className="text-center text-sm text-muted-foreground">
+                  Not following anyone yet.
+                </Text>
               </View>
             )}
 
