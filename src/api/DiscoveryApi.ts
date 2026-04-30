@@ -3,6 +3,8 @@ import type { Recommendation } from '~/types/recommendation/recommendation';
 import { mapDiscoverFeedRowSafe } from '~/api/mapDiscoverFeed';
 
 export interface DiscoverQueryParams {
+  category_filter?: string | null;
+  tag_filters?: string[] | null;
   result_limit?: number;
   result_offset?: number;
 }
@@ -21,8 +23,11 @@ export const DiscoveryApi = {
   getDiscoverRecommendations: async (
     params: DiscoverQueryParams = {},
   ): Promise<Recommendation[]> => {
+    const tags = params.tag_filters?.filter((t) => t.trim().length > 0);
     const raw = unwrap(
       await Backend.rpc('recommendation_feed', {
+        category_filter: params.category_filter ?? null,
+        tag_filters: tags != null && tags.length > 0 ? tags : null,
         result_limit: params.result_limit ?? 20,
         result_offset: params.result_offset ?? 0,
       }),

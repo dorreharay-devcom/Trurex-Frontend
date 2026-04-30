@@ -1,7 +1,9 @@
 import { useCallback } from 'react';
 import { Platform, Share } from 'react-native';
 import * as Linking from 'expo-linking';
+import * as Clipboard from 'expo-clipboard';
 import type { Recommendation } from '~/types/recommendation/recommendation';
+import { toastSuccess } from '~/utils/appToast';
 
 const APP_NAME = 'TruRex';
 
@@ -10,14 +12,12 @@ export type RexShareInput = Pick<Recommendation, 'id' | 'title'>;
 export function getRexShareUrl(rexId: string): string {
   if (Platform.OS === 'web' && typeof window !== 'undefined') {
     try {
-      const u = new URL(window.location.href);
-      u.searchParams.set('rex', rexId);
-      return u.toString();
+      return `${window.location.origin}/rex/${encodeURIComponent(rexId)}`;
     } catch {
       return '';
     }
   }
-  return Linking.createURL('/', { queryParams: { rex: rexId } });
+  return Linking.createURL(`/rex/${rexId}`);
 }
 
 export function buildRexShareContent(rec: RexShareInput): { title: string; message: string } {
@@ -31,7 +31,16 @@ export function buildRexShareContent(rec: RexShareInput): { title: string; messa
 export function useShareRex() {
   const shareRecommendation = useCallback(async (rec: RexShareInput) => {
     const { title, message } = buildRexShareContent(rec);
+    const url = getRexShareUrl(rec.id);
     try {
+      if (Platform.OS === 'web') {
+        const toCopy = url || message;
+        if (toCopy) {
+          await Clipboard.setStringAsync(toCopy);
+          toastSuccess('Link copied!');
+        }
+        return;
+      }
       await Share.share({ message, title });
     } catch {}
   }, []);

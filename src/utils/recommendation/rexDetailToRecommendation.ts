@@ -1,0 +1,49 @@
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import type { Recommendation } from '~/types/recommendation/recommendation';
+import type { RexDetailRow } from '~/types/recommendation/rexDetail';
+import { averageScoreFromCategoryRatings } from '~/utils/recommendation/recContentDisplay';
+
+dayjs.extend(relativeTime);
+
+function normalizeHandle(raw: string | null): string {
+  if (!raw) return '';
+  const t = raw.trim();
+  if (!t) return '';
+  return t.startsWith('@') ? t : `@${t}`;
+}
+
+export function rexDetailRowToRecommendation(row: RexDetailRow): Recommendation {
+  const photoPaths = row.photo_paths?.filter((p) => p.trim().length > 0) ?? [];
+  const photoPath = photoPaths[0] ?? null;
+  const bodyText = row.review ?? row.description ?? row.quick_tip ?? null;
+  const rating = averageScoreFromCategoryRatings(row.category_ratings);
+
+  return {
+    id: row.id,
+    title: row.place_name?.trim() || 'Place',
+    description: bodyText,
+    photoPath: photoPath ?? undefined,
+    photoPaths: photoPaths.length > 0 ? photoPaths : undefined,
+    photoCount: photoPaths.length,
+    categoryId: row.category_code || 'all',
+    category: row.category_name?.trim() || 'Uncategorized',
+    categoryIcon: row.category_icon,
+    authorId: row.author_id,
+    location: row.place_name?.trim() || undefined,
+    rating: rating ?? null,
+    scoreValueForMoney: row.score_value_for_money,
+    tags: row.tag_slugs?.length ? row.tag_slugs : null,
+    user: {
+      name: row.author_display_name?.trim() || 'Member',
+      handle: normalizeHandle(row.author_username),
+      avatar: row.author_profile_picture_url?.trim() ?? '',
+    },
+    timeAgo: row.created_at && dayjs(row.created_at).isValid() ? dayjs(row.created_at).fromNow() : '',
+    likes: row.like_count ?? 0,
+    comments: row.comment_count ?? 0,
+    saves: 0,
+    isLiked: row.liked_by_me ?? false,
+    isSaved: row.is_saved ?? false,
+  };
+}
