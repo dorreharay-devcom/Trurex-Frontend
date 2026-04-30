@@ -1,4 +1,4 @@
-import { Pressable } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import {
   ErrorToast,
   InfoToast,
@@ -17,50 +17,46 @@ export const toastRowStyle = {
   borderLeftColor: Theme.colors.primary,
 };
 
+type ToastRowComponent = typeof SuccessToast | typeof ErrorToast | typeof InfoToast;
+
+const dismissHitSlop = { top: 10, right: 10, bottom: 10, left: 10 } as const;
+
+const dismissStyles = StyleSheet.create({
+  root: {
+    alignSelf: 'flex-start',
+    marginTop: 10,
+    marginRight: 12,
+    paddingLeft: 6,
+    paddingBottom: 4,
+  },
+});
+
 export function ToastDismissButton({ hide }: Pick<AppToastRendererProps, 'hide'>) {
   return (
     <Pressable
       onPress={() => hide()}
-      hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+      hitSlop={dismissHitSlop}
       accessibilityRole="button"
       accessibilityLabel="Dismiss notification"
-      style={{
-        alignSelf: 'flex-start',
-        marginTop: 10,
-        marginRight: 12,
-        paddingLeft: 6,
-        paddingBottom: 4,
-      }}
+      style={dismissStyles.root}
     >
       <X size={12} color={Theme.colors.muted} strokeWidth={2} />
     </Pressable>
   );
 }
 
-function trailingDismiss(props: AppToastRendererProps) {
-  return () => <ToastDismissButton hide={props.hide} />;
+function renderToastRow(Row: ToastRowComponent, props: AppToastRendererProps) {
+  return (
+    <Row
+      {...props}
+      renderTrailingIcon={() => <ToastDismissButton hide={props.hide} />}
+      style={[toastRowStyle, props.style]}
+    />
+  );
 }
 
 export const appToastConfig = {
-  success: (props: AppToastRendererProps) => (
-    <SuccessToast
-      {...props}
-      renderTrailingIcon={trailingDismiss(props)}
-      style={[toastRowStyle, props.style]}
-    />
-  ),
-  error: (props: AppToastRendererProps) => (
-    <ErrorToast
-      {...props}
-      renderTrailingIcon={trailingDismiss(props)}
-      style={[toastRowStyle, props.style]}
-    />
-  ),
-  info: (props: AppToastRendererProps) => (
-    <InfoToast
-      {...props}
-      renderTrailingIcon={trailingDismiss(props)}
-      style={[toastRowStyle, props.style]}
-    />
-  ),
+  success: (props: AppToastRendererProps) => renderToastRow(SuccessToast, props),
+  error: (props: AppToastRendererProps) => renderToastRow(ErrorToast, props),
+  info: (props: AppToastRendererProps) => renderToastRow(InfoToast, props),
 };

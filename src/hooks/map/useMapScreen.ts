@@ -16,6 +16,7 @@ import { MapApi } from '~/api/MapApi';
 import { useAuth } from '~/services/AuthContext';
 import type { PinVisibility } from '~/types/map/mapPin';
 import { DEFAULT_PIN_VISIBILITY } from '~/types/map/mapPin';
+import { mapSearchTitleSuggestions } from '~/utils/map/mapSearchSuggestions';
 
 type Params = {
   onRecommendationPress?: (rec: Recommendation) => void;
@@ -23,6 +24,7 @@ type Params = {
 
 const BOUNDS_DEBOUNCE_MS = 450;
 const SEARCH_DEBOUNCE_MS = 400;
+const SEARCH_SUGGEST_DEBOUNCE_MS = 160;
 
 export function useMapScreen({ onRecommendationPress }: Params) {
   const { user } = useAuth();
@@ -177,16 +179,14 @@ export function useMapScreen({ onRecommendationPress }: Params) {
       setDebouncedSearchSuggest(searchQuery);
       return;
     }
-    const t = setTimeout(() => setDebouncedSearchSuggest(searchQuery), 160);
+    const t = setTimeout(() => setDebouncedSearchSuggest(searchQuery), SEARCH_SUGGEST_DEBOUNCE_MS);
     return () => clearTimeout(t);
   }, [searchQuery]);
 
-  const suggestions = useMemo(() => {
-    const q = debouncedSearchSuggest.trim().toLowerCase();
-    if (q.length < 2) return [];
-    const titles = locatedRecs.filter((r) => r.title.toLowerCase().includes(q)).map((r) => r.title);
-    return [...new Set(titles)].slice(0, 5);
-  }, [locatedRecs, debouncedSearchSuggest]);
+  const suggestions = useMemo(
+    () => mapSearchTitleSuggestions(layerFiltered, debouncedSearchSuggest),
+    [layerFiltered, debouncedSearchSuggest],
+  );
 
   const selectedRec = useMemo(
     () => (selectedRecId ? (layerFiltered.find((r) => r.id === selectedRecId) ?? null) : null),
@@ -216,7 +216,7 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     setSelectedRecId(id);
   }, []);
 
-  const clearSelection = useCallback(() => setSelectedRecId(null), {});
+  const clearSelection = useCallback(() => setSelectedRecId(null), []);
 
   const fittedForSearchRef = useRef<string | null>(null);
   useEffect(() => {
