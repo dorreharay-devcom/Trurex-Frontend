@@ -17,6 +17,7 @@ import type {
   CategoryRatingDimension,
   CategoryQuestion,
 } from '~/types/recommendation/rexCategoryCreateConfig';
+import type { CreateRecCircle } from '~/constants/recommendation/createCircles';
 import { isStrictUuid } from '~/utils/guards';
 
 function suggestedCategoryFromSearch(
@@ -95,9 +96,7 @@ export function useCreateRecWizard() {
   const [scoreQuickTip, setScoreQuickTip] = useState('');
   const [scoreValueForMoney, setScoreValueForMoney] = useState<number | null>(null);
   const [scoreReview, setScoreReview] = useState('');
-  const [selectedCircleIds, setSelectedCircleIds] = useState<Set<string>>(
-    () => new Set(['public']),
-  );
+  const [selectedCircleIds, setSelectedCircleIds] = useState<Set<string>>(() => new Set());
   const [categoryHasSubcategoryStep, setCategoryHasSubcategoryStep] = useState(false);
 
   const syncCategoryCreateShape = useCallback((config: CategoryCreateConfig | null) => {
@@ -274,8 +273,23 @@ export function useCreateRecWizard() {
     setScoreQuickTip('');
     setScoreValueForMoney(null);
     setScoreReview('');
-    setSelectedCircleIds(new Set(['public']));
+    setSelectedCircleIds(new Set());
     setCategoryHasSubcategoryStep(false);
+  }, []);
+
+  const ensureDefaultCircleSelectionFromApiOrder = useCallback((rows: CreateRecCircle[]) => {
+    if (!rows.length) return;
+    const outerId = rows[rows.length - 1]!.id;
+    setSelectedCircleIds((prev) => {
+      if (prev.has('public')) {
+        const next = new Set(prev);
+        next.delete('public');
+        next.add(outerId);
+        return next;
+      }
+      if (prev.size === 0) return new Set([outerId]);
+      return prev;
+    });
   }, []);
 
   const applyAddYourOwnPrefill = useCallback(
@@ -376,6 +390,7 @@ export function useCreateRecWizard() {
     setScoreReview: setScoreReviewClamped,
     selectedCircleIds,
     toggleCircleId,
+    ensureDefaultCircleSelectionFromApiOrder,
     syncCategoryCreateShape,
   };
 }

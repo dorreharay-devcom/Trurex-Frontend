@@ -1,5 +1,4 @@
 import type { CreateRecCircle } from '~/constants/recommendation/createCircles';
-import { PUBLIC_CIRCLE_ROW } from '~/constants/recommendation/createCircles';
 
 export const RING_CENTER_DIAMETER = 56;
 export const RING_INNERMOST_USER_RING = RING_CENTER_DIAMETER + 28;
@@ -38,15 +37,16 @@ export function effectiveCirclesAfterLoadError(
   loadError: boolean,
   circles: CreateRecCircle[],
 ): CreateRecCircle[] {
-  return loadError ? circles.filter((c) => c.id === PUBLIC_CIRCLE_ROW.id) : circles;
+  return loadError ? [] : circles;
 }
 
 export function partitionPublicAndPrivateRings(rows: CreateRecCircle[]): {
   publicCircle: CreateRecCircle | undefined;
   ringsInnerToBroader: CreateRecCircle[];
 } {
-  const publicCircle = rows.find((c) => c.id === PUBLIC_CIRCLE_ROW.id);
-  const ringsInnerToBroader = rows.filter((c) => c.id !== PUBLIC_CIRCLE_ROW.id);
+  if (rows.length === 0) return { publicCircle: undefined, ringsInnerToBroader: [] };
+  const publicCircle = rows[rows.length - 1]!;
+  const ringsInnerToBroader = rows.slice(0, -1);
   return { publicCircle, ringsInnerToBroader };
 }
 
@@ -103,7 +103,7 @@ export function distanceFromInnerForRingId(
 }
 
 export function circleFooterSubtitle(c: CreateRecCircle): string {
-  if (c.id === PUBLIC_CIRCLE_ROW.id) return c.subtitle;
+  if (c.systemKind === 'broader_network') return 'Visible to anyone on TruRex';
   const n = c.memberCount;
   return `${n} ${n === 1 ? 'member' : 'members'}`;
 }

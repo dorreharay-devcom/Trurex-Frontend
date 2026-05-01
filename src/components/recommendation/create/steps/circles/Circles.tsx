@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, Pressable, TextInput } from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { Check, Pencil, Plus, X } from 'lucide-react-native';
@@ -55,7 +55,13 @@ export const Circles: React.FC<Props> = ({
     [visible],
   );
 
-  const [highlightId, setHighlightId] = useState('public');
+  const outerId = visible[visible.length - 1]?.id ?? '';
+  const [highlightId, setHighlightId] = useState(outerId);
+
+  useEffect(() => {
+    const nextOuter = visible[visible.length - 1]?.id ?? '';
+    setHighlightId((h) => (visible.some((c) => c.id === h) ? h : nextOuter));
+  }, [visible]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [busy, setBusy] = useState(false);
@@ -119,10 +125,7 @@ export const Circles: React.FC<Props> = ({
   }, [ringsInnerToBroader.length, invalidateCircles]);
 
   const showRenameControl =
-    displayCircle != null &&
-    displayCircle.id !== 'public' &&
-    canRenameCreateRecCircle(displayCircle) &&
-    editingId == null;
+    displayCircle != null && canRenameCreateRecCircle(displayCircle) && editingId == null;
 
   return (
     <ScrollView

@@ -1,11 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { View, Animated as RNAnimated } from 'react-native';
 import type { useCreateRecWizard } from '~/hooks/recommendation';
 import { useMyCircles } from '~/hooks/useMyCircles';
-import { PUBLIC_CIRCLE_ROW } from '~/constants/recommendation/createCircles';
 import { isSensitiveRexSubcategory } from '~/constants/recommendation/sensitiveRexSubcategories';
 import { getRexCategoryApiCode } from '~/constants/recommendation/rexCategories';
-import { mapApiCirclesToDisplayRows, sortCirclesForRingStack } from '~/utils/recommendation/recCircles';
+import {
+  mapApiCirclesToDisplayRows,
+  sortCirclesForRingStack,
+} from '~/utils/recommendation/recCircles';
 import { mapSubcategoriesFromConfig } from '~/data/rexSubcategoryCatalog';
 import type {
   CategoryCreateConfig,
@@ -54,6 +56,7 @@ export const CreateModalBody: React.FC<Props> = ({
   useExperienceReviewCopy,
   subcategoryLabelForConfirm,
 }) => {
+  const { ensureDefaultCircleSelectionFromApiOrder } = flow;
   const categoryApiCode = getRexCategoryApiCode(flow.selectedCategoryId);
   const configLoadError =
     !!flow.selectedCategoryId && !!categoryApiCode && !configLoading && !activeCreateConfig;
@@ -73,9 +76,13 @@ export const CreateModalBody: React.FC<Props> = ({
 
   const displayCircles = useMemo(() => {
     const sorted = apiCircles?.length ? sortCirclesForRingStack(apiCircles) : [];
-    const mapped = sorted.length ? mapApiCirclesToDisplayRows(sorted) : [];
-    return [PUBLIC_CIRCLE_ROW, ...mapped];
+    return sorted.length ? mapApiCirclesToDisplayRows(sorted) : [];
   }, [apiCircles]);
+
+  useEffect(() => {
+    if (!visible || displayCircles.length === 0) return;
+    ensureDefaultCircleSelectionFromApiOrder(displayCircles);
+  }, [visible, displayCircles, ensureDefaultCircleSelectionFromApiOrder]);
 
   const circleTitleLookup = useMemo(
     () => displayCircles.map((c) => ({ id: c.id, title: c.title })),
