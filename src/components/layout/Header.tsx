@@ -19,6 +19,8 @@ import { NotificationBell } from '~/components/layout/NotificationBell';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
 
+const HEADER_SEARCH_FIELD_BG = 'hsl(0, 0%, 86%)';
+
 interface HeaderProps {
   searchQuery: string;
   onSearchChange: (text: string) => void;
@@ -75,8 +77,8 @@ export const Header: React.FC<HeaderProps> = ({
               onChangeText={onSearchChange}
               placeholder="Search recommendations..."
               placeholderTextColor={Theme.colors.foreground}
-              className="w-full rounded-lg border border-border bg-muted py-1.5 pl-9 pr-4 text-sm text-foreground focus:outline-none focus:ring-2"
-              style={textFieldCaretStyle}
+              className="w-full rounded-lg border border-border py-1.5 pl-9 pr-4 text-sm text-foreground focus:outline-none focus:ring-2"
+              style={[textFieldCaretStyle, { backgroundColor: HEADER_SEARCH_FIELD_BG }]}
               selectionColor={Theme.colors.foreground}
               returnKeyType="search"
               underlineColorAndroid="transparent"

@@ -38,6 +38,7 @@ type CanProceedDeps = {
   selectedCategoryId: string | null;
   selectedCircleIds: Set<string>;
   selectedSubcategoryCode: string | null;
+  photoStoragePaths: string[];
 };
 
 function canProceedForStep(stepId: CreateRecStepId, d: CanProceedDeps): boolean {
@@ -53,7 +54,7 @@ function canProceedForStep(stepId: CreateRecStepId, d: CanProceedDeps): boolean 
     case 'scorecard':
       return true;
     case 'photos':
-      return true;
+      return d.photoStoragePaths.length >= 1;
     case 'circles':
       return d.selectedCircleIds.size > 0;
     case 'confirm':
@@ -156,6 +157,7 @@ export function useCreateRecWizard() {
         selectedCategoryId,
         selectedCircleIds,
         selectedSubcategoryCode,
+        photoStoragePaths,
       }),
     [
       stepId,
@@ -165,6 +167,7 @@ export function useCreateRecWizard() {
       selectedCategoryId,
       selectedCircleIds,
       selectedSubcategoryCode,
+      photoStoragePaths,
     ],
   );
 
