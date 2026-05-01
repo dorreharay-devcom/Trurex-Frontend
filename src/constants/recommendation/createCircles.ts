@@ -13,19 +13,7 @@ export type CreateRecCircle = {
   memberCount: number;
 };
 
-export const PUBLIC_CIRCLE_ROW: CreateRecCircle = {
-  id: 'public',
-  title: 'Public',
-  subtitle: 'Visible to anyone on TruRex',
-  iconKind: 'globe',
-  accent: '#22c55e',
-  iconBg: 'rgba(34, 197, 94, 0.15)',
-  systemKind: 'public',
-  memberCount: 0,
-};
-
 export function canRenameCreateRecCircle(c: CreateRecCircle): boolean {
-  if (c.id === 'public') return false;
   return c.systemKind == null || c.systemKind === '';
 }
 
