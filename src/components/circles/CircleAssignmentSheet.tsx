@@ -29,7 +29,7 @@ import {
   hexToSoftIconBackground,
   parseCircleAccentHex,
   isUserCreatedCircle,
-  sortCirclesForTabList,
+  sortCirclesForRingStack,
 } from '~/utils/recommendation/recCircles';
 
 type Props = {
@@ -112,7 +112,7 @@ export function CircleAssignmentSheet({
   };
 
   const assignableCircles = useMemo(() => {
-    const sorted = sortCirclesForTabList(circles);
+    const sorted = sortCirclesForRingStack(circles);
     const already = memberCircleIds ?? new Set<string>();
     return sorted.filter(
       (c) => (c.system_kind === 'inner_circle' || isUserCreatedCircle(c)) && !already.has(c.id),

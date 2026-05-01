@@ -1,4 +1,5 @@
-/** Lucide glyph inside the 48px tinted circle (Lovable: emoji or Globe). */
+import { isNonEmptyString } from '~/utils/guards';
+
 export type CreateRecCircleIconKind = 'globe' | 'lock' | 'heart' | 'users';
 
 export type CreateRecCircle = {
@@ -6,18 +7,34 @@ export type CreateRecCircle = {
   title: string;
   subtitle: string;
   iconKind: CreateRecCircleIconKind;
-  /** Icon stroke/fill color */
   accent: string;
-  /** Soft tint behind the icon, e.g. hsla(..., 0.15) */
   iconBg: string;
+  systemKind: string | null;
+  memberCount: number;
 };
 
-/** Matches Lovable Public row: hsl(145 60% 45%) on hsl(... / 0.15) */
 export const PUBLIC_CIRCLE_ROW: CreateRecCircle = {
   id: 'public',
   title: 'Public',
   subtitle: 'Visible to anyone on TruRex',
   iconKind: 'globe',
-  accent: 'hsl(145, 60%, 45%)',
-  iconBg: 'hsla(145, 60%, 45%, 0.15)',
+  accent: '#22c55e',
+  iconBg: 'rgba(34, 197, 94, 0.15)',
+  systemKind: 'public',
+  memberCount: 0,
 };
+
+export function canRenameCreateRecCircle(c: CreateRecCircle): boolean {
+  if (c.id === 'public') return false;
+  return c.systemKind == null || c.systemKind === '';
+}
+
+export function findRenameableCircleById(
+  rows: CreateRecCircle[],
+  id: string | null,
+): CreateRecCircle | undefined {
+  if (id == null || !isNonEmptyString(id)) return undefined;
+  const row = rows.find((c) => c.id === id);
+  if (row == null || !canRenameCreateRecCircle(row)) return undefined;
+  return row;
+}
