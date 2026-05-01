@@ -1,5 +1,7 @@
 import type { CircleApiRow } from '~/api/circlesApi';
 import type { CreateRecCircle } from '~/constants/recommendation/createCircles';
+import { rgbaFromHexColor } from '~/utils/color';
+import { finiteNum } from '~/utils/guards';
 
 const SYSTEM_KIND_COLOR_FALLBACK: Record<string, string> = {
   inner_circle: '#7C3AED',
@@ -31,11 +33,7 @@ export function parseCircleAccentHex(row: CircleApiRow): string | null {
 }
 
 export function hexToSoftIconBackground(accentHex: string, alpha = 0.2): string {
-  const hex = accentHex.replace('#', '');
-  const r = parseInt(hex.slice(0, 2), 16);
-  const g = parseInt(hex.slice(2, 4), 16);
-  const b = parseInt(hex.slice(4, 6), 16);
-  return `rgba(${r},${g},${b},${alpha})`;
+  return rgbaFromHexColor(accentHex, alpha);
 }
 
 function colorsForCircleRow(
@@ -97,6 +95,44 @@ const SYSTEM_KIND_ORDER: Record<string, number> = {
   close_friends: 1,
   broader_network: 2,
 };
+
+function sortCustomByRankThenCreated(a: CircleApiRow, b: CircleApiRow): number {
+  const ar = a.sort_rank ?? 999;
+  const br = b.sort_rank ?? 999;
+  if (ar !== br) return ar - br;
+  return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+}
+
+function pickFirstBySortRank(rows: CircleApiRow[]): CircleApiRow | undefined {
+  if (!rows.length) return undefined;
+  return rows.slice().sort(sortCustomByRankThenCreated)[0];
+}
+
+export function sortCirclesForRingStack(rows: CircleApiRow[]): CircleApiRow[] {
+  if (!rows.length) return [];
+
+  const inner = pickFirstBySortRank(rows.filter((r) => r.system_kind === 'inner_circle'));
+  const trusted = pickFirstBySortRank(
+    rows.filter((r) => r.system_kind === 'trusted' || r.system_kind === 'close_friends'),
+  );
+  const broader = pickFirstBySortRank(rows.filter((r) => r.system_kind === 'broader_network'));
+  const custom = rows.filter(isUserCreatedCircle).sort(sortCustomByRankThenCreated);
+
+  const ordered: CircleApiRow[] = [];
+  if (inner) ordered.push(inner);
+  if (trusted) ordered.push(trusted);
+  ordered.push(...custom);
+  if (broader) ordered.push(broader);
+
+  const seen = new Set(ordered.map((r) => r.id));
+  const orphans = rows.filter((r) => !seen.has(r.id)).sort(sortCustomByRankThenCreated);
+  if (orphans.length) {
+    const insertAt = broader ? ordered.length - 1 : ordered.length;
+    ordered.splice(insertAt, 0, ...orphans);
+  }
+
+  return ordered;
+}
 
 export function isUserCreatedCircle(row: CircleApiRow): boolean {
   const k = row.system_kind;
@@ -166,6 +202,8 @@ export function mapApiCirclesToDisplayRows(rows: CircleApiRow[]): CreateRecCircl
       iconKind: circleTabIconKind(row),
       accent: colors.accent,
       iconBg: colors.iconBg,
+      systemKind: row.system_kind ?? null,
+      memberCount: finiteNum(row.member_count, 0),
     };
   });
 }

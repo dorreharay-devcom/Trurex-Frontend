@@ -1,7 +1,13 @@
 import * as Linking from 'expo-linking';
 import { Platform, Dimensions } from 'react-native';
+import { isNonEmptyString } from './guards';
 
 export { cn, type ClassValue } from './general';
+
+export function unknownErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && isNonEmptyString(error.message)) return error.message;
+  return fallback;
+}
 
 export const isWeb = Platform.OS === 'web';
 
