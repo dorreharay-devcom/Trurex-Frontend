@@ -89,13 +89,6 @@ export type CircleTabRow = {
   iconKind: CircleTabIconKind;
 };
 
-const SYSTEM_KIND_ORDER: Record<string, number> = {
-  inner_circle: 0,
-  trusted: 1,
-  close_friends: 1,
-  broader_network: 2,
-};
-
 function sortCustomByRankThenCreated(a: CircleApiRow, b: CircleApiRow): number {
   const ar = a.sort_rank ?? 999;
   const br = b.sort_rank ?? 999;
@@ -137,39 +130,6 @@ export function sortCirclesForRingStack(rows: CircleApiRow[]): CircleApiRow[] {
 export function isUserCreatedCircle(row: CircleApiRow): boolean {
   const k = row.system_kind;
   return k == null || k === '';
-}
-
-export function sortCirclesForTabList(rows: CircleApiRow[]): CircleApiRow[] {
-  const hasServerOrder = rows.some((r) => typeof r.sort_rank === 'number');
-
-  const sortUserCircles = (a: CircleApiRow, b: CircleApiRow) => {
-    if (hasServerOrder) {
-      const ar = a.sort_rank ?? 999;
-      const br = b.sort_rank ?? 999;
-      if (ar !== br) return ar - br;
-    }
-    return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-  };
-
-  const sortSystemCircles = (a: CircleApiRow, b: CircleApiRow) => {
-    if (hasServerOrder) {
-      const ar = a.sort_rank ?? 999;
-      const br = b.sort_rank ?? 999;
-      if (ar !== br) return ar - br;
-      const am = a.member_count ?? 0;
-      const bm = b.member_count ?? 0;
-      if (am !== bm) return am - bm;
-    }
-    const ao = SYSTEM_KIND_ORDER[a.system_kind ?? ''] ?? 50;
-    const bo = SYSTEM_KIND_ORDER[b.system_kind ?? ''] ?? 50;
-    if (ao !== bo) return ao - bo;
-    return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-  };
-
-  const systemRows = rows.filter((r) => !isUserCreatedCircle(r)).sort(sortSystemCircles);
-  const userRows = rows.filter((r) => isUserCreatedCircle(r)).sort(sortUserCircles);
-
-  return [...systemRows, ...userRows];
 }
 
 export function mapApiCirclesToTabRows(rows: CircleApiRow[]): CircleTabRow[] {

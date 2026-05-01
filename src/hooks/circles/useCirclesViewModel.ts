@@ -19,7 +19,7 @@ import { useAuth } from '~/services/AuthContext';
 import {
   mapApiCirclesToTabRows,
   parseCircleAccentHex,
-  sortCirclesForTabList,
+  sortCirclesForRingStack,
 } from '~/utils/recommendation/recCircles';
 import {
   CIRCLE_COLOR_PRESETS,
@@ -48,7 +48,7 @@ export function useCirclesViewModel(isActive: boolean) {
   const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
 
   const { data: circles = [], isLoading, isError } = useMyCircles(!!user && isActive);
-  const sortedCircles = useMemo(() => sortCirclesForTabList(circles), [circles]);
+  const sortedCircles = useMemo(() => sortCirclesForRingStack(circles), [circles]);
   const tabRows = useMemo(() => mapApiCirclesToTabRows(sortedCircles), [sortedCircles]);
 
   const selectedCircle = useMemo(
@@ -73,10 +73,7 @@ export function useCirclesViewModel(isActive: boolean) {
   const detailOpen = !!user && isActive && !!selectedCircleId;
   const connectionsEnabled = !!user && isActive;
 
-  const {
-    data: trustedRows = [],
-    isLoading: trustedLoading,
-  } = useQuery({
+  const { data: trustedRows = [], isLoading: trustedLoading } = useQuery({
     queryKey: ['trusted_users', user?.id],
     queryFn: () => fetchTrustedUsers(user!.id),
     enabled: connectionsEnabled && !!user?.id,
@@ -88,10 +85,7 @@ export function useCirclesViewModel(isActive: boolean) {
     enabled: detailOpen && !!selectedCircleId,
   });
 
-  const {
-    data: followerRows = [],
-    isLoading: followersLoading,
-  } = useQuery({
+  const { data: followerRows = [], isLoading: followersLoading } = useQuery({
     queryKey: ['user_followers', user?.id],
     queryFn: () => fetchUserFollowers(user!.id),
     enabled: connectionsEnabled && !!user?.id,
@@ -127,7 +121,7 @@ export function useCirclesViewModel(isActive: boolean) {
   }, [circleMemberAssignments]);
 
   const circleForMemberUserId = useMemo(() => {
-    const sorted = sortCirclesForTabList(circles);
+    const sorted = sortCirclesForRingStack(circles);
     const idOrder = new Map(sorted.map((c, i) => [c.id, i]));
     const m = new Map<string, (typeof circles)[number]>();
     for (const a of circleMemberAssignments) {
