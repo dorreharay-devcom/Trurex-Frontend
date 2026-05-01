@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { MapPin, Star } from 'lucide-react-native';
-import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
+import { useCategoryIcon } from '~/hooks/useCategoryIcon';
 import type {
   ConfirmAuthorPreview,
   ConfirmPreviewPlace,
@@ -12,6 +12,7 @@ import { cn } from '~/utils/general';
 const TAGS_PREVIEW_MAX = 5;
 
 type Props = {
+  author: ConfirmAuthorPreview;
   place: ConfirmPreviewPlace;
   selectedCategoryId: string | null;
   categoryDisplayName: string | null;
@@ -37,7 +38,7 @@ export function ConfirmPreviewCard({
   review,
   circleTitles,
 }: Props) {
-  const categoryEmoji = selectedCategoryId ? getCategoryEmoji(selectedCategoryId) : '📍';
+  const categoryEmoji = useCategoryIcon(selectedCategoryId);
   const categoryLabel = categoryDisplayName?.trim() || 'Category';
   const sharingLine = circleTitles.length > 0 ? circleTitles.join(', ') : 'No one yet';
 

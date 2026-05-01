@@ -21,10 +21,10 @@ export function ScorecardReview({
   return (
     <View>
       <View className="mb-2 flex-row items-center justify-between">
-        <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <Text className="text-xs font-medium uppercase tracking-wider text-black">
           {title}
         </Text>
-        <Text className="text-[10px] text-muted-foreground opacity-60">
+        <Text className="text-[10px] text-black opacity-70">
           {reviewLen}/{CREATE_REC_REVIEW_MAX}
         </Text>
       </View>

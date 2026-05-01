@@ -30,11 +30,11 @@ export function ScorecardValueForMoney({ value, onChange, useRipOffLabels }: Pro
   return (
     <View className="space-y-3">
       <View className="flex-row items-center justify-between gap-2">
-        <Text className="text-xs font-medium uppercase tracking-wider text-foreground">
+        <Text className="text-xs font-medium uppercase tracking-wider text-black">
           Value for money
         </Text>
         {value === null ? (
-          <Text className="max-w-[55%] shrink text-right text-[10px] italic text-primary/70">
+          <Text className="max-w-[55%] shrink text-right text-[10px] italic text-black opacity-80">
             Help others plan — how was the value?
           </Text>
         ) : null}
@@ -58,8 +58,8 @@ export function ScorecardValueForMoney({ value, onChange, useRipOffLabels }: Pro
             >
               <Text
                 className={cn(
-                  'text-sm font-medium',
-                  selected ? 'text-primary-foreground' : 'text-muted-foreground',
+                  'text-sm',
+                  selected ? 'text-primary-foreground' : 'text-black',
                 )}
               >
                 {dollars} {label}

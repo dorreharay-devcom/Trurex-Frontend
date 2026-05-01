@@ -21,6 +21,8 @@ export type CreateRecSearchPlace = {
   subtitle: string;
   categoryLabel: string;
   categoryId: string | null;
+  categoryCode?: string | null;
+  categoryIcon?: string | null;
   provider?: string | null;
   providerPlaceId?: string | null;
   placeResourceName?: string;

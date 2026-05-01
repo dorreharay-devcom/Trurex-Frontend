@@ -209,6 +209,7 @@ export function buildSelectedSearchPlaceFromAddYourOwn(
     subtitle: s.locationLine ?? '',
     categoryLabel: s.placeCategoryLabel,
     categoryId: s.categoryCode,
+    categoryCode: s.categoryCode,
     fullText: s.locationLine ? `${s.placeName} — ${s.locationLine}` : s.placeName,
     latitude: s.latitude,
     longitude: s.longitude,

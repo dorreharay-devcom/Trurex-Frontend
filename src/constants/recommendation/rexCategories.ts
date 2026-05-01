@@ -1,5 +1,5 @@
 import type { DbCategoryRow } from '~/types/recommendation/rexCategoryCreateConfig';
-import { getCategoryEmoji } from '~/constants/recommendation/categoryEmojis';
+import { CATEGORY_ICON_FALLBACK } from '~/utils/recommendation/categoryIconResolve';
 
 export const REAL_ESTATE_CATEGORY_CODE = 'real_estate';
 
@@ -17,14 +17,10 @@ export function getRexCategoryApiCode(categoryCode: string | null): string | nul
 }
 
 export function categoryRowToPickerTile(row: DbCategoryRow): CategoryPickerTile {
+  const icon = row.icon?.trim();
   return {
     id: row.code,
     label: row.display_name,
-    emoji: getCategoryEmoji(row.code),
+    emoji: icon && icon.length > 0 ? icon : CATEGORY_ICON_FALLBACK,
   };
 }
-
-export {
-  getCategoryEmoji,
-  CATEGORY_EMOJI_BY_CODE,
-} from '~/constants/recommendation/categoryEmojis';

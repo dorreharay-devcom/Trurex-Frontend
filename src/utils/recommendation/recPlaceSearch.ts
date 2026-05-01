@@ -6,13 +6,16 @@ export function mapSearchItemToCreateRecPlace(
 ): CreateRecSearchPlace | null {
   if (r.source === 'database') {
     if (!r.id) return null;
+    const name = r.categoryName?.trim();
     return {
       id: r.id,
       source: 'database',
       title: r.mainText,
       subtitle: r.secondaryText ?? r.fullText ?? '',
-      categoryLabel: 'Saved',
-      categoryId: null,
+      categoryLabel: name && name.length > 0 ? name : 'Saved',
+      categoryId: r.categoryId ?? null,
+      categoryCode: r.categoryCode ?? null,
+      categoryIcon: r.categoryIcon?.trim() || null,
       provider: r.provider,
       providerPlaceId: r.providerPlaceId,
       placeResourceName: r.placeResourceName,
@@ -30,6 +33,8 @@ export function mapSearchItemToCreateRecPlace(
     subtitle: r.secondaryText ?? '',
     categoryLabel: 'Google',
     categoryId: null,
+    categoryCode: null,
+    categoryIcon: null,
     provider: r.provider,
     providerPlaceId: r.providerPlaceId,
     placeResourceName: r.placeResourceName,

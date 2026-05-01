@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, Pressable, useWindowDimensions, ActivityIndicator } from 'react-native';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, ChevronRight } from 'lucide-react-native';
+import { ArrowLeft, ChevronRight, X } from 'lucide-react-native';
 import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';
 import { getRexCategoryApiCode } from '~/constants/recommendation/rexCategories';
 import { OverlayModal } from '~/components/common/OverlayModal';
@@ -193,8 +193,6 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
     );
   }, [activeCreateConfig, flow.selectedSubcategoryCode]);
 
-  const categoryStarTitle = activeCreateConfig?.display_name ?? 'Category';
-
   const showQuickTip = mergedTagOptions.length > 0;
   const useExperienceReviewCopy = categoryDefinesSubcategories;
 
@@ -369,7 +367,19 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
             <Text className="min-w-0 flex-1 text-center text-lg font-display font-semibold text-foreground">
               New Rex
             </Text>
-            <View className="w-[72px]" />
+            <View className="w-[72px] items-end justify-center">
+              {!flow.isFirstStep ? (
+                <Pressable
+                  onPress={abandonDraftAndClose}
+                  hitSlop={12}
+                  accessibilityRole="button"
+                  accessibilityLabel="Cancel and discard draft"
+                  className="rounded-lg p-0.5 active:opacity-80"
+                >
+                  <X size={22} color={Theme.colors.secondaryText} strokeWidth={2.25} />
+                </Pressable>
+              ) : null}
+            </View>
           </View>
 
           <CreateWizardStepper steps={flow.activeSteps} currentIndex={flow.stepIndex} />
@@ -394,7 +404,6 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
           subDimsOnly={subDimsOnly}
           categoryQsOnly={categoryQsOnly}
           subQsOnly={subQsOnly}
-          categoryStarTitle={categoryStarTitle}
           subcategoryStarTitle={subcategoryLabelForConfirm}
           showQuickTip={showQuickTip}
           useExperienceReviewCopy={useExperienceReviewCopy}

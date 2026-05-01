@@ -1,5 +1,13 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ScrollView, useWindowDimensions } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  ScrollView,
+  useWindowDimensions,
+  ActivityIndicator,
+} from 'react-native';
 import { TrendingUp, Star, PlusCircle, ChevronDown, ChevronUp } from 'lucide-react-native';
 import {
   DiscoverCategoryPinButton,
@@ -17,7 +25,7 @@ import {
 import { useActiveCategories } from '~/hooks/useActiveCategories';
 import { usePinnedCategoryIds } from '~/hooks/usePinnedCategoryIds';
 import { categoryPillColor } from '~/utils/recommendation/recCategoryNav';
-import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
+import { CATEGORY_ICON_FALLBACK } from '~/utils/recommendation/categoryIconResolve';
 import { Theme } from '~/theme/Theme';
 import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
 import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
@@ -27,16 +35,6 @@ import { useTrendingTags } from '~/hooks/useTags';
 
 const searchFilterPill = 'flex-row items-center gap-1.5 px-3 py-1.5 rounded-full border';
 
-const FALLBACK_CATEGORY_CODES = [
-  { code: 'restaurants', label: 'Restaurants' },
-  { code: 'cafes_coffee_shops', label: 'Cafes' },
-  { code: 'hotels_accommodation', label: 'Hotels' },
-  { code: 'experiences_tour_guides', label: 'Experiences' },
-  { code: 'growth_learning', label: 'Learning' },
-  { code: 'bars_nightlife', label: 'Bars' },
-  { code: 'real_estate', label: 'Real estate' },
-];
-
 type Category = {
   id: string;
   code: string;
@@ -45,16 +43,6 @@ type Category = {
   color: string;
   serverId?: string;
 };
-
-function buildFallbackCategories(): Category[] {
-  return FALLBACK_CATEGORY_CODES.map(({ code, label }) => ({
-    id: code,
-    code,
-    label,
-    emoji: getCategoryEmoji(code),
-    color: categoryPillColor(code),
-  }));
-}
 
 type DiscoverViewProps = {
   searchQuery?: string;
@@ -102,19 +90,17 @@ const DiscoverView = ({
   const colCount = isWeb ? (screenWidth >= 1024 ? 5 : screenWidth >= 640 ? 4 : 3) : 3;
   const itemPct = `${(100 / colCount).toFixed(4)}%` as `${number}%`;
 
-  const { data: activeCategoryRows } = useActiveCategories(true);
+  const { data: activeCategoryRows, isPending: categoriesPending } = useActiveCategories(true);
   const allCats = useMemo((): Category[] => {
-    if (activeCategoryRows?.length) {
-      return activeCategoryRows.map((row) => ({
-        id: row.id,
-        code: row.code,
-        serverId: row.id,
-        label: row.display_name,
-        emoji: row.icon || '',
-        color: categoryPillColor(row.code),
-      }));
-    }
-    return buildFallbackCategories();
+    if (!activeCategoryRows?.length) return [];
+    return activeCategoryRows.map((row) => ({
+      id: row.id,
+      code: row.code,
+      serverId: row.id,
+      label: row.display_name,
+      emoji: row.icon?.trim() || CATEGORY_ICON_FALLBACK,
+      color: categoryPillColor(row.code),
+    }));
   }, [activeCategoryRows]);
 
   const {
@@ -339,13 +325,13 @@ const DiscoverView = ({
         </View>
       )}
 
-      {!hasSearch && allCats.length > 0 && (
+      {!hasSearch && (categoriesPending || allCats.length > 0) && (
         <View className="mb-8 w-full">
           <View className="flex-row items-center justify-between mb-3">
             <Text className="text-sm font-display font-semibold text-foreground">
               {pinnedCats.length > 0 ? 'All Categories' : 'Browse by Category'}
             </Text>
-            {pinnedCats.length > 0 && (
+            {!categoriesPending && pinnedCats.length > 0 && (
               <TouchableOpacity
                 onPress={() => setShowAllCategories((v) => !v)}
                 activeOpacity={0.7}
@@ -363,7 +349,11 @@ const DiscoverView = ({
             )}
           </View>
 
-          {pinnedCats.length === 0 || showAllCategories ? (
+          {categoriesPending && allCats.length === 0 ? (
+            <View className="min-h-[120px] w-full items-center justify-center py-8">
+              <ActivityIndicator color={Theme.colors.primary} />
+            </View>
+          ) : pinnedCats.length === 0 || showAllCategories ? (
             <View className="w-full flex-row flex-wrap">
               {allCats.map((cat) => {
                 const isActive = activeCategory === cat.code;
@@ -426,7 +416,7 @@ const DiscoverView = ({
             </ScrollView>
           )}
 
-          {pinnedCats.length === 0 && (
+          {pinnedCats.length === 0 && !categoriesPending && (
             <View className="mt-3 flex-row items-center justify-center gap-1.5">
               <DiscoverCategoryPinHintIcon />
               <Text className="shrink text-xs text-muted-foreground text-center">

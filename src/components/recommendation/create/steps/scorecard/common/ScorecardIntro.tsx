@@ -17,8 +17,8 @@ export function ScorecardIntro({ categoryEmoji, filledCount, totalSlots }: Props
       </Text>
 
       <View className="mt-2 items-center justify-center">
-        <View className="rounded-full bg-muted px-3 py-1.5">
-          <Text className="text-xs font-medium text-foreground">
+        <View className="rounded-full border border-border bg-muted/50 px-3 py-2">
+          <Text className="text-xs font-medium text-black">
             {filledCount} of {totalSlots} ratings filled
           </Text>
         </View>
