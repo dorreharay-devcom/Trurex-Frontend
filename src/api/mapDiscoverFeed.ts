@@ -14,7 +14,7 @@ import { averageScoreFromCategoryRatings } from '~/utils/recommendation/recConte
 dayjs.extend(relativeTime);
 
 function parseTags(o: Record<string, unknown>): string[] | null {
-  const raw = o.tag_slugs ?? o.tags;
+  const raw = o.tag_names ?? o.tag_slugs ?? o.tags;
   if (Array.isArray(raw)) return raw.map(String).filter(Boolean);
   return null;
 }
@@ -59,11 +59,8 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
   const image = imageField && /^https?:\/\//i.test(imageField) ? imageField : null;
 
   const authorId = firstNonEmptyString(o, 'user_id', 'author_id', 'author_user_id') ?? undefined;
-  const authorName =
-    firstNonEmptyString(o, 'author_display_name', 'author_name', 'user_name') ?? 'Member';
-  const authorHandle = normalizeHandle(
-    firstNonEmptyString(o, 'author_username', 'author_handle', 'handle') ?? '',
-  );
+  const authorName = firstNonEmptyString(o, 'author_display_name', 'author_name', 'user_name') ?? 'Member';
+  const authorHandle = normalizeHandle(firstNonEmptyString(o, 'author_handle', 'author_username', 'handle') ?? '');
   const avatarRaw = firstNonEmptyString(
     o,
     'author_profile_picture_url',
@@ -71,6 +68,7 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
     'author_avatar',
     'avatar_url',
     'avatar',
+    'profile_picture_url',
   );
 
   const created = o.created_at ?? o.createdAt;
@@ -116,7 +114,7 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
       'scoreValueForMoney',
     ),
     tags: parseTags(o),
-    savedAt: optStr(o, 'saved_at') ?? null,
+    savedAt: firstNonEmptyString(o, 'saved_at') ?? null,
     user: {
       name: authorName,
       handle: authorHandle,

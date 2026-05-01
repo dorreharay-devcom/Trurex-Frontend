@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { useEffect, useState } from 'react';
 import { Backend } from '~/services/AuthService';
 import { isNonEmptyString, isPlainObject } from '~/utils/guards';
@@ -12,7 +13,7 @@ const SIGNED_READ_BUFFER_MS = 60_000;
 
 // On web: restore valid entries from localStorage so reloads skip API calls
 function loadPersistedCache() {
-  if (typeof window === 'undefined') return;
+  if (Platform.OS !== 'web') return;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
@@ -27,7 +28,7 @@ function loadPersistedCache() {
 }
 
 function persistCache() {
-  if (typeof window === 'undefined') return;
+  if (Platform.OS !== 'web') return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(urlCache.entries())));
   } catch {}
@@ -68,15 +69,27 @@ async function resolveUrl(
   expiresInSec: number,
 ): Promise<{ url: string; cacheUntil: number } | null> {
   try {
+    // 1. Try to create a signed URL first
     const { data, error } = await Backend.storage.from(bucket).createSignedUrl(path, expiresInSec);
-    if (error) {
-      return null;
+
+    if (!error && data) {
+      const u = parseSignedUrlData(data);
+      if (u) {
+        return { url: u, cacheUntil: Date.now() + expiresInSec * 1000 };
+      }
     }
-    const u = parseSignedUrlData(data);
-    if (!u) {
-      return null;
+
+    // 2. Fallback to Public URL if signed URL failed
+    // (This handles public buckets when the user is not logged in)
+    const { data: publicData } = Backend.storage.from(bucket).getPublicUrl(path);
+    if (publicData?.publicUrl) {
+      return {
+        url: publicData.publicUrl,
+        cacheUntil: Date.now() + 24 * 60 * 60 * 1000, // Cache public URLs for a day
+      };
     }
-    return { url: u, cacheUntil: Date.now() + expiresInSec * 1000 };
+
+    return null;
   } catch {
     return null;
   }
@@ -102,7 +115,11 @@ export function useSignedStorageUrl(
   objectPath: string,
   expiresInSec = 3600,
 ): { uri: string | null; loading: boolean } {
-  const trimmed = (objectPath ?? '').trim().replace(/^\/+/, '');
+  const rawPath = (objectPath ?? '').trim().replace(/^\/+/, '');
+  // If the path already starts with the bucket name, strip it to avoid double-prefixing
+  const bucketPrefix = `${bucket}/`;
+  const trimmed = rawPath.startsWith(bucketPrefix) ? rawPath.slice(bucketPrefix.length) : rawPath;
+
   const cacheKey = trimmed ? `${bucket}:${trimmed}` : '';
 
   const [uri, setUri] = useState<string | null>(() => (cacheKey ? getCached(cacheKey) : null));

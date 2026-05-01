@@ -27,12 +27,14 @@ export function SignedUserAvatar({ name, avatar, className }: Props) {
   }
 
   return (
-    <SignedStorageImage
-      bucket={USER_AVATARS_BUCKET}
-      storagePath={path}
-      remoteUri={http}
-      className={cn('h-9 w-9', base, className)}
-      accessibilityLabel={name}
-    />
+    <View className={cn('h-9 w-9 overflow-hidden', base, className)}>
+      <SignedStorageImage
+        bucket={USER_AVATARS_BUCKET}
+        storagePath={path}
+        remoteUri={http}
+        style={{ width: '100%', height: '100%' }}
+        accessibilityLabel={name}
+      />
+    </View>
   );
 }

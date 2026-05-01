@@ -39,7 +39,7 @@ export function SearchPlaceRow({ place, categoryRows, selected, onSelect }: Prop
     <Pressable
       onPress={() => onSelect(place)}
       className={cn(
-        'mb-2 w-full flex-row items-start gap-3 rounded-xl border border-border bg-card p-4 text-left transition-all duration-150',
+        'mb-2 w-full flex-row items-start gap-3 rounded-xl border border-border bg-card p-4 text-left',
         selected ? 'border-primary bg-primary/5' : 'active:border-primary/40 active:bg-primary/5',
       )}
       accessibilityRole="button"

@@ -28,7 +28,7 @@ export function CategoryTile({
       onPress={onSelect}
       android_ripple={{ color: `${Theme.colors.primary}26` }}
       className={cn(
-        'min-w-0 flex-1 flex-col items-center justify-center rounded-xl border-2 bg-card p-3 transition-transform duration-150 active:scale-[0.95] active:opacity-90',
+        'min-w-0 flex-1 flex-col items-center justify-center rounded-xl border-2 bg-card p-3 active:scale-[0.95] active:opacity-90',
         selected ? 'border-primary bg-primary/10 shadow-sm' : 'border-border bg-card',
       )}
       style={{

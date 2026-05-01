@@ -20,7 +20,7 @@ export function SearchQueryField({ value, onChangeText }: Props) {
         onChangeText={onChangeText}
         placeholder="Search by name..."
         placeholderTextColor={Theme.colors.secondaryText}
-        className="w-full rounded-xl border border-border bg-muted/50 py-3.5 pl-11 pr-4 text-base text-foreground transition focus:outline-none focus:border-primary"
+        className="w-full rounded-xl border border-border bg-muted/50 py-3.5 pl-11 pr-4 text-base text-foreground focus:outline-none focus:border-primary"
         autoCorrect={false}
         autoCapitalize="none"
         returnKeyType="search"

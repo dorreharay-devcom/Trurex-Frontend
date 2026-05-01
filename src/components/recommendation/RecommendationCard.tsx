@@ -123,13 +123,16 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
         )}
       </View>
 
-      <View className="mx-4 rounded-lg overflow-hidden bg-gray-100 aspect-[4/3]">
+      <View
+        className="mx-4 rounded-lg overflow-hidden bg-muted"
+        style={{ aspectRatio: 4 / 3 }}
+      >
         <SignedStorageImage
           bucket={REX_IMAGES_BUCKET}
           storagePath={coverPath}
           remoteUri={coverHttp}
-          className="w-full h-full"
-          contentFit="contain"
+          style={{ width: '100%', height: '100%' }}
+          contentFit="cover"
           accessibilityLabel={rec.title}
         />
         {showGalleryHint ? (

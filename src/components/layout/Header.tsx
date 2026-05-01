@@ -9,8 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Search, PlusCircle, LogOut, UserCircle2 } from 'lucide-react-native';
-import { Auth } from '~/services/AuthService';
+import { Search, PlusCircle, UserCircle2 } from 'lucide-react-native';
 import { useAuth } from '~/services/AuthContext';
 import { ProfileApi } from '~/api/ProfileApi';
 import { Theme, textFieldCaretStyle } from '~/theme/Theme';
@@ -108,14 +107,6 @@ export const Header: React.FC<HeaderProps> = ({
 
           <NotificationBell onUserPress={onUserPress} />
 
-          <TouchableOpacity
-            onPress={() => Auth.signOut()}
-            className="rounded-lg p-2 active:opacity-80"
-            accessibilityRole="button"
-            accessibilityLabel="Sign out"
-          >
-            <LogOut size={20} color={Theme.colors.secondaryText} strokeWidth={2} />
-          </TouchableOpacity>
 
           <TouchableOpacity
             onPress={onProfilePress}

@@ -55,7 +55,7 @@ export const TabBar: React.FC<TabBarProps> = ({ currentTab, onTabChange }) => {
 
   return (
     <View className="bg-card border-b border-border">
-      <View className="flex-row" style={{ paddingTop: insets.top }}>
+      <View className="flex-row">
         {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
           const active = currentTab === id;
           return (

@@ -33,45 +33,26 @@ export function SignedStorageImage({
 
   const { uri, loading } = useSignedStorageUrl(bucket, http ? '' : path);
   const displayUri = http ?? uri;
-  const [imageReady, setImageReady] = useState(false);
-
-  useEffect(() => {
-    setImageReady(false);
-  }, [displayUri]);
 
   if (!displayUri) {
-    if (loading && path) {
-      return (
-        <View className={cn('relative overflow-hidden', className)} style={style}>
-          <Skeleton className="absolute inset-0 h-full w-full bg-muted/60" />
-        </View>
-      );
-    }
-    return <View className={cn('bg-muted', className)} style={style} />;
+    return (
+      <View className={cn('bg-muted', className)} style={style}>
+        {loading && <Skeleton className="h-full w-full bg-muted/60" />}
+      </View>
+    );
   }
 
   return (
-    <View className={cn('relative overflow-hidden', className)} style={style}>
-      {!imageReady ? (
-        <View
-          className="pointer-events-none absolute inset-0 z-[1]"
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
-        >
-          <Skeleton className="h-full w-full bg-muted/50" />
-        </View>
-      ) : null}
+    <View className={cn('relative overflow-hidden bg-muted', className)} style={style}>
       <Image
         source={{ uri: displayUri }}
         className="h-full w-full"
+        style={{ width: '100%', height: '100%' }}
         contentFit={contentFit}
         transition={200}
         cachePolicy="memory-disk"
         accessibilityLabel={accessibilityLabel}
-        onLoad={(e) => {
-          setImageReady(true);
-          onLoad?.(e);
-        }}
+        onLoad={onLoad}
       />
     </View>
   );

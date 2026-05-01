@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Image, Alert, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Link } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { AuthApi } from '~/api/AuthApi';
 import { Routes } from '~/constants/routes';
@@ -67,7 +67,7 @@ export default function LoginScreen() {
         <Text className="text-muted-foreground text-sm">Sign in to your account</Text>
       </View>
 
-      <View className="space-y-3">
+      <View className="gap-4">
         <Button
           variant={ButtonVariant.Outline}
           title="Continue with Google"
@@ -90,7 +90,7 @@ export default function LoginScreen() {
         <View className="flex-1 h-px bg-border" />
       </View>
 
-      <View className="space-y-4">
+      <View className="gap-6">
         <Input
           label="Email"
           value={email}
@@ -106,12 +106,14 @@ export default function LoginScreen() {
         <Input
           label="Password"
           labelRight={
-            <Button
-              variant={ButtonVariant.Link}
-              onPress={() => router.push(Routes.ForgotPassword)}
-              title="Forgot password?"
-              textClassName="text-xs text-accent font-medium hover:underline"
-            />
+            <Link href={Routes.ForgotPassword} asChild>
+              <Button
+                variant={ButtonVariant.Link}
+                onPress={() => {}}
+                title="Forgot password?"
+                textClassName="text-xs text-accent font-medium hover:underline"
+              />
+            </Link>
           }
           value={password}
           onChangeText={(v) => {
@@ -137,9 +139,11 @@ export default function LoginScreen() {
 
       <View className="flex-row items-center justify-center">
         <Text className="text-sm text-muted-foreground mr-1">Don't have an account?</Text>
-        <TouchableOpacity onPress={() => router.push(Routes.Signup)}>
-          <Text className="text-sm text-foreground font-medium hover:underline">Sign up</Text>
-        </TouchableOpacity>
+        <Link href={Routes.Signup} asChild>
+          <TouchableOpacity>
+            <Text className="text-sm text-foreground font-medium hover:underline">Sign up</Text>
+          </TouchableOpacity>
+        </Link>
       </View>
     </AuthLayout>
   );

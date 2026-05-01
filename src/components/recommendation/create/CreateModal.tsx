@@ -423,7 +423,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
               disabled={primaryDisabled}
               accessibilityRole="button"
               accessibilityLabel={flow.isLastStep ? 'Confirm and post' : 'Continue'}
-              className="inline-flex w-full h-12 flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-4 py-2 ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:bg-primary/90"
+              className="inline-flex w-full h-12 flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-4 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:bg-primary/90"
             >
               {submitting ? (
                 <ActivityIndicator color={Theme.colors.primaryForeground} />

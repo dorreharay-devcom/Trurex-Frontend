@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
+import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { Theme } from '~/theme/Theme';
 import type { UserCollection } from '~/api/CollectionsApi';
@@ -37,38 +36,28 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
   onPress,
 }) => {
   const height = Math.round(width * (CARD_HEIGHT / CARD_WIDTH));
-  const { uri: coverUri, loading } = useSignedStorageUrl(
-    REX_IMAGES_BUCKET,
-    collection.cover_image_path ?? '',
-  );
-
   const [gradStart, gradEnd] = gradientForId(collection.id);
 
   return (
     <TouchableOpacity
       activeOpacity={0.85}
       onPress={onPress}
-      className="rounded-xl overflow-hidden flex-shrink-0"
+      className="rounded-xl overflow-hidden flex-shrink-0 bg-muted"
       style={{ width, height }}
     >
-      {coverUri ? (
-        <Image
-          source={{ uri: coverUri }}
-          className="w-full h-full"
-          contentFit="cover"
-          cachePolicy="memory-disk"
-          transition={200}
-        />
-      ) : loading && collection.cover_image_path ? (
-        <View className="w-full h-full bg-muted items-center justify-center">
-          <ActivityIndicator size="small" color={Theme.colors.primary} />
-        </View>
-      ) : (
+      <SignedStorageImage
+        bucket={REX_IMAGES_BUCKET}
+        storagePath={collection.cover_image_path}
+        className="w-full h-full"
+        contentFit="cover"
+      />
+
+      {!collection.cover_image_path && (
         <LinearGradient
           colors={[gradStart, gradEnd]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={{ width: '100%', height: '100%' }}
+          style={{ width: '100%', height: '100%', position: 'absolute' }}
         />
       )}
 

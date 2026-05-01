@@ -80,7 +80,7 @@ export default function SignupScreen() {
         <Text className="text-sm text-muted-foreground">Create your TruRex account</Text>
       </View>
 
-      <View className="space-y-3">
+      <View className="gap-4">
         <TouchableOpacity
           onPress={() => handleOAuth('google')}
           className="w-full flex-row items-center justify-center gap-2 py-2.5 rounded-lg bg-card border border-border"
@@ -104,7 +104,7 @@ export default function SignupScreen() {
         <View className="flex-1 h-px bg-border" />
       </View>
 
-      <View className="space-y-4">
+      <View className="gap-6">
         <Input
           label="Full name"
           value={fullName}

@@ -27,7 +27,6 @@ import { usePinnedCategoryIds } from '~/hooks/usePinnedCategoryIds';
 import { categoryPillColor } from '~/utils/recommendation/recCategoryNav';
 import { CATEGORY_ICON_FALLBACK } from '~/utils/recommendation/categoryIconResolve';
 import { Theme } from '~/theme/Theme';
-import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
 import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
 import { useAuth } from '~/services/AuthContext';
 import { toastError } from '~/utils/appToast';
@@ -139,7 +138,7 @@ const DiscoverView = ({
 
   const filtered = useMemo(() => {
     if (hasSearch) return searchRows;
-    return discoverData?.length ? discoverData : MOCK_RECS;
+    return discoverData ?? [];
   }, [hasSearch, searchRows, discoverData]);
 
   const isLoading = hasSearch ? searchLoading : discoverLoading;
