@@ -17,13 +17,18 @@ import type {
   CategoryRatingDimension,
   CategoryQuestion,
 } from '~/types/recommendation/rexCategoryCreateConfig';
+import { isStrictUuid } from '~/utils/guards';
 
 function suggestedCategoryFromSearch(
   searchMode: SearchEntryMode,
   selectedSearchPlace: CreateRecSearchPlace | null,
 ): string | null {
-  if (searchMode !== 'select' || !selectedSearchPlace?.categoryId) return null;
-  return selectedSearchPlace.categoryId;
+  if (searchMode !== 'select' || !selectedSearchPlace) return null;
+  const code = selectedSearchPlace.categoryCode?.trim();
+  if (code) return code;
+  const cid = selectedSearchPlace.categoryId?.trim();
+  if (!cid || isStrictUuid(cid)) return null;
+  return cid;
 }
 
 type CanProceedDeps = {

@@ -17,7 +17,7 @@ import {
 import { useActiveCategories } from '~/hooks/useActiveCategories';
 import { usePinnedCategoryIds } from '~/hooks/usePinnedCategoryIds';
 import { categoryPillColor } from '~/utils/recommendation/recCategoryNav';
-import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
+import { CATEGORY_ICON_FALLBACK } from '~/utils/recommendation/categoryIconResolve';
 import { Theme } from '~/theme/Theme';
 import { MOCK_RECS } from '~/constants/recommendation/mockRecommendations';
 import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
@@ -52,7 +52,7 @@ function buildFallbackCategories(): Category[] {
     id: code,
     code,
     label,
-    emoji: getCategoryEmoji(code),
+    emoji: CATEGORY_ICON_FALLBACK,
     color: categoryPillColor(code),
   }));
 }
@@ -109,7 +109,7 @@ const DiscoverView = ({
         code: row.code,
         serverId: row.id,
         label: row.display_name,
-        emoji: row.icon || '',
+        emoji: row.icon?.trim() || CATEGORY_ICON_FALLBACK,
         color: categoryPillColor(row.code),
       }));
     }

@@ -30,7 +30,6 @@ type Props = {
   subDimsOnly: CategoryRatingDimension[];
   categoryQsOnly: CategoryQuestion[];
   subQsOnly: CategoryQuestion[];
-  categoryStarTitle: string;
   subcategoryStarTitle: string | null;
   showQuickTip: boolean;
   useExperienceReviewCopy: boolean;
@@ -50,7 +49,6 @@ export const CreateModalBody: React.FC<Props> = ({
   subDimsOnly,
   categoryQsOnly,
   subQsOnly,
-  categoryStarTitle,
   subcategoryStarTitle,
   showQuickTip,
   useExperienceReviewCopy,
@@ -127,7 +125,6 @@ export const CreateModalBody: React.FC<Props> = ({
             selectedCategoryId={flow.selectedCategoryId}
             showQuickTip={showQuickTip}
             useExperienceReviewCopy={useExperienceReviewCopy}
-            categoryStarTitle={categoryStarTitle}
             subcategoryStarTitle={subcategoryStarTitle}
             categoryRatingDimensions={categoryDimsOnly}
             subcategoryRatingDimensions={subDimsOnly}

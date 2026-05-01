@@ -17,6 +17,11 @@ export type GooglePlacesSearchResultItem = {
   fullText?: string;
   latitude?: number | null;
   longitude?: number | null;
+  categoryId?: string | null;
+  categoryCode?: string | null;
+  categoryName?: string | null;
+  categoryIcon?: string | null;
+  categoryColor?: string | null;
 };
 
 export type GooglePlacesSearchResponse = {

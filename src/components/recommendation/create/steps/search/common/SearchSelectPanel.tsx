@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react-native';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { CreateStepTitle } from '../../../CreateStepTitle';
 import { Theme } from '~/theme/Theme';
+import { useActiveCategories } from '~/hooks/useActiveCategories';
 import type { CreateRecSearchPlace } from '~/types/recommendation/create';
 import { cn } from '~/utils/general';
 import { SearchPlaceRow } from './SearchPlaceRow';
@@ -36,6 +37,8 @@ export function SearchSelectPanel({
   searchErrorMessage,
   onOpenManual,
 }: Props) {
+  const { data: categoryRows } = useActiveCategories(true);
+
   return (
     <ScrollView
       className="flex-1"
@@ -74,6 +77,7 @@ export function SearchSelectPanel({
             <SearchPlaceRow
               key={place.id}
               place={place}
+              categoryRows={categoryRows}
               selected={selectedSearchPlace?.id === place.id}
               onSelect={onSelectPlace}
             />

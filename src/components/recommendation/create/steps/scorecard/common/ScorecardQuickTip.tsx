@@ -12,10 +12,10 @@ export function ScorecardQuickTip({ value, onChangeText }: Props) {
   return (
     <View>
       <View className="mb-2 flex-row flex-wrap items-center gap-2">
-        <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <Text className="text-xs font-medium uppercase tracking-wider text-black">
           Quick tip
         </Text>
-        <Text className="text-[10px] italic text-muted-foreground opacity-60">optional</Text>
+        <Text className="text-[10px] italic text-black opacity-70">optional</Text>
       </View>
       <TextInput
         value={value}

@@ -1,21 +1,39 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { MapPin } from 'lucide-react-native';
-import { getCategoryEmoji } from '~/constants/recommendation/rexCategories';
+import type { DbCategoryRow } from '~/types/recommendation/rexCategoryCreateConfig';
+import {
+  CATEGORY_ICON_FALLBACK,
+  resolveCategoryIconFromRows,
+} from '~/utils/recommendation/categoryIconResolve';
 import { Theme } from '~/theme/Theme';
 import type { CreateRecSearchPlace } from '~/types/recommendation/create';
 import { cn } from '~/utils/general';
+import { isStrictUuid } from '~/utils/guards';
 
 type Props = {
   place: CreateRecSearchPlace;
+  categoryRows: DbCategoryRow[] | undefined;
   selected: boolean;
   onSelect: (place: CreateRecSearchPlace) => void;
 };
 
-export function SearchPlaceRow({ place, selected, onSelect }: Props) {
-  const categoryLabel = place.categoryLabel;
-  const categoryEmoji = place.categoryId != null ? getCategoryEmoji(place.categoryId) : '📍';
-  const categoryLine = `${categoryEmoji}\u00A0${categoryLabel}`;
+function categoryEmojiForPlace(
+  place: CreateRecSearchPlace,
+  categoryRows: DbCategoryRow[] | undefined,
+): string {
+  const fromApi = place.categoryIcon?.trim();
+  if (fromApi) return fromApi;
+  const code = place.categoryCode?.trim();
+  if (code) return resolveCategoryIconFromRows(code, categoryRows);
+  const legacyId = place.categoryId?.trim();
+  if (legacyId && !isStrictUuid(legacyId))
+    return resolveCategoryIconFromRows(legacyId, categoryRows);
+  return CATEGORY_ICON_FALLBACK;
+}
+
+export function SearchPlaceRow({ place, categoryRows, selected, onSelect }: Props) {
+  const categoryLine = `${categoryEmojiForPlace(place, categoryRows)}\u00A0${place.categoryLabel}`;
 
   return (
     <Pressable

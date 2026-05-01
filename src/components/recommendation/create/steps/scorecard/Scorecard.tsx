@@ -1,9 +1,7 @@
 import React, { useMemo } from 'react';
 import { ScrollView, View, Text } from 'react-native';
-import {
-  getCategoryEmoji,
-  REAL_ESTATE_CATEGORY_ID,
-} from '~/constants/recommendation/rexCategories';
+import { REAL_ESTATE_CATEGORY_ID } from '~/constants/recommendation/rexCategories';
+import { useCategoryIcon } from '~/hooks/useCategoryIcon';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { countScorecardFilledSlots } from '~/utils/recommendation/recCreateFlow';
 import { cn } from '~/utils/general';
@@ -26,7 +24,6 @@ type Props = {
   selectedCategoryId: string | null;
   showQuickTip: boolean;
   useExperienceReviewCopy: boolean;
-  categoryStarTitle: string;
   subcategoryStarTitle: string | null;
   categoryRatingDimensions: CategoryRatingDimension[];
   subcategoryRatingDimensions: CategoryRatingDimension[];
@@ -53,7 +50,6 @@ export const Scorecard: React.FC<Props> = ({
   selectedCategoryId,
   showQuickTip,
   useExperienceReviewCopy,
-  categoryStarTitle,
   subcategoryStarTitle,
   categoryRatingDimensions,
   subcategoryRatingDimensions,
@@ -75,7 +71,7 @@ export const Scorecard: React.FC<Props> = ({
   reviewText,
   onReviewChange,
 }) => {
-  const categoryEmoji = getCategoryEmoji(selectedCategoryId ?? '');
+  const categoryEmoji = useCategoryIcon(selectedCategoryId);
   const totalSlots = useMemo(() => {
     return categoryRatingDimensions.length + subcategoryRatingDimensions.length + 1;
   }, [categoryRatingDimensions.length, subcategoryRatingDimensions.length]);
@@ -113,7 +109,6 @@ export const Scorecard: React.FC<Props> = ({
           <>
             {categoryRatingDimensions.length > 0 ? (
               <ScorecardStarsTable
-                sectionTitle={`${categoryEmoji} ${categoryStarTitle}`}
                 dimensions={categoryRatingDimensions}
                 scores={categoryRatings}
                 onStarChange={onCategoryRatingChange}
@@ -161,6 +156,10 @@ export const Scorecard: React.FC<Props> = ({
               onToggle={onToggleTag}
             />
 
+            {showQuickTip ? (
+              <ScorecardQuickTip value={quickTip} onChangeText={onQuickTipChange} />
+            ) : null}
+
             <ScorecardValueForMoney
               value={scoreValueForMoney}
               onChange={onScoreValueForMoneyChange}
@@ -168,10 +167,6 @@ export const Scorecard: React.FC<Props> = ({
             />
           </>
         )}
-
-        {showQuickTip ? (
-          <ScorecardQuickTip value={quickTip} onChangeText={onQuickTipChange} />
-        ) : null}
 
         <ScorecardReview
           title={useExperienceReviewCopy ? 'Your experience' : 'Your review'}
