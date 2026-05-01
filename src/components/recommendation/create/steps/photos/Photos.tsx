@@ -21,7 +21,7 @@ export function Photos({ photoPaths, onPhotoPathsChange }: Props) {
         <View className="items-center gap-2">
           <CreateStepTitle>Add photos</CreateStepTitle>
           <Text className="text-center text-sm text-muted-foreground">
-            Show others what makes this place special (optional).
+            Show others what makes this place special.
           </Text>
         </View>
 
