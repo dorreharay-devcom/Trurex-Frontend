@@ -299,6 +299,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
                     CollectionsApi.unsaveRex(user!.id, item.id).then(() => {
                       queryClient.invalidateQueries({ queryKey: ['my-saved-ids'] });
                       queryClient.invalidateQueries({ queryKey: ['my-saved-rexes'] });
+                      queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
                     })
                   }
                   className="p-0.5"

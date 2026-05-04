@@ -226,7 +226,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity onPress={() => { setSaved(true); onSave?.(rec); }}>
+        <TouchableOpacity onPress={() => onSave?.(rec)}>
           <Bookmark
             size={20}
             color={saved ? Theme.colors.primary : Theme.colors.muted}

@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   View,
   Text,
@@ -62,6 +63,7 @@ const DiscoverView = ({
 }: DiscoverViewProps) => {
   const onOpenRec = onRecommendationPress ?? onTapRec;
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { pinnedCategoryIds, togglePin, isTogglingPin } = usePinnedCategoryIds();
 
   const [activeCategory, setActiveCategory] = useState('all');
@@ -503,7 +505,10 @@ const DiscoverView = ({
 
       <AddToCollectionSheet
         open={!!saveTarget}
-        onClose={() => setSaveTarget(null)}
+        onClose={() => {
+          setSaveTarget(null);
+          queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
+        }}
         rec={saveTarget}
       />
     </View>
