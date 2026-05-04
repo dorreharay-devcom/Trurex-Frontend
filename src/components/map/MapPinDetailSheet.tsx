@@ -124,7 +124,11 @@ export const MapPinDetailSheet: React.FC<Props> = ({
               className="rounded-xl border border-border p-2.5 active:bg-muted/30"
               accessibilityRole="button"
             >
-              <Bookmark size={16} color={Theme.colors.foreground} />
+              <Bookmark
+                size={16}
+                color={pin.isSaved ? Theme.colors.primary : Theme.colors.foreground}
+                fill={pin.isSaved ? Theme.colors.primary : 'transparent'}
+              />
             </Pressable>
           ) : null}
           <Pressable

@@ -230,7 +230,12 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
         ListHeaderComponent={ListHeader}
         renderItem={({ item }) => (
           <View className="px-4 mb-3">
-            <View className="flex-row items-center gap-3 p-3 rounded-xl bg-card border border-border">
+            <TouchableOpacity
+              activeOpacity={onRecommendationPress ? 0.7 : 1}
+              onPress={() => onRecommendationPress?.(item)}
+              disabled={!onRecommendationPress}
+              className="flex-row items-center gap-3 p-3 rounded-xl bg-card border border-border"
+            >
               <View className="w-12 h-12 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                 <SignedStorageImage
                   bucket={REX_IMAGES_BUCKET}
@@ -306,9 +311,9 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
                 </Pressable>
               </View>
             </View>
+          </TouchableOpacity>
           </View>
-        </View>
-      )}
+        )}
         ListEmptyComponent={
           loadingSaved ? null : (
             <View className="items-center py-10 gap-2">

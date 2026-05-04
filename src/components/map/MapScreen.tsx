@@ -222,6 +222,7 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
                     place_name: r.title,
                     category_code: r.category,
                     location: r.location,
+                    isSaved: r.isSaved,
                   });
                 }}
               />

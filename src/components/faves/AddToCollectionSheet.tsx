@@ -241,7 +241,7 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
                 <View className="w-10 h-1 rounded-full bg-muted-foreground/30" />
               </View>
 
-              <View style={[{ paddingHorizontal: 16, paddingBottom: 8 }, webContainerStyle]} className="flex-row items-center justify-between">
+              <View style={[{ paddingHorizontal: 16, paddingBottom: 16 }, webContainerStyle]} className="flex-row items-center justify-between">
                 <Text className="text-base font-display font-medium text-foreground">
                   Add to collection
                 </Text>

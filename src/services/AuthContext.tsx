@@ -35,7 +35,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .then(({ data: { session }, error }) => {
         if (error) {
           console.warn('[Auth]', error.message);
-          if ((error as any).code === 'refresh_token_not_found') {
+          const code = (error as any).code;
+          if (code === 'refresh_token_not_found' || code === 'bad_jwt') {
             Auth.signOut().catch(() => {});
           }
         }

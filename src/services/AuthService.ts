@@ -23,7 +23,11 @@ export const Backend = client;
 
 export function unwrap<T>(response: { data: unknown; error: unknown }): T {
   if (response.error) {
-    console.error('Supabase Error:', response.error);
+    const err = response.error as any;
+    console.error('Supabase Error:', err);
+    if (err?.code === 'bad_jwt') {
+      Auth.signOut().catch(() => {});
+    }
     throw response.error;
   }
   return response.data as T;

@@ -79,6 +79,7 @@ const DiscoverView = ({
         place_name: rec.title,
         category_code: rec.categoryId,
         location: rec.location,
+        isSaved: rec.isSaved,
       });
     },
     [user],

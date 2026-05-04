@@ -48,13 +48,15 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
   const { shareRecommendation } = useShareRex();
   const [liked, setLiked] = useState(rec.isLiked);
   const [likes, setLikes] = useState(rec.likes);
+  const [saved, setSaved] = useState(rec.isSaved ?? false);
 
   const likeBusy = useRef(false);
 
   useEffect(() => {
     setLiked(rec.isLiked);
     setLikes(rec.likes);
-  }, [rec.id, rec.isLiked, rec.likes]);
+    setSaved(rec.isSaved ?? false);
+  }, [rec.id, rec.isLiked, rec.likes, rec.isSaved]);
 
   const author = rec.user ?? { name: 'Member', handle: '', avatar: '' };
   const tags = rec.tags ?? [];
@@ -224,8 +226,12 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity onPress={() => onSave?.(rec)}>
-          <Bookmark size={20} color={Theme.colors.muted} fill="transparent" />
+        <TouchableOpacity onPress={() => { setSaved(true); onSave?.(rec); }}>
+          <Bookmark
+            size={20}
+            color={saved ? Theme.colors.primary : Theme.colors.muted}
+            fill={saved ? Theme.colors.primary : 'transparent'}
+          />
         </TouchableOpacity>
       </View>
     </Wrapper>
