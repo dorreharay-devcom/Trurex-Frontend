@@ -91,14 +91,10 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
   }, [visible, addYourOwnPrefill, applyAddYourOwnPrefill]);
 
   const abandonDraftAndClose = useCallback(() => {
-    void (async () => {
-      if (!postedSuccessfullyRef.current) {
-        try {
-          await discardDraftRexData();
-        } catch {}
-      }
-      handleClose();
-    })();
+    handleClose();
+    if (!postedSuccessfullyRef.current) {
+      void discardDraftRexData().catch(() => {});
+    }
   }, [handleClose]);
 
   const categoryApiCode = getRexCategoryApiCode(flow.selectedCategoryId);
