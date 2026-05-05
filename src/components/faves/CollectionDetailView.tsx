@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Modal, Pressable, StyleSheet, useWindowDimensions, TextInput } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { ArrowLeft, Plus, MoreVertical, Trash2, Pencil, Link2, BookmarkPlus, BookmarkMinus, MapPin, Star, DollarSign, X, StickyNote, Lock, Globe, Users } from 'lucide-react-native';
+import { ArrowLeft, Plus, MoreVertical, Trash2, Pencil, Share2, BookmarkPlus, BookmarkMinus, MapPin, Star, DollarSign, X, StickyNote, Lock, Globe, Users } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { isWeb, webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
@@ -193,8 +193,10 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
         contentContainerClassName="pb-24"
         ListHeaderComponent={ListHeader}
         ListEmptyComponent={
-          <View className="items-center py-10 gap-2 px-4">
-            <Text className="text-sm text-muted-foreground text-center">No rexes in this collection yet.</Text>
+          <View className="items-center py-12 gap-1 px-4">
+            <Text className="text-3xl mb-1">📦</Text>
+            <Text className="text-base font-semibold text-foreground text-center">Your collection is ready</Text>
+            <Text className="text-sm text-muted-foreground text-center">Start adding recommendations.</Text>
           </View>
         }
         renderItem={({ item }) => (
@@ -316,44 +318,48 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
           {detail.is_my_collection ? (
             <>
               <TouchableOpacity
+                activeOpacity={0.7}
                 onPress={() => {
                   setShowEdit(true);
                   setShowMenu(false);
                 }}
-                className="flex-row items-center gap-3 px-4 py-2.5"
+                className="flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md hover:bg-zinc-100"
               >
                 <Pencil size={15} color={Theme.colors.foreground} />
-                <Text className="text-sm text-foreground">Edit collection</Text>
+                <Text className="text-sm text-foreground">Edit details</Text>
               </TouchableOpacity>
               <TouchableOpacity
+                activeOpacity={0.7}
                 onPress={handleCopyLink}
-                className="flex-row items-center gap-3 px-4 py-2.5"
+                className="flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md hover:bg-zinc-100"
               >
-                <Link2 size={15} color={Theme.colors.foreground} />
-                <Text className="text-sm text-foreground">Copy link</Text>
+                <Share2 size={15} color={Theme.colors.foreground} />
+                <Text className="text-sm text-foreground">Share collection</Text>
               </TouchableOpacity>
-              <View className="h-px bg-border mx-2 my-1" />
               <TouchableOpacity
+                activeOpacity={0.7}
                 onPress={() => {
                   setShowDeleteConfirm(true);
                   setShowMenu(false);
                 }}
-                className="flex-row items-center gap-3 px-4 py-2.5"
+                className="flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md hover:bg-zinc-100"
               >
                 <Trash2 size={15} color={Theme.colors.destructive} />
-                <Text className="text-sm text-destructive">Delete</Text>
+                <Text className="text-sm text-destructive">Delete collection</Text>
               </TouchableOpacity>
             </>
           ) : (
             <>
               <TouchableOpacity
+                activeOpacity={0.7}
                 onPress={handleCopyLink}
-                className="flex-row items-center gap-3 px-4 py-2.5"
+                className="flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md hover:bg-zinc-100"
               >
-                <Link2 size={15} color={Theme.colors.foreground} />
-                <Text className="text-sm text-foreground">Copy link</Text>
+                <Share2 size={15} color={Theme.colors.foreground} />
+                <Text className="text-sm text-foreground">Share collection</Text>
               </TouchableOpacity>
               <TouchableOpacity
+                activeOpacity={0.7}
                 onPress={() => {
                   setShowMenu(false);
                   const next = !isSaved;
@@ -364,7 +370,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                     unsave(collectionId, { onError: () => setSavedOverride(!next) });
                   }
                 }}
-                className="flex-row items-center gap-3 px-4 py-2.5"
+                className={`flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md ${isSaved ? 'hover:bg-zinc-100' : 'hover:bg-zinc-100'}`}
               >
                 {isSaved ? (
                   <BookmarkMinus size={15} color={Theme.colors.destructive} />

@@ -27,7 +27,8 @@ import {
 } from '~/utils/photos/storageUpload';
 import { generateRexImageStoragePath } from '~/utils/photos/photoUtils';
 import { isWeb, webContainerStyle } from '~/utils';
-import { Theme } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle } from '~/theme/Theme';
+import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
 
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 
@@ -269,8 +270,11 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                     value={name}
                     onChangeText={(v) => setName(v.slice(0, 60))}
                     placeholder="e.g. My Ideal Weekend in Lisbon, Best Hikes in Sydney…"
-                    placeholderTextColor="#737373"
-                    className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground"
+                    placeholderTextColor={Theme.colors.secondaryText}
+                    underlineColorAndroid="transparent"
+                    selectionColor={Theme.colors.foreground}
+                    style={[webNoOutline, textFieldCaretStyle]}
+                    className="w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground focus:outline-none focus:border-primary"
                   />
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">
                     {name.length}/60
@@ -286,11 +290,14 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                     value={description}
                     onChangeText={(v) => setDescription(v.slice(0, 200))}
                     placeholder="What's this list about? Who's it for?"
-                    placeholderTextColor="#737373"
+                    placeholderTextColor={Theme.colors.secondaryText}
                     multiline
                     numberOfLines={2}
                     textAlignVertical="top"
-                    className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground"
+                    underlineColorAndroid="transparent"
+                    selectionColor={Theme.colors.foreground}
+                    style={[webNoOutline, textFieldCaretStyle]}
+                    className="flex min-h-[80px] w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground focus:outline-none focus:border-primary"
                   />
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">
                     {description.length}/200

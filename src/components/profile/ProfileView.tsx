@@ -40,6 +40,62 @@ const TABS = [
   { id: ProfileTab.Collections, label: 'Collections' },
 ];
 
+const AnimatedRexCard: React.FC<{
+  rec: Recommendation;
+  index: number;
+  width: number;
+  onPress?: () => void;
+}> = ({ rec, index, width, onPress }) => {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const scale = useRef(new Animated.Value(0.95)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 250,
+        delay: index * 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 1,
+        duration: 250,
+        delay: index * 50,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  return (
+    <Animated.View style={{ width, opacity, transform: [{ scale }] }}>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={onPress}
+        className="rounded-xl overflow-hidden shadow-card bg-background border border-border"
+      >
+        <SignedStorageImage
+          bucket={REX_IMAGES_BUCKET}
+          storagePath={rexCoverStoragePathFromRecommendation(rec)}
+          remoteUri={rexCoverRemoteHttpUrl(rec)}
+          className="aspect-square w-full"
+          accessibilityLabel={rec.title}
+        />
+        <View className="p-2.5">
+          <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>
+            {rec.title}
+          </Text>
+          <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
+            {rec.location || rec.category}
+          </Text>
+          <Text className="text-[10px] font-medium text-accent">
+            ★ {rec.rating}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
+
 const CollectionSkeleton: React.FC = () => {
   const opacity = useRef(new Animated.Value(0.4)).current;
   useEffect(() => {
@@ -247,7 +303,7 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={webContainerStyle}
-        contentContainerClassName="p-4 pb-24"
+        contentContainerClassName="p-4"
       >
         {onBack && (
           <TouchableOpacity
@@ -319,37 +375,18 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
                 <View className="p-4">
                   {(() => {
                     const gw = Math.min(windowWidth, 1280) - 66;
-                    const numCols = gw < 400 ? 1 : gw < 700 ? 2 : 4;
+                    const numCols = gw < 700 ? 2 : 4;
                     const cw = Math.floor((gw - 12 * (numCols - 1)) / numCols);
                     return (
                       <View className="flex-row flex-wrap" style={{ gap: 12 }}>
-                        {myRexes.map((rec) => (
-                          <TouchableOpacity
+                        {myRexes.map((rec, i) => (
+                          <AnimatedRexCard
                             key={rec.id}
-                            activeOpacity={0.8}
+                            rec={rec}
+                            index={i}
+                            width={cw}
                             onPress={() => onRexPress?.(rec)}
-                            style={{ width: cw }}
-                            className="rounded-xl overflow-hidden shadow-card bg-background border border-border"
-                          >
-                            <SignedStorageImage
-                              bucket={REX_IMAGES_BUCKET}
-                              storagePath={rexCoverStoragePathFromRecommendation(rec)}
-                              remoteUri={rexCoverRemoteHttpUrl(rec)}
-                              className="aspect-square w-full"
-                              accessibilityLabel={rec.title}
-                            />
-                            <View className="p-2.5">
-                              <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>
-                                {rec.title}
-                              </Text>
-                              <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
-                                {rec.location || rec.category}
-                              </Text>
-                              <Text className="text-[10px] font-medium text-primary">
-                                ★ {rec.rating}
-                              </Text>
-                            </View>
-                          </TouchableOpacity>
+                          />
                         ))}
                       </View>
                     );

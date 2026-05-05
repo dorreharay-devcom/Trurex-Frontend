@@ -250,7 +250,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
                   {item.title}
                 </Text>
                 <View className="flex-row items-center gap-2 mt-1 flex-wrap">
-                  <Text className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground capitalize">
+                  <Text className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-muted text-foreground capitalize">
                     {item.category}
                   </Text>
                   {item.location && (
