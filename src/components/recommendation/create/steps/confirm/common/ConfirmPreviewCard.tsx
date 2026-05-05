@@ -55,8 +55,8 @@ export function ConfirmPreviewCard({
           </Text>
         </View>
         {selectedCategoryId ? (
-          <View className="max-w-[52%] shrink-0 rounded-full bg-muted px-2.5 py-1">
-            <Text className="text-xs font-medium text-foreground" numberOfLines={2}>
+          <View className="max-w-[52%] shrink-0 rounded-full border border-border bg-muted/50 px-2.5 py-1">
+            <Text className="text-xs font-medium text-black" numberOfLines={2}>
               {categoryEmoji} {categoryLabel}
               {subcategoryLabel ? ` · ${subcategoryLabel}` : ''}
             </Text>
@@ -94,13 +94,16 @@ export function ConfirmPreviewCard({
       {tagLabels.length > 0 ? (
         <View className="flex-row flex-wrap gap-1.5 px-4 pb-2">
           {tagLabels.slice(0, TAGS_PREVIEW_MAX).map((label, i) => (
-            <View key={`${label}-${i}`} className="rounded-full bg-muted px-2 py-0.5">
-              <Text className="text-xs text-muted-foreground">{label}</Text>
+            <View
+              key={`${label}-${i}`}
+              className="rounded-full border border-border bg-muted/50 px-2 py-0.5"
+            >
+              <Text className="text-xs text-black">{label}</Text>
             </View>
           ))}
           {tagLabels.length > TAGS_PREVIEW_MAX ? (
-            <View className="rounded-full bg-muted px-2 py-0.5">
-              <Text className="text-xs text-muted-foreground">
+            <View className="rounded-full border border-border bg-muted/50 px-2 py-0.5">
+              <Text className="text-xs text-black">
                 +{tagLabels.length - TAGS_PREVIEW_MAX} more
               </Text>
             </View>
