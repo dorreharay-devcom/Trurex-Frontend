@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, FlatList, Pressable, useWindowDimensions } from 'react-native';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
+import { Skeleton } from '~/components/ui/skeleton';
 import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { useInfiniteHorizontalCarousel } from '~/hooks/useInfiniteHorizontalCarousel';
@@ -49,21 +50,24 @@ export function RexImageCarousel({ paths, className, accessibilityLabelBase = 'P
   if (resolvedPaths.length === 0) {
     return (
       <View
-        className={cn('aspect-[16/9] w-full overflow-hidden rounded-xl bg-muted', className)}
+        className={cn('aspect-[16/9] w-full overflow-hidden rounded-xl', className)}
         accessibilityLabel="No photos"
         accessibilityRole="image"
-      />
+      >
+        <Skeleton className="h-full w-full rounded-xl bg-muted/40" />
+      </View>
     );
   }
 
   if (resolvedPaths.length === 1) {
     return (
-      <View className={cn('w-full overflow-hidden rounded-xl bg-gray-100 aspect-[4/3]', className)}>
+      <View className={cn('aspect-[16/9] w-full overflow-hidden rounded-xl', className)}>
         <SignedStorageImage
           bucket={REX_IMAGES_BUCKET}
           storagePath={resolvedPaths[0]!}
-          className="w-full h-full"
-          contentFit="contain"
+          className="h-full w-full"
+          contentFit="cover"
+          skeletonUntilLoaded
           accessibilityLabel={accessibilityLabelBase}
         />
       </View>
@@ -104,12 +108,13 @@ export function RexImageCarousel({ paths, className, accessibilityLabelBase = 'P
                   ? `${accessibilityLabelBase} ${listIndexToReal(index) + 1} of ${count}`
                   : `${accessibilityLabelBase} ${index + 1} of ${count}`;
               return (
-                <View style={{ width: itemWidth, height: itemH }} className="bg-gray-100">
+                <View style={{ width: itemWidth, height: itemH }} className="overflow-hidden">
                   <SignedStorageImage
                     bucket={REX_IMAGES_BUCKET}
                     storagePath={item}
                     className="h-full w-full"
-                    contentFit="contain"
+                    contentFit="cover"
+                    skeletonUntilLoaded
                     accessibilityLabel={displayLabel}
                   />
                 </View>
@@ -118,10 +123,12 @@ export function RexImageCarousel({ paths, className, accessibilityLabelBase = 'P
           />
         ) : (
           <View
-            className="aspect-[16/9] w-full bg-muted"
+            className="aspect-[16/9] w-full overflow-hidden rounded-xl"
             accessibilityLabel="Preparing photos"
             accessibilityRole="image"
-          />
+          >
+            <Skeleton className="h-full w-full rounded-xl bg-muted/40" />
+          </View>
         )}
       </View>
 

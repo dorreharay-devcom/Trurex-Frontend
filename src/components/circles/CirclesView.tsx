@@ -254,6 +254,9 @@ function CirclesListContent({ vm, isActive }: { vm: CirclesViewModel; isActive: 
                     key={row.user_id}
                     row={row}
                     circle={vm.circleForMemberUserId.get(row.user_id)}
+                    additionalCirclesCount={
+                      vm.extraCircleCountByMemberUserId.get(row.user_id) ?? 0
+                    }
                     allowAddToCircle={connTab !== 'following'}
                     onAddToCircle={
                       connTab === 'following'

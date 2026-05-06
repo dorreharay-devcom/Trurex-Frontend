@@ -7,7 +7,6 @@ import {
   useWindowDimensions,
   findNodeHandle,
   Platform,
-  ActivityIndicator,
 } from 'react-native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -49,6 +48,7 @@ import {
   rexPhotoStoragePathsFromRecommendation,
 } from '~/utils/recommendation/recContentDisplay';
 import { deleteRexToastMessage } from '~/utils/recommendation/rexDetailToRecommendation';
+import { Skeleton } from '~/components/ui/skeleton';
 
 type Props = {
   visible: boolean;
@@ -205,19 +205,10 @@ export const RecommendationDetailModal: React.FC<Props> = ({
 
   const placeLocationLine = useMemo(() => {
     if (!recommendation) return '';
-    const titleT = recommendation.title.trim();
     const fromDetail = (rexDetail?.place_location ?? '').trim();
-    if (fromDetail.length > 0) return fromDetail;
     const fromRec = (recommendation.location ?? '').trim();
-    if (
-      detailLoading &&
-      fromRec.length > 0 &&
-      fromRec.toLowerCase() !== titleT.toLowerCase()
-    ) {
-      return fromRec;
-    }
-    return '';
-  }, [detailLoading, recommendation, rexDetail?.place_location]);
+    return fromDetail || fromRec;
+  }, [recommendation, rexDetail?.place_location]);
 
   const coverPath = useMemo(
     () => (recommendation ? rexCoverStoragePathFromRecommendation(recommendation) : null),
@@ -354,10 +345,10 @@ export const RecommendationDetailModal: React.FC<Props> = ({
             <View className={cn(CREATE_REC_STEP_INNER, 'gap-6')}>
               {showDetailHeroLoading ? (
                 <View
-                  className="aspect-[16/9] w-full items-center justify-center overflow-hidden rounded-xl border border-border bg-muted"
+                  className="aspect-[16/9] w-full overflow-hidden rounded-xl"
                   accessibilityLabel="Loading photos"
                 >
-                  <ActivityIndicator color={Theme.colors.primary} />
+                  <Skeleton className="h-full w-full rounded-xl bg-muted/40" />
                 </View>
               ) : galleryPaths.length > 0 ? (
                 <RexImageCarousel
@@ -365,13 +356,14 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                   accessibilityLabelBase={recommendation.title}
                 />
               ) : showHero && (coverPath || coverHttp) ? (
-                <View className="overflow-hidden rounded-xl bg-gray-100 aspect-[4/3]">
+                <View className="aspect-[16/9] w-full overflow-hidden rounded-xl">
                   <SignedStorageImage
                     bucket={REX_IMAGES_BUCKET}
                     storagePath={coverPath}
                     remoteUri={coverHttp}
-                    className="w-full h-full"
-                    contentFit="contain"
+                    className="h-full w-full"
+                    contentFit="cover"
+                    skeletonUntilLoaded
                     accessibilityLabel={recommendation.title}
                   />
                 </View>

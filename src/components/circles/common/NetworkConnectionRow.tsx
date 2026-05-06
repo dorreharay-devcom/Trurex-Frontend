@@ -10,13 +10,81 @@ import { hexToSoftIconBackground, parseCircleAccentHex } from '~/utils/recommend
 type Props = {
   row: NetworkUserRow;
   circle?: CircleApiRow;
+  additionalCirclesCount?: number;
   onAddToCircle?: () => void;
   allowAddToCircle?: boolean;
 };
 
+function CircleMembershipBadge({
+  circle,
+  accent,
+  badgeBg,
+  extraCount,
+  interactive,
+  onPress,
+}: {
+  circle: CircleApiRow;
+  accent: string | null;
+  badgeBg: string | undefined;
+  extraCount: number;
+  interactive: boolean;
+  onPress?: () => void;
+}) {
+  const shellStyle = accent
+    ? { backgroundColor: badgeBg }
+    : { backgroundColor: Theme.colors.accent };
+  const color = accent ?? Theme.colors.primary;
+  const showExtra = extraCount > 0;
+  const a11y = showExtra ? `${circle.name}, plus ${extraCount} more circles` : circle.name;
+
+  const body = (
+    <>
+      <Text className="text-[10px] font-semibold" style={{ color }} numberOfLines={1}>
+        {circle.name}
+      </Text>
+      {showExtra ? (
+        <View
+          className="absolute -right-1.5 -top-2 min-w-[18px] items-center rounded-full border border-border bg-card px-1 py-px"
+          pointerEvents="none"
+        >
+          <Text className="text-[9px] font-bold leading-none text-foreground" numberOfLines={1}>
+            +{extraCount}
+          </Text>
+        </View>
+      ) : null}
+    </>
+  );
+
+  if (interactive && onPress) {
+    return (
+      <Pressable
+        onPress={onPress}
+        hitSlop={6}
+        accessibilityLabel={a11y}
+        className="relative rounded-full px-2 py-0.5 active:opacity-80"
+        style={shellStyle}
+      >
+        {body}
+      </Pressable>
+    );
+  }
+
+  return (
+    <View
+      accessible
+      accessibilityLabel={a11y}
+      className="relative rounded-full px-2 py-0.5"
+      style={shellStyle}
+    >
+      {body}
+    </View>
+  );
+}
+
 export function NetworkConnectionRow({
   row,
   circle,
+  additionalCirclesCount = 0,
   onAddToCircle,
   allowAddToCircle = true,
 }: Props) {
@@ -33,39 +101,14 @@ export function NetworkConnectionRow({
             {label}
           </Text>
           {circle ? (
-            allowAddToCircle && onAddToCircle ? (
-              <Pressable
-                onPress={onAddToCircle}
-                hitSlop={6}
-                className="rounded-full px-2 py-0.5 active:opacity-80"
-                style={
-                  accent ? { backgroundColor: badgeBg } : { backgroundColor: Theme.colors.accent }
-                }
-              >
-                <Text
-                  className="text-[10px] font-semibold"
-                  style={{ color: accent ?? Theme.colors.primary }}
-                  numberOfLines={1}
-                >
-                  {circle.name}
-                </Text>
-              </Pressable>
-            ) : (
-              <View
-                className="rounded-full px-2 py-0.5"
-                style={
-                  accent ? { backgroundColor: badgeBg } : { backgroundColor: Theme.colors.accent }
-                }
-              >
-                <Text
-                  className="text-[10px] font-semibold"
-                  style={{ color: accent ?? Theme.colors.primary }}
-                  numberOfLines={1}
-                >
-                  {circle.name}
-                </Text>
-              </View>
-            )
+            <CircleMembershipBadge
+              circle={circle}
+              accent={accent}
+              badgeBg={badgeBg}
+              extraCount={additionalCirclesCount}
+              interactive={Boolean(allowAddToCircle && onAddToCircle)}
+              onPress={onAddToCircle}
+            />
           ) : null}
         </View>
         {row.handle ? (

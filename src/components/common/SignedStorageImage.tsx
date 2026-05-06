@@ -16,6 +16,7 @@ type Props = {
   accessibilityLabel?: string;
   contentFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
   onLoad?: (e: { source: { width: number; height: number } }) => void;
+  skeletonUntilLoaded?: boolean;
 };
 
 export function SignedStorageImage({
@@ -27,6 +28,7 @@ export function SignedStorageImage({
   accessibilityLabel,
   contentFit = 'cover',
   onLoad,
+  skeletonUntilLoaded = false,
 }: Props) {
   const http = remoteUri?.trim() && isHttpUrl(remoteUri.trim()) ? remoteUri.trim() : null;
   const path = storagePath?.trim() ?? '';
@@ -34,25 +36,56 @@ export function SignedStorageImage({
   const { uri, loading } = useSignedStorageUrl(bucket, http ? '' : path);
   const displayUri = http ?? uri;
 
+  const [decoded, setDecoded] = useState(false);
+  useEffect(() => {
+    setDecoded(false);
+  }, [displayUri]);
+
   if (!displayUri) {
     return (
-      <View className={cn('bg-muted', className)} style={style}>
-        {loading && <Skeleton className="h-full w-full bg-muted/60" />}
+      <View
+        className={cn(skeletonUntilLoaded ? 'bg-transparent' : 'bg-muted', className)}
+        style={style}
+      >
+        {loading ? (
+          <Skeleton
+            className={cn(
+              'h-full w-full',
+              skeletonUntilLoaded ? 'rounded-none bg-muted/40' : 'bg-muted/60',
+            )}
+          />
+        ) : null}
       </View>
     );
   }
 
   return (
-    <View className={cn('relative overflow-hidden bg-muted', className)} style={style}>
+    <View
+      className={cn(
+        'relative overflow-hidden',
+        skeletonUntilLoaded ? 'bg-transparent' : 'bg-muted',
+        className,
+      )}
+      style={style}
+    >
+      {skeletonUntilLoaded && !decoded ? (
+        <View className="absolute inset-0 z-[1]" pointerEvents="none">
+          <Skeleton className="h-full w-full rounded-none bg-muted/40" />
+        </View>
+      ) : null}
       <Image
         source={{ uri: displayUri }}
-        className="h-full w-full"
+        className={cn('h-full w-full', skeletonUntilLoaded && !decoded && 'opacity-0')}
         style={{ width: '100%', height: '100%' }}
         contentFit={contentFit}
-        transition={200}
+        transition={skeletonUntilLoaded ? 0 : 200}
         cachePolicy="memory-disk"
         accessibilityLabel={accessibilityLabel}
-        onLoad={onLoad}
+        onLoad={(e) => {
+          setDecoded(true);
+          onLoad?.(e);
+        }}
+        onError={() => setDecoded(true)}
       />
     </View>
   );

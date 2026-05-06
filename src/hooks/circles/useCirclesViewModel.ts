@@ -134,6 +134,15 @@ export function useCirclesViewModel(isActive: boolean) {
     return m;
   }, [circleMemberAssignments, circles]);
 
+  const extraCircleCountByMemberUserId = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const [uid, ids] of circleIdsByMemberUserId.entries()) {
+      const extra = ids.size - 1;
+      if (extra > 0) m.set(uid, extra);
+    }
+    return m;
+  }, [circleIdsByMemberUserId]);
+
   const addMemberMutation = useMutation({
     mutationFn: async (vars: { circleId: string; userId: string }) => {
       setAddingMemberId(vars.userId);
@@ -280,6 +289,7 @@ export function useCirclesViewModel(isActive: boolean) {
     followingOneWay,
     followingLoading,
     circleForMemberUserId,
+    extraCircleCountByMemberUserId,
     circleIdsByMemberUserId,
     circleAssignmentsLoading,
     addingMemberId,

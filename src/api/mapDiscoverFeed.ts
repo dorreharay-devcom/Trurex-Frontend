@@ -102,7 +102,7 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
     categoryId: categoryCode || 'all',
     category: categoryLabel,
     categoryIcon,
-    location: firstNonEmptyString(o, 'location', 'place_address') ?? undefined,
+    location: firstNonEmptyString(o, 'place_location') ?? undefined,
     latitude: optionalFiniteNumber(o, 'latitude'),
     longitude: optionalFiniteNumber(o, 'longitude'),
     rating,
