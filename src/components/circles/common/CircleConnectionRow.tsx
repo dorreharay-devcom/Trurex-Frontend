@@ -33,16 +33,10 @@ export function CircleConnectionRow({ row, onAdd, isMember, isAdding, allowAdd =
           onPress={onAdd}
           disabled={isMember || isAdding}
           className={`flex-row items-center gap-1 rounded-lg border px-3 py-2 ${
-            isMember ? '' : 'border-border bg-background active:opacity-90'
-          }`}
-          style={
             isMember
-              ? {
-                  backgroundColor: '#d4d4d466',
-                  borderColor: '#d4d4d4cc',
-                }
-              : undefined
-          }
+              ? 'border-[#d4d4d4cc] bg-[#d4d4d466]'
+              : 'border-border bg-background active:opacity-90'
+          }`}
         >
           {isAdding ? (
             <ActivityIndicator size="small" color={Theme.colors.primary} />
