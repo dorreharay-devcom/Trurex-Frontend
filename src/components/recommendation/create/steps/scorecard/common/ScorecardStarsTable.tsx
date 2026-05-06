@@ -38,7 +38,9 @@ export function ScorecardStarsTable({
               <View className="min-w-0 flex-1">
                 <Text className="text-sm text-foreground">{dim.display_label}</Text>
                 {dim.description ? (
-                  <Text className="mt-0.5 text-xs text-muted-foreground">{dim.description}</Text>
+                  <Text className="mt-0.5 text-xs italic text-muted-foreground">
+                    {dim.description}
+                  </Text>
                 ) : null}
               </View>
               <View className="shrink-0 flex-row gap-0.5">

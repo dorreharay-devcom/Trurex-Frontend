@@ -69,3 +69,16 @@ export async function fetchRexDetail(rexId: string): Promise<RexDetailRow> {
   }
   return row;
 }
+
+export async function deleteRex(rexId: string): Promise<void> {
+  const trimmed = rexId.trim();
+  if (!trimmed) {
+    throw new Error('Missing rex id');
+  }
+  const { error } = await Backend.rpc('delete_rex', {
+    input_rex_id: trimmed,
+  });
+  if (error) {
+    throw error;
+  }
+}

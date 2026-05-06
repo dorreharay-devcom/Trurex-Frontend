@@ -7,10 +7,18 @@ import {
   useWindowDimensions,
   findNodeHandle,
   Platform,
-  ActivityIndicator,
 } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Star, MapPin, Quote, Plus, ChevronRight, Flag } from 'lucide-react-native';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  ArrowLeft,
+  Star,
+  MapPin,
+  Quote,
+  Plus,
+  ChevronRight,
+  Flag,
+  Trash2,
+} from 'lucide-react-native';
 import { RexCommentsSection } from '~/components/recommendation/comment';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
@@ -18,11 +26,12 @@ import { OverlayModal } from '~/components/common/OverlayModal';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
-import { fetchRexDetail } from '~/api/rexDetailApi';
+import { deleteRex, fetchRexDetail } from '~/api/rexDetailApi';
+import { DeleteRecommendationConfirmModal } from '~/components/recommendation/DeleteRecommendationConfirmModal';
 import { ReportContentDialog } from '~/components/recommendation/report/ReportContentDialog';
 import { useAuth } from '~/services/AuthContext';
 import type { ContentReportTarget } from '~/constants/recommendation/contentReport';
-import { toastInfo } from '~/utils/appToast';
+import { toastError, toastInfo, toastSuccess } from '~/utils/appToast';
 import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
 import { Theme } from '~/theme/Theme';
 import type { Recommendation } from '~/types/recommendation/recommendation';
@@ -38,6 +47,8 @@ import {
   rexCoverStoragePathFromRecommendation,
   rexPhotoStoragePathsFromRecommendation,
 } from '~/utils/recommendation/recContentDisplay';
+import { deleteRexToastMessage } from '~/utils/recommendation/rexDetailToRecommendation';
+import { Skeleton } from '~/components/ui/skeleton';
 
 type Props = {
   visible: boolean;
@@ -64,6 +75,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   const { layout } = modalConfig;
   const { user: authUser } = useAuth();
   const [reportTarget, setReportTarget] = useState<ContentReportTarget | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const commentsSectionWrapRef = useRef<View>(null);
   const composerAnchorRef = useRef<View>(null);
@@ -97,6 +109,10 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     windowHeight,
     onClose,
   });
+
+  useEffect(() => {
+    if (!visible) setDeleteConfirmOpen(false);
+  }, [visible]);
 
   useEffect(() => {
     if (!visible || !recommendation || !scrollToComments) return;
@@ -187,6 +203,13 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     return rexPhotoStoragePathsFromRecommendation(recommendation);
   }, [rexDetail, recommendation]);
 
+  const placeLocationLine = useMemo(() => {
+    if (!recommendation) return '';
+    const fromDetail = (rexDetail?.place_location ?? '').trim();
+    const fromRec = (recommendation.location ?? '').trim();
+    return fromDetail || fromRec;
+  }, [recommendation, rexDetail?.place_location]);
+
   const coverPath = useMemo(
     () => (recommendation ? rexCoverStoragePathFromRecommendation(recommendation) : null),
     [recommendation],
@@ -205,11 +228,44 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     galleryPaths.length === 0 &&
     !(coverPath || coverHttp);
 
+  const queryClient = useQueryClient();
+  const deleteRexMutation = useMutation({
+    mutationFn: deleteRex,
+    onSuccess: (_data, rexId) => {
+      setDeleteConfirmOpen(false);
+      toastSuccess('Deleted', 'Your recommendation was removed.');
+      void queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
+      void queryClient.invalidateQueries({ queryKey: ['search-rexes'] });
+      void queryClient.invalidateQueries({ queryKey: ['my-rexes'] });
+      void queryClient.removeQueries({ queryKey: ['rexDetail', rexId] });
+      void queryClient.invalidateQueries({ queryKey: ['collection-detail'] });
+      void queryClient.invalidateQueries({ queryKey: ['my-collections'] });
+      void queryClient.invalidateQueries({ queryKey: ['mapRexesInBounds'] });
+      void queryClient.invalidateQueries({ queryKey: ['mapRexPins'] });
+      handleClose();
+    },
+    onError: (err: unknown) => {
+      toastError('Could not delete', deleteRexToastMessage(err));
+    },
+  });
+
+  const openDeleteConfirm = useCallback(() => {
+    setDeleteConfirmOpen(true);
+  }, []);
+
+  const handleConfirmDeleteRex = useCallback(() => {
+    const id = recommendation?.id;
+    if (!id) return;
+    deleteRexMutation.mutate(id);
+  }, [recommendation?.id, deleteRexMutation]);
+
   if (!recommendation) {
     return null;
   }
 
   const user = recommendation.user ?? { name: 'Member', handle: '', avatar: '' };
+  const isOwner =
+    authUser != null && recommendation.authorId != null && authUser.id === recommendation.authorId;
 
   return (
     <>
@@ -236,9 +292,25 @@ export const RecommendationDetailModal: React.FC<Props> = ({
               <Text className="min-w-0 flex-1 text-center text-lg font-display font-semibold text-foreground">
                 Recommendation
               </Text>
-              <View className="w-[60px] items-end justify-center">
-                {authUser &&
-                (recommendation.authorId == null || authUser.id !== recommendation.authorId) ? (
+              <View className="min-w-[72px] shrink-0 items-end justify-center">
+                {isOwner ? (
+                  <Pressable
+                    onPress={openDeleteConfirm}
+                    accessibilityLabel="Delete this recommendation"
+                    accessibilityRole="button"
+                    className="h-8 flex-row items-center gap-1 rounded-full border-2 border-destructive bg-destructive/10 px-2.5 active:opacity-90"
+                  >
+                    <Trash2 size={12} color={Theme.colors.destructive} strokeWidth={2.25} />
+                    <Text
+                      className="text-xs font-semibold"
+                      style={{ color: Theme.colors.destructive }}
+                      numberOfLines={1}
+                    >
+                      Delete
+                    </Text>
+                  </Pressable>
+                ) : authUser &&
+                  (recommendation.authorId == null || authUser.id !== recommendation.authorId) ? (
                   <Pressable
                     onPress={openRexReport}
                     accessibilityLabel="Report this recommendation"
@@ -273,10 +345,10 @@ export const RecommendationDetailModal: React.FC<Props> = ({
             <View className={cn(CREATE_REC_STEP_INNER, 'gap-6')}>
               {showDetailHeroLoading ? (
                 <View
-                  className="aspect-[16/9] w-full items-center justify-center overflow-hidden rounded-xl border border-border bg-muted"
+                  className="aspect-[16/9] w-full overflow-hidden rounded-xl"
                   accessibilityLabel="Loading photos"
                 >
-                  <ActivityIndicator color={Theme.colors.primary} />
+                  <Skeleton className="h-full w-full rounded-xl bg-muted/40" />
                 </View>
               ) : galleryPaths.length > 0 ? (
                 <RexImageCarousel
@@ -284,13 +356,14 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                   accessibilityLabelBase={recommendation.title}
                 />
               ) : showHero && (coverPath || coverHttp) ? (
-                <View className="overflow-hidden rounded-xl bg-gray-100 aspect-[4/3]">
+                <View className="aspect-[16/9] w-full overflow-hidden rounded-xl">
                   <SignedStorageImage
                     bucket={REX_IMAGES_BUCKET}
                     storagePath={coverPath}
                     remoteUri={coverHttp}
-                    className="w-full h-full"
-                    contentFit="contain"
+                    className="h-full w-full"
+                    contentFit="cover"
+                    skeletonUntilLoaded
                     accessibilityLabel={recommendation.title}
                   />
                 </View>
@@ -307,10 +380,10 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                 <Text className="mt-2 font-display text-2xl font-bold text-foreground">
                   {recommendation.title}
                 </Text>
-                {recommendation.location ? (
+                {placeLocationLine ? (
                   <View className="mt-1 flex-row items-center gap-1.5">
                     <MapPin size={14} color={Theme.colors.secondaryText} />
-                    <Text className="text-sm text-muted-foreground">{recommendation.location}</Text>
+                    <Text className="text-sm text-muted-foreground">{placeLocationLine}</Text>
                   </View>
                 ) : null}
               </View>
@@ -432,6 +505,13 @@ export const RecommendationDetailModal: React.FC<Props> = ({
           if (!o) setReportTarget(null);
         }}
         target={reportTarget}
+      />
+      <DeleteRecommendationConfirmModal
+        visible={deleteConfirmOpen}
+        message="This permanently removes this rex and related likes, comments, photos, saves, and collection entries. This can’t be undone."
+        onCancel={() => setDeleteConfirmOpen(false)}
+        onConfirm={handleConfirmDeleteRex}
+        isDeleting={deleteRexMutation.isPending}
       />
     </>
   );

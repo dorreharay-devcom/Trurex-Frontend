@@ -15,6 +15,7 @@ export type RexDetailRow = {
   subcategory_display_name: string;
   place_id: string | null;
   place_name: string;
+  place_location?: string | null;
   description: string | null;
   reason: string | null;
   review: string | null;

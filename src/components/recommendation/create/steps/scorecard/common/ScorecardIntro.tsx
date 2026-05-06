@@ -4,14 +4,25 @@ import { CreateStepTitle } from '../../../CreateStepTitle';
 
 type Props = {
   categoryEmoji: string;
+  typeStepDisplayName: string | null;
   filledCount: number;
   totalSlots: number;
 };
 
-export function ScorecardIntro({ categoryEmoji, filledCount, totalSlots }: Props) {
+export function ScorecardIntro({
+  categoryEmoji,
+  typeStepDisplayName,
+  filledCount,
+  totalSlots,
+}: Props) {
+  const typeTrimmed = typeStepDisplayName?.trim() ?? '';
+
   return (
     <View className="items-center space-y-2">
       <CreateStepTitle>{categoryEmoji} Rate your experience</CreateStepTitle>
+      {typeTrimmed.length > 0 ? (
+        <Text className="text-center text-sm font-medium text-primary">{typeTrimmed}</Text>
+      ) : null}
       <Text className="text-center text-sm text-muted-foreground">
         All fields are optional — share as much or as little as you like
       </Text>

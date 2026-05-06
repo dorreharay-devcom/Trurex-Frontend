@@ -88,11 +88,12 @@ export const Scorecard: React.FC<Props> = ({
       className="flex-1"
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
-      contentContainerClassName="items-center pb-36"
+      contentContainerClassName="items-center pb-16"
     >
       <View className={cn(CREATE_REC_STEP_INNER, 'gap-6')}>
         <ScorecardIntro
           categoryEmoji={categoryEmoji}
+          typeStepDisplayName={subcategoryStarTitle}
           filledCount={filledCount}
           totalSlots={totalSlots}
         />
@@ -141,9 +142,8 @@ export const Scorecard: React.FC<Props> = ({
 
             {subcategoryQuestions.length > 0 ? (
               <ScorecardQuestions
-                sectionTitle={
-                  subcategoryStarTitle ? `${subcategoryStarTitle} · more` : 'More questions'
-                }
+                sectionTitle={null}
+                questionStyle="emphasized"
                 questions={subcategoryQuestions}
                 answers={questionAnswers}
                 onSelectOption={onQuestionAnswer}
@@ -170,6 +170,7 @@ export const Scorecard: React.FC<Props> = ({
 
         <ScorecardReview
           title={useExperienceReviewCopy ? 'Your experience' : 'Your review'}
+          showOptionalHint={useExperienceReviewCopy}
           placeholder={
             useExperienceReviewCopy ? 'How was your experience? What stood out?' : undefined
           }
