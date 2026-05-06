@@ -1,6 +1,7 @@
 export type CategoryGridConfig = {
   numColumns: number;
   gap: number;
+  tileWidth: number;
   tile: {
     minHeight: number;
     paddingHorizontal: number;

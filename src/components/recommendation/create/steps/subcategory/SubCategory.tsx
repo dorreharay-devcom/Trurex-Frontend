@@ -6,6 +6,8 @@ import { CreateStepTitle } from '../../CreateStepTitle';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { cn } from '~/utils/general';
 
+const TYPE_FALLBACK_ICON = '📍';
+
 type Props = {
   subCategories: RexSubcategoryOption[];
   selected: string | null;
@@ -31,7 +33,7 @@ export function SubCategory({ subCategories, selected, onSelect }: Props) {
         <View className="gap-2.5">
           {subCategories.map((sc) => {
             const isSelected = selected === sc.code;
-            const icon = resolveSubcategoryIcon(sc.code, sc.label);
+            const icon = resolveSubcategoryIcon(sc.code, sc.label).trim();
             const ratingLabel = `${sc.ratingCount} specific rating${sc.ratingCount !== 1 ? 's' : ''}`;
             const q =
               sc.questionCount > 0
@@ -48,7 +50,11 @@ export function SubCategory({ subCategories, selected, onSelect }: Props) {
                     : 'border-border bg-card active:border-primary/30',
                 )}
               >
-                <Text className="text-2xl">{icon}</Text>
+                <View className="w-7 shrink-0 items-center justify-start pt-0.5">
+                  <Text className="text-2xl leading-none">
+                    {icon.length > 0 ? icon : TYPE_FALLBACK_ICON}
+                  </Text>
+                </View>
                 <View className="min-w-0 flex-1">
                   <Text
                     className={cn(

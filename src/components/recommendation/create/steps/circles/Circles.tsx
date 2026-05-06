@@ -140,9 +140,6 @@ export const Circles: React.FC<Props> = ({
           <Text className="text-center text-sm text-muted-foreground">
             Tap a ring to share with that circle. Smallest = most private.
           </Text>
-          <Text className="text-center text-sm font-medium text-foreground">
-            {selectedIds.size} circle{selectedIds.size === 1 ? '' : 's'} selected
-          </Text>
         </View>
 
         {showSensitiveNudge ? (
@@ -188,6 +185,10 @@ export const Circles: React.FC<Props> = ({
               onHighlightId={setHighlightId}
               editingId={editingId}
             />
+
+            <Text className="text-center text-sm font-medium text-foreground">
+              {selectedIds.size} circle{selectedIds.size === 1 ? '' : 's'} selected
+            </Text>
 
             {displayCircle != null ? (
               <View className="items-center gap-0.5">

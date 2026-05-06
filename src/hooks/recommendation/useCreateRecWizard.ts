@@ -185,7 +185,13 @@ export function useCreateRecWizard() {
   }, []);
 
   const setQuestionAnswer = useCallback((code: string, optionCode: string) => {
-    setQuestionAnswers((prev) => ({ ...prev, [code]: optionCode }));
+    setQuestionAnswers((prev) => {
+      if (prev[code] === optionCode) {
+        const { [code]: _removed, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [code]: optionCode };
+    });
   }, []);
 
   const toggleTagSlug = useCallback((slug: string) => {

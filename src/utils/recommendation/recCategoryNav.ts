@@ -108,6 +108,7 @@ export function getCategoryGridConfig(windowWidth: number): CategoryGridConfig {
   return {
     numColumns: cols,
     gap: rules.columnGap,
+    tileWidth: tileW,
     tile: {
       minHeight,
       paddingHorizontal: padH,
