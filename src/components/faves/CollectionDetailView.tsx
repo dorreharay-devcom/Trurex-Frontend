@@ -3,7 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Modal, Press
 import * as Clipboard from 'expo-clipboard';
 import { ArrowLeft, Plus, MoreVertical, Trash2, Pencil, Share2, BookmarkPlus, BookmarkMinus, MapPin, Star, DollarSign, X, StickyNote, Lock, Globe, Link2 } from 'lucide-react-native';
 import { Image } from 'expo-image';
-import { isWeb, webContainerStyle } from '~/utils';
+import { webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
 import {
   useCollectionDetail,
@@ -23,6 +23,7 @@ import type { Recommendation, RecommendationOpenOptions } from '~/types/recommen
 const VALUE_LABELS = ['Total Steal', 'Budget-Friendly', 'Good Value', 'Worth It', 'Splurge'];
 import type { CollectionRexEntry } from '~/api/CollectionsApi';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
+import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 
 function entryToRec(entry: CollectionRexEntry): Recommendation {
   return {
@@ -400,119 +401,34 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
         }}
       />
 
-      <Modal
+      <DestructiveActionConfirmModal
         visible={showDeleteConfirm}
-        transparent
-        animationType={isWeb ? 'fade' : 'slide'}
-        onRequestClose={() => setShowDeleteConfirm(false)}
-      >
-        <Pressable
-          className={`flex-1 bg-black/50 ${isWeb ? 'items-center justify-center px-4' : 'justify-end'}`}
-          onPress={() => setShowDeleteConfirm(false)}
-        >
-          <Pressable
-            className={`bg-card border border-border pt-3 pb-8 ${isWeb ? 'rounded-2xl w-full' : 'rounded-t-2xl border-t-0'}`}
-            style={isWeb ? { maxWidth: 400 } : undefined}
-            onPress={() => {}}
-          >
-            <View style={webContainerStyle} className="px-4">
-              <View className="items-center mb-4">
-                <View
-                  className={`w-10 h-1 rounded-full bg-muted-foreground/30 ${isWeb ? 'hidden' : ''}`}
-                />
-              </View>
-              <View className="w-12 h-12 rounded-full bg-destructive/10 items-center justify-center mb-4 self-center">
-                <Trash2 size={22} color={Theme.colors.destructive} />
-              </View>
-              <Text className="text-lg font-display font-bold text-foreground text-center mb-1">
-                Delete collection?
-              </Text>
-              <Text className="text-sm text-muted-foreground text-center mb-6">
-                "{detail.display_name}" will be permanently deleted. This cannot be undone.
-              </Text>
-              <View className="flex-row gap-3">
-                <TouchableOpacity
-                  onPress={() => setShowDeleteConfirm(false)}
-                  activeOpacity={0.7}
-                  disabled={deleteMutation.isPending}
-                  className="flex-1 py-2.5 rounded-xl bg-muted items-center"
-                >
-                  <Text className="text-sm font-semibold text-foreground">Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => deleteMutation.mutate(collectionId, { onSuccess: onBack })}
-                  activeOpacity={0.8}
-                  disabled={deleteMutation.isPending}
-                  className="flex-1 py-2.5 rounded-xl bg-destructive items-center"
-                >
-                  <Text className="text-sm font-semibold text-white">Delete</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
+        title="Delete collection?"
+        message={`"${detail.display_name}" will be permanently deleted. This cannot be undone.`}
+        confirmLabel="Delete"
+        pending={deleteMutation.isPending}
+        onCancel={() => setShowDeleteConfirm(false)}
+        onConfirm={() => deleteMutation.mutate(collectionId, { onSuccess: onBack })}
+      />
 
-      <Modal
+      <DestructiveActionConfirmModal
         visible={showUnsaveConfirm}
-        transparent
-        animationType={isWeb ? 'fade' : 'slide'}
-        onRequestClose={() => setShowUnsaveConfirm(false)}
-      >
-        <Pressable
-          className={`flex-1 bg-black/50 ${isWeb ? 'items-center justify-center px-4' : 'justify-end'}`}
-          onPress={() => setShowUnsaveConfirm(false)}
-        >
-          <Pressable
-            className={`bg-card border border-border pt-3 pb-8 ${isWeb ? 'rounded-2xl w-full' : 'rounded-t-2xl border-t-0'}`}
-            style={isWeb ? { maxWidth: 400 } : undefined}
-            onPress={() => {}}
-          >
-            <View style={webContainerStyle} className="px-4">
-              <View className="items-center mb-4">
-                <View
-                  className={`w-10 h-1 rounded-full bg-muted-foreground/30 ${isWeb ? 'hidden' : ''}`}
-                />
-              </View>
-              <View className="w-12 h-12 rounded-full bg-destructive/10 items-center justify-center mb-4 self-center">
-                <BookmarkMinus size={22} color={Theme.colors.destructive} />
-              </View>
-              <Text className="text-lg font-display font-bold text-foreground text-center mb-1">
-                Remove from saved?
-              </Text>
-              <Text className="text-sm text-muted-foreground text-center mb-6">
-                "{detail.display_name}" will be removed from your saved collections. You can save it again anytime.
-              </Text>
-              <View className="flex-row gap-3">
-                <TouchableOpacity
-                  onPress={() => setShowUnsaveConfirm(false)}
-                  activeOpacity={0.7}
-                  disabled={unsaving}
-                  className="flex-1 py-2.5 rounded-xl bg-muted items-center"
-                >
-                  <Text className="text-sm font-semibold text-foreground">Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() =>
-                    unsave(collectionId, {
-                      onSuccess: () => {
-                        setShowUnsaveConfirm(false);
-                        setSavedOverride(false);
-                        onBack();
-                      },
-                    })
-                  }
-                  activeOpacity={0.8}
-                  disabled={unsaving}
-                  className="flex-1 py-2.5 rounded-xl bg-destructive items-center"
-                >
-                  <Text className="text-sm font-semibold text-white">Remove</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
+        title="Remove from saved?"
+        message={`"${detail.display_name}" will be removed from your saved collections. You can save it again anytime.`}
+        confirmLabel="Remove"
+        icon={<BookmarkMinus size={22} color={Theme.colors.destructive} />}
+        pending={unsaving}
+        onCancel={() => setShowUnsaveConfirm(false)}
+        onConfirm={() =>
+          unsave(collectionId, {
+            onSuccess: () => {
+              setShowUnsaveConfirm(false);
+              setSavedOverride(false);
+              onBack();
+            },
+          })
+        }
+      />
 
       <AddToCollectionSheet
         open={!!saveTarget}
