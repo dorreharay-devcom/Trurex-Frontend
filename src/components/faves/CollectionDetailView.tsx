@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Modal, Pressable, StyleSheet, useWindowDimensions, TextInput } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { ArrowLeft, Plus, MoreVertical, Trash2, Pencil, Share2, BookmarkPlus, BookmarkMinus, MapPin, Star, DollarSign, X, StickyNote, Lock, Globe, Users } from 'lucide-react-native';
+import { ArrowLeft, Plus, MoreVertical, Trash2, Pencil, Share2, BookmarkPlus, BookmarkMinus, MapPin, Star, DollarSign, X, StickyNote, Lock, Globe, Link2 } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { isWeb, webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
@@ -67,7 +67,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   const removeMutation = useRemoveRexFromCollection(collectionId);
   const deleteMutation = useDeleteCollection();
   const { mutate: save } = useSaveCollection();
-  const { mutate: unsave } = useUnsaveCollection();
+  const { mutate: unsave, isPending: unsaving } = useUnsaveCollection();
   const updateNote = useUpdateCollectionRexNote(collectionId);
 
   const [noteItemId, setNoteItemId] = useState<string | null>(null);
@@ -88,6 +88,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
 
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showUnsaveConfirm, setShowUnsaveConfirm] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [savedOverride, setSavedOverride] = useState<boolean | null>(null);
   const isSaved = savedOverride ?? detail?.is_saved ?? false;
@@ -362,13 +363,13 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                 activeOpacity={0.7}
                 onPress={() => {
                   setShowMenu(false);
-                  const next = !isSaved;
-                  setSavedOverride(next);
-                  if (next) {
-                    save(collectionId, { onError: () => setSavedOverride(!next) });
-                  } else {
-                    unsave(collectionId, { onError: () => setSavedOverride(!next) });
+                  if (isSaved) {
+                    setShowUnsaveConfirm(true);
+                    return;
                   }
+                  const next = true;
+                  setSavedOverride(next);
+                  save(collectionId, { onError: () => setSavedOverride(false) });
                 }}
                 className={`flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md ${isSaved ? 'hover:bg-zinc-100' : 'hover:bg-zinc-100'}`}
               >
@@ -433,6 +434,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                 <TouchableOpacity
                   onPress={() => setShowDeleteConfirm(false)}
                   activeOpacity={0.7}
+                  disabled={deleteMutation.isPending}
                   className="flex-1 py-2.5 rounded-xl bg-muted items-center"
                 >
                   <Text className="text-sm font-semibold text-foreground">Cancel</Text>
@@ -440,9 +442,71 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                 <TouchableOpacity
                   onPress={() => deleteMutation.mutate(collectionId, { onSuccess: onBack })}
                   activeOpacity={0.8}
+                  disabled={deleteMutation.isPending}
                   className="flex-1 py-2.5 rounded-xl bg-destructive items-center"
                 >
                   <Text className="text-sm font-semibold text-white">Delete</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      <Modal
+        visible={showUnsaveConfirm}
+        transparent
+        animationType={isWeb ? 'fade' : 'slide'}
+        onRequestClose={() => setShowUnsaveConfirm(false)}
+      >
+        <Pressable
+          className={`flex-1 bg-black/50 ${isWeb ? 'items-center justify-center px-4' : 'justify-end'}`}
+          onPress={() => setShowUnsaveConfirm(false)}
+        >
+          <Pressable
+            className={`bg-card border border-border pt-3 pb-8 ${isWeb ? 'rounded-2xl w-full' : 'rounded-t-2xl border-t-0'}`}
+            style={isWeb ? { maxWidth: 400 } : undefined}
+            onPress={() => {}}
+          >
+            <View style={webContainerStyle} className="px-4">
+              <View className="items-center mb-4">
+                <View
+                  className={`w-10 h-1 rounded-full bg-muted-foreground/30 ${isWeb ? 'hidden' : ''}`}
+                />
+              </View>
+              <View className="w-12 h-12 rounded-full bg-destructive/10 items-center justify-center mb-4 self-center">
+                <BookmarkMinus size={22} color={Theme.colors.destructive} />
+              </View>
+              <Text className="text-lg font-display font-bold text-foreground text-center mb-1">
+                Remove from saved?
+              </Text>
+              <Text className="text-sm text-muted-foreground text-center mb-6">
+                "{detail.display_name}" will be removed from your saved collections. You can save it again anytime.
+              </Text>
+              <View className="flex-row gap-3">
+                <TouchableOpacity
+                  onPress={() => setShowUnsaveConfirm(false)}
+                  activeOpacity={0.7}
+                  disabled={unsaving}
+                  className="flex-1 py-2.5 rounded-xl bg-muted items-center"
+                >
+                  <Text className="text-sm font-semibold text-foreground">Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    unsave(collectionId, {
+                      onSuccess: () => {
+                        setShowUnsaveConfirm(false);
+                        setSavedOverride(false);
+                        onBack();
+                      },
+                    })
+                  }
+                  activeOpacity={0.8}
+                  disabled={unsaving}
+                  className="flex-1 py-2.5 rounded-xl bg-destructive items-center"
+                >
+                  <Text className="text-sm font-semibold text-white">Remove</Text>
                 </TouchableOpacity>
               </View>
             </View>

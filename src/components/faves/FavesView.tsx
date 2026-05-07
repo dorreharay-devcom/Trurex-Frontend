@@ -29,6 +29,8 @@ import CreateCollectionModal from '~/components/faves/CreateCollectionModal';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import AddRexToCollectionSheet from '~/components/faves/AddRexToCollectionSheet';
 import CollectionCard from '~/components/profile/CollectionCard';
+import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
+import { toastError } from '~/utils/appToast';
 
 type FavesViewProps = {
   commentCountByRexId?: Record<string, number>;
@@ -45,6 +47,10 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
   const [addToCollectionId, setAddToCollectionId] = useState<string | null>(null);
   const [showCreateCollection, setShowCreateCollection] = useState(false);
   const [addToCollectionRec, setAddToCollectionRec] = useState<RecSummary | null>(null);
+  const [confirmRemoveUncollected, setConfirmRemoveUncollected] = useState<Recommendation | null>(
+    null,
+  );
+  const [removeUncollectedPending, setRemoveUncollectedPending] = useState(false);
 
   const { data: myCollections = [], isLoading: loadingMine } = useMyCollections(user?.id);
   const { data: savedCollections = [], isLoading: loadingSavedCollections } =
@@ -70,6 +76,22 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
         (r.location?.toLowerCase() ?? '').includes(q),
     );
   }, [uncollectedRecs, searchQuery]);
+
+  const confirmRemoveUncollectedRex = async () => {
+    if (!user || !confirmRemoveUncollected) return;
+    setRemoveUncollectedPending(true);
+    try {
+      await CollectionsApi.unsaveRex(user.id, confirmRemoveUncollected.id);
+      queryClient.invalidateQueries({ queryKey: ['my-saved-ids'] });
+      queryClient.invalidateQueries({ queryKey: ['my-saved-rexes'] });
+      queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
+      setConfirmRemoveUncollected(null);
+    } catch (e) {
+      toastError('Could not remove', e instanceof Error ? e.message : 'Try again.');
+    } finally {
+      setRemoveUncollectedPending(false);
+    }
+  };
 
   if (openCollectionId) {
     return (
@@ -249,10 +271,12 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
                 <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
                   {item.title}
                 </Text>
-                <View className="flex-row items-center gap-2 mt-1 flex-wrap">
-                  <Text className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-muted text-foreground capitalize">
-                    {item.category}
-                  </Text>
+                <View className="mt-1 flex-row flex-wrap items-center gap-2">
+                  <View className="rounded-full border border-[#d4d4d4cc] bg-[#d4d4d466] px-2 py-0.5">
+                    <Text className="text-[10px] font-medium capitalize text-foreground">
+                      {item.category}
+                    </Text>
+                  </View>
                   {item.location && (
                     <View className="flex-row items-center gap-0.5">
                       <MapPin size={10} color={Theme.colors.muted} />
@@ -295,13 +319,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
                   <Text className="text-[11px] font-medium text-foreground">Add</Text>
                 </TouchableOpacity>
                 <Pressable
-                  onPress={() =>
-                    CollectionsApi.unsaveRex(user!.id, item.id).then(() => {
-                      queryClient.invalidateQueries({ queryKey: ['my-saved-ids'] });
-                      queryClient.invalidateQueries({ queryKey: ['my-saved-rexes'] });
-                      queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
-                    })
-                  }
+                  onPress={() => user && setConfirmRemoveUncollected(item)}
                   className="p-0.5"
                 >
                   {({ hovered, pressed }: { hovered?: boolean; pressed?: boolean }) => (
@@ -327,6 +345,20 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
             </View>
           )
         }
+      />
+
+      <DestructiveActionConfirmModal
+        visible={confirmRemoveUncollected != null}
+        title="Remove from saved?"
+        message={
+          confirmRemoveUncollected
+            ? `"${confirmRemoveUncollected.title}" will be removed from Uncollected Rex. You can save it again from Discover.`
+            : ''
+        }
+        confirmLabel="Remove"
+        pending={removeUncollectedPending}
+        onCancel={() => !removeUncollectedPending && setConfirmRemoveUncollected(null)}
+        onConfirm={() => void confirmRemoveUncollectedRex()}
       />
 
       <CreateCollectionModal

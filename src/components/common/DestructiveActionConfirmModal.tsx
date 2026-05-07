@@ -1,38 +1,46 @@
-import React from 'react';
-import { View, Text, Modal, Pressable, ActivityIndicator } from 'react-native';
+import React, { type ReactNode } from 'react';
+import { ActivityIndicator, Modal, Pressable, Text, View } from 'react-native';
 import { Trash2 } from 'lucide-react-native';
-import { Theme } from '~/theme/Theme';
 import { isWeb, webContainerStyle } from '~/utils';
+import { Theme } from '~/theme/Theme';
 
-type Props = {
+export type DestructiveActionConfirmModalProps = {
   visible: boolean;
+  title: string;
   message: string;
+  confirmLabel: string;
+  cancelLabel?: string;
+  icon?: ReactNode;
+  pending?: boolean;
   onCancel: () => void;
   onConfirm: () => void;
-  isDeleting?: boolean;
 };
 
-export function DeleteRecommendationConfirmModal({
+export function DestructiveActionConfirmModal({
   visible,
+  title,
   message,
+  confirmLabel,
+  cancelLabel = 'Cancel',
+  icon,
+  pending = false,
   onCancel,
   onConfirm,
-  isDeleting = false,
-}: Props) {
+}: DestructiveActionConfirmModalProps) {
   return (
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType={isWeb ? 'fade' : 'slide'}
       onRequestClose={() => {
-        if (!isDeleting) onCancel();
+        if (!pending) onCancel();
       }}
       accessibilityViewIsModal
     >
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Dismiss"
-        disabled={isDeleting}
+        disabled={pending}
         className={`flex-1 bg-black/50 ${isWeb ? 'items-center justify-center px-4' : 'justify-end'}`}
         onPress={onCancel}
       >
@@ -46,10 +54,10 @@ export function DeleteRecommendationConfirmModal({
               <View className="h-1 w-10 rounded-full bg-muted-foreground/30" />
             </View>
             <View className="mb-4 h-12 w-12 items-center justify-center self-center rounded-full bg-destructive/10">
-              <Trash2 size={22} color={Theme.colors.destructive} />
+              {icon ?? <Trash2 size={22} color={Theme.colors.destructive} />}
             </View>
             <Text className="mb-1 text-center font-display text-lg font-bold text-foreground">
-              Delete recommendation?
+              {title}
             </Text>
             <Text className="mb-6 text-center text-sm leading-relaxed text-muted-foreground">
               {message}
@@ -58,23 +66,23 @@ export function DeleteRecommendationConfirmModal({
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Cancel"
-                disabled={isDeleting}
+                disabled={pending}
                 onPress={onCancel}
                 className="flex-1 items-center rounded-xl border border-border bg-muted/50 py-2.5 cursor-pointer transition-colors hover:bg-muted active:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-muted/50"
               >
-                <Text className="text-sm font-semibold text-black">Cancel</Text>
+                <Text className="text-sm font-semibold text-black">{cancelLabel}</Text>
               </Pressable>
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Delete recommendation"
-                disabled={isDeleting}
+                accessibilityLabel={confirmLabel}
+                disabled={pending}
                 onPress={onConfirm}
                 className="flex-1 flex-row items-center justify-center gap-2 rounded-xl bg-destructive py-2.5 cursor-pointer transition-colors hover:bg-destructive/90 active:opacity-90 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-destructive"
               >
-                {isDeleting ? (
+                {pending ? (
                   <ActivityIndicator size="small" color={Theme.colors.white} />
                 ) : (
-                  <Text className="text-sm font-semibold text-white">Delete</Text>
+                  <Text className="text-sm font-semibold text-white">{confirmLabel}</Text>
                 )}
               </Pressable>
             </View>

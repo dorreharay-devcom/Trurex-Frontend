@@ -27,7 +27,7 @@ import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
 import { deleteRex, fetchRexDetail } from '~/api/rexDetailApi';
-import { DeleteRecommendationConfirmModal } from '~/components/recommendation/DeleteRecommendationConfirmModal';
+import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 import { ReportContentDialog } from '~/components/recommendation/report/ReportContentDialog';
 import { useAuth } from '~/services/AuthContext';
 import type { ContentReportTarget } from '~/constants/recommendation/contentReport';
@@ -506,12 +506,14 @@ export const RecommendationDetailModal: React.FC<Props> = ({
         }}
         target={reportTarget}
       />
-      <DeleteRecommendationConfirmModal
+      <DestructiveActionConfirmModal
         visible={deleteConfirmOpen}
-        message="This permanently removes this rex and related likes, comments, photos, saves, and collection entries. This can’t be undone."
+        title="Delete recommendation?"
+        message="This permanently removes this rex and related likes, comments, photos, saves, and collection entries. This can't be undone."
+        confirmLabel="Delete"
+        pending={deleteRexMutation.isPending}
         onCancel={() => setDeleteConfirmOpen(false)}
         onConfirm={handleConfirmDeleteRex}
-        isDeleting={deleteRexMutation.isPending}
       />
     </>
   );
