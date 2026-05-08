@@ -37,46 +37,40 @@ function CircleMembershipBadge({
   const showExtra = extraCount > 0;
   const a11y = showExtra ? `${circle.name}, plus ${extraCount} more circles` : circle.name;
 
-  const body = (
-    <>
+  const pill = interactive ? (
+    <Pressable
+      onPress={onPress}
+      hitSlop={6}
+      accessibilityLabel={a11y}
+      className="rounded-full px-2 py-0.5 active:opacity-80"
+      style={shellStyle}
+    >
       <Text className="text-[10px] font-semibold" style={{ color }} numberOfLines={1}>
         {circle.name}
       </Text>
+    </Pressable>
+  ) : (
+    <View accessible accessibilityLabel={a11y} className="rounded-full px-2 py-0.5" style={shellStyle}>
+      <Text className="text-[10px] font-semibold" style={{ color }} numberOfLines={1}>
+        {circle.name}
+      </Text>
+    </View>
+  );
+
+  return (
+    <View className="flex-row items-center gap-1">
+      {pill}
       {showExtra ? (
         <View
-          className="absolute -right-1.5 -top-2 min-w-[18px] items-center rounded-full border border-border bg-card px-1 py-px"
+          className="min-w-[18px] items-center rounded-full border border-border bg-card px-1 py-px"
           pointerEvents="none"
+          accessibilityElementsHidden
         >
           <Text className="text-[9px] font-bold leading-none text-foreground" numberOfLines={1}>
             +{extraCount}
           </Text>
         </View>
       ) : null}
-    </>
-  );
-
-  if (interactive && onPress) {
-    return (
-      <Pressable
-        onPress={onPress}
-        hitSlop={6}
-        accessibilityLabel={a11y}
-        className="relative rounded-full px-2 py-0.5 active:opacity-80"
-        style={shellStyle}
-      >
-        {body}
-      </Pressable>
-    );
-  }
-
-  return (
-    <View
-      accessible
-      accessibilityLabel={a11y}
-      className="relative rounded-full px-2 py-0.5"
-      style={shellStyle}
-    >
-      {body}
     </View>
   );
 }

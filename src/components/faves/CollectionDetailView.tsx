@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Modal, Pressable, StyleSheet, useWindowDimensions, TextInput } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { ArrowLeft, Plus, MoreVertical, Trash2, Pencil, Share2, BookmarkPlus, BookmarkMinus, MapPin, Star, DollarSign, X, StickyNote, Lock, Globe, Users } from 'lucide-react-native';
+import { ArrowLeft, Plus, MoreVertical, Trash2, Pencil, Share2, BookmarkPlus, BookmarkMinus, MapPin, Star, DollarSign, X, StickyNote, Lock, Globe, Link2 } from 'lucide-react-native';
 import { Image } from 'expo-image';
-import { isWeb, webContainerStyle } from '~/utils';
+import { webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
 import {
   useCollectionDetail,
@@ -23,6 +23,7 @@ import type { Recommendation, RecommendationOpenOptions } from '~/types/recommen
 const VALUE_LABELS = ['Total Steal', 'Budget-Friendly', 'Good Value', 'Worth It', 'Splurge'];
 import type { CollectionRexEntry } from '~/api/CollectionsApi';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
+import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 
 function entryToRec(entry: CollectionRexEntry): Recommendation {
   return {
@@ -67,7 +68,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   const removeMutation = useRemoveRexFromCollection(collectionId);
   const deleteMutation = useDeleteCollection();
   const { mutate: save } = useSaveCollection();
-  const { mutate: unsave } = useUnsaveCollection();
+  const { mutate: unsave, isPending: unsaving } = useUnsaveCollection();
   const updateNote = useUpdateCollectionRexNote(collectionId);
 
   const [noteItemId, setNoteItemId] = useState<string | null>(null);
@@ -88,6 +89,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
 
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showUnsaveConfirm, setShowUnsaveConfirm] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [savedOverride, setSavedOverride] = useState<boolean | null>(null);
   const isSaved = savedOverride ?? detail?.is_saved ?? false;
@@ -362,13 +364,13 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                 activeOpacity={0.7}
                 onPress={() => {
                   setShowMenu(false);
-                  const next = !isSaved;
-                  setSavedOverride(next);
-                  if (next) {
-                    save(collectionId, { onError: () => setSavedOverride(!next) });
-                  } else {
-                    unsave(collectionId, { onError: () => setSavedOverride(!next) });
+                  if (isSaved) {
+                    setShowUnsaveConfirm(true);
+                    return;
                   }
+                  const next = true;
+                  setSavedOverride(next);
+                  save(collectionId, { onError: () => setSavedOverride(false) });
                 }}
                 className={`flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md ${isSaved ? 'hover:bg-zinc-100' : 'hover:bg-zinc-100'}`}
               >
@@ -399,56 +401,34 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
         }}
       />
 
-      <Modal
+      <DestructiveActionConfirmModal
         visible={showDeleteConfirm}
-        transparent
-        animationType={isWeb ? 'fade' : 'slide'}
-        onRequestClose={() => setShowDeleteConfirm(false)}
-      >
-        <Pressable
-          className={`flex-1 bg-black/50 ${isWeb ? 'items-center justify-center px-4' : 'justify-end'}`}
-          onPress={() => setShowDeleteConfirm(false)}
-        >
-          <Pressable
-            className={`bg-card border border-border pt-3 pb-8 ${isWeb ? 'rounded-2xl w-full' : 'rounded-t-2xl border-t-0'}`}
-            style={isWeb ? { maxWidth: 400 } : undefined}
-            onPress={() => {}}
-          >
-            <View style={webContainerStyle} className="px-4">
-              <View className="items-center mb-4">
-                <View
-                  className={`w-10 h-1 rounded-full bg-muted-foreground/30 ${isWeb ? 'hidden' : ''}`}
-                />
-              </View>
-              <View className="w-12 h-12 rounded-full bg-destructive/10 items-center justify-center mb-4 self-center">
-                <Trash2 size={22} color={Theme.colors.destructive} />
-              </View>
-              <Text className="text-lg font-display font-bold text-foreground text-center mb-1">
-                Delete collection?
-              </Text>
-              <Text className="text-sm text-muted-foreground text-center mb-6">
-                "{detail.display_name}" will be permanently deleted. This cannot be undone.
-              </Text>
-              <View className="flex-row gap-3">
-                <TouchableOpacity
-                  onPress={() => setShowDeleteConfirm(false)}
-                  activeOpacity={0.7}
-                  className="flex-1 py-2.5 rounded-xl bg-muted items-center"
-                >
-                  <Text className="text-sm font-semibold text-foreground">Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => deleteMutation.mutate(collectionId, { onSuccess: onBack })}
-                  activeOpacity={0.8}
-                  className="flex-1 py-2.5 rounded-xl bg-destructive items-center"
-                >
-                  <Text className="text-sm font-semibold text-white">Delete</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
+        title="Delete collection?"
+        message={`"${detail.display_name}" will be permanently deleted. This cannot be undone.`}
+        confirmLabel="Delete"
+        pending={deleteMutation.isPending}
+        onCancel={() => setShowDeleteConfirm(false)}
+        onConfirm={() => deleteMutation.mutate(collectionId, { onSuccess: onBack })}
+      />
+
+      <DestructiveActionConfirmModal
+        visible={showUnsaveConfirm}
+        title="Remove from saved?"
+        message={`"${detail.display_name}" will be removed from your saved collections. You can save it again anytime.`}
+        confirmLabel="Remove"
+        icon={<BookmarkMinus size={22} color={Theme.colors.destructive} />}
+        pending={unsaving}
+        onCancel={() => setShowUnsaveConfirm(false)}
+        onConfirm={() =>
+          unsave(collectionId, {
+            onSuccess: () => {
+              setShowUnsaveConfirm(false);
+              setSavedOverride(false);
+              onBack();
+            },
+          })
+        }
+      />
 
       <AddToCollectionSheet
         open={!!saveTarget}
