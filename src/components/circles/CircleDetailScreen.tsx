@@ -30,9 +30,9 @@ import { Theme } from '~/theme/Theme';
 import { canEditOrDeleteUserCircle, getCircleUiPolicy } from '~/utils/circleTabUtils';
 import { webContainerStyle } from '~/utils';
 
-type Props = { vm: CirclesViewModel };
+type Props = { vm: CirclesViewModel; onUserPress?: (userId: string) => void };
 
-export function CircleDetailScreen({ vm }: Props) {
+export function CircleDetailScreen({ vm, onUserPress }: Props) {
   const [addConnTab, setAddConnTab] = useState<ConnectionScopeTab>('trusted');
 
   const selectedCircle = vm.selectedCircle;
@@ -133,6 +133,7 @@ export function CircleDetailScreen({ vm }: Props) {
               <CircleMemberRow
                 key={m.user_id}
                 member={m}
+                onUserPress={onUserPress}
                 onRemove={
                   canManage && allowRemoveMember
                     ? () => vm.removeFromSelectedCircle(m.user_id)
@@ -201,6 +202,7 @@ export function CircleDetailScreen({ vm }: Props) {
                     isMember={vm.memberIdSet.has(row.user_id)}
                     isAdding={vm.addingMemberId === row.user_id}
                     onAdd={() => vm.addToSelectedCircle(row.user_id)}
+                    onUserPress={onUserPress}
                   />
                 ))}
               </View>
@@ -213,7 +215,9 @@ export function CircleDetailScreen({ vm }: Props) {
                 ) : addPhase === 'trusted_empty' ? (
                   <TrustedEmptyState />
                 ) : addPhase === 'followers_empty' ? (
-                  <Text className="text-center text-sm text-muted-foreground">No followers yet.</Text>
+                  <Text className="text-center text-sm text-muted-foreground">
+                    No followers yet.
+                  </Text>
                 ) : (
                   <Text className="text-center text-sm text-muted-foreground">
                     Not following anyone yet.

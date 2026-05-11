@@ -26,6 +26,7 @@ export default function HomeScreen() {
   const [previewOptions, setPreviewOptions] = useState<RecommendationOpenOptions>({});
   const [avatarRefreshKey, setAvatarRefreshKey] = useState(0);
   const [viewingUserId, setViewingUserId] = useState<string | undefined>(undefined);
+  const [profileReturnTab, setProfileReturnTab] = useState<Tab>('discover');
 
   const handleCloseCreate = useCallback(() => {
     setCreateRecommendationOpen(false);
@@ -49,12 +50,16 @@ export default function HomeScreen() {
     setPreviewOptions({});
   }, []);
 
-  const openUserProfile = useCallback((userId: string) => {
-    setPreviewRecommendation(null);
-    setPreviewOptions({});
-    setViewingUserId(userId);
-    setCurrentTab('profile');
-  }, []);
+  const openUserProfile = useCallback(
+    (userId: string) => {
+      setPreviewRecommendation(null);
+      setPreviewOptions({});
+      setViewingUserId(userId);
+      setProfileReturnTab((prev) => (currentTab !== 'profile' ? currentTab : prev));
+      setCurrentTab('profile');
+    },
+    [currentTab],
+  );
 
   const handleCommentCountChange = useCallback((_total: number) => {}, []);
 
@@ -81,12 +86,11 @@ export default function HomeScreen() {
           <DiscoverView searchQuery={searchQuery} onRecommendationPress={openPreview} />
         )}
         {currentTab === 'faves' && (
-          <FavesView
-            commentCountByRexId={{}}
-            onRecommendationPress={openPreview}
-          />
+          <FavesView commentCountByRexId={{}} onRecommendationPress={openPreview} />
         )}
-        {currentTab === 'circles' && <CirclesView isActive={currentTab === 'circles'} />}
+        {currentTab === 'circles' && (
+          <CirclesView isActive={currentTab === 'circles'} onUserPress={openUserProfile} />
+        )}
         {currentTab === 'map' && <MapScreen onRecommendationPress={openPreview} />}
         {currentTab === 'profile' && (
           <ProfileView
@@ -96,7 +100,7 @@ export default function HomeScreen() {
               viewingUserId
                 ? () => {
                     setViewingUserId(undefined);
-                    setCurrentTab('discover');
+                    setCurrentTab(profileReturnTab);
                   }
                 : undefined
             }

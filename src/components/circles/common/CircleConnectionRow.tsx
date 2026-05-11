@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import { UserPlus } from 'lucide-react-native';
+import { ChevronRight, UserPlus } from 'lucide-react-native';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { Theme } from '~/theme/Theme';
 import type { NetworkUserRow } from '~/types/network';
@@ -11,12 +11,21 @@ type Props = {
   isMember: boolean;
   isAdding: boolean;
   allowAdd?: boolean;
+  onUserPress?: (userId: string) => void;
 };
 
-export function CircleConnectionRow({ row, onAdd, isMember, isAdding, allowAdd = true }: Props) {
+export function CircleConnectionRow({
+  row,
+  onAdd,
+  isMember,
+  isAdding,
+  allowAdd = true,
+  onUserPress,
+}: Props) {
   const label = row.display_name || 'Member';
-  return (
-    <View className="flex-row items-center gap-3 rounded-xl border border-border bg-card p-3">
+
+  const profileBody = (
+    <>
       <SignedUserAvatar name={label} avatar={row.avatar_url} className="h-10 w-10" />
       <View className="min-w-0 flex-1">
         <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
@@ -28,6 +37,23 @@ export function CircleConnectionRow({ row, onAdd, isMember, isAdding, allowAdd =
           </Text>
         ) : null}
       </View>
+    </>
+  );
+
+  return (
+    <View className="flex-row items-center gap-3 rounded-xl border border-border bg-card p-3">
+      {onUserPress ? (
+        <Pressable
+          onPress={() => onUserPress(row.user_id)}
+          accessibilityRole="button"
+          accessibilityLabel={`View ${label}'s profile`}
+          className="min-w-0 flex-1 flex-row items-center gap-3 rounded-lg active:opacity-70"
+        >
+          {profileBody}
+        </Pressable>
+      ) : (
+        <View className="min-w-0 flex-1 flex-row items-center gap-3">{profileBody}</View>
+      )}
       {allowAdd ? (
         <Pressable
           onPress={onAdd}
@@ -56,6 +82,17 @@ export function CircleConnectionRow({ row, onAdd, isMember, isAdding, allowAdd =
           <Text className="text-[10px] font-medium text-muted-foreground">Following</Text>
         </View>
       )}
+      {onUserPress ? (
+        <Pressable
+          onPress={() => onUserPress(row.user_id)}
+          accessibilityRole="button"
+          accessibilityLabel={`View ${label}'s profile`}
+          hitSlop={8}
+          className="justify-center rounded-lg p-0.5 active:opacity-70"
+        >
+          <ChevronRight size={16} color={Theme.colors.secondaryText} />
+        </Pressable>
+      ) : null}
     </View>
   );
 }
