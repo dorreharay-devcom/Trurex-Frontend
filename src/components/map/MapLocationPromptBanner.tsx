@@ -20,8 +20,8 @@ export const MapLocationPromptBanner: React.FC<Props> = ({ visible, onAllow, onN
         left: MAP_ACTION_INSET,
         right: MAP_ACTION_INSET,
         top: MAP_LOCATION_PROMPT_TOP,
-        zIndex: 1250,
-        elevation: Platform.OS === 'android' ? 14 : 0,
+        zIndex: 1280,
+        elevation: Platform.OS === 'android' ? 15 : 0,
       }}
     >
       <View className="rounded-2xl border border-border bg-card p-4 shadow-md">

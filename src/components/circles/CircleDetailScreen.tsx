@@ -27,7 +27,12 @@ import {
   type ConnectionScopeTab,
 } from '~/hooks/circles/useScopedConnectionUserSearch';
 import { Theme } from '~/theme/Theme';
-import { canEditOrDeleteUserCircle, getCircleUiPolicy } from '~/utils/circleTabUtils';
+import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
+import {
+  DELETE_CIRCLE_CONFIRM_MESSAGE,
+  canEditOrDeleteUserCircle,
+  getCircleUiPolicy,
+} from '~/utils/circleTabUtils';
 import { webContainerStyle } from '~/utils';
 
 type Props = { vm: CirclesViewModel; onUserPress?: (userId: string) => void };
@@ -90,6 +95,7 @@ export function CircleDetailScreen({ vm, onUserPress }: Props) {
         <DetailToolbar
           canManage={canManage}
           deletePending={vm.deleteMutation.isPending}
+          deleteModalOpen={vm.showDeleteCircleModal}
           onBack={() => vm.setSelectedCircleId(null)}
           onEdit={vm.openEditSheet}
           onDelete={vm.requestDeleteCircle}
@@ -246,6 +252,16 @@ export function CircleDetailScreen({ vm, onUserPress }: Props) {
         saveDisabled={!vm.editName.trim() || vm.updateMutation.isPending}
         saving={vm.updateMutation.isPending}
       />
+
+      <DestructiveActionConfirmModal
+        visible={vm.showDeleteCircleModal}
+        title="Delete circle?"
+        message={DELETE_CIRCLE_CONFIRM_MESSAGE}
+        confirmLabel="Delete"
+        pending={vm.deleteMutation.isPending}
+        onCancel={vm.dismissDeleteCircleModal}
+        onConfirm={vm.commitDeleteCircle}
+      />
     </>
   );
 }
@@ -253,12 +269,14 @@ export function CircleDetailScreen({ vm, onUserPress }: Props) {
 function DetailToolbar({
   canManage,
   deletePending,
+  deleteModalOpen,
   onBack,
   onEdit,
   onDelete,
 }: {
   canManage: boolean;
   deletePending: boolean;
+  deleteModalOpen: boolean;
   onBack: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -280,7 +298,7 @@ function DetailToolbar({
           </Pressable>
           <Pressable
             onPress={onDelete}
-            disabled={deletePending}
+            disabled={deletePending || deleteModalOpen}
             className="flex-row items-center gap-1 rounded-lg border border-destructive/40 bg-destructive/5 px-3 py-2 active:opacity-90"
           >
             {deletePending ? (

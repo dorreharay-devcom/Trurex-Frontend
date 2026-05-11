@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import type { CircleApiRow } from '~/api/circlesApi';
 import type { NetworkUserRow } from '~/types/network';
 import { isWeb } from '~/utils';
@@ -82,20 +81,5 @@ export function selectFollowersNotFollowedBack(
   return followerRows.filter((r) => !iFollowUserIds.has(r.user_id));
 }
 
-const DELETE_CIRCLE_BODY = 'This removes the circle and its memberships. This cannot be undone.';
-
-export function confirmDeleteCircle(onConfirm: () => void): void {
-  if (isWeb) {
-    if (
-      typeof window !== 'undefined' &&
-      window.confirm(`Delete circle?\n\n${DELETE_CIRCLE_BODY}`)
-    ) {
-      onConfirm();
-    }
-    return;
-  }
-  Alert.alert('Delete circle?', DELETE_CIRCLE_BODY, [
-    { text: 'Cancel', style: 'cancel' },
-    { text: 'Delete', style: 'destructive', onPress: onConfirm },
-  ]);
-}
+export const DELETE_CIRCLE_CONFIRM_MESSAGE =
+  'This removes the circle and its memberships. This cannot be undone.';

@@ -116,8 +116,7 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
   const showEmptyMapAreaBanner =
     mapViewVisible && mapDataReady && flow.locatedRexCount === 0 && !hasSearchQuery;
 
-  const showNoSearchMatchBanner =
-    mapViewVisible && flow.mapMarkers.length === 0 && hasSearchQuery;
+  const showNoSearchMatchBanner = mapViewVisible && flow.mapMarkers.length === 0 && hasSearchQuery;
 
   return (
     <View className="relative min-h-0 w-full flex-1 bg-background pt-4">
@@ -152,11 +151,6 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
                 }),
               ]}
             >
-              <MapLocationPromptBanner
-                visible={locationPromptVisible}
-                onAllow={onLocationAllow}
-                onNotNow={onLocationNotNow}
-              />
               <MapLegend />
               <MapLayerToggle visibility={flow.layers} onChange={flow.setLayers} />
 
@@ -202,7 +196,6 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
                   </View>
                 </View>
               ) : null}
-
             </View>
 
             {flow.selectedRec && (
@@ -288,7 +281,9 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
               trailingSlot="preserve-width"
               field={
                 <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
-                  <Text className="text-sm font-medium text-foreground">No Rex match that name</Text>
+                  <Text className="text-sm font-medium text-foreground">
+                    No Rex match that name
+                  </Text>
                   <Text className="mt-1 text-xs text-muted-foreground">
                     Try another title or clear the search.
                   </Text>
@@ -296,6 +291,14 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
               }
             />
           </View>
+        ) : null}
+
+        {!flow.listView ? (
+          <MapLocationPromptBanner
+            visible={locationPromptVisible}
+            onAllow={onLocationAllow}
+            onNotNow={onLocationNotNow}
+          />
         ) : null}
 
         <MapSearchBar

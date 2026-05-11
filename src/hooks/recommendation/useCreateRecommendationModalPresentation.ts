@@ -20,6 +20,8 @@ export function useCreateRecommendationModalPresentation({
   reset,
 }: Params) {
   const prevStepIndex = useRef(-1);
+  const windowHeightRef = useRef(windowHeight);
+  windowHeightRef.current = windowHeight;
   const sheetTranslateY = useRef(
     new RNAnimated.Value(Math.max(Dimensions.get('window').height, 1)),
   ).current;
@@ -34,7 +36,7 @@ export function useCreateRecommendationModalPresentation({
 
   useEffect(() => {
     if (!visible) return;
-    const h = Math.max(windowHeight, Dimensions.get('window').height, 1);
+    const h = Math.max(windowHeightRef.current, Dimensions.get('window').height, 1);
     sheetTranslateY.setValue(h);
     RNAnimated.timing(sheetTranslateY, {
       toValue: 0,
@@ -42,7 +44,7 @@ export function useCreateRecommendationModalPresentation({
       easing: RNEasing.out(RNEasing.cubic),
       useNativeDriver: Platform.OS !== 'web',
     }).start();
-  }, [visible, windowHeight, sheetTranslateY]);
+  }, [visible, sheetTranslateY]);
 
   useLayoutEffect(() => {
     if (stepIndex !== prevStepIndex.current && prevStepIndex.current !== -1) {
@@ -57,7 +59,7 @@ export function useCreateRecommendationModalPresentation({
   }, [stepIndex, stepOpacity]);
 
   const handleClose = useCallback(() => {
-    const h = Math.max(windowHeight, Dimensions.get('window').height, 1);
+    const h = Math.max(windowHeightRef.current, Dimensions.get('window').height, 1);
     RNAnimated.timing(sheetTranslateY, {
       toValue: h,
       duration: timing.sheetCloseMs,
@@ -68,7 +70,7 @@ export function useCreateRecommendationModalPresentation({
         onClose();
       }
     });
-  }, [windowHeight, sheetTranslateY, onClose]);
+  }, [sheetTranslateY, onClose]);
 
   return {
     sheetTranslateY,

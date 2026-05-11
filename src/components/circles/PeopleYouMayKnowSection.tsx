@@ -1,29 +1,78 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import { Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { UserPlus, X } from 'lucide-react-native';
-import { MOCK_PEOPLE_YOU_MAY_KNOW } from '~/data/mockPeopleYouMayKnow';
+import {
+  dismissPeopleSuggestion,
+  fetchPeopleSuggestions,
+  followUserFromPeopleSuggestion,
+} from '~/api/peopleSuggestionsApi';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { Theme } from '~/theme/Theme';
-import type { SuggestedUser } from '~/types/network';
+import type { PeopleSuggestionRow } from '~/types/peopleSuggestions';
+import { toastError, toastSuccess } from '~/utils/appToast';
+import { unknownErrorMessage } from '~/utils';
+
+function formatSuggestionSubtitle(s: PeopleSuggestionRow): string | undefined {
+  const parts: string[] = [];
+  if (s.mutual_count > 0) {
+    parts.push(
+      s.mutual_count === 1 ? '1 mutual connection' : `${s.mutual_count} mutual connections`,
+    );
+  }
+  if (s.common_circle_count > 0) {
+    const first = s.common_circles?.[0];
+    if (s.common_circle_count === 1 && first?.name) {
+      parts.push(`Shared circle: ${first.name}`);
+    } else {
+      parts.push(`${s.common_circle_count} shared circles`);
+    }
+  }
+  if (parts.length > 0) return parts.join(' · ');
+  if (s.primary_reason === 'fallback_global') return 'Suggested for you';
+  if (s.connection_degree === 2) return 'Connected through your network';
+  if (s.connection_degree === 3) return 'Extended network';
+  return undefined;
+}
 
 function PeopleYouMayKnowCard({
   suggestion,
   onDismiss,
-  onMockFollow,
-  followed,
+  onFollow,
+  isFollowing,
+  dismissPending,
+  followPending,
   layout,
   cardStyle,
+  onUserPress,
 }: {
-  suggestion: SuggestedUser;
+  suggestion: PeopleSuggestionRow;
   onDismiss: () => void;
-  onMockFollow: () => void;
-  followed: boolean;
+  onFollow: () => void;
+  isFollowing: boolean;
+  dismissPending: boolean;
+  followPending: boolean;
   layout: 'stack' | 'carousel';
   cardStyle?: StyleProp<ViewStyle>;
+  onUserPress?: (userId: string) => void;
 }) {
   const label = suggestion.display_name ?? 'Member';
-  const subline = suggestion.bio?.trim() || suggestion.location?.trim();
+  const subline = formatSuggestionSubtitle(suggestion);
+
+  const profilePress =
+    onUserPress != null
+      ? () => {
+          onUserPress(suggestion.candidate_user_id);
+        }
+      : undefined;
 
   return (
     <View
@@ -35,12 +84,17 @@ function PeopleYouMayKnowCard({
       <Pressable
         onPress={onDismiss}
         hitSlop={8}
-        className="absolute right-2 top-2 z-10 rounded-md p-1 active:opacity-70"
+        disabled={dismissPending}
+        className="absolute right-2 top-2 z-10 rounded-md p-1 active:opacity-70 disabled:opacity-40"
       >
         <X size={14} color={Theme.colors.muted} />
       </Pressable>
 
-      <View className="flex-row items-start gap-3 pr-6">
+      <Pressable
+        onPress={profilePress}
+        disabled={!profilePress}
+        className={`flex-row items-start gap-3 pr-6 ${profilePress ? 'active:opacity-80' : ''}`}
+      >
         <SignedUserAvatar
           name={label}
           avatar={suggestion.avatar_url}
@@ -61,17 +115,18 @@ function PeopleYouMayKnowCard({
             </Text>
           ) : null}
         </View>
-      </View>
+      </Pressable>
 
       <View className="mt-1.5 flex-row justify-end">
-        {followed ? (
+        {isFollowing ? (
           <View className="rounded-lg border border-border bg-muted px-3 py-1.5">
             <Text className="text-xs font-medium text-muted-foreground">Following</Text>
           </View>
         ) : (
           <Pressable
-            onPress={onMockFollow}
-            className="flex-row items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 active:opacity-90"
+            onPress={onFollow}
+            disabled={followPending}
+            className="flex-row items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 active:opacity-90 disabled:opacity-50"
           >
             <UserPlus size={14} color={Theme.colors.primaryForeground} />
             <Text className="text-xs font-semibold text-primary-foreground">Follow</Text>
@@ -84,28 +139,92 @@ function PeopleYouMayKnowCard({
 
 const COMPACT_BREAKPOINT = 640;
 
-export function PeopleYouMayKnowSection() {
+type Props = {
+  isActive: boolean;
+  onUserPress?: (userId: string) => void;
+};
+
+export function PeopleYouMayKnowSection({ isActive, onUserPress }: Props) {
+  const queryClient = useQueryClient();
   const { width: windowWidth } = useWindowDimensions();
   const compact = windowWidth < COMPACT_BREAKPOINT;
   const carouselCardWidth = Math.min(288, Math.max(240, Math.floor(windowWidth - 48)));
 
-  const [dismissed, setDismissed] = useState<Set<string>>(() => new Set());
-  const [followedMock, setFollowedMock] = useState<Set<string>>(() => new Set());
+  const {
+    data: rows = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ['people_suggestions'],
+    queryFn: () => fetchPeopleSuggestions({ input_limit: 20, input_offset: 0 }),
+    enabled: isActive,
+    staleTime: 60_000,
+  });
 
-  const visible = useMemo(
-    () => MOCK_PEOPLE_YOU_MAY_KNOW.filter((s) => !dismissed.has(s.user_id)),
-    [dismissed],
+  const dismissMutation = useMutation({
+    mutationFn: dismissPeopleSuggestion,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['people_suggestions'] });
+    },
+    onError: (e: unknown) => {
+      toastError('Could not dismiss', unknownErrorMessage(e, 'Try again.'));
+    },
+  });
+
+  const followMutation = useMutation({
+    mutationFn: followUserFromPeopleSuggestion,
+    onSuccess: () => {
+      toastSuccess('Following');
+      void queryClient.invalidateQueries({ queryKey: ['people_suggestions'] });
+      void queryClient.invalidateQueries({ queryKey: ['trusted_users'] });
+      void queryClient.invalidateQueries({ queryKey: ['user_followers'] });
+      void queryClient.invalidateQueries({ queryKey: ['user_following'] });
+    },
+    onError: (e: unknown) => {
+      toastError('Could not follow', unknownErrorMessage(e, 'Try again.'));
+    },
+  });
+
+  const onDismiss = useCallback(
+    (id: string) => {
+      dismissMutation.mutate(id);
+    },
+    [dismissMutation],
   );
 
-  const onDismiss = useCallback((id: string) => {
-    setDismissed((prev) => new Set(prev).add(id));
-  }, []);
+  const onFollow = useCallback(
+    (id: string) => {
+      followMutation.mutate(id);
+    },
+    [followMutation],
+  );
 
-  const onMockFollow = useCallback((id: string) => {
-    setFollowedMock((prev) => new Set(prev).add(id));
-  }, []);
+  const dismissPendingFor = useCallback(
+    (id: string) => dismissMutation.isPending && dismissMutation.variables === id,
+    [dismissMutation.isPending, dismissMutation.variables],
+  );
 
-  if (visible.length === 0) {
+  const followPendingFor = useCallback(
+    (id: string) => followMutation.isPending && followMutation.variables === id,
+    [followMutation.isPending, followMutation.variables],
+  );
+
+  if (isLoading && rows.length === 0) {
+    return (
+      <View className="mt-10 items-center py-6">
+        <Text className="mb-3 self-stretch text-base font-semibold text-foreground">
+          People you might know
+        </Text>
+        <ActivityIndicator color={Theme.colors.primary} />
+      </View>
+    );
+  }
+
+  if (isError) {
+    return null;
+  }
+
+  if (rows.length === 0) {
     return (
       <View className="mt-10">
         <Text className="mb-3 text-base font-semibold text-foreground">People you might know</Text>
@@ -119,14 +238,17 @@ export function PeopleYouMayKnowSection() {
       <View className="mt-10 w-full max-w-full">
         <Text className="mb-3 text-base font-semibold text-foreground">People you might know</Text>
         <View className="w-full max-w-full gap-3">
-          {visible.map((s) => (
+          {rows.map((s) => (
             <PeopleYouMayKnowCard
-              key={s.user_id}
+              key={s.candidate_user_id}
               layout="stack"
               suggestion={s}
-              followed={followedMock.has(s.user_id)}
-              onDismiss={() => onDismiss(s.user_id)}
-              onMockFollow={() => onMockFollow(s.user_id)}
+              isFollowing={s.relationship_status === 'following'}
+              dismissPending={dismissPendingFor(s.candidate_user_id)}
+              followPending={followPendingFor(s.candidate_user_id)}
+              onDismiss={() => onDismiss(s.candidate_user_id)}
+              onFollow={() => onFollow(s.candidate_user_id)}
+              onUserPress={onUserPress}
             />
           ))}
         </View>
@@ -150,15 +272,18 @@ export function PeopleYouMayKnowSection() {
           paddingRight: 8,
         }}
       >
-        {visible.map((s) => (
+        {rows.map((s) => (
           <PeopleYouMayKnowCard
-            key={s.user_id}
+            key={s.candidate_user_id}
             layout="carousel"
             cardStyle={{ width: carouselCardWidth }}
             suggestion={s}
-            followed={followedMock.has(s.user_id)}
-            onDismiss={() => onDismiss(s.user_id)}
-            onMockFollow={() => onMockFollow(s.user_id)}
+            isFollowing={s.relationship_status === 'following'}
+            dismissPending={dismissPendingFor(s.candidate_user_id)}
+            followPending={followPendingFor(s.candidate_user_id)}
+            onDismiss={() => onDismiss(s.candidate_user_id)}
+            onFollow={() => onFollow(s.candidate_user_id)}
+            onUserPress={onUserPress}
           />
         ))}
       </ScrollView>

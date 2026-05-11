@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { AuthApi } from '~/api/AuthApi';
@@ -7,8 +7,7 @@ import { Routes } from '~/constants/routes';
 import { Button } from '~/components/common/Button';
 import AuthLayout from '~/components/common/AuthLayout';
 import Input from '~/components/common/Input';
-import { Globe as GoogleIcon, Apple as AppleIcon } from 'lucide-react-native';
-import { Theme } from '~/theme/Theme';
+import { OAuthSocialButtons } from '~/components/auth/OAuthSocialButtons';
 import { isWeb, getRedirectUrl } from '~/utils';
 import { mapAuthError } from '~/utils/errors';
 
@@ -80,23 +79,10 @@ export default function SignupScreen() {
         <Text className="text-sm text-muted-foreground">Create your TruRex account</Text>
       </View>
 
-      <View className="gap-4">
-        <TouchableOpacity
-          onPress={() => handleOAuth('google')}
-          className="w-full flex-row items-center justify-center gap-2 py-2.5 rounded-lg bg-card border border-border"
-        >
-          <GoogleIcon size={16} color={Theme.colors.foreground} />
-          <Text className="text-sm font-medium text-foreground">Continue with Google</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => handleOAuth('apple')}
-          className="w-full flex-row items-center justify-center gap-2 py-2.5 rounded-lg bg-card border border-border"
-        >
-          <AppleIcon size={16} color={Theme.colors.foreground} />
-          <Text className="text-sm font-medium text-foreground">Continue with Apple</Text>
-        </TouchableOpacity>
-      </View>
+      <OAuthSocialButtons
+        onGooglePress={() => handleOAuth('google')}
+        onApplePress={() => handleOAuth('apple')}
+      />
 
       <View className="flex-row items-center gap-3">
         <View className="flex-1 h-px bg-border" />
