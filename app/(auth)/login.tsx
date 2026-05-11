@@ -7,8 +7,7 @@ import { Routes } from '~/constants/routes';
 import { Button, ButtonVariant } from '~/components/common/Button';
 import AuthLayout from '~/components/common/AuthLayout';
 import Input from '~/components/common/Input';
-import { Globe as GoogleIcon, Apple as AppleIcon } from 'lucide-react-native';
-import { Theme } from '~/theme/Theme';
+import { OAuthSocialButtons } from '~/components/auth/OAuthSocialButtons';
 import { isWeb, getRedirectUrl } from '~/utils';
 import { mapAuthError } from '~/utils/errors';
 
@@ -67,22 +66,10 @@ export default function LoginScreen() {
         <Text className="text-muted-foreground text-sm">Sign in to your account</Text>
       </View>
 
-      <View className="gap-4">
-        <Button
-          variant={ButtonVariant.Outline}
-          title="Continue with Google"
-          onPress={() => handleOAuth('google')}
-          icon={<GoogleIcon size={16} color={Theme.colors.foreground} />}
-          className="w-full bg-card"
-        />
-        <Button
-          variant={ButtonVariant.Outline}
-          title="Continue with Apple"
-          onPress={() => handleOAuth('apple')}
-          icon={<AppleIcon size={16} color={Theme.colors.foreground} />}
-          className="w-full bg-card"
-        />
-      </View>
+      <OAuthSocialButtons
+        onGooglePress={() => handleOAuth('google')}
+        onApplePress={() => handleOAuth('apple')}
+      />
 
       <View className="flex-row items-center gap-3">
         <View className="flex-1 h-px bg-border" />
