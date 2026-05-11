@@ -22,19 +22,27 @@ import {
 import { Theme } from '~/theme/Theme';
 import { webContainerStyle } from '~/utils';
 
-type Props = { isActive: boolean };
+type Props = { isActive: boolean; onUserPress?: (userId: string) => void };
 
-const CirclesView = ({ isActive }: Props) => {
+const CirclesView = ({ isActive, onUserPress }: Props) => {
   const vm = useCirclesViewModel(isActive);
 
   if (vm.selectedCircleId && vm.selectedCircle && vm.selectedTab) {
-    return <CircleDetailScreen vm={vm} />;
+    return <CircleDetailScreen vm={vm} onUserPress={onUserPress} />;
   }
 
-  return <CirclesListContent vm={vm} isActive={isActive} />;
+  return <CirclesListContent vm={vm} isActive={isActive} onUserPress={onUserPress} />;
 };
 
-function CirclesListContent({ vm, isActive }: { vm: CirclesViewModel; isActive: boolean }) {
+function CirclesListContent({
+  vm,
+  isActive,
+  onUserPress,
+}: {
+  vm: CirclesViewModel;
+  isActive: boolean;
+  onUserPress?: (userId: string) => void;
+}) {
   const [connTab, setConnTab] = useState<ConnectionScopeTab>('trusted');
   const [circleSheet, setCircleSheet] = useState<{ id: string; name: string } | null>(null);
 
@@ -254,9 +262,7 @@ function CirclesListContent({ vm, isActive }: { vm: CirclesViewModel; isActive: 
                     key={row.user_id}
                     row={row}
                     circle={vm.circleForMemberUserId.get(row.user_id)}
-                    additionalCirclesCount={
-                      vm.extraCircleCountByMemberUserId.get(row.user_id) ?? 0
-                    }
+                    additionalCirclesCount={vm.extraCircleCountByMemberUserId.get(row.user_id) ?? 0}
                     allowAddToCircle={connTab !== 'following'}
                     onAddToCircle={
                       connTab === 'following'
@@ -267,6 +273,7 @@ function CirclesListContent({ vm, isActive }: { vm: CirclesViewModel; isActive: 
                               name: row.display_name || 'Member',
                             })
                     }
+                    onUserPress={onUserPress}
                   />
                 ))}
               </View>

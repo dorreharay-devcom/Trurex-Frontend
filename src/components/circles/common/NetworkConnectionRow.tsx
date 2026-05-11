@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { PlusCircle } from 'lucide-react-native';
+import { ChevronRight, PlusCircle } from 'lucide-react-native';
 import type { CircleApiRow } from '~/api/circlesApi';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { Theme } from '~/theme/Theme';
@@ -13,6 +13,7 @@ type Props = {
   additionalCirclesCount?: number;
   onAddToCircle?: () => void;
   allowAddToCircle?: boolean;
+  onUserPress?: (userId: string) => void;
 };
 
 function CircleMembershipBadge({
@@ -50,7 +51,12 @@ function CircleMembershipBadge({
       </Text>
     </Pressable>
   ) : (
-    <View accessible accessibilityLabel={a11y} className="rounded-full px-2 py-0.5" style={shellStyle}>
+    <View
+      accessible
+      accessibilityLabel={a11y}
+      className="rounded-full px-2 py-0.5"
+      style={shellStyle}
+    >
       <Text className="text-[10px] font-semibold" style={{ color }} numberOfLines={1}>
         {circle.name}
       </Text>
@@ -81,13 +87,14 @@ export function NetworkConnectionRow({
   additionalCirclesCount = 0,
   onAddToCircle,
   allowAddToCircle = true,
+  onUserPress,
 }: Props) {
   const label = row.display_name || 'Member';
   const accent = circle ? (parseCircleAccentHex(circle) ?? Theme.colors.primary) : null;
   const badgeBg = accent ? hexToSoftIconBackground(accent, 0.14) : undefined;
 
-  return (
-    <View className="flex-row items-center gap-3 rounded-xl border border-border bg-card p-3">
+  const profileBody = (
+    <>
       <SignedUserAvatar name={label} avatar={row.avatar_url} className="h-10 w-10" />
       <View className="min-w-0 flex-1">
         <View className="flex-row flex-wrap items-center gap-1.5">
@@ -111,6 +118,23 @@ export function NetworkConnectionRow({
           </Text>
         ) : null}
       </View>
+    </>
+  );
+
+  return (
+    <View className="flex-row items-center gap-3 rounded-xl border border-border bg-card p-3">
+      {onUserPress ? (
+        <Pressable
+          onPress={() => onUserPress(row.user_id)}
+          accessibilityRole="button"
+          accessibilityLabel={`View ${label}'s profile`}
+          className="min-w-0 flex-1 flex-row items-center gap-3 rounded-lg active:opacity-70"
+        >
+          {profileBody}
+        </Pressable>
+      ) : (
+        <View className="min-w-0 flex-1 flex-row items-center gap-3">{profileBody}</View>
+      )}
       {allowAddToCircle && onAddToCircle ? (
         <Pressable
           onPress={onAddToCircle}
@@ -118,6 +142,17 @@ export function NetworkConnectionRow({
         >
           <PlusCircle size={13} color={Theme.colors.secondaryText} />
           <Text className="text-[11px] font-medium text-muted-foreground">Add to Circle</Text>
+        </Pressable>
+      ) : null}
+      {onUserPress ? (
+        <Pressable
+          onPress={() => onUserPress(row.user_id)}
+          accessibilityRole="button"
+          accessibilityLabel={`View ${label}'s profile`}
+          hitSlop={8}
+          className="justify-center rounded-lg p-0.5 active:opacity-70"
+        >
+          <ChevronRight size={16} color={Theme.colors.secondaryText} />
         </Pressable>
       ) : null}
     </View>
