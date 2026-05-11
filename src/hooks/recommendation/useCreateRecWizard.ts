@@ -55,7 +55,7 @@ function canProceedForStep(stepId: CreateRecStepId, d: CanProceedDeps): boolean 
     case 'scorecard':
       return true;
     case 'photos':
-      return d.photoStoragePaths.length >= 1;
+      return true;
     case 'circles':
       return d.selectedCircleIds.size > 0;
     case 'confirm':

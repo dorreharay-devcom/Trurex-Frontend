@@ -7,6 +7,7 @@ import {
   Image,
   useWindowDimensions,
   Platform,
+  type TextStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Search, PlusCircle, UserCircle2 } from 'lucide-react-native';
@@ -66,8 +67,8 @@ export const Header: React.FC<HeaderProps> = ({
           accessibilityIgnoresInvertColors
         />
 
-        <View className="flex-1 max-w-md mx-4 sm:mx-8">
-          <View className="relative w-full justify-center">
+        <View className="mx-4 min-w-0 max-w-md flex-1 sm:mx-8">
+          <View className="relative w-full min-w-0 justify-center">
             <View className="pointer-events-none absolute left-3 top-0 bottom-0 z-10 justify-center">
               <Search size={16} color={Theme.colors.secondaryText} />
             </View>
@@ -76,11 +77,23 @@ export const Header: React.FC<HeaderProps> = ({
               onChangeText={onSearchChange}
               placeholder="Search recommendations..."
               placeholderTextColor={Theme.colors.foreground}
-              className="w-full rounded-lg border border-border py-1.5 pl-9 pr-4 text-sm text-foreground focus:outline-none focus:ring-2"
-              style={[textFieldCaretStyle, { backgroundColor: HEADER_SEARCH_FIELD_BG }]}
+              className="header-search-input w-full min-w-0 shrink rounded-lg border border-border py-1.5 pl-9 pr-4 text-sm text-foreground focus:outline-none focus:ring-2"
+              style={[
+                textFieldCaretStyle,
+                { backgroundColor: HEADER_SEARCH_FIELD_BG },
+                Platform.OS === 'web'
+                  ? ({
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    } as TextStyle)
+                  : null,
+              ]}
               selectionColor={Theme.colors.foreground}
               returnKeyType="search"
               underlineColorAndroid="transparent"
+              multiline={false}
+              numberOfLines={1}
             />
           </View>
         </View>
@@ -108,7 +121,6 @@ export const Header: React.FC<HeaderProps> = ({
           )}
 
           <NotificationBell onUserPress={onUserPress} />
-
 
           <TouchableOpacity
             onPress={onProfilePress}

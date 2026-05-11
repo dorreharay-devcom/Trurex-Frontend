@@ -1,3 +1,5 @@
+import { REX_PHOTO_PLACEHOLDER_STORAGE_PATH } from '~/constants/rexPlaceholderPhoto';
+
 export function isHttpUrl(s: string): boolean {
   return /^https?:\/\//i.test(s.trim());
 }
@@ -10,7 +12,8 @@ export function rexCoverStoragePathFromRecommendation(rec: {
   if (explicit) return explicit;
   const img = rec.image?.trim() ?? '';
   if (img && !isHttpUrl(img)) return img;
-  return null;
+  if (img && isHttpUrl(img)) return null;
+  return REX_PHOTO_PLACEHOLDER_STORAGE_PATH;
 }
 
 export function rexPhotoStoragePathsFromRecommendation(rec: {
@@ -20,7 +23,8 @@ export function rexPhotoStoragePathsFromRecommendation(rec: {
   const fromList = rec.photoPaths?.map((p) => p.trim()).filter(Boolean) ?? [];
   if (fromList.length > 0) return fromList;
   const one = rec.photoPath?.trim() ?? '';
-  return one ? [one] : [];
+  if (one) return [one];
+  return [REX_PHOTO_PLACEHOLDER_STORAGE_PATH];
 }
 
 export function rexCoverRemoteHttpUrl(rec: { image?: string | null }): string | null {

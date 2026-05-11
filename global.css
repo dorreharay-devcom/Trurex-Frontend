@@ -9,3 +9,9 @@
     outline: none;
   }
 }
+
+.header-search-input::placeholder {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

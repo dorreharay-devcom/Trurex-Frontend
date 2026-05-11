@@ -6,6 +6,10 @@ import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { Skeleton } from '~/components/ui/skeleton';
 import { cn } from '~/utils/general';
 import { isHttpUrl } from '~/utils/recommendation/recContentDisplay';
+import {
+  isRexPlaceholderPhotoPath,
+  REX_PLACEHOLDER_IMAGE_SOURCE,
+} from '~/constants/rexPlaceholderPhoto';
 
 type Props = {
   bucket: string;
@@ -32,14 +36,40 @@ export function SignedStorageImage({
 }: Props) {
   const http = remoteUri?.trim() && isHttpUrl(remoteUri.trim()) ? remoteUri.trim() : null;
   const path = storagePath?.trim() ?? '';
+  const useBundledPlaceholder = !http && isRexPlaceholderPhotoPath(path);
 
-  const { uri, loading } = useSignedStorageUrl(bucket, http ? '' : path);
+  const { uri, loading } = useSignedStorageUrl(bucket, http || useBundledPlaceholder ? '' : path);
   const displayUri = http ?? uri;
 
   const [decoded, setDecoded] = useState(false);
   useEffect(() => {
     setDecoded(false);
   }, [displayUri]);
+
+  if (useBundledPlaceholder) {
+    return (
+      <View
+        className={cn(
+          'relative overflow-hidden',
+          skeletonUntilLoaded ? 'bg-transparent' : 'bg-muted',
+          className,
+        )}
+        style={style}
+      >
+        <Image
+          source={REX_PLACEHOLDER_IMAGE_SOURCE}
+          className="h-full w-full"
+          style={{ width: '100%', height: '100%' }}
+          contentFit={contentFit}
+          accessibilityLabel={accessibilityLabel}
+          onLoad={(e) => {
+            setDecoded(true);
+            onLoad?.(e);
+          }}
+        />
+      </View>
+    );
+  }
 
   if (!displayUri) {
     return (

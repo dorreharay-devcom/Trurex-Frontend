@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Platform,
   KeyboardAvoidingView,
   useWindowDimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ShieldAlert, X } from 'lucide-react-native';
@@ -16,7 +17,7 @@ import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
 import {
   type ContentReportTarget,
-  reasonOptionsForTarget,
+  CONTENT_REPORT_OTHER_CODE,
   MAX_CONTENT_REPORT_DETAILS,
 } from '~/constants/recommendation/contentReport';
 import { useContentReportFlow } from '~/hooks/recommendation/useContentReportFlow';
@@ -43,14 +44,23 @@ export const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, targe
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
   const maxSheetHeight = Math.min(windowHeight * 0.92, 720);
   const formScrollMaxHeight = Math.max(200, maxSheetHeight - 56 - FORM_FOOTER_EST - insets.bottom);
-  const { reason, setReason, details, setDetails, canSubmit, reset, submit } = useContentReportFlow(
-    {
-      open,
-      target,
-    },
-  );
-
-  const options = useMemo(() => reasonOptionsForTarget(target), [target]);
+  const {
+    reason,
+    setReason,
+    details,
+    setDetails,
+    reasonOptions,
+    reasonsLoading,
+    reasonsError,
+    refetchReasons,
+    canSubmit,
+    isSubmitting,
+    reset,
+    submit,
+  } = useContentReportFlow({
+    open,
+    target,
+  });
   const heading = target?.kind === 'comment' ? 'Report this comment' : 'Report this Rex';
   const subtext =
     target?.kind === 'comment'
@@ -156,6 +166,26 @@ export const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, targe
                         <Text className="text-sm text-primary">OK</Text>
                       </Pressable>
                     </View>
+                  ) : reasonsLoading ? (
+                    <View className="items-center py-8">
+                      <ActivityIndicator color={Theme.colors.primary} />
+                      <Text className="mt-2 text-sm text-muted-foreground">Loading reasons…</Text>
+                    </View>
+                  ) : reasonsError ? (
+                    <View className="items-center gap-2 py-6">
+                      <Text className="text-center text-sm text-muted-foreground">
+                        Could not load report reasons.
+                      </Text>
+                      <Pressable onPress={() => void refetchReasons()} className="rounded-lg py-2">
+                        <Text className="text-sm font-medium text-primary">Retry</Text>
+                      </Pressable>
+                    </View>
+                  ) : reasonOptions.length === 0 ? (
+                    <View className="items-center py-6">
+                      <Text className="text-center text-sm text-muted-foreground">
+                        No report reasons are available right now. Try again later.
+                      </Text>
+                    </View>
                   ) : (
                     <>
                       <View className="mb-3 flex-row items-start gap-2">
@@ -171,7 +201,7 @@ export const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, targe
                       </View>
 
                       <View className="pb-2">
-                        {options.map((r) => {
+                        {reasonOptions.map((r) => {
                           const active = reason === r.value;
                           return (
                             <Pressable
@@ -205,10 +235,11 @@ export const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, targe
                         })}
                       </View>
 
-                      {reason === 'other' ? (
+                      {reason != null &&
+                      reason.toLowerCase() === CONTENT_REPORT_OTHER_CODE.toLowerCase() ? (
                         <View className="mb-3">
                           <TextInput
-                            placeholder="Tell us a bit more (optional)"
+                            placeholder="Describe the issue (required)"
                             placeholderTextColor={Theme.colors.secondaryText}
                             value={details}
                             onChangeText={setDetails}
@@ -240,21 +271,26 @@ export const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, targe
                       <Text className="text-sm font-medium text-muted-foreground">Cancel</Text>
                     </Pressable>
                     <Pressable
-                      onPress={() => {
+                      onPress={async () => {
                         if (!user) {
                           openReportIfSignedIn();
                           return;
                         }
-                        void submit();
+                        const ok = await submit();
+                        if (ok) onRequestClose();
                       }}
                       className="rounded-lg bg-primary px-4 py-2.5 active:opacity-50"
                       disabled={!canSubmit}
-                      accessibilityLabel="Submit report (not available yet)"
+                      accessibilityLabel="Submit report"
                       accessibilityState={{ disabled: !canSubmit }}
                     >
-                      <Text className="text-sm font-semibold text-primary-foreground">
-                        Submit report
-                      </Text>
+                      {isSubmitting ? (
+                        <ActivityIndicator color={Theme.colors.primaryForeground} />
+                      ) : (
+                        <Text className="text-sm font-semibold text-primary-foreground">
+                          Submit report
+                        </Text>
+                      )}
                     </Pressable>
                   </View>
                 ) : null}

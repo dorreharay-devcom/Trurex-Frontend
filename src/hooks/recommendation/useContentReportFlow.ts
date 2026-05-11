@@ -1,9 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
-import type {
-  ContentReportReasonCode,
-  ContentReportTarget,
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import * as ModerationApi from '~/api/moderationApi';
+import {
+  CONTENT_REPORT_OTHER_CODE,
+  MAX_CONTENT_REPORT_DETAILS,
+  type ContentReportTarget,
 } from '~/constants/recommendation/contentReport';
-import { MAX_CONTENT_REPORT_DETAILS } from '~/constants/recommendation/contentReport';
+import { toastError, toastSuccess } from '~/utils/appToast';
+import { useAuth } from '~/services/AuthContext';
 
 type Params = {
   open: boolean;
@@ -11,8 +15,26 @@ type Params = {
 };
 
 export function useContentReportFlow({ open, target }: Params) {
-  const [reason, setReason] = useState<ContentReportReasonCode | null>(null);
+  const { user } = useAuth();
+  const [reason, setReason] = useState<string | null>(null);
   const [details, setDetails] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const reasonsQuery = useQuery({
+    queryKey: ['moderation', 'flagReasons'],
+    queryFn: () => ModerationApi.fetchFlagReasons(),
+    enabled: open && user != null,
+    staleTime: 60 * 60 * 1000,
+  });
+
+  const reasonOptions = useMemo(
+    () =>
+      (reasonsQuery.data ?? []).map((r) => ({
+        value: r.code,
+        label: r.label,
+      })),
+    [reasonsQuery.data],
+  );
 
   const reset = useCallback(() => {
     setReason(null);
@@ -33,14 +55,59 @@ export function useContentReportFlow({ open, target }: Params) {
     }
   }, [open, target]);
 
-  const submit = useCallback(async () => {}, []);
+  const otherSelected =
+    reason != null && reason.toLowerCase() === CONTENT_REPORT_OTHER_CODE.toLowerCase();
+  const canSubmit =
+    Boolean(reason && reason.length > 0) &&
+    reasonOptions.length > 0 &&
+    (!otherSelected || details.trim().length > 0) &&
+    !isSubmitting;
+
+  const submit = useCallback(async (): Promise<boolean> => {
+    if (!target || reason == null) return false;
+    if (otherSelected && !details.trim()) {
+      toastError('Details required', 'Please describe the issue when reporting as Other.');
+      return false;
+    }
+    setIsSubmitting(true);
+    try {
+      const detailPayload =
+        otherSelected ? details.trim() : details.trim() !== '' ? details.trim() : null;
+      if (target.kind === 'recommendation') {
+        await ModerationApi.flagRex({
+          rexId: target.rexId,
+          reasonCode: reason,
+          details: detailPayload,
+        });
+      } else {
+        await ModerationApi.flagComment({
+          commentId: target.commentId,
+          reasonCode: reason,
+          details: detailPayload,
+        });
+      }
+      toastSuccess('Report sent', 'Thanks — our team will review it.');
+      reset();
+      return true;
+    } catch (e) {
+      toastError('Could not send report', e instanceof Error ? e.message : 'Try again.');
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [target, reason, details, otherSelected, reset]);
 
   return {
     reason,
-    setReason: (c: ContentReportReasonCode) => setReason(c),
+    setReason,
     details,
     setDetails: (d: string) => setDetails(d.slice(0, MAX_CONTENT_REPORT_DETAILS)),
-    canSubmit: false,
+    reasonOptions,
+    reasonsLoading: reasonsQuery.isPending || reasonsQuery.isFetching,
+    reasonsError: reasonsQuery.isError,
+    refetchReasons: reasonsQuery.refetch,
+    canSubmit,
+    isSubmitting,
     reset,
     submit,
   };

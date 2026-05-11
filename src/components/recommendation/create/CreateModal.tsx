@@ -252,10 +252,6 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
       );
       return;
     }
-    if (flow.photoStoragePaths.length < 1) {
-      toastError('Photos required', 'Add at least one photo before posting.');
-      return;
-    }
     for (const q of mergedQuestions) {
       if (q.is_required) {
         const v = flow.questionAnswers[q.code];
@@ -296,7 +292,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
         p_visibility: vis.p_visibility,
         circle_ids: vis.circle_ids ?? undefined,
         tag_names: flow.selectedTagSlugs,
-        photo_paths: flow.photoStoragePaths,
+        photo_paths: flow.photoStoragePaths.length > 0 ? flow.photoStoragePaths : null,
         p_linked_place_id: getLinkedPlaceId(flow.linkedPlaceId) ?? undefined,
         p_category_ratings: buildCategoryRatingsPayload(flow.categoryRatings),
         p_question_answers: p_question_answers,
