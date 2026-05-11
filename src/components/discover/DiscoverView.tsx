@@ -260,7 +260,7 @@ const DiscoverView = ({
       {!hasSearch && (
         <View className="mb-6">
           <View className="flex-row items-center gap-2 mb-3">
-            <TrendingUp size={16} color={Theme.colors.accent} />
+            <TrendingUp size={16} color={Theme.colors.primary} />
             <Text className="text-sm font-display font-semibold text-foreground">Trending Now</Text>
           </View>
           <View className="flex-row flex-wrap gap-2">
