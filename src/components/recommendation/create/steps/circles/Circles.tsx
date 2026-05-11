@@ -25,6 +25,8 @@ import {
 
 const NEW_CIRCLE_HEX_COLORS = ['#9333ea', '#ca8a04', '#dc2626', '#0d9488', '#ea580c'] as const;
 
+const NEW_CIRCLE_DRAFT_ID = '__create_rec_new_circle__';
+
 type Props = {
   circles: CreateRecCircle[];
   showFetchSpinner: boolean;
@@ -81,9 +83,33 @@ export const Circles: React.FC<Props> = ({
   );
 
   const handleSaveEdit = useCallback(async () => {
-    const id = editingId;
     const name = editName.trim();
-    if (id == null || !isNonEmptyString(name)) return;
+    if (!isNonEmptyString(name)) return;
+
+    if (editingId === NEW_CIRCLE_DRAFT_ID) {
+      const color =
+        NEW_CIRCLE_HEX_COLORS[ringsInnerToBroader.length % NEW_CIRCLE_HEX_COLORS.length];
+      setBusy(true);
+      try {
+        const created = await createCircle({
+          input_name: name,
+          input_color: color,
+        });
+        toastSuccess('Circle added');
+        setEditingId(null);
+        setEditName('');
+        invalidateCircles();
+        setHighlightId(created.id);
+      } catch (e) {
+        toastError('Could not create circle', unknownErrorMessage(e, 'Try again.'));
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
+
+    const id = editingId;
+    if (id == null) return;
 
     setBusy(true);
     try {
@@ -97,32 +123,20 @@ export const Circles: React.FC<Props> = ({
     } finally {
       setBusy(false);
     }
-  }, [editingId, editName, invalidateCircles]);
+  }, [editingId, editName, invalidateCircles, ringsInnerToBroader.length]);
 
   const cancelEdit = useCallback(() => {
     setEditingId(null);
     setEditName('');
   }, []);
 
-  const handleAddCircle = useCallback(async () => {
-    const color = NEW_CIRCLE_HEX_COLORS[ringsInnerToBroader.length % NEW_CIRCLE_HEX_COLORS.length];
-    setBusy(true);
-    try {
-      const created = await createCircle({
-        input_name: 'New Circle',
-        input_color: color,
-      });
-      toastSuccess('Circle added', 'Rename it below if you like.');
-      invalidateCircles();
-      setEditingId(created.id);
-      setEditName(created.name ?? 'New Circle');
-      setHighlightId(created.id);
-    } catch (e) {
-      toastError('Could not create circle', unknownErrorMessage(e, 'Try again.'));
-    } finally {
-      setBusy(false);
-    }
-  }, [ringsInnerToBroader.length, invalidateCircles]);
+  const handleAddCircle = useCallback(() => {
+    setEditingId(NEW_CIRCLE_DRAFT_ID);
+    setEditName('');
+  }, []);
+
+  const showNameEditRow = renameTarget != null || editingId === NEW_CIRCLE_DRAFT_ID;
+  const isDraftNewCircle = editingId === NEW_CIRCLE_DRAFT_ID;
 
   const showRenameControl =
     displayCircle != null && canRenameCreateRecCircle(displayCircle) && editingId == null;
@@ -201,7 +215,7 @@ export const Circles: React.FC<Props> = ({
               </View>
             ) : null}
 
-            {renameTarget != null ? (
+            {showNameEditRow ? (
               <View className="mx-auto w-full max-w-sm flex-row items-center gap-2">
                 <TextInput
                   value={editName}
@@ -217,7 +231,7 @@ export const Circles: React.FC<Props> = ({
                 <Pressable
                   onPress={() => void handleSaveEdit()}
                   accessibilityRole="button"
-                  accessibilityLabel="Save name"
+                  accessibilityLabel={isDraftNewCircle ? 'Create circle' : 'Save name'}
                   disabled={busy}
                   className="rounded-lg bg-primary p-2 active:opacity-90 disabled:opacity-50"
                 >
@@ -237,8 +251,8 @@ export const Circles: React.FC<Props> = ({
 
             <View className="flex-row flex-wrap items-center justify-center gap-2">
               <Pressable
-                onPress={() => void handleAddCircle()}
-                disabled={busy || loadError}
+                onPress={handleAddCircle}
+                disabled={busy || loadError || editingId != null}
                 accessibilityRole="button"
                 className="flex-row items-center gap-1.5 rounded-full border border-border px-3 py-1.5 active:bg-muted/40 disabled:opacity-50"
               >

@@ -21,11 +21,7 @@ import {
   parseCircleAccentHex,
   sortCirclesForRingStack,
 } from '~/utils/recommendation/recCircles';
-import {
-  CIRCLE_COLOR_PRESETS,
-  type CirclePresetColor,
-  confirmDeleteCircle,
-} from '~/utils/circleTabUtils';
+import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/utils/circleTabUtils';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { useMyCircles } from '~/hooks/useMyCircles';
 
@@ -46,6 +42,7 @@ export function useCirclesViewModel(isActive: boolean) {
   const [editColor, setEditColor] = useState<string>(PRESET_DEFAULT);
   const [addingMemberId, setAddingMemberId] = useState<string | null>(null);
   const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
+  const [showDeleteCircleModal, setShowDeleteCircleModal] = useState(false);
 
   const { data: circles = [], isLoading, isError } = useMyCircles(!!user && isActive);
   const sortedCircles = useMemo(() => sortCirclesForRingStack(circles), [circles]);
@@ -67,7 +64,10 @@ export function useCirclesViewModel(isActive: boolean) {
   }, [selectedCircleId, isLoading, circles, selectedCircle]);
 
   useEffect(() => {
-    if (!selectedCircleId) setShowEditModal(false);
+    if (!selectedCircleId) {
+      setShowEditModal(false);
+      setShowDeleteCircleModal(false);
+    }
   }, [selectedCircleId]);
 
   const detailOpen = !!user && isActive && !!selectedCircleId;
@@ -217,10 +217,14 @@ export function useCirclesViewModel(isActive: boolean) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myCircles'] });
+      setShowDeleteCircleModal(false);
       setSelectedCircleId(null);
       toastSuccess('Circle deleted');
     },
-    onError: (e: Error) => toastError('Could not delete circle', e.message),
+    onError: (e: Error) => {
+      setShowDeleteCircleModal(false);
+      toastError('Could not delete circle', e.message);
+    },
   });
 
   const openEditSheet = useCallback(() => {
@@ -232,7 +236,15 @@ export function useCirclesViewModel(isActive: boolean) {
   }, [selectedCircle]);
 
   const requestDeleteCircle = useCallback(() => {
-    confirmDeleteCircle(() => deleteMutation.mutate());
+    setShowDeleteCircleModal(true);
+  }, []);
+
+  const dismissDeleteCircleModal = useCallback(() => {
+    if (!deleteMutation.isPending) setShowDeleteCircleModal(false);
+  }, [deleteMutation.isPending]);
+
+  const commitDeleteCircle = useCallback(() => {
+    deleteMutation.mutate();
   }, [deleteMutation]);
 
   const addToSelectedCircle = useCallback(
@@ -299,7 +311,10 @@ export function useCirclesViewModel(isActive: boolean) {
     deleteMutation,
     addMemberMutation,
     openEditSheet,
+    showDeleteCircleModal,
     requestDeleteCircle,
+    dismissDeleteCircleModal,
+    commitDeleteCircle,
     addToSelectedCircle,
     removeFromSelectedCircle,
     colorPresets: CIRCLE_COLOR_PRESETS,

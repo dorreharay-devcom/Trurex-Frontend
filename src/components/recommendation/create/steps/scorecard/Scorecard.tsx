@@ -3,7 +3,6 @@ import { ScrollView, View, Text } from 'react-native';
 import { REAL_ESTATE_CATEGORY_ID } from '~/constants/recommendation/rexCategories';
 import { useCategoryIcon } from '~/hooks/useCategoryIcon';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
-import { countScorecardFilledSlots } from '~/utils/recommendation/recCreateFlow';
 import { cn } from '~/utils/general';
 import type {
   CategoryQuestion,
@@ -72,13 +71,20 @@ export const Scorecard: React.FC<Props> = ({
   onReviewChange,
 }) => {
   const categoryEmoji = useCategoryIcon(selectedCategoryId);
-  const totalSlots = useMemo(() => {
-    return categoryRatingDimensions.length + subcategoryRatingDimensions.length + 1;
-  }, [categoryRatingDimensions.length, subcategoryRatingDimensions.length]);
+  const starDimensions = useMemo(
+    () => [...categoryRatingDimensions, ...subcategoryRatingDimensions],
+    [categoryRatingDimensions, subcategoryRatingDimensions],
+  );
+
+  const totalSlots = starDimensions.length;
 
   const filledCount = useMemo(
-    () => countScorecardFilledSlots(categoryRatings, scoreValueForMoney),
-    [categoryRatings, scoreValueForMoney],
+    () =>
+      starDimensions.filter((d) => {
+        const v = categoryRatings[d.code];
+        return v != null && v > 0;
+      }).length,
+    [starDimensions, categoryRatings],
   );
 
   const hasAnyStars = categoryRatingDimensions.length > 0 || subcategoryRatingDimensions.length > 0;

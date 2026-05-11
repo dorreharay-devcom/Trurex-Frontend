@@ -69,7 +69,7 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="min-h-0 flex-1 bg-background">
       <Header
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -81,7 +81,7 @@ export default function HomeScreen() {
 
       <TabBar currentTab={currentTab} onTabChange={handleTabChange} />
 
-      <View className="flex-1">
+      <View className="min-h-0 flex-1">
         {currentTab === 'discover' && (
           <DiscoverView searchQuery={searchQuery} onRecommendationPress={openPreview} />
         )}

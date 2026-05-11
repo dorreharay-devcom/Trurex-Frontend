@@ -297,7 +297,7 @@ function CirclesListContent({
               </View>
             )}
 
-            <PeopleYouMayKnowSection />
+            <PeopleYouMayKnowSection isActive={isActive} onUserPress={onUserPress} />
           </View>
         ) : null}
       </ScrollView>
