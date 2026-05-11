@@ -56,7 +56,7 @@ export type CreateRexRpcParams = {
   p_visibility: 'public' | 'private' | 'circles';
   circle_ids?: string[] | null;
   tag_names: string[];
-  photo_paths: string[];
+  photo_paths: string[] | null;
   p_linked_place_id?: string | null;
   p_quick_tip?: string | null;
   p_category_ratings: Record<string, number>;
