@@ -7,6 +7,7 @@ import DiscoverView from '~/components/discover/DiscoverView';
 import MapScreen from '~/components/map/MapScreen';
 import CirclesView from '~/components/circles/CirclesView';
 import { Header } from '~/components/layout/Header';
+import { StickyTopChromeLayout } from '~/components/layout/StickyTopChromeLayout';
 import { TabBar, Tab } from '~/components/layout/TabBar';
 import { CreateModal } from '~/components/recommendation/create/CreateModal';
 import { RecommendationDetailModal } from '~/components/recommendation/RecommendationDetailModal';
@@ -70,18 +71,21 @@ export default function HomeScreen() {
 
   return (
     <View className="min-h-0 flex-1 bg-background">
-      <Header
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        onProfilePress={() => handleTabChange('profile')}
-        onAddPress={() => setCreateRecommendationOpen(true)}
-        onUserPress={openUserProfile}
-        avatarRefreshKey={avatarRefreshKey}
-      />
-
-      <TabBar currentTab={currentTab} onTabChange={handleTabChange} />
-
-      <View className="min-h-0 flex-1">
+      <StickyTopChromeLayout
+        topChrome={
+          <>
+            <Header
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onProfilePress={() => handleTabChange('profile')}
+              onAddPress={() => setCreateRecommendationOpen(true)}
+              onUserPress={openUserProfile}
+              avatarRefreshKey={avatarRefreshKey}
+            />
+            <TabBar currentTab={currentTab} onTabChange={handleTabChange} />
+          </>
+        }
+      >
         {currentTab === 'discover' && (
           <DiscoverView searchQuery={searchQuery} onRecommendationPress={openPreview} />
         )}
@@ -107,7 +111,7 @@ export default function HomeScreen() {
             onRexPress={openPreview}
           />
         )}
-      </View>
+      </StickyTopChromeLayout>
 
       {currentTab === 'discover' && (
         <TouchableOpacity
