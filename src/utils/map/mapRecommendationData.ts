@@ -140,7 +140,7 @@ export function mapPinRowToMapMarkerItem(row: MapPinRow): MapMarkerItem {
     subtitle: row.place_name,
     pinType,
     glyph: MAP_PIN_GLYPH[pinType],
-    pinColor: row.category_color?.trim() ? row.category_color : MAP_PIN_COLOR[pinType],
+    pinColor: MAP_PIN_COLOR[pinType],
   };
 }
 
