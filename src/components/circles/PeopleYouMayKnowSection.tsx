@@ -21,25 +21,17 @@ import type { PeopleSuggestionRow } from '~/types/peopleSuggestions';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { unknownErrorMessage } from '~/utils';
 
+function ordinalDegreeLabel(degree: number): string {
+  const j = degree % 10;
+  const k = degree % 100;
+  if (j === 1 && k !== 11) return `${degree}st`;
+  if (j === 2 && k !== 12) return `${degree}nd`;
+  if (j === 3 && k !== 13) return `${degree}rd`;
+  return `${degree}th`;
+}
+
 function formatSuggestionSubtitle(s: PeopleSuggestionRow): string | undefined {
-  const parts: string[] = [];
-  if (s.mutual_count > 0) {
-    parts.push(
-      s.mutual_count === 1 ? '1 mutual connection' : `${s.mutual_count} mutual connections`,
-    );
-  }
-  if (s.common_circle_count > 0) {
-    const first = s.common_circles?.[0];
-    if (s.common_circle_count === 1 && first?.name) {
-      parts.push(`Shared circle: ${first.name}`);
-    } else {
-      parts.push(`${s.common_circle_count} shared circles`);
-    }
-  }
-  if (parts.length > 0) return parts.join(' · ');
   if (s.primary_reason === 'fallback_global') return 'Suggested for you';
-  if (s.connection_degree === 2) return 'Connected through your network';
-  if (s.connection_degree === 3) return 'Extended network';
   return undefined;
 }
 
@@ -104,8 +96,15 @@ function PeopleYouMayKnowCard({
           <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
             {label}
           </Text>
+          {suggestion.connection_degree != null && suggestion.connection_degree >= 1 ? (
+            <View className="mt-1.5 self-start rounded-full border border-border bg-card px-2 py-0.5">
+              <Text className="text-[11px] font-medium text-muted-foreground">
+                {ordinalDegreeLabel(suggestion.connection_degree)} degree
+              </Text>
+            </View>
+          ) : null}
           {subline ? (
-            <Text className="mt-0.5 text-xs text-muted-foreground" numberOfLines={2}>
+            <Text className="mt-1.5 text-xs text-muted-foreground" numberOfLines={2}>
               {subline}
             </Text>
           ) : null}
