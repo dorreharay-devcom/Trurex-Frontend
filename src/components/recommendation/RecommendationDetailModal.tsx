@@ -354,6 +354,8 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                 <RexImageCarousel
                   paths={galleryPaths}
                   accessibilityLabelBase={recommendation.title}
+                  placeholderCategoryId={recommendation.categoryId}
+                  placeholderCategoryLabel={recommendation.category}
                 />
               ) : showHero && (coverPath || coverHttp) ? (
                 <View className="aspect-[16/9] w-full overflow-hidden rounded-xl">
@@ -365,6 +367,8 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                     contentFit="cover"
                     skeletonUntilLoaded
                     accessibilityLabel={recommendation.title}
+                    placeholderCategoryId={recommendation.categoryId}
+                    placeholderCategoryLabel={recommendation.category}
                   />
                 </View>
               ) : null}

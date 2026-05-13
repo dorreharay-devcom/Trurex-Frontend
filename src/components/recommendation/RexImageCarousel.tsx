@@ -5,6 +5,7 @@ import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { Skeleton } from '~/components/ui/skeleton';
 import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
+import { isRexPlaceholderPhotoPath } from '~/placeholder';
 import { useInfiniteHorizontalCarousel } from '~/hooks/useInfiniteHorizontalCarousel';
 import { Theme } from '~/theme/Theme';
 import { cn } from '~/utils/general';
@@ -22,9 +23,17 @@ type Props = {
   paths: string[];
   className?: string;
   accessibilityLabelBase?: string;
+  placeholderCategoryId?: string | null;
+  placeholderCategoryLabel?: string | null;
 };
 
-export function RexImageCarousel({ paths, className, accessibilityLabelBase = 'Photo' }: Props) {
+export function RexImageCarousel({
+  paths,
+  className,
+  accessibilityLabelBase = 'Photo',
+  placeholderCategoryId,
+  placeholderCategoryLabel,
+}: Props) {
   const { width: winW } = useWindowDimensions();
   const [measuredW, setMeasuredW] = useState(0);
   const itemWidth = useMemo(() => {
@@ -69,6 +78,12 @@ export function RexImageCarousel({ paths, className, accessibilityLabelBase = 'P
           contentFit="cover"
           skeletonUntilLoaded
           accessibilityLabel={accessibilityLabelBase}
+          placeholderCategoryId={
+            isRexPlaceholderPhotoPath(resolvedPaths[0]) ? placeholderCategoryId : undefined
+          }
+          placeholderCategoryLabel={
+            isRexPlaceholderPhotoPath(resolvedPaths[0]) ? placeholderCategoryLabel : undefined
+          }
         />
       </View>
     );
@@ -116,6 +131,10 @@ export function RexImageCarousel({ paths, className, accessibilityLabelBase = 'P
                     contentFit="cover"
                     skeletonUntilLoaded
                     accessibilityLabel={displayLabel}
+                    placeholderCategoryId={isRexPlaceholderPhotoPath(item) ? placeholderCategoryId : undefined}
+                    placeholderCategoryLabel={
+                      isRexPlaceholderPhotoPath(item) ? placeholderCategoryLabel : undefined
+                    }
                   />
                 </View>
               );

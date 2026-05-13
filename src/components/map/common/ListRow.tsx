@@ -38,6 +38,8 @@ export const ListRow: React.FC<Props> = ({ rec, highlighted, onPress, ...hoverPr
         remoteUri={coverHttp}
         className="h-12 w-12 rounded-lg"
         accessibilityLabel={rec.title}
+        placeholderCategoryId={rec.categoryId}
+        placeholderCategoryLabel={rec.category}
       />
       <View className="flex-1 min-w-0">
         <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>

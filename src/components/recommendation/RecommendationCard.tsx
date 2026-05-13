@@ -136,6 +136,8 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           style={{ width: '100%', height: '100%' }}
           contentFit="cover"
           accessibilityLabel={rec.title}
+          placeholderCategoryId={rec.categoryId}
+          placeholderCategoryLabel={rec.category}
         />
         {showGalleryHint ? (
           <View className="absolute right-2 top-2 flex-row items-center gap-1 rounded-full bg-black/45 px-2 py-1.5">

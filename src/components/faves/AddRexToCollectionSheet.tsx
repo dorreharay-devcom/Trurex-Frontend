@@ -152,6 +152,8 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({ open,
                           remoteUri={rexCoverRemoteHttpUrl(rec)}
                           className="w-full h-full"
                           accessibilityLabel={rec.title}
+                          placeholderCategoryId={rec.categoryId}
+                          placeholderCategoryLabel={rec.category}
                         />
                       </View>
                       <View className="flex-1 min-w-0">

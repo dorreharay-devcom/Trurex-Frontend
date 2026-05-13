@@ -6,10 +6,7 @@ import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { Skeleton } from '~/components/ui/skeleton';
 import { cn } from '~/utils/general';
 import { isHttpUrl } from '~/utils/recommendation/recContentDisplay';
-import {
-  isRexPlaceholderPhotoPath,
-  REX_PLACEHOLDER_IMAGE_SOURCE,
-} from '~/constants/rexPlaceholderPhoto';
+import { isRexPlaceholderPhotoPath, RexCoverPlaceholder } from '~/placeholder';
 
 type Props = {
   bucket: string;
@@ -21,6 +18,8 @@ type Props = {
   contentFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
   onLoad?: (e: { source: { width: number; height: number } }) => void;
   skeletonUntilLoaded?: boolean;
+  placeholderCategoryId?: string | null;
+  placeholderCategoryLabel?: string | null;
 };
 
 export function SignedStorageImage({
@@ -33,6 +32,8 @@ export function SignedStorageImage({
   contentFit = 'cover',
   onLoad,
   skeletonUntilLoaded = false,
+  placeholderCategoryId,
+  placeholderCategoryLabel,
 }: Props) {
   const http = remoteUri?.trim() && isHttpUrl(remoteUri.trim()) ? remoteUri.trim() : null;
   const path = storagePath?.trim() ?? '';
@@ -46,28 +47,21 @@ export function SignedStorageImage({
     setDecoded(false);
   }, [displayUri]);
 
+  useEffect(() => {
+    if (useBundledPlaceholder) {
+      onLoad?.({ source: { width: 200, height: 150 } });
+    }
+  }, [useBundledPlaceholder, onLoad]);
+
   if (useBundledPlaceholder) {
     return (
-      <View
-        className={cn(
-          'relative overflow-hidden',
-          skeletonUntilLoaded ? 'bg-transparent' : 'bg-muted',
-          className,
-        )}
+      <RexCoverPlaceholder
+        categoryId={placeholderCategoryId}
+        categoryLabel={placeholderCategoryLabel}
+        accessibilityLabel={accessibilityLabel}
+        className={cn(skeletonUntilLoaded ? 'bg-transparent' : undefined, className)}
         style={style}
-      >
-        <Image
-          source={REX_PLACEHOLDER_IMAGE_SOURCE}
-          className="h-full w-full"
-          style={{ width: '100%', height: '100%' }}
-          contentFit={contentFit}
-          accessibilityLabel={accessibilityLabel}
-          onLoad={(e) => {
-            setDecoded(true);
-            onLoad?.(e);
-          }}
-        />
-      </View>
+      />
     );
   }
 
