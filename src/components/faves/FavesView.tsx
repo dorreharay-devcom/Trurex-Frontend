@@ -8,8 +8,6 @@ import {
   ScrollView,
   Pressable,
   useWindowDimensions,
-  Platform,
-  type TextStyle,
 } from 'react-native';
 import { Plus, PackageOpen, Search, MapPin, X, Calendar } from 'lucide-react-native';
 import { CollectionsApi } from '~/api/CollectionsApi';
@@ -20,7 +18,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useMyCollections, useMySavedCollections } from '~/hooks/useCollections';
 import { useSavedRexes } from '~/hooks/useGems';
 import { useAuth } from '~/services/AuthContext';
-import { webContainerStyle } from '~/utils';
+import { webContainerStyle, singleLineEllipsisTextStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
 import type {
   Recommendation,
@@ -294,17 +292,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
                         className="text-[11px] text-muted-foreground"
                         numberOfLines={1}
                         ellipsizeMode="tail"
-                        style={[
-                          { flex: 1, minWidth: 0 },
-                          Platform.OS === 'web'
-                            ? ({
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                                maxWidth: '100%',
-                              } as TextStyle)
-                            : null,
-                        ]}
+                        style={singleLineEllipsisTextStyle}
                       >
                         {item.location}
                       </Text>
@@ -377,7 +365,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
         title="Remove from saved?"
         message={
           confirmRemoveUncollected
-            ? `${confirmRemoveUncollected.title} will be removed from Uncollected Rex. You can save it again from Discover.`
+            ? `"${confirmRemoveUncollected.title}" will be removed from Uncollected Rex. You can save it again from Discover.`
             : ''
         }
         confirmLabel="Remove"
