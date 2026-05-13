@@ -8,6 +8,8 @@ import {
   ScrollView,
   Pressable,
   useWindowDimensions,
+  Platform,
+  type TextStyle,
 } from 'react-native';
 import { Plus, PackageOpen, Search, MapPin, X, Calendar } from 'lucide-react-native';
 import { CollectionsApi } from '~/api/CollectionsApi';
@@ -256,7 +258,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
               activeOpacity={onRecommendationPress ? 0.7 : 1}
               onPress={() => onRecommendationPress?.(item)}
               disabled={!onRecommendationPress}
-              className="flex-row items-center gap-3 p-3 rounded-xl bg-card border border-border"
+              className="min-w-0 flex-row items-center gap-3 p-3 rounded-xl bg-card border border-border"
             >
               <View className="w-12 h-12 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                 <SignedStorageImage
@@ -267,24 +269,47 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
                   accessibilityLabel={item.title}
                 />
               </View>
-              <View className="flex-1 min-w-0">
+              <View className="min-w-0 flex-1 overflow-hidden">
                 <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
                   {item.title}
                 </Text>
-                <View className="mt-1 flex-row flex-wrap items-center gap-2">
-                  <View className="rounded-full border border-[#d4d4d4cc] bg-[#d4d4d466] px-2 py-0.5">
+                <View className="mt-1 w-full min-w-0 flex-row flex-wrap items-center gap-2">
+                  <View className="shrink-0 rounded-full border border-[#d4d4d4cc] bg-[#d4d4d466] px-2 py-0.5">
                     <Text className="text-[10px] font-medium capitalize text-foreground">
                       {item.category}
                     </Text>
                   </View>
-                  {item.location && (
-                    <View className="flex-row items-center gap-0.5">
-                      <MapPin size={10} color={Theme.colors.muted} />
-                      <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
+                  {item.location ? (
+                    <View
+                      className="min-w-0 max-w-full flex-row items-center gap-0.5 overflow-hidden"
+                      style={{
+                        flexGrow: 1,
+                        flexShrink: 1,
+                        flexBasis: 1,
+                        minWidth: 56,
+                      }}
+                    >
+                      <MapPin size={10} color={Theme.colors.muted} style={{ flexShrink: 0 }} />
+                      <Text
+                        className="text-[11px] text-muted-foreground"
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={[
+                          { flex: 1, minWidth: 0 },
+                          Platform.OS === 'web'
+                            ? ({
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                maxWidth: '100%',
+                              } as TextStyle)
+                            : null,
+                        ]}
+                      >
                         {item.location}
                       </Text>
                     </View>
-                  )}
+                  ) : null}
                 </View>
                 {item.description ? (
                   <Text className="text-xs text-foreground/70 mt-1" numberOfLines={1}>
@@ -352,7 +377,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
         title="Remove from saved?"
         message={
           confirmRemoveUncollected
-            ? `"${confirmRemoveUncollected.title}" will be removed from Uncollected Rex. You can save it again from Discover.`
+            ? `${confirmRemoveUncollected.title} will be removed from Uncollected Rex. You can save it again from Discover.`
             : ''
         }
         confirmLabel="Remove"

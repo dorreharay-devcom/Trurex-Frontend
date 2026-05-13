@@ -20,7 +20,7 @@ export function ScorecardQuickTip({ value, onChangeText }: Props) {
       <TextInput
         value={value}
         onChangeText={onChangeText}
-        placeholder="What's their must-order?"
+        placeholder="Share your quick tip"
         placeholderTextColor={Theme.colors.secondaryText}
         className="w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground focus:outline-none focus:border-primary"
         style={[webNoOutline, textFieldCaretStyle]}
