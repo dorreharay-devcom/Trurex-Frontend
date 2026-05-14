@@ -1,7 +1,7 @@
 export {
   REX_PHOTO_PLACEHOLDER_STORAGE_PATH,
   isRexPlaceholderPhotoPath,
-} from './rexPlaceholderPhoto';
+} from '~/constants/rexPlaceholderPhoto';
 
 export {
   type RexCoverPlaceholderFooter,
