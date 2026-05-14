@@ -2,6 +2,7 @@ import 'react-native-url-polyfill/auto';
 import { createClient } from '@supabase/supabase-js';
 import { Platform } from 'react-native';
 import { StorageService } from './StorageService';
+import { toastIfAccountFrozenMutationError } from '~/utils/mutationRestrictionError';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const BACKEND_KEY =
@@ -28,6 +29,7 @@ export function unwrap<T>(response: { data: unknown; error: unknown }): T {
     if (err?.code === 'bad_jwt') {
       Auth.signOut().catch(() => {});
     }
+    toastIfAccountFrozenMutationError(response.error);
     throw response.error;
   }
   return response.data as T;

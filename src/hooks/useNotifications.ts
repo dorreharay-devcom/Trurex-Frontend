@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Backend, unwrap } from '~/services/AuthService';
+import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
 import type { AppNotification } from '~/types/notification/appNotification';
 
 async function fetchNotifications(): Promise<AppNotification[]> {
@@ -12,8 +13,7 @@ async function fetchNotifications(): Promise<AppNotification[]> {
 
 async function markNotificationsRead(ids?: string[]): Promise<void> {
   const params = ids?.length ? { input_ids: ids } : {};
-  const { error } = await Backend.rpc('mark_notifications_read', params);
-  if (error) throw error;
+  throwRpcIfFailed(await Backend.rpc('mark_notifications_read', params));
 }
 
 export function useNotifications() {

@@ -18,6 +18,7 @@ export type CategoryTagOption = {
   slug: string;
   label: string;
   sort_order: number;
+  tag_group?: string | null;
 };
 
 export type CategorySubcategoryConfig = {

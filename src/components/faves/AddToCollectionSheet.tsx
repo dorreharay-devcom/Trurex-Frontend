@@ -21,6 +21,9 @@ import { CollectionsApi, UserCollection } from '~/api/CollectionsApi';
 import { useAuth } from '~/services/AuthContext';
 import { toastSuccess, toastError } from '~/utils/appToast';
 import { webContainerStyle } from '~/utils';
+import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
+import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { unknownErrorMessage } from '~/utils';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { Theme } from '~/theme/Theme';
@@ -154,8 +157,9 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
             queryClient.invalidateQueries({ queryKey: ['my-saved'] });
             if (!suppressSaveToast.current) toastSuccess('Saved to uncollected');
           })
-          .catch((e: any) => {
-            toastError(e?.message || 'Failed to save');
+          .catch((e: unknown) => {
+            if (didAccountFrozenMutationToast(e)) return;
+            toastError(unknownErrorMessage(e, 'Failed to save'));
             onClose();
           });
       }
@@ -186,8 +190,10 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
       queryClient.invalidateQueries({ queryKey: ['my-collections'] });
       queryClient.invalidateQueries({ queryKey: ['collection-detail'] });
       queryClient.invalidateQueries({ queryKey: ['my-saved-rexes'] });
-    } catch {
-      toastError('Failed to update collections');
+    } catch (e: unknown) {
+      if (!didAccountFrozenMutationToast(e)) {
+        toastError('Failed to update collections');
+      }
     }
     setSaving(false);
     onClose();
@@ -353,6 +359,7 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
           </Animated.View>
         </KeyboardAvoidingView>
       </View>
+      <ModalToastLayer />
     </Modal>
   );
 };

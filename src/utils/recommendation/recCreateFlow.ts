@@ -86,6 +86,36 @@ export function mergeTagOptions(
   return out;
 }
 
+export type TagOptionsGroup = {
+  groupTitle: string;
+  tags: CategoryTagOption[];
+};
+
+export function groupTagOptionsByTagGroup(tags: CategoryTagOption[]): TagOptionsGroup[] {
+  const map = new Map<string, CategoryTagOption[]>();
+  for (const t of tags) {
+    const raw = t.tag_group;
+    const g = typeof raw === 'string' && raw.trim() !== '' ? raw.trim() : '';
+    if (!map.has(g)) map.set(g, []);
+    map.get(g)!.push(t);
+  }
+  const buckets = [...map.entries()].map(([groupTitle, list]) => ({
+    groupTitle,
+    tags: sortByOrder(list),
+  }));
+  buckets.sort((a, b) => {
+    const aEmpty = a.groupTitle === '';
+    const bEmpty = b.groupTitle === '';
+    if (aEmpty !== bEmpty) return aEmpty ? 1 : -1;
+    const aMin = Math.min(...a.tags.map((x) => x.sort_order));
+    const bMin = Math.min(...b.tags.map((x) => x.sort_order));
+    if (aMin !== bMin) return aMin - bMin;
+    if (aEmpty) return 0;
+    return a.groupTitle.localeCompare(b.groupTitle);
+  });
+  return buckets;
+}
+
 export function categoryRatingDimensionsOnly(
   config: CategoryCreateConfig,
 ): CategoryRatingDimension[] {

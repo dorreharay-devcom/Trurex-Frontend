@@ -23,6 +23,8 @@ import { CircleGlyphIcon } from '~/components/circles/common/CircleGlyphIcon';
 import { Theme } from '~/theme/Theme';
 import { isWeb } from '~/utils';
 import { toastError, toastSuccess } from '~/utils/appToast';
+import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { unknownErrorMessage } from '~/utils';
 import {
   circleTabIconKind,
   defaultCircleSubtitle,
@@ -31,6 +33,7 @@ import {
   isUserCreatedCircle,
   sortCirclesForRingStack,
 } from '~/utils/recommendation/recCircles';
+import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 
 type Props = {
   open: boolean;
@@ -128,7 +131,10 @@ export function CircleAssignmentSheet({
       toastSuccess('Added to circle');
       onClose();
     },
-    onError: (e: Error) => toastError('Could not add to circle', e.message),
+    onError: (e: unknown) => {
+      if (didAccountFrozenMutationToast(e)) return;
+      toastError('Could not add to circle', unknownErrorMessage(e, 'Try again.'));
+    },
   });
 
   const pendingCircleId =
@@ -158,7 +164,8 @@ export function CircleAssignmentSheet({
       setNewName('');
       setShowCreate(false);
     } catch (e) {
-      toastError('Could not create circle', e instanceof Error ? e.message : 'Unknown error');
+      if (didAccountFrozenMutationToast(e)) return;
+      toastError('Could not create circle', unknownErrorMessage(e, 'Unknown error'));
     } finally {
       setCreating(false);
     }
@@ -349,6 +356,7 @@ export function CircleAssignmentSheet({
           </Animated.View>
         </KeyboardAvoidingView>
       </View>
+      <ModalToastLayer />
     </Modal>
   );
 }

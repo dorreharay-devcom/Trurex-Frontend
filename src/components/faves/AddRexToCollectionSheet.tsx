@@ -20,6 +20,8 @@ import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { rexCoverStoragePathFromRecommendation, rexCoverRemoteHttpUrl } from '~/utils/recommendation/recContentDisplay';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { webContainerStyle } from '~/utils';
+import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
+import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { Theme } from '~/theme/Theme';
 
 interface AddRexToCollectionSheetProps {
@@ -75,8 +77,10 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({ open,
       queryClient.invalidateQueries({ queryKey: ['collection-detail'] });
       queryClient.invalidateQueries({ queryKey: ['my-saved-rexes'] });
       toastSuccess(`Added ${selected.size} rex${selected.size !== 1 ? 'es' : ''}`);
-    } catch {
-      toastError('Failed to add rexes');
+    } catch (e: unknown) {
+      if (!didAccountFrozenMutationToast(e)) {
+        toastError('Failed to add rexes');
+      }
     }
     setSaving(false);
     onClose();
@@ -169,6 +173,7 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({ open,
           </View>
         </Animated.View>
       </View>
+      <ModalToastLayer />
     </Modal>
   );
 };

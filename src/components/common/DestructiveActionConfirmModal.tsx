@@ -3,6 +3,7 @@ import { ActivityIndicator, Modal, Pressable, Text, View } from 'react-native';
 import { Trash2 } from 'lucide-react-native';
 import { isWeb, webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
+import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 
 export type DestructiveActionConfirmModalProps = {
   visible: boolean;
@@ -37,13 +38,14 @@ export function DestructiveActionConfirmModal({
       }}
       accessibilityViewIsModal
     >
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Dismiss"
-        disabled={pending}
-        className={`flex-1 bg-black/50 ${isWeb ? 'items-center justify-center px-4' : 'justify-end'}`}
-        onPress={onCancel}
-      >
+      <>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Dismiss"
+          disabled={pending}
+          className={`flex-1 bg-black/50 ${isWeb ? 'items-center justify-center px-4' : 'justify-end'}`}
+          onPress={onCancel}
+        >
         <Pressable
           className={`border border-border bg-card pt-3 pb-8 ${isWeb ? 'w-full rounded-2xl' : 'rounded-t-2xl border-t-0'}`}
           style={isWeb ? { maxWidth: 400 } : undefined}
@@ -89,6 +91,8 @@ export function DestructiveActionConfirmModal({
           </View>
         </Pressable>
       </Pressable>
+      <ModalToastLayer />
+      </>
     </Modal>
   );
 }

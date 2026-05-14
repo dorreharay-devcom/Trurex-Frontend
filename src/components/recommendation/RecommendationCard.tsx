@@ -22,6 +22,8 @@ import type {
 import { useAuth } from '~/services/AuthContext';
 import { useShareRex } from '~/hooks/recommendation/useShareRex';
 import { toastError } from '~/utils/appToast';
+import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { unknownErrorMessage } from '~/utils';
 import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
@@ -93,7 +95,13 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
     } catch (e) {
       setLiked(wasLiked);
       setLikes((n) => (nextLiked ? n - 1 : n + 1));
-      toastError("Couldn't update like", e instanceof Error ? e.message : undefined);
+      if (didAccountFrozenMutationToast(e)) return;
+      const detail = unknownErrorMessage(e, '').trim();
+      if (detail) {
+        toastError(detail);
+      } else {
+        toastError("Couldn't update like", 'Try again.');
+      }
     } finally {
       likeBusy.current = false;
     }

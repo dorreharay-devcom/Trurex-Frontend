@@ -19,6 +19,7 @@ import { followUser } from '~/api/usersApi';
 import { Theme } from '~/theme/Theme';
 import { formatCompactRelativeTime } from '~/utils/date';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
+import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 
 function formatNotificationTime(iso: string): string {
   const c = formatCompactRelativeTime(iso);
@@ -338,6 +339,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress 
             </View>
           ) : null}
         </View>
+        <ModalToastLayer />
       </Modal>
     </>
   );

@@ -5,6 +5,8 @@ import { useRexComments } from '~/hooks/recommendation/useRexComments';
 import { useAuth } from '~/services/AuthContext';
 import { Theme } from '~/theme/Theme';
 import { toastError } from '~/utils/appToast';
+import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { unknownErrorMessage } from '~/utils';
 import { CommentComposer } from './common/CommentComposer';
 import { CommentThread } from './common/CommentThread';
 import { totalCommentCount } from './utils/totalCommentCount';
@@ -54,7 +56,8 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
       setText('');
       setReplyTo(null);
     } catch (e) {
-      toastError('Comment failed', e instanceof Error ? e.message : undefined);
+      if (didAccountFrozenMutationToast(e)) return;
+      toastError('Comment failed', unknownErrorMessage(e, 'Try again.'));
     }
   }, [addComment, replyTo, text]);
 
@@ -63,7 +66,8 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
       try {
         await deleteComment(id);
       } catch (e) {
-        toastError('Delete failed', e instanceof Error ? e.message : undefined);
+        if (didAccountFrozenMutationToast(e)) return;
+        toastError('Delete failed', unknownErrorMessage(e, 'Try again.'));
       }
     },
     [deleteComment],
@@ -80,7 +84,8 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
       try {
         await toggleCommentLike(commentId, currentlyLiked);
       } catch (e) {
-        toastError('Could not update like', e instanceof Error ? e.message : undefined);
+        if (didAccountFrozenMutationToast(e)) return;
+        toastError('Could not update like', unknownErrorMessage(e, 'Try again.'));
       }
     },
     [user, toggleCommentLike],

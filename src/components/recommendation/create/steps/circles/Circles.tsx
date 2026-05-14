@@ -16,6 +16,7 @@ import { createCircle, updateCircle } from '~/api/circlesApi';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { webNoOutline } from '../search/common/webInputOutline';
 import { unknownErrorMessage } from '~/utils';
+import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { isNonEmptyString } from '~/utils/guards';
 import {
   circleFooterSubtitle,
@@ -101,6 +102,7 @@ export const Circles: React.FC<Props> = ({
         invalidateCircles();
         setHighlightId(created.id);
       } catch (e) {
+        if (didAccountFrozenMutationToast(e)) return;
         toastError('Could not create circle', unknownErrorMessage(e, 'Try again.'));
       } finally {
         setBusy(false);
@@ -119,6 +121,7 @@ export const Circles: React.FC<Props> = ({
       setEditName('');
       invalidateCircles();
     } catch (e) {
+      if (didAccountFrozenMutationToast(e)) return;
       toastError('Rename failed', unknownErrorMessage(e, 'Try again.'));
     } finally {
       setBusy(false);

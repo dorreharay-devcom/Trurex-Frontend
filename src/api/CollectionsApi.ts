@@ -1,4 +1,5 @@
 import { Backend, unwrap } from '~/services/AuthService';
+import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
 
 export type CollectionVisibility = 'private' | 'shared' | 'public';
 
@@ -96,11 +97,12 @@ export const CollectionsApi = {
     collection_id: string;
     rex_id: string;
   }): Promise<void> => {
-    const { error } = await Backend.rpc('remove_rex_from_collection', {
-      input_collection_id: params.collection_id,
-      input_rex_id: params.rex_id,
-    });
-    if (error) throw error;
+    throwRpcIfFailed(
+      await Backend.rpc('remove_rex_from_collection', {
+        input_collection_id: params.collection_id,
+        input_rex_id: params.rex_id,
+      }),
+    );
   },
 
   addRexToCollection: async (params: {
@@ -150,13 +152,11 @@ export const CollectionsApi = {
   },
 
   saveRex: async (_userId: string, rexId: string): Promise<void> => {
-    const { error } = await Backend.rpc('save_rex', { input_rex_id: rexId });
-    if (error) throw error;
+    throwRpcIfFailed(await Backend.rpc('save_rex', { input_rex_id: rexId }));
   },
 
   unsaveRex: async (_userId: string, rexId: string): Promise<void> => {
-    const { error } = await Backend.rpc('unsave_rex', { input_rex_id: rexId });
-    if (error) throw error;
+    throwRpcIfFailed(await Backend.rpc('unsave_rex', { input_rex_id: rexId }));
   },
 
   updateRexNote: async (params: {
@@ -164,11 +164,12 @@ export const CollectionsApi = {
     rex_id: string;
     note: string | null;
   }): Promise<void> => {
-    const { error } = await Backend.rpc('update_collection_rex_note', {
-      input_collection_id: params.collection_id,
-      input_rex_id: params.rex_id,
-      input_note: params.note,
-    });
-    if (error) throw error;
+    throwRpcIfFailed(
+      await Backend.rpc('update_collection_rex_note', {
+        input_collection_id: params.collection_id,
+        input_rex_id: params.rex_id,
+        input_note: params.note,
+      }),
+    );
   },
 };

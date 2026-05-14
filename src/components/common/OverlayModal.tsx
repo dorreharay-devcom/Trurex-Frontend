@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { OverlayModalProps } from '~/types/overlayModal';
+import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 
 export type { OverlayModalProps } from '~/types/overlayModal';
 
@@ -84,6 +85,7 @@ export const OverlayModal: React.FC<OverlayModalProps> = ({
           </RNAnimated.View>
         </KeyboardAvoidingView>
       </View>
+      <ModalToastLayer />
     </Modal>
   );
 };

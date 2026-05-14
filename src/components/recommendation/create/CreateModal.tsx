@@ -37,6 +37,8 @@ import {
   resolveVisibilityAndCircles,
 } from '~/utils/recommendation/recCreateFlow';
 import { toastError, toastInfo, toastSuccess } from '~/utils/appToast';
+import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { unknownErrorMessage } from '~/utils';
 import { CreateWizardStepper } from './CreateWizardStepper';
 import { CreateModalBody } from './CreateModalBody';
 
@@ -235,8 +237,8 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
           await flow.persistPlaceForCategory(code);
           flow.goNext();
         } catch (e) {
-          const err = e as Error;
-          toastError('Place', err.message || 'Could not save this place. Try again.');
+          if (didAccountFrozenMutationToast(e)) return;
+          toastError('Place', unknownErrorMessage(e, 'Could not save this place. Try again.'));
         } finally {
           setSubmitting(false);
         }
@@ -309,8 +311,8 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
       queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
       handleClose();
     } catch (e) {
-      const err = e as Error;
-      toastError('Could not post', err.message || 'Something went wrong.');
+      if (didAccountFrozenMutationToast(e)) return;
+      toastError('Could not post', unknownErrorMessage(e, 'Something went wrong.'));
     } finally {
       setSubmitting(false);
     }

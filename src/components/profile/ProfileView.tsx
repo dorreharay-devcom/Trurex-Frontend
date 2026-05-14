@@ -26,6 +26,7 @@ import { useMyRexes } from '~/hooks/useDiscovery';
 import { ChevronLeft, UserX } from 'lucide-react-native';
 import CollectionDetailView from '~/components/faves/CollectionDetailView';
 import { OverlayModal } from '~/components/common/OverlayModal';
+import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
 import { useQueryClient } from '@tanstack/react-query';
@@ -545,6 +546,7 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
             </View>
           </Animated.View>
         </View>
+        <ModalToastLayer />
       </Modal>
     </>
   );

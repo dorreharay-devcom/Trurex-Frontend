@@ -32,6 +32,7 @@ import { ReportContentDialog } from '~/components/recommendation/report/ReportCo
 import { useAuth } from '~/services/AuthContext';
 import type { ContentReportTarget } from '~/constants/recommendation/contentReport';
 import { toastError, toastInfo, toastSuccess } from '~/utils/appToast';
+import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
 import { Theme } from '~/theme/Theme';
 import type { Recommendation } from '~/types/recommendation/recommendation';
@@ -245,6 +246,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
       handleClose();
     },
     onError: (err: unknown) => {
+      if (didAccountFrozenMutationToast(err)) return;
       toastError('Could not delete', deleteRexToastMessage(err));
     },
   });

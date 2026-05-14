@@ -17,6 +17,7 @@ import { Theme } from '~/theme/Theme';
 import { Button } from '~/components/common/Button';
 import Input from '~/components/common/Input';
 import { toastError } from '~/utils/appToast';
+import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 
 interface EditProfileProps {
   onClose: () => void;
@@ -112,6 +113,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
       });
       onClose();
     } catch (e: any) {
+      if (didAccountFrozenMutationToast(e)) return;
       const message = e?.message || 'Failed to save profile';
       toastError(message);
     } finally {
