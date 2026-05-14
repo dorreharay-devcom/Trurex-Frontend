@@ -1,4 +1,4 @@
-import { REX_PHOTO_PLACEHOLDER_STORAGE_PATH } from '~/placeholder';
+import { REX_PHOTO_PLACEHOLDER_STORAGE_PATH } from '~/constants/rexPlaceholderPhoto';
 
 export function isHttpUrl(s: string): boolean {
   return /^https?:\/\//i.test(s.trim());
