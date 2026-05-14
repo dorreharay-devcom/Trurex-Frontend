@@ -42,7 +42,6 @@ function PeopleYouMayKnowCard({
   isFollowing,
   dismissPending,
   followPending,
-  layout,
   cardStyle,
   onUserPress,
 }: {
@@ -52,7 +51,6 @@ function PeopleYouMayKnowCard({
   isFollowing: boolean;
   dismissPending: boolean;
   followPending: boolean;
-  layout: 'stack' | 'carousel';
   cardStyle?: StyleProp<ViewStyle>;
   onUserPress?: (userId: string) => void;
 }) {
@@ -69,9 +67,7 @@ function PeopleYouMayKnowCard({
   return (
     <View
       style={cardStyle}
-      className={`relative shrink-0 flex-col rounded-xl border border-border bg-card p-3 shadow-sm ${
-        layout === 'stack' ? 'w-full max-w-full self-auto' : 'self-stretch'
-      }`}
+      className="relative shrink-0 flex-col self-stretch rounded-xl border border-border bg-card p-3 shadow-sm"
     >
       <Pressable
         onPress={onDismiss}
@@ -136,8 +132,6 @@ function PeopleYouMayKnowCard({
   );
 }
 
-const COMPACT_BREAKPOINT = 640;
-
 type Props = {
   isActive: boolean;
   onUserPress?: (userId: string) => void;
@@ -146,7 +140,6 @@ type Props = {
 export function PeopleYouMayKnowSection({ isActive, onUserPress }: Props) {
   const queryClient = useQueryClient();
   const { width: windowWidth } = useWindowDimensions();
-  const compact = windowWidth < COMPACT_BREAKPOINT;
   const carouselCardWidth = Math.min(288, Math.max(240, Math.floor(windowWidth - 48)));
 
   const {
@@ -232,29 +225,6 @@ export function PeopleYouMayKnowSection({ isActive, onUserPress }: Props) {
     );
   }
 
-  if (compact) {
-    return (
-      <View className="mt-10 w-full max-w-full">
-        <Text className="mb-3 text-base font-semibold text-foreground">People you might know</Text>
-        <View className="w-full max-w-full gap-3">
-          {rows.map((s) => (
-            <PeopleYouMayKnowCard
-              key={s.candidate_user_id}
-              layout="stack"
-              suggestion={s}
-              isFollowing={s.relationship_status === 'following'}
-              dismissPending={dismissPendingFor(s.candidate_user_id)}
-              followPending={followPendingFor(s.candidate_user_id)}
-              onDismiss={() => onDismiss(s.candidate_user_id)}
-              onFollow={() => onFollow(s.candidate_user_id)}
-              onUserPress={onUserPress}
-            />
-          ))}
-        </View>
-      </View>
-    );
-  }
-
   return (
     <View className="mt-10 w-full max-w-full overflow-hidden">
       <Text className="mb-3 text-base font-semibold text-foreground">People you might know</Text>
@@ -274,7 +244,6 @@ export function PeopleYouMayKnowSection({ isActive, onUserPress }: Props) {
         {rows.map((s) => (
           <PeopleYouMayKnowCard
             key={s.candidate_user_id}
-            layout="carousel"
             cardStyle={{ width: carouselCardWidth }}
             suggestion={s}
             isFollowing={s.relationship_status === 'following'}

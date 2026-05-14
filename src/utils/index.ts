@@ -1,5 +1,5 @@
 import * as Linking from 'expo-linking';
-import { Platform, Dimensions } from 'react-native';
+import { Platform, Dimensions, type TextStyle } from 'react-native';
 import { isNonEmptyString } from './guards';
 
 export { cn, type ClassValue } from './general';
@@ -10,6 +10,21 @@ export function unknownErrorMessage(error: unknown, fallback: string): string {
 }
 
 export const isWeb = Platform.OS === 'web';
+
+const flexRowSingleLineText: TextStyle = {
+  flex: 1,
+  minWidth: 0,
+};
+
+export const singleLineEllipsisTextStyle: TextStyle = isWeb
+  ? ({
+      ...flexRowSingleLineText,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+      maxWidth: '100%',
+    } as TextStyle)
+  : flexRowSingleLineText;
 
 export const webContainerStyle = isWeb
   ? { maxWidth: 1280, width: '100%' as const, alignSelf: 'center' as const }
