@@ -16,7 +16,6 @@ import {
 import EditCollectionModal from '~/components/faves/EditCollectionModal';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
-import { REX_PHOTO_PLACEHOLDER_STORAGE_PATH } from '~/placeholder';
 import { toastSuccess } from '~/utils/appToast';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import type { Recommendation, RecommendationOpenOptions } from '~/types/recommendation/recommendation';
@@ -213,11 +212,9 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                   <View className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                     <SignedStorageImage
                       bucket={REX_IMAGES_BUCKET}
-                      storagePath={item.photo_path?.trim() || REX_PHOTO_PLACEHOLDER_STORAGE_PATH}
+                      storagePath={item.photo_path ?? ''}
                       className="w-full h-full"
                       accessibilityLabel={item.place_name}
-                      placeholderCategoryId={item.category_code}
-                      placeholderCategoryLabel={item.category_name ?? undefined}
                     />
                   </View>
                   <View className="flex-1 min-w-0">
