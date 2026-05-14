@@ -29,6 +29,7 @@ import { generateRexImageStoragePath } from '~/utils/photos/photoUtils';
 import { isWeb, webContainerStyle } from '~/utils';
 import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
+import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 
@@ -397,6 +398,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
           </Animated.View>
         </KeyboardAvoidingView>
       </View>
+      <ModalToastLayer />
     </Modal>
   );
 };

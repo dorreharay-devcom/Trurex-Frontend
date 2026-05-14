@@ -24,6 +24,7 @@ const VALUE_LABELS = ['Total Steal', 'Budget-Friendly', 'Good Value', 'Worth It'
 import type { CollectionRexEntry } from '~/api/CollectionsApi';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
+import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 
 function entryToRec(entry: CollectionRexEntry): Recommendation {
   return {
@@ -386,6 +387,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
             </>
           )}
         </View>
+        <ModalToastLayer />
       </Modal>
 
       <EditCollectionModal

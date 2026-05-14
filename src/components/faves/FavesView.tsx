@@ -31,6 +31,8 @@ import AddRexToCollectionSheet from '~/components/faves/AddRexToCollectionSheet'
 import CollectionCard from '~/components/profile/CollectionCard';
 import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 import { toastError } from '~/utils/appToast';
+import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { unknownErrorMessage } from '~/utils';
 
 type FavesViewProps = {
   commentCountByRexId?: Record<string, number>;
@@ -87,7 +89,8 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
       queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
       setConfirmRemoveUncollected(null);
     } catch (e) {
-      toastError('Could not remove', e instanceof Error ? e.message : 'Try again.');
+      if (didAccountFrozenMutationToast(e)) return;
+      toastError('Could not remove', unknownErrorMessage(e, 'Try again.'));
     } finally {
       setRemoveUncollectedPending(false);
     }

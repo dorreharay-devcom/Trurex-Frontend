@@ -1,6 +1,7 @@
 import * as ImageManipulator from 'expo-image-manipulator';
 import { Backend } from '~/services/AuthService';
 import { generateRexImageStoragePath } from './photoUtils';
+import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
 
 export async function resizeForUpload(uri: string, maxWidth = 1200): Promise<string> {
   const result = await ImageManipulator.manipulateAsync(uri, [{ resize: { width: maxWidth } }], {
@@ -25,7 +26,7 @@ export async function uploadBlobToStorageBucket(
     contentType: contentType || blob.type || 'image/jpeg',
     upsert: false,
   });
-  if (error) throw error;
+  throwRpcIfFailed({ data: null, error });
 }
 
 export async function uploadLocalPickerImage(

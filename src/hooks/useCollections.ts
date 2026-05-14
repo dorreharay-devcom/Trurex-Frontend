@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Backend } from '~/services/AuthService';
 import { CollectionsApi, UserCollection, CollectionDetailRow, CollectionVisibility } from '~/api/CollectionsApi';
 import { toastSuccess, toastError } from '~/utils/appToast';
+import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { unknownErrorMessage } from '~/utils';
 
 export const useMyCollections = (userId?: string) => {
   return useQuery<UserCollection[]>({
@@ -25,8 +26,9 @@ export const useSaveCollection = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-saved-collections'] });
     },
-    onError: (error: any) => {
-      toastError('Failed to save collection', error.message);
+    onError: (error: unknown) => {
+      if (didAccountFrozenMutationToast(error)) return;
+      toastError('Failed to save collection', unknownErrorMessage(error, 'Try again.'));
     },
   });
 };
@@ -38,8 +40,9 @@ export const useUnsaveCollection = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-saved-collections'] });
     },
-    onError: (error: any) => {
-      toastError('Failed to unsave collection', error.message);
+    onError: (error: unknown) => {
+      if (didAccountFrozenMutationToast(error)) return;
+      toastError('Failed to unsave collection', unknownErrorMessage(error, 'Try again.'));
     },
   });
 };
@@ -66,8 +69,9 @@ export const useCreateCollection = () => {
       queryClient.invalidateQueries({ queryKey: ['my-collections'] });
       toastSuccess('Collection created!');
     },
-    onError: (error: any) => {
-      toastError('Failed to create collection', error.message);
+    onError: (error: unknown) => {
+      if (didAccountFrozenMutationToast(error)) return;
+      toastError('Failed to create collection', unknownErrorMessage(error, 'Try again.'));
     },
   });
 };
@@ -89,8 +93,9 @@ export const useUpdateCollection = () => {
       queryClient.invalidateQueries({ queryKey: ['collection-detail', variables.collection_id] });
       toastSuccess('Collection updated!');
     },
-    onError: (error: any) => {
-      toastError('Failed to update collection', error.message);
+    onError: (error: unknown) => {
+      if (didAccountFrozenMutationToast(error)) return;
+      toastError('Failed to update collection', unknownErrorMessage(error, 'Try again.'));
     },
   });
 };
@@ -105,8 +110,9 @@ export const useAddRexToCollection = () => {
       queryClient.invalidateQueries({ queryKey: ['collection-detail', variables.collection_id] });
       toastSuccess('Added to collection!');
     },
-    onError: (error: any) => {
-      toastError('Failed to add to collection', error.message);
+    onError: (error: unknown) => {
+      if (didAccountFrozenMutationToast(error)) return;
+      toastError('Failed to add to collection', unknownErrorMessage(error, 'Try again.'));
     },
   });
 };
@@ -115,21 +121,17 @@ export const useRemoveRexFromCollection = (collectionId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (rexId: string) => {
-      const { error } = await Backend.rpc('remove_rex_from_collection', {
-        input_collection_id: collectionId,
-        input_rex_id: rexId,
-      });
-      if (error) throw error;
-    },
+    mutationFn: (rexId: string) =>
+      CollectionsApi.removeRexFromCollection({ collection_id: collectionId, rex_id: rexId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['collection-detail', collectionId] });
       queryClient.invalidateQueries({ queryKey: ['my-collections'] });
       queryClient.invalidateQueries({ queryKey: ['my-saved-collections'] });
       toastSuccess('Removed from collection');
     },
-    onError: (error: any) => {
-      toastError('Failed to remove', error.message);
+    onError: (error: unknown) => {
+      if (didAccountFrozenMutationToast(error)) return;
+      toastError('Failed to remove', unknownErrorMessage(error, 'Try again.'));
     },
   });
 };
@@ -143,8 +145,9 @@ export const useDeleteCollection = () => {
       queryClient.invalidateQueries({ queryKey: ['my-collections'] });
       toastSuccess('Collection deleted');
     },
-    onError: (error: any) => {
-      toastError('Failed to delete collection', error.message);
+    onError: (error: unknown) => {
+      if (didAccountFrozenMutationToast(error)) return;
+      toastError('Failed to delete collection', unknownErrorMessage(error, 'Try again.'));
     },
   });
 };
@@ -169,8 +172,9 @@ export const useUpdateCollectionRexNote = (collectionId: string) => {
         },
       );
     },
-    onError: (error: any) => {
-      toastError('Failed to save note', error.message);
+    onError: (error: unknown) => {
+      if (didAccountFrozenMutationToast(error)) return;
+      toastError('Failed to save note', unknownErrorMessage(error, 'Try again.'));
     },
   });
 };
@@ -199,8 +203,9 @@ export const useToggleSave = () => {
       queryClient.invalidateQueries({ queryKey: ['my-saved', variables.userId] });
       toastSuccess(variables.isSaved ? 'Removed from bookmarks' : 'Added to bookmarks');
     },
-    onError: (error: any) => {
-      toastError('Action failed', error.message);
+    onError: (error: unknown) => {
+      if (didAccountFrozenMutationToast(error)) return;
+      toastError('Action failed', unknownErrorMessage(error, 'Try again.'));
     },
   });
 };

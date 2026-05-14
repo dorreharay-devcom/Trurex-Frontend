@@ -1,5 +1,6 @@
 import { Backend } from '~/services/AuthService';
 import type { NetworkUserRow, PublicUserRow, UserConfigRow, UserProfileRow } from '~/types/network';
+import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
 import {
   coerceId,
   finiteNum,
@@ -74,7 +75,7 @@ async function fetchUserFollowingInternal(inputUserId: string): Promise<NetworkU
     input_offset: 0,
     input_user_id: inputUserId,
   });
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return unknownAsArray<Record<string, unknown>>(data)
     .map(normalizeNetworkRow)
     .filter((u) => u.user_id);
@@ -96,7 +97,7 @@ export async function fetchTrustedUsers(inputUserId: string): Promise<NetworkUse
   }
 
   if (!isTrustedUsersRpcUnavailable(error)) {
-    throw error;
+    throwRpcIfFailed({ data, error });
   }
 
   const { data: sessionData } = await Backend.auth.getSession();
@@ -125,7 +126,7 @@ export async function fetchUserFollowers(inputUserId: string): Promise<NetworkUs
     input_offset: 0,
     input_user_id: inputUserId,
   });
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return unknownAsArray<Record<string, unknown>>(data)
     .map(normalizeNetworkRow)
     .filter((u) => u.user_id);
@@ -156,7 +157,7 @@ export async function searchUsers(params: {
     payload.input_user_id = params.input_user_id;
   }
   const { data, error } = await Backend.rpc('search_users', payload);
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return unknownAsArray<Record<string, unknown>>(data)
     .map(normalizeNetworkRow)
     .filter((u) => u.user_id);
@@ -172,7 +173,7 @@ export async function getUserProfile(params: {
     payload.input_handle = params.input_handle.trim();
   }
   const { data, error } = await Backend.rpc('get_user_profile', payload);
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   if (data == null) return null;
   const raw = Array.isArray(data) ? data[0] : data;
   if (!isPlainObject(raw)) return null;
@@ -186,7 +187,7 @@ export async function fetchUserByHandle(handle: string): Promise<PublicUserRow |
     .select(PUBLIC_USER_COLUMNS)
     .eq('handle', h)
     .maybeSingle();
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return data as PublicUserRow | null;
 }
 
@@ -195,18 +196,16 @@ export async function fetchPublicUserById(userId: string): Promise<PublicUserRow
     .select(PUBLIC_USER_COLUMNS)
     .eq('id', userId)
     .maybeSingle();
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return data as PublicUserRow | null;
 }
 
 export async function followUser(input_followed_user_id: string): Promise<void> {
-  const { error } = await Backend.rpc('follow_user', { input_followed_user_id });
-  if (error) throw error;
+  throwRpcIfFailed(await Backend.rpc('follow_user', { input_followed_user_id }));
 }
 
 export async function unfollowUser(input_followed_user_id: string): Promise<void> {
-  const { error } = await Backend.rpc('unfollow_user', { input_followed_user_id });
-  if (error) throw error;
+  throwRpcIfFailed(await Backend.rpc('unfollow_user', { input_followed_user_id }));
 }
 
 export function filterOneWayFollowing(rows: NetworkUserRow[]): NetworkUserRow[] {
@@ -233,6 +232,6 @@ function normalizeUserConfigResponse(data: unknown): UserConfigRow {
 
 export async function fetchUserConfig(): Promise<UserConfigRow> {
   const { data, error } = await Backend.rpc('user_config');
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return normalizeUserConfigResponse(data);
 }

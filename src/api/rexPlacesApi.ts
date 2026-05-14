@@ -1,4 +1,5 @@
 import { Backend } from '~/services/AuthService';
+import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
 
 export type GooglePlacesSearchMeta = {
   localCount: number;
@@ -70,7 +71,7 @@ export async function searchPlacesForRex(
       },
     },
   );
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   if (data == null) {
     return { results: [], meta: { localCount: 0, googleSkippedNoKey: false } };
   }
@@ -86,7 +87,7 @@ export async function upsertGooglePlace(params: {
   p_longitude: number | null;
 }): Promise<RexPlaceRow> {
   const { data, error } = await Backend.rpc('upsert_google_place', params);
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return data as RexPlaceRow;
 }
 
@@ -98,6 +99,6 @@ export async function createManualPlace(params: {
   p_longitude: number | null;
 }): Promise<RexPlaceRow> {
   const { data, error } = await Backend.rpc('create_manual_place', params);
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return data as RexPlaceRow;
 }

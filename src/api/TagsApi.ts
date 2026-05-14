@@ -1,4 +1,5 @@
 import { Backend, unwrap } from '~/services/AuthService';
+import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
 
 export interface TagRow {
   id: string;
@@ -34,7 +35,7 @@ export const TagsApi = {
 
   createTag: async (label: string): Promise<TagFullRow> => {
     const { data, error } = await Backend.rpc('create_tag', { input_label: label });
-    if (error) throw error;
+    throwRpcIfFailed({ data, error });
     return data as TagFullRow;
   },
 
@@ -42,7 +43,7 @@ export const TagsApi = {
     const { data, error } = await Backend.from('tags')
       .select('*')
       .order('label', { ascending: true });
-    if (error) throw error;
+    throwRpcIfFailed({ data, error });
     return (data ?? []) as TagFullRow[];
   },
 };

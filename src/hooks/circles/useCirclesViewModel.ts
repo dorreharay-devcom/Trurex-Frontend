@@ -23,6 +23,8 @@ import {
 } from '~/utils/recommendation/recCircles';
 import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/utils/circleTabUtils';
 import { toastError, toastSuccess } from '~/utils/appToast';
+import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { unknownErrorMessage } from '~/utils';
 import { useMyCircles } from '~/hooks/useMyCircles';
 
 const PRESET_DEFAULT: CirclePresetColor = CIRCLE_COLOR_PRESETS[0];
@@ -154,7 +156,10 @@ export function useCirclesViewModel(isActive: boolean) {
       queryClient.invalidateQueries({ queryKey: ['myCircles'] });
       toastSuccess('Added to circle');
     },
-    onError: (e: Error) => toastError('Could not add to circle', e.message),
+    onError: (e: unknown) => {
+      if (didAccountFrozenMutationToast(e)) return;
+      toastError('Could not add to circle', unknownErrorMessage(e, 'Try again.'));
+    },
     onSettled: () => setAddingMemberId(null),
   });
 
@@ -169,7 +174,10 @@ export function useCirclesViewModel(isActive: boolean) {
       queryClient.invalidateQueries({ queryKey: ['myCircles'] });
       toastSuccess('Removed from circle');
     },
-    onError: (e: Error) => toastError('Could not remove from circle', e.message),
+    onError: (e: unknown) => {
+      if (didAccountFrozenMutationToast(e)) return;
+      toastError('Could not remove from circle', unknownErrorMessage(e, 'Try again.'));
+    },
     onSettled: () => setRemovingMemberId(null),
   });
 
@@ -189,7 +197,10 @@ export function useCirclesViewModel(isActive: boolean) {
       setNewDesc('');
       setSelectedColor(PRESET_DEFAULT);
     },
-    onError: (e: Error) => toastError('Could not create circle', e.message),
+    onError: (e: unknown) => {
+      if (didAccountFrozenMutationToast(e)) return;
+      toastError('Could not create circle', unknownErrorMessage(e, 'Try again.'));
+    },
   });
 
   const updateMutation = useMutation({
@@ -207,7 +218,10 @@ export function useCirclesViewModel(isActive: boolean) {
       setShowEditModal(false);
       toastSuccess('Circle updated');
     },
-    onError: (e: Error) => toastError('Could not update circle', e.message),
+    onError: (e: unknown) => {
+      if (didAccountFrozenMutationToast(e)) return;
+      toastError('Could not update circle', unknownErrorMessage(e, 'Try again.'));
+    },
   });
 
   const deleteMutation = useMutation({
@@ -221,9 +235,10 @@ export function useCirclesViewModel(isActive: boolean) {
       setSelectedCircleId(null);
       toastSuccess('Circle deleted');
     },
-    onError: (e: Error) => {
+    onError: (e: unknown) => {
+      if (didAccountFrozenMutationToast(e)) return;
       setShowDeleteCircleModal(false);
-      toastError('Could not delete circle', e.message);
+      toastError('Could not delete circle', unknownErrorMessage(e, 'Try again.'));
     },
   });
 

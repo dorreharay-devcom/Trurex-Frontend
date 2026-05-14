@@ -1,4 +1,5 @@
 import { Backend } from '~/services/AuthService';
+import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
 import { coerceNonEmptyId, isPlainObject, optStr, stringifyOrNull } from '~/utils/guards';
 
 export type CircleApiRow = {
@@ -36,7 +37,7 @@ async function fetchMyCirclesViaPostgrest(): Promise<CircleApiRow[]> {
       'id, owner_id, name, description, icon_url, color, system_kind, is_active, created_at, updated_at',
     )
     .order('created_at', { ascending: false });
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return (data ?? []).map((row: CircleRowFromDb) => ({
     ...row,
     invitation_code: null,
@@ -57,7 +58,7 @@ export async function fetchMyCircles(): Promise<CircleApiRow[]> {
   try {
     return await fetchMyCirclesViaPostgrest();
   } catch {
-    if (error) throw error;
+    throwRpcIfFailed({ data, error });
     throw new Error('fetchMyCircles failed');
   }
 }
@@ -67,7 +68,7 @@ export async function addCircleMember(circleId: string, userId: string): Promise
     input_circle_id: circleId,
     input_user_id: userId,
   });
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return data;
 }
 
@@ -76,7 +77,7 @@ export async function removeCircleMember(circleId: string, userId: string): Prom
     input_circle_id: circleId,
     input_user_id: userId,
   });
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return data === true;
 }
 
@@ -94,7 +95,7 @@ export async function createCircle(params: CreateCircleParams): Promise<CircleAp
     input_icon_url: params.input_icon_url ?? null,
     input_color: params.input_color ?? null,
   });
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return data as CircleApiRow;
 }
 
@@ -116,7 +117,7 @@ export async function updateCircle(params: UpdateCircleParams): Promise<CircleAp
   if (params.input_color !== undefined) body.input_color = params.input_color;
 
   const { data, error } = await Backend.rpc('update_circle', body);
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return data as CircleApiRow;
 }
 
@@ -124,7 +125,7 @@ export async function deleteCircle(input_circle_id: string): Promise<CircleApiRo
   const { data, error } = await Backend.rpc('delete_circle', {
     input_circle_id,
   });
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return data as CircleApiRow;
 }
 
@@ -132,7 +133,7 @@ export async function joinCircle(input_invitation_code: string): Promise<Record<
   const { data, error } = await Backend.rpc('join_circle', {
     input_invitation_code,
   });
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return (data ?? {}) as Record<string, unknown>;
 }
 
@@ -148,7 +149,7 @@ export async function fetchCircleDiscoverFeed(
     result_limit: params.result_limit ?? 20,
     result_offset: params.result_offset ?? 0,
   });
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   return data;
 }
 
@@ -180,7 +181,7 @@ export async function fetchCircleMembers(circleId: string): Promise<CircleMember
   const { data, error } = await Backend.rpc('get_circle_members', {
     input_circle_id: circleId,
   });
-  if (error) throw error;
+  throwRpcIfFailed({ data, error });
   const rows = Array.isArray(data) ? data : [];
   return rows
     .map(mapGetCircleMembersRow)
@@ -189,7 +190,7 @@ export async function fetchCircleMembers(circleId: string): Promise<CircleMember
 
 export async function fetchMyCircleMemberAssignments(): Promise<CircleMemberAssignment[]> {
   const { data: circlesData, error: ce } = await Backend.from('circles').select('id');
-  if (ce) throw ce;
+  throwRpcIfFailed({ data: circlesData, error: ce });
   const circleIds = (circlesData ?? []).map((c: { id: string }) => c.id);
   if (circleIds.length === 0) return [];
 

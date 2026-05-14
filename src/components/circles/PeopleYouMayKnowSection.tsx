@@ -20,6 +20,7 @@ import { Theme } from '~/theme/Theme';
 import type { PeopleSuggestionRow } from '~/types/peopleSuggestions';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { unknownErrorMessage } from '~/utils';
+import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 
 function ordinalDegreeLabel(degree: number): string {
   const j = degree % 10;
@@ -159,6 +160,7 @@ export function PeopleYouMayKnowSection({ isActive, onUserPress }: Props) {
       void queryClient.invalidateQueries({ queryKey: ['people_suggestions'] });
     },
     onError: (e: unknown) => {
+      if (didAccountFrozenMutationToast(e)) return;
       toastError('Could not dismiss', unknownErrorMessage(e, 'Try again.'));
     },
   });
@@ -173,6 +175,7 @@ export function PeopleYouMayKnowSection({ isActive, onUserPress }: Props) {
       void queryClient.invalidateQueries({ queryKey: ['user_following'] });
     },
     onError: (e: unknown) => {
+      if (didAccountFrozenMutationToast(e)) return;
       toastError('Could not follow', unknownErrorMessage(e, 'Try again.'));
     },
   });

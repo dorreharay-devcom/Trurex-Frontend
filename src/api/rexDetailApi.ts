@@ -1,4 +1,5 @@
 import { Backend, unwrap } from '~/services/AuthService';
+import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
 import type { RexDetailRow } from '~/types/recommendation/rexDetail';
 
 function tryJsonStringAsArray(s: string): unknown[] | null {
@@ -75,10 +76,9 @@ export async function deleteRex(rexId: string): Promise<void> {
   if (!trimmed) {
     throw new Error('Missing rex id');
   }
-  const { error } = await Backend.rpc('delete_rex', {
-    input_rex_id: trimmed,
-  });
-  if (error) {
-    throw error;
-  }
+  throwRpcIfFailed(
+    await Backend.rpc('delete_rex', {
+      input_rex_id: trimmed,
+    }),
+  );
 }

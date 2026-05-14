@@ -25,6 +25,7 @@ import { useAuth } from '~/services/AuthContext';
 import { cn } from '~/utils/general';
 import { toastInfo } from '~/utils/appToast';
 import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';
+import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 
 const isWeb = Platform.OS === 'web';
 
@@ -299,6 +300,7 @@ export const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, targe
           )}
         </View>
       </View>
+      <ModalToastLayer />
     </Modal>
   );
 };

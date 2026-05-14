@@ -8,6 +8,8 @@ import {
 } from '~/constants/recommendation/contentReport';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { useAuth } from '~/services/AuthContext';
+import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { unknownErrorMessage } from '~/utils';
 
 type Params = {
   open: boolean;
@@ -90,7 +92,8 @@ export function useContentReportFlow({ open, target }: Params) {
       reset();
       return true;
     } catch (e) {
-      toastError('Could not send report', e instanceof Error ? e.message : 'Try again.');
+      if (didAccountFrozenMutationToast(e)) return false;
+      toastError('Could not send report', unknownErrorMessage(e, 'Try again.'));
       return false;
     } finally {
       setIsSubmitting(false);

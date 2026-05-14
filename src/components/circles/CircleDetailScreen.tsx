@@ -34,6 +34,7 @@ import {
   getCircleUiPolicy,
 } from '~/utils/circleTabUtils';
 import { webContainerStyle } from '~/utils';
+import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 
 type Props = { vm: CirclesViewModel; onUserPress?: (userId: string) => void };
 
@@ -410,6 +411,7 @@ function EditCircleModal({
           </View>
         </View>
       </View>
+      <ModalToastLayer />
     </Modal>
   );
 }
