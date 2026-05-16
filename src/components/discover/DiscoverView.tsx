@@ -287,7 +287,7 @@ const DiscoverView = ({
         <View className="mb-5">
           <View className="flex-row items-center justify-between mb-3">
             <View className="flex-row items-center gap-2">
-              <Star size={14} color={Theme.colors.ratingStar} fill={Theme.colors.ratingStar} />
+              <Star size={14} color={Theme.colors.primary} fill={Theme.colors.primary} />
               <Text className="text-sm font-display font-semibold text-foreground">
                 Your Categories
               </Text>

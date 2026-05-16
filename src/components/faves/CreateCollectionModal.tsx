@@ -331,7 +331,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                           <Text
                             className={cn(
                               'text-xs font-medium',
-                              on ? 'text-primary-foreground' : 'text-muted-foreground',
+                              on ? 'text-primary-foreground' : 'text-foreground',
                             )}
                           >
                             {tag}
@@ -390,30 +390,42 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
               {/* sticky bottom-0 bg-card — Footer */}
               <View className="border-t border-border bg-card">
                 <View style={[{ padding: 16 }, webContainerStyle]}>
-                  <Pressable
-                    onPress={() => {
-                      if (!canCreate) return;
-                      void handleCreate();
-                    }}
-                    disabled={!canCreate}
-                    accessibilityRole="button"
-                    accessibilityState={{ disabled: !canCreate }}
-                    style={!canCreate && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined}
-                    className={cn(
-                      'w-full items-center rounded-xl py-3',
-                      canCreate
-                        ? 'cursor-pointer bg-primary active:opacity-90'
-                        : 'cursor-not-allowed bg-primary/40 opacity-50',
-                    )}
+                  <View
+                    className={cn('w-full', !canCreate && isWeb && 'cursor-not-allowed')}
+                    style={
+                      !canCreate && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined
+                    }
                   >
-                    {loading ? (
-                      <ActivityIndicator color={Theme.colors.primaryForeground} />
-                    ) : (
-                      <Text className="text-sm font-semibold text-primary-foreground">
-                        Create Collection
-                      </Text>
-                    )}
-                  </Pressable>
+                    <Pressable
+                      onPress={() => {
+                        if (!canCreate) return;
+                        void handleCreate();
+                      }}
+                      disabled={!canCreate && Platform.OS !== 'web'}
+                      accessibilityRole="button"
+                      accessibilityState={{ disabled: !canCreate }}
+                      style={
+                        !canCreate && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined
+                      }
+                      className={cn(
+                        'w-full items-center rounded-xl py-3',
+                        canCreate
+                          ? 'cursor-pointer bg-primary active:opacity-90'
+                          : 'cursor-not-allowed bg-primary/40 opacity-50',
+                      )}
+                    >
+                      {loading ? (
+                        <ActivityIndicator color={Theme.colors.primaryForeground} />
+                      ) : (
+                        <Text
+                          pointerEvents="none"
+                          className="text-sm font-semibold text-primary-foreground"
+                        >
+                          Create Collection
+                        </Text>
+                      )}
+                    </Pressable>
+                  </View>
                 </View>
               </View>
             </View>

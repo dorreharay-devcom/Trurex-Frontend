@@ -10,7 +10,7 @@ export function MapSearchRow({ field, trailingSlot }: Props) {
   const showTrailing = trailingSlot !== undefined;
 
   return (
-    <View className="flex-row items-start gap-2">
+    <View className="flex-row items-center gap-2">
       <View className="min-w-0 flex-1">{field}</View>
       {showTrailing ? (
         <View className="shrink-0 items-end gap-2">

@@ -368,8 +368,8 @@ export function CircleAssignmentSheet({
                           disabled={assignInFlight}
                           className="flex-row items-center gap-3 rounded-xl border border-dashed border-border bg-background p-4 active:opacity-90"
                         >
-                          <View className="h-11 w-11 items-center justify-center rounded-full bg-muted">
-                            <Plus size={18} color={Theme.colors.secondaryText} />
+                          <View className="h-11 w-11 items-center justify-center rounded-full bg-primary">
+                            <Plus size={18} color={Theme.colors.primaryForeground} />
                           </View>
                           <Text
                             className="text-sm font-medium"

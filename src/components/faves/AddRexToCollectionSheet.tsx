@@ -23,6 +23,7 @@ import { webContainerStyle } from '~/utils';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { Theme } from '~/theme/Theme';
+import { cn } from '~/utils/general';
 
 interface AddRexToCollectionSheetProps {
   open: boolean;
@@ -117,7 +118,7 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({ open,
                 {saving ? (
                   <ActivityIndicator size="small" color={Theme.colors.primary} />
                 ) : (
-                  <Text className="text-sm font-semibold text-primary">
+                  <Text className="text-sm font-semibold text-foreground">
                     {selected.size > 0 ? `Add ${selected.size}` : 'Done'}
                   </Text>
                 )}
@@ -146,8 +147,8 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({ open,
                       key={rec.id}
                       onPress={() => toggle(rec.id)}
                       activeOpacity={0.7}
-                      style={isSelected ? { backgroundColor: `${Theme.colors.primary}14` } : undefined}
-                      className="w-full flex-row items-center gap-3 p-3 rounded-xl"
+                      style={isSelected ? { backgroundColor: Theme.colors.accent } : undefined}
+                      className="w-full flex-row items-center gap-3 rounded-xl p-3"
                     >
                       <View className="w-10 h-10 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                         <SignedStorageImage
@@ -160,11 +161,16 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({ open,
                       </View>
                       <View className="flex-1 min-w-0">
                         <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>{rec.title}</Text>
-                        <Text className="text-xs" style={{ color: isSelected ? Theme.colors.primary : Theme.colors.muted }}>
+                        <Text
+                          className={cn(
+                            'text-xs font-medium',
+                            isSelected ? 'text-foreground' : 'text-muted-foreground',
+                          )}
+                        >
                           {isSelected ? 'Selected' : rec.category}
                         </Text>
                       </View>
-                      {isSelected && <Check size={18} color={Theme.colors.primary} />}
+                      {isSelected && <Check size={18} color={Theme.colors.foreground} />}
                     </TouchableOpacity>
                   );
                 })

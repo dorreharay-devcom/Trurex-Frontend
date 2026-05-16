@@ -89,56 +89,54 @@ export function MapSearchBar({
     <View pointerEvents="box-none" style={styles.root}>
       <MapSearchRow
         field={
-          <>
-            <View className="relative w-full">
-              <View className="pointer-events-none absolute left-3.5 top-1/2 z-[1] -mt-2">
-                <Search size={16} color={Theme.colors.secondaryText} />
-              </View>
-              <TextInput
-                ref={inputRef}
-                value={value}
-                onChangeText={onChangeText}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                placeholder="Search rex by name…"
-                placeholderTextColor={Theme.colors.secondaryText}
-                className="rounded-2xl border border-border bg-card/95 py-3 pl-10 pr-10 text-sm text-foreground shadow-md"
-                accessibilityLabel="Search recommendations by name"
-              />
-              {value.length > 0 ? (
-                <Pressable
-                  onPress={() => onChangeText('')}
-                  className="absolute right-3 top-1/2 z-[1] -mt-3 rounded-lg p-1 active:opacity-70"
-                  accessibilityRole="button"
-                  accessibilityLabel="Clear search"
-                >
-                  <X size={16} color={Theme.colors.secondaryText} />
-                </Pressable>
-              ) : null}
+          <View className="relative w-full">
+            <View className="pointer-events-none absolute left-3.5 top-1/2 z-[1] -mt-2">
+              <Search size={16} color={Theme.colors.secondaryText} />
             </View>
-
-            {showSuggestions ? (
-              <View className="mt-1.5 w-full overflow-hidden rounded-xl border border-border bg-card/95 shadow-md">
-                <ScrollView keyboardShouldPersistTaps="handled" className="max-h-48">
-                  {suggestions.map((rec) => (
-                    <Pressable
-                      key={rec.id}
-                      onPress={() => pickSuggestion(rec)}
-                      {...WEB_SUGGESTION_ROW_HANDLERS}
-                      className="border-b border-border/60 px-4 py-2.5 active:bg-muted/30"
-                    >
-                      <Text className="text-sm text-foreground" numberOfLines={1}>
-                        {rec.title}
-                      </Text>
-                    </Pressable>
-                  ))}
-                </ScrollView>
-              </View>
+            <TextInput
+              ref={inputRef}
+              value={value}
+              onChangeText={onChangeText}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              placeholder="Search rex by name…"
+              placeholderTextColor={Theme.colors.secondaryText}
+              className="rounded-2xl border border-border bg-card/95 py-3 pl-10 pr-10 text-sm text-foreground shadow-md"
+              accessibilityLabel="Search recommendations by name"
+            />
+            {value.length > 0 ? (
+              <Pressable
+                onPress={() => onChangeText('')}
+                className="absolute right-3 top-1/2 z-[1] -mt-3 rounded-lg p-1 active:opacity-70"
+                accessibilityRole="button"
+                accessibilityLabel="Clear search"
+              >
+                <X size={16} color={Theme.colors.secondaryText} />
+              </Pressable>
             ) : null}
-          </>
+          </View>
         }
         trailingSlot={trailing}
       />
+
+      {showSuggestions ? (
+        <View className="mt-1.5 w-full overflow-hidden rounded-xl border border-border bg-card/95 shadow-md">
+          <ScrollView keyboardShouldPersistTaps="handled" className="max-h-48">
+            {suggestions.map((rec) => (
+              <Pressable
+                key={rec.id}
+                onPress={() => pickSuggestion(rec)}
+                {...WEB_SUGGESTION_ROW_HANDLERS}
+                className="border-b border-border/60 px-4 py-2.5 active:bg-muted/30"
+              >
+                <Text className="text-sm text-foreground" numberOfLines={1}>
+                  {rec.title}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      ) : null}
     </View>
   );
 }
