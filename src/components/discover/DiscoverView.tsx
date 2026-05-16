@@ -18,6 +18,7 @@ import {
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import { isWeb, webContainerStyle } from '~/utils';
 import RecommendationCard, { Recommendation } from '~/components/recommendation/RecommendationCard';
+import { RecommendationCardSkeleton } from '~/components/recommendation/RecommendationCardSkeleton';
 import { useDiscoverRecommendations } from '~/hooks/useDiscovery';
 import {
   useDiscoverSearchFilters,
@@ -36,6 +37,40 @@ import { toastError } from '~/utils/appToast';
 import { useTrendingTags } from '~/hooks/useTags';
 
 const searchFilterPill = 'flex-row items-center gap-1.5 px-3 py-1.5 rounded-full border';
+
+const PILL_SKELETON_WIDTHS = [56, 72, 64, 80, 68, 76, 60, 84] as const;
+
+function DiscoverPillSkeletonRow({ count = 6 }: { count?: number }) {
+  return (
+    <View className="flex-row flex-wrap gap-2">
+      {Array.from({ length: count }, (_, i) => (
+        <View
+          key={i}
+          className="h-8 rounded-full bg-border/40"
+          style={{ width: PILL_SKELETON_WIDTHS[i % PILL_SKELETON_WIDTHS.length] }}
+        />
+      ))}
+    </View>
+  );
+}
+
+function DiscoverCategoryGridSkeleton({
+  itemPct,
+  count,
+}: {
+  itemPct: `${number}%`;
+  count: number;
+}) {
+  return (
+    <View className="w-full flex-row flex-wrap">
+      {Array.from({ length: count }, (_, i) => (
+        <View key={i} style={{ width: itemPct, padding: 6 }}>
+          <View style={{ width: '100%', height: 74 }} className="rounded-2xl bg-border/40" />
+        </View>
+      ))}
+    </View>
+  );
+}
 
 type Category = {
   id: string;
@@ -89,7 +124,7 @@ const DiscoverView = ({
   const [editingPinned, setEditingPinned] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
 
-  const { data: trendingTags = [] } = useTrendingTags();
+  const { data: trendingTags = [], isPending: trendingPending } = useTrendingTags();
   const { width: screenWidth } = useWindowDimensions();
   const colCount = isWeb ? (screenWidth >= 1024 ? 5 : screenWidth >= 640 ? 4 : 3) : 3;
   const itemPct = `${(100 / colCount).toFixed(4)}%` as `${number}%`;
@@ -263,23 +298,29 @@ const DiscoverView = ({
             <TrendingUp size={16} color={Theme.colors.primary} />
             <Text className="text-sm font-display font-semibold text-foreground">Trending Now</Text>
           </View>
-          <View className="flex-row flex-wrap gap-2">
-            {trendingTags.map((tag) => {
-              const active = activeTag === tag.slug;
-              return (
-                <TouchableOpacity
-                  key={tag.id}
-                  onPress={() => setActiveTag(active ? null : tag.slug)}
-                  activeOpacity={0.7}
-                  className={`px-3 py-1.5 rounded-full border ${active ? 'bg-primary border-primary' : 'bg-card border-border'}`}
-                >
-                  <Text className={`text-xs ${active ? 'text-primary-foreground font-semibold' : 'text-muted-foreground'}`}>
-                    #{tag.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+          {trendingPending && trendingTags.length === 0 ? (
+            <DiscoverPillSkeletonRow count={6} />
+          ) : (
+            <View className="flex-row flex-wrap gap-2">
+              {trendingTags.map((tag) => {
+                const active = activeTag === tag.slug;
+                return (
+                  <TouchableOpacity
+                    key={tag.id}
+                    onPress={() => setActiveTag(active ? null : tag.slug)}
+                    activeOpacity={0.7}
+                    className={`px-3 py-1.5 rounded-full border ${active ? 'bg-primary border-primary' : 'bg-card border-border'}`}
+                  >
+                    <Text
+                      className={`text-xs ${active ? 'text-primary-foreground font-semibold' : 'text-muted-foreground'}`}
+                    >
+                      #{tag.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
         </View>
       )}
 
@@ -333,7 +374,7 @@ const DiscoverView = ({
         <View className="mb-8 w-full">
           <View className="flex-row items-center justify-between mb-3">
             <Text className="text-sm font-display font-semibold text-foreground">
-              {pinnedCats.length > 0 ? 'All Categories' : 'Browse by Category'}
+              All Categories
             </Text>
             {!categoriesPending && pinnedCats.length > 0 && (
               <TouchableOpacity
@@ -354,9 +395,7 @@ const DiscoverView = ({
           </View>
 
           {categoriesPending && allCats.length === 0 ? (
-            <View className="min-h-[120px] w-full items-center justify-center py-8">
-              <ActivityIndicator color={Theme.colors.primary} />
-            </View>
+            <DiscoverCategoryGridSkeleton itemPct={itemPct} count={colCount * 2} />
           ) : pinnedCats.length === 0 || showAllCategories ? (
             <View className="w-full flex-row flex-wrap">
               {allCats.map((cat) => {
@@ -448,9 +487,11 @@ const DiscoverView = ({
       </Text>
 
       {isLoading && (
-        <View className="gap-3">
-          {[1, 2, 3].map((i) => (
-            <View key={i} className="h-16 rounded-xl bg-primary" />
+        <View
+          style={isWeb ? { maxWidth: 680, width: '100%', alignSelf: 'center' } : undefined}
+        >
+          {[1, 2].map((i) => (
+            <RecommendationCardSkeleton key={i} />
           ))}
         </View>
       )}

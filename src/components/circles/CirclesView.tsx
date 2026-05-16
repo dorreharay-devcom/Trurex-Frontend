@@ -182,8 +182,10 @@ function CirclesListContent({
         )}
 
         {vm.isLoading ? (
-          <View className="items-center py-12">
-            <ActivityIndicator color={Theme.colors.primary} />
+          <View className="gap-3">
+            {[1, 2, 3].map((i) => (
+              <View key={i} className="h-16 rounded-xl bg-border/40" />
+            ))}
           </View>
         ) : vm.isError ? (
           <View className="rounded-xl border border-destructive/30 bg-destructive/5 p-4">
@@ -268,8 +270,10 @@ function CirclesListContent({
             </View>
 
             {connPhase === 'loading' ? (
-              <View className="items-center py-8">
-                <ActivityIndicator color={Theme.colors.primary} />
+              <View className="gap-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <View key={i} className="h-16 rounded-xl bg-border/40" />
+                ))}
               </View>
             ) : connPhase === 'rows' ? (
               <View className="gap-2">

@@ -156,7 +156,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
               <View
                 key={i}
                 style={{ width: 160, height: 204, borderRadius: 12 }}
-                className="bg-primary"
+                className="bg-border/40"
               />
             ))}
           </View>
@@ -237,7 +237,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
       {loadingSaved && (
         <View className="gap-3 mb-3">
           {[1, 2].map((i) => (
-            <View key={i} className="h-16 rounded-xl bg-primary" />
+            <View key={i} className="h-16 rounded-xl bg-border/40" />
           ))}
         </View>
       )}
