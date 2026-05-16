@@ -2,6 +2,7 @@ import React from 'react';
 import { View, TextInput } from 'react-native';
 import { Search as SearchIcon } from 'lucide-react-native';
 import { Theme, textFieldCaretStyle } from '~/theme/Theme';
+import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 import { webNoOutline } from './webInputOutline';
 
 type Props = {
@@ -20,7 +21,7 @@ export function SearchQueryField({ value, onChangeText }: Props) {
         onChangeText={onChangeText}
         placeholder="Search by name..."
         placeholderTextColor={Theme.colors.secondaryText}
-        className="w-full rounded-xl border border-border bg-muted/50 py-3.5 pl-11 pr-4 text-base text-foreground focus:outline-none focus:border-primary"
+        className={`w-full rounded-xl border border-border bg-muted/50 py-3.5 pl-11 pr-4 text-base text-foreground ${INPUT_FOCUS_RING_CLASS}`}
         autoCorrect={false}
         autoCapitalize="none"
         returnKeyType="search"

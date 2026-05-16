@@ -57,8 +57,8 @@ export function ScorecardStarsTable({
                     >
                       <Star
                         size={20}
-                        color={active ? Theme.colors.accentForeground : Theme.colors.border}
-                        fill={active ? Theme.colors.accentForeground : 'transparent'}
+                        color={active ? Theme.colors.ratingStar : Theme.colors.border}
+                        fill={active ? Theme.colors.ratingStar : 'transparent'}
                       />
                     </Pressable>
                   );

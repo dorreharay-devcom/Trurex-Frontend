@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput } from 'react-native';
+import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import { webNoOutline } from '../../search/common/webInputOutline';
 
@@ -22,7 +23,7 @@ export function ScorecardQuickTip({ value, onChangeText }: Props) {
         onChangeText={onChangeText}
         placeholder="Share your quick tip"
         placeholderTextColor={Theme.colors.secondaryText}
-        className="w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground focus:outline-none focus:border-primary"
+        className={`w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
         style={[webNoOutline, textFieldCaretStyle]}
         underlineColorAndroid="transparent"
         selectionColor={Theme.colors.foreground}

@@ -3,6 +3,7 @@ import { View, Text, TextInput, ScrollView, Pressable, ActivityIndicator } from 
 import { MapPin } from 'lucide-react-native';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { CreateStepTitle } from '../../../CreateStepTitle';
+import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import { cn } from '~/utils/general';
 import { webNoOutline } from './webInputOutline';
@@ -51,7 +52,7 @@ export function SearchManualPanel({
           placeholder="Name of place, person, or service"
           placeholderTextColor={Theme.colors.secondaryText}
           editable={!tagLocationLoading}
-          className="w-full rounded-[12px] border border-border bg-muted/50 px-4 py-3.5 text-base text-foreground focus:outline-none focus:border-primary"
+          className={`w-full rounded-[12px] border border-border bg-muted/50 px-4 py-3.5 text-base text-foreground ${INPUT_FOCUS_RING_CLASS}`}
           style={[webNoOutline, textFieldCaretStyle]}
           autoCorrect
           autoCapitalize="words"
@@ -65,7 +66,7 @@ export function SearchManualPanel({
           placeholder="Address or location (optional)"
           placeholderTextColor={Theme.colors.secondaryText}
           editable={!tagLocationLoading}
-          className="w-full rounded-[12px] border border-border bg-muted/50 px-4 py-3.5 text-base text-foreground focus:outline-none focus:border-primary"
+          className={`w-full rounded-[12px] border border-border bg-muted/50 px-4 py-3.5 text-base text-foreground ${INPUT_FOCUS_RING_CLASS}`}
           style={[webNoOutline, textFieldCaretStyle]}
           autoCorrect
           autoCapitalize="sentences"
@@ -85,11 +86,8 @@ export function SearchManualPanel({
             accessibilityRole="button"
             accessibilityLabel={manualGeotag ? 'Update geotagged location' : 'Tag current location'}
           >
-            <MapPin size={18} color={Theme.colors.primary} />
-            <Text
-              style={{ color: Theme.colors.primary }}
-              className="text-sm font-normal underline-offset-2 decoration-primary hover:underline active:underline"
-            >
+            <MapPin size={18} color={Theme.colors.secondaryText} />
+            <Text className="text-sm text-muted-foreground">
               {manualGeotag
                 ? `Geotagged (${manualGeotag.lat.toFixed(4)}, ${manualGeotag.lng.toFixed(4)})`
                 : 'Tag current location'}
@@ -104,10 +102,10 @@ export function SearchManualPanel({
           accessibilityLabel="Back to search"
         >
           <View className="flex-row items-center">
-            <Text className="text-sm text-foreground group-hover:text-primary group-active:text-primary">
+            <Text className="text-sm text-muted-foreground group-hover:text-foreground group-active:text-foreground">
               ←{' '}
             </Text>
-            <Text className="text-sm text-foreground underline-offset-2 decoration-primary group-hover:text-primary group-hover:underline group-active:text-primary group-active:underline">
+            <Text className="text-sm text-muted-foreground underline-offset-2 decoration-foreground group-hover:text-foreground group-hover:underline group-active:text-foreground group-active:underline">
               Back to search
             </Text>
           </View>

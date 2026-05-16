@@ -88,7 +88,7 @@ const AnimatedRexCard: React.FC<{
           <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
             {rec.location || rec.category}
           </Text>
-          <Text className="text-[10px] font-medium text-accent">
+          <Text className="text-[10px] font-medium text-primary">
             ★ {rec.rating}
           </Text>
         </View>

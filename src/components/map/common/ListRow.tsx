@@ -61,7 +61,7 @@ export const ListRow: React.FC<Props> = ({ rec, highlighted, onPress, ...hoverPr
       </View>
       <View className="items-end shrink-0">
         {rec.rating != null && (
-          <Text className="text-xs text-accent-foreground font-medium">★ {rec.rating}</Text>
+          <Text className="text-xs font-medium text-rating-star">★ {rec.rating}</Text>
         )}
         <Text className="text-[10px] text-muted-foreground mt-0.5">{rec.category}</Text>
       </View>

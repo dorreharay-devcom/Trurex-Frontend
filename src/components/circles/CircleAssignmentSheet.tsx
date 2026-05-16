@@ -34,6 +34,11 @@ import {
   sortCirclesForRingStack,
 } from '~/utils/recommendation/recCircles';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
+import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/utils/circleTabUtils';
+import { cn } from '~/utils/general';
+
+const PRESET_DEFAULT: CirclePresetColor = CIRCLE_COLOR_PRESETS[0];
+const collectionFieldBg = { backgroundColor: Theme.colors.searchFieldBackground };
 
 type Props = {
   open: boolean;
@@ -64,6 +69,8 @@ export function CircleAssignmentSheet({
 
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
+  const [newDesc, setNewDesc] = useState('');
+  const [selectedColor, setSelectedColor] = useState<CirclePresetColor>(PRESET_DEFAULT);
   const [creating, setCreating] = useState(false);
   const [scrollViewportH, setScrollViewportH] = useState(0);
   const [scrollContentH, setScrollContentH] = useState(0);
@@ -96,6 +103,8 @@ export function CircleAssignmentSheet({
     if (!open) {
       setShowCreate(false);
       setNewName('');
+      setNewDesc('');
+      setSelectedColor(PRESET_DEFAULT);
       setScrollViewportH(0);
       setScrollContentH(0);
       setScrollY(0);
@@ -155,13 +164,15 @@ export function CircleAssignmentSheet({
     try {
       const created = await createCircle({
         input_name: trimmed,
-        input_description: null,
+        input_description: newDesc.trim() || null,
         input_icon_url: null,
-        input_color: Theme.colors.primary,
+        input_color: selectedColor,
       });
       queryClient.invalidateQueries({ queryKey: ['myCircles'] });
       await assignMutation.mutateAsync({ circleId: created.id });
       setNewName('');
+      setNewDesc('');
+      setSelectedColor(PRESET_DEFAULT);
       setShowCreate(false);
     } catch (e) {
       if (didAccountFrozenMutationToast(e)) return;
@@ -281,7 +292,15 @@ export function CircleAssignmentSheet({
                             >
                               New Circle
                             </Text>
-                            <Pressable onPress={() => setShowCreate(false)} hitSlop={8}>
+                            <Pressable
+                              onPress={() => {
+                                setShowCreate(false);
+                                setNewName('');
+                                setNewDesc('');
+                                setSelectedColor(PRESET_DEFAULT);
+                              }}
+                              hitSlop={8}
+                            >
                               <X size={16} color={Theme.colors.muted} />
                             </Pressable>
                           </View>
@@ -291,14 +310,48 @@ export function CircleAssignmentSheet({
                             value={newName}
                             onChangeText={setNewName}
                             maxLength={40}
-                            className="rounded-xl border border-border bg-card px-3 py-3 text-sm text-foreground"
+                            style={collectionFieldBg}
+                            className="rounded-xl border border-border px-3 py-3 text-sm text-foreground"
                           />
+                          <TextInput
+                            placeholder="Description (optional)"
+                            placeholderTextColor={Theme.colors.muted}
+                            value={newDesc}
+                            onChangeText={setNewDesc}
+                            maxLength={100}
+                            multiline
+                            style={collectionFieldBg}
+                            className="min-h-[44px] rounded-xl border border-border px-3 py-3 text-sm text-foreground"
+                          />
+                          <Text className="text-xs text-muted-foreground">Color</Text>
+                          <View className="flex-row flex-wrap gap-2">
+                            {CIRCLE_COLOR_PRESETS.map((c) => (
+                              <Pressable
+                                key={c}
+                                onPress={() => setSelectedColor(c)}
+                                className="h-7 w-7 rounded-full"
+                                style={{
+                                  backgroundColor: c,
+                                  borderWidth: selectedColor === c ? 3 : 0,
+                                  borderColor: Theme.colors.foreground,
+                                }}
+                              />
+                            ))}
+                          </View>
                           <Pressable
                             onPress={() => void handleCreateAndAssign()}
                             disabled={!newName.trim() || assignInFlight}
-                            className={`items-center rounded-xl py-3 ${
-                              newName.trim() && !assignInFlight ? 'bg-primary' : 'bg-primary/40'
-                            }`}
+                            style={
+                              (!newName.trim() || assignInFlight) && isWeb
+                                ? ({ cursor: 'not-allowed' } as const)
+                                : undefined
+                            }
+                            className={cn(
+                              'items-center rounded-xl py-3',
+                              newName.trim() && !assignInFlight
+                                ? 'cursor-pointer bg-primary active:opacity-90'
+                                : 'cursor-not-allowed bg-primary/40 opacity-50',
+                            )}
                           >
                             {creating || assignMutation.isPending ? (
                               <ActivityIndicator color={Theme.colors.primaryForeground} />

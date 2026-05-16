@@ -1,5 +1,6 @@
 import type { CircleApiRow } from '~/api/circlesApi';
 import type { NetworkUserRow } from '~/types/network';
+import { Theme } from '~/theme/Theme';
 import { isWeb } from '~/utils';
 
 export const CIRCLE_COLOR_PRESETS = [
@@ -7,7 +8,7 @@ export const CIRCLE_COLOR_PRESETS = [
   '#ec4899',
   '#38bdf8',
   '#14b8a6',
-  '#ea580c',
+  '#B7C7CF',
   '#ef4444',
   '#2563eb',
   '#ca8a04',
@@ -83,3 +84,15 @@ export function selectFollowersNotFollowedBack(
 
 export const DELETE_CIRCLE_CONFIRM_MESSAGE =
   'This removes the circle and its memberships. This cannot be undone.';
+
+export function connectionScopeTabStyle(active: boolean) {
+  return {
+    pressableClassName: active
+      ? 'flex-row items-center rounded-xl border border-primary bg-accent px-3 py-2'
+      : 'flex-row items-center rounded-xl border border-border px-3 py-2',
+    pressableStyle: active
+      ? undefined
+      : ({ backgroundColor: Theme.colors.searchFieldBackground } as const),
+    textClassName: `text-xs font-semibold ${active ? 'text-foreground' : 'text-muted-foreground'}`,
+  };
+}

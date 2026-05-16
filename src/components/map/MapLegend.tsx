@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, Platform } from 'react-native';
 import { ChevronDown, ChevronUp } from 'lucide-react-native';
 import { MAP_ACTION_INSET } from '~/constants/map/mapUi';
+import { MAP_PIN_COLOR, MAP_PIN_GLYPH, MAP_PIN_GLYPH_COLOR } from '~/types/map/mapPin';
 import { Theme } from '~/theme/Theme';
 
 const legendItems = [
-  { label: 'Trusted Rex', color: 'hsl(20, 90%, 48%)', icon: '👥' },
-  { label: 'Saved / Want to Go', color: 'hsl(37, 92%, 50%)', icon: '★' },
-  { label: 'Been Here', color: 'hsl(168, 60%, 35%)', icon: '✓' },
-  { label: 'Overlap', color: 'hsl(270, 50%, 50%)', icon: '◆' },
+  { label: 'Trusted Rex', pinType: 'network' as const },
+  { label: 'Saved / Want to Go', pinType: 'saved' as const },
+  { label: 'Been Here', pinType: 'beenHere' as const },
+  { label: 'Overlap', pinType: 'overlap' as const },
 ];
 
 export const MapLegend: React.FC = () => {
@@ -42,9 +43,11 @@ export const MapLegend: React.FC = () => {
             <View key={item.label} className="min-w-0 flex-row items-center gap-1.5 py-0.5">
               <View
                 className="h-4 w-4 shrink-0 items-center justify-center rounded-full"
-                style={{ backgroundColor: item.color }}
+                style={{ backgroundColor: MAP_PIN_COLOR[item.pinType] }}
               >
-                <Text className="text-[9px] text-white">{item.icon}</Text>
+                <Text className="text-[9px]" style={{ color: MAP_PIN_GLYPH_COLOR[item.pinType] }}>
+                  {MAP_PIN_GLYPH[item.pinType]}
+                </Text>
               </View>
               <Text className="min-w-0 flex-1 text-[11px] leading-snug text-foreground">
                 {item.label}

@@ -1,6 +1,9 @@
 import React from 'react';
-import { TouchableOpacity, Text, ActivityIndicator, View } from 'react-native';
+import { TouchableOpacity, Text, ActivityIndicator, View, Platform } from 'react-native';
 import { Theme } from '~/theme/Theme';
+import { cn } from '~/utils/general';
+
+const isWeb = Platform.OS === 'web';
 
 export enum ButtonVariant {
   Primary = 'primary',
@@ -67,12 +70,20 @@ export const Button: React.FC<ButtonProps> = ({
   labelClassName,
   icon,
 }) => {
+  const isDisabled = Boolean(disabled || loading);
+
   return (
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onPress}
-      disabled={disabled || loading}
-      className={`flex-row items-center justify-center ${buttonVariants[variant]} ${disabled ? 'opacity-50' : ''} ${className ?? ''}`}
+      disabled={isDisabled}
+      style={isDisabled && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined}
+      className={cn(
+        'flex-row items-center justify-center',
+        buttonVariants[variant],
+        isDisabled ? 'cursor-not-allowed opacity-50' : isWeb && 'cursor-pointer',
+        className,
+      )}
     >
       {loading ? (
         <ActivityIndicator color={spinnerColor[variant]} />

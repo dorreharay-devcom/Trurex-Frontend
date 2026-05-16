@@ -151,7 +151,7 @@ const ProfileHeader = ({
             <Text className="text-xs text-muted-foreground">Rex's</Text>
           </View>
           <View className="items-center">
-            <Text className="text-lg font-display font-bold text-accent-foreground">
+            <Text className="text-lg font-display font-bold text-rating-star">
               {profile.trustScore}
             </Text>
             <Text className="text-xs text-muted-foreground">Score</Text>

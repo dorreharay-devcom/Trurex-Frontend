@@ -287,13 +287,13 @@ const DiscoverView = ({
         <View className="mb-5">
           <View className="flex-row items-center justify-between mb-3">
             <View className="flex-row items-center gap-2">
-              <Star size={14} color={Theme.colors.primary} fill={Theme.colors.primary} />
+              <Star size={14} color={Theme.colors.ratingStar} fill={Theme.colors.ratingStar} />
               <Text className="text-sm font-display font-semibold text-foreground">
                 Your Categories
               </Text>
             </View>
-            <TouchableOpacity onPress={() => setEditingPinned((v) => !v)}>
-              <Text className="text-xs text-primary font-medium">
+            <TouchableOpacity onPress={() => setEditingPinned((v) => !v)} activeOpacity={0.7}>
+              <Text className="text-xs text-muted-foreground">
                 {editingPinned ? 'Done' : 'Edit'}
               </Text>
             </TouchableOpacity>
@@ -450,7 +450,7 @@ const DiscoverView = ({
       {isLoading && (
         <View className="gap-3">
           {[1, 2, 3].map((i) => (
-            <View key={i} className="h-16 rounded-xl bg-muted" />
+            <View key={i} className="h-16 rounded-xl bg-primary" />
           ))}
         </View>
       )}

@@ -24,7 +24,7 @@ export function CategoryListHeader({
       </View>
       {autoSuggestedCat ? (
         <View className="items-center mb-4">
-          <Text className="px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium border border-primary/20 text-center max-w-full">
+          <Text className="max-w-full rounded-full border border-accent-foreground/20 bg-accent px-4 py-2 text-center text-sm font-medium text-accent-foreground">
             {`✨ Auto-suggested: ${autoSuggestedCat.emoji} ${autoSuggestedCat.label}`}
           </Text>
         </View>

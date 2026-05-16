@@ -57,7 +57,6 @@ export const nativeMarkerStyles = StyleSheet.create({
   },
   glyph: {
     fontSize: 14,
-    color: Theme.colors.white,
     textAlign: 'center',
   },
 });

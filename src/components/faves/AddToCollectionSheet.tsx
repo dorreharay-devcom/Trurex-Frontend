@@ -20,13 +20,16 @@ import { useQueryClient } from '@tanstack/react-query';
 import { CollectionsApi, UserCollection } from '~/api/CollectionsApi';
 import { useAuth } from '~/services/AuthContext';
 import { toastSuccess, toastError } from '~/utils/appToast';
-import { webContainerStyle } from '~/utils';
+import { isWeb, webContainerStyle } from '~/utils';
+import { cn } from '~/utils/general';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { unknownErrorMessage } from '~/utils';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { Theme } from '~/theme/Theme';
+
+const collectionFieldBg = { backgroundColor: Theme.colors.searchFieldBackground };
 
 export interface RecSummary {
   id: string;
@@ -58,8 +61,8 @@ const CollectionRow: React.FC<{
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.7}
-      style={selected ? { backgroundColor: `${Theme.colors.primary}14` } : undefined}
-      className="w-full flex-row items-center gap-3 p-3 rounded-xl"
+      style={selected ? { backgroundColor: Theme.colors.accent } : undefined}
+      className="w-full flex-row items-center gap-3 rounded-xl p-3"
     >
       <View className="w-10 h-10 rounded-lg bg-muted overflow-hidden items-center justify-center shrink-0">
         {coverUri ? (
@@ -73,13 +76,15 @@ const CollectionRow: React.FC<{
           {col.display_name}
         </Text>
         <Text
-          className="text-xs font-medium"
-          style={{ color: selected ? Theme.colors.primary : Theme.colors.muted }}
+          className={cn(
+            'text-xs font-medium',
+            selected ? 'text-foreground' : 'text-muted-foreground',
+          )}
         >
           {selected ? 'In collection' : `${col.item_count} item${col.item_count !== 1 ? 's' : ''}`}
         </Text>
       </View>
-      {selected && <Check size={18} color={Theme.colors.primary} />}
+      {selected && <Check size={18} color={Theme.colors.foreground} />}
     </TouchableOpacity>
   );
 };
@@ -255,7 +260,7 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
                   {saving ? (
                     <ActivityIndicator size="small" color={Theme.colors.primary} />
                   ) : (
-                    <Text className="text-sm font-semibold text-primary">Done</Text>
+                    <Text className="text-sm font-semibold text-foreground">Done</Text>
                   )}
                 </TouchableOpacity>
               </View>
@@ -312,21 +317,35 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
                         autoFocus
                         returnKeyType="done"
                         onSubmitEditing={handleCreateAndAdd}
-                        className="flex-1 px-3 py-2.5 rounded-lg bg-muted border border-border text-sm text-foreground"
+                        className="flex-1 rounded-lg border border-border px-3 py-2.5 text-sm text-foreground"
+                        style={collectionFieldBg}
                       />
-                      <TouchableOpacity
-                        onPress={handleCreateAndAdd}
+                      <Pressable
+                        onPress={() => {
+                          if (!newName.trim() || creating) return;
+                          void handleCreateAndAdd();
+                        }}
                         disabled={!newName.trim() || creating}
-                        className={`px-4 rounded-lg bg-primary items-center justify-center ${!newName.trim() || creating ? 'opacity-50' : ''}`}
+                        style={
+                          (!newName.trim() || creating) && isWeb
+                            ? ({ cursor: 'not-allowed' } as const)
+                            : undefined
+                        }
+                        className={cn(
+                          'items-center justify-center rounded-lg px-4',
+                          newName.trim() && !creating
+                            ? 'cursor-pointer bg-primary active:opacity-90'
+                            : 'cursor-not-allowed bg-primary/40 opacity-50',
+                        )}
                       >
                         {creating ? (
                           <ActivityIndicator size="small" color={Theme.colors.primaryForeground} />
                         ) : (
-                          <Text className="text-primary-foreground text-sm font-medium">
+                          <Text className="text-sm font-medium text-primary-foreground">
                             Create & add
                           </Text>
                         )}
-                      </TouchableOpacity>
+                      </Pressable>
                     </View>
                   ) : (
                     <View className="gap-2">

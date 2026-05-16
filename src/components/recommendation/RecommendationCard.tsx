@@ -169,10 +169,10 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
               <View className="flex-row items-center gap-1">
                 <Star
                   size={12}
-                  color={Theme.colors.accentForeground}
-                  fill={Theme.colors.accentForeground}
+                  color={Theme.colors.ratingStar}
+                  fill={Theme.colors.ratingStar}
                 />
-                <Text className="text-xs text-accent-foreground">
+                <Text className="text-xs text-rating-star">
                   {rec.rating != null && rec.rating % 1 === 0
                     ? String(rec.rating)
                     : rec.rating!.toFixed(1)}

@@ -28,10 +28,13 @@ import {
 import { generateRexImageStoragePath } from '~/utils/photos/photoUtils';
 import { isWeb, webContainerStyle } from '~/utils';
 import { Theme, textFieldCaretStyle } from '~/theme/Theme';
+import { cn } from '~/utils/general';
 import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
+
+const collectionFieldBg = { backgroundColor: Theme.colors.searchFieldBackground };
 
 const COLLECTION_COVERS_BUCKET = REX_IMAGES_BUCKET;
 
@@ -117,6 +120,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
 
   const createColMutation = useCreateCollection();
   const loading = createColMutation.isPending;
+  const canCreate = Boolean(name.trim()) && !loading && !uploading;
 
   const pickCover = async () => {
     if (!user) return;
@@ -274,8 +278,8 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                     placeholderTextColor={Theme.colors.secondaryText}
                     underlineColorAndroid="transparent"
                     selectionColor={Theme.colors.foreground}
-                    style={[webNoOutline, textFieldCaretStyle]}
-                    className="w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground focus:outline-none focus:border-primary"
+                    style={[webNoOutline, textFieldCaretStyle, collectionFieldBg]}
+                    className="w-full rounded-xl border border-border px-4 py-3 text-sm text-foreground focus:outline-none focus:border-primary"
                   />
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">
                     {name.length}/60
@@ -297,8 +301,8 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                     textAlignVertical="top"
                     underlineColorAndroid="transparent"
                     selectionColor={Theme.colors.foreground}
-                    style={[webNoOutline, textFieldCaretStyle]}
-                    className="flex min-h-[80px] w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground focus:outline-none focus:border-primary"
+                    style={[webNoOutline, textFieldCaretStyle, collectionFieldBg]}
+                    className="flex min-h-[80px] w-full rounded-xl border border-border px-4 py-3 text-sm text-foreground focus:outline-none focus:border-primary"
                   />
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">
                     {description.length}/200
@@ -307,31 +311,34 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
 
                 {/* Category tag */}
                 <View>
-                  <Text className="text-xs font-semibold text-muted-foreground mb-1.5">
+                  <Text className="mb-1.5 text-xs font-semibold text-muted-foreground">
                     Category tag (optional)
                   </Text>
                   <View className="flex-row flex-wrap gap-1.5">
-                    {CATEGORY_TAGS.map((tag) => (
-                      <TouchableOpacity
-                        key={tag}
-                        onPress={() => setCategoryTag(categoryTag === tag ? null : tag)}
-                        className={`px-3 py-1.5 rounded-full border ${
-                          categoryTag === tag
-                            ? 'bg-primary border-primary'
-                            : 'bg-muted/50 border-border'
-                        }`}
-                      >
-                        <Text
-                          className={`text-xs font-medium ${
-                            categoryTag === tag
-                              ? 'text-primary-foreground'
-                              : 'text-muted-foreground'
-                          }`}
+                    {CATEGORY_TAGS.map((tag) => {
+                      const on = categoryTag === tag;
+                      return (
+                        <Pressable
+                          key={tag}
+                          onPress={() => setCategoryTag(on ? null : tag)}
+                          className={cn(
+                            'rounded-full border px-3 py-1.5 active:opacity-90',
+                            on ? 'border-primary bg-primary' : 'border-border bg-muted/50',
+                          )}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected: on }}
                         >
-                          {tag}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
+                          <Text
+                            className={cn(
+                              'text-xs font-medium',
+                              on ? 'text-primary-foreground' : 'text-muted-foreground',
+                            )}
+                          >
+                            {tag}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
                   </View>
                 </View>
 
@@ -347,29 +354,31 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                         <TouchableOpacity
                           key={value}
                           onPress={() => setPrivacy(value)}
-                          className={`w-full p-3 rounded-xl border ${
-                            selected ? 'border-primary bg-primary/5' : 'border-border bg-muted/30'
-                          }`}
+                          style={selected ? undefined : collectionFieldBg}
+                          className={cn(
+                            'w-full rounded-xl border p-3',
+                            selected ? 'border-primary bg-accent' : 'border-border',
+                          )}
                         >
                           <View className="flex-row items-center gap-3">
                             <View
-                              className={`w-8 h-8 rounded-lg items-center justify-center ${
-                                selected ? 'bg-primary/10' : 'bg-muted'
-                              }`}
+                              className={cn(
+                                'h-8 w-8 items-center justify-center rounded-lg',
+                                selected ? 'bg-primary/15' : 'bg-card',
+                              )}
                             >
-                              <Icon size={16} color={selected ? Theme.colors.primary : '#737373'} />
+                              <Icon
+                                size={16}
+                                color={
+                                  selected ? Theme.brand.colorDark : Theme.colors.secondaryText
+                                }
+                              />
                             </View>
                             <View className="flex-1">
-                              <Text
-                                className={`text-sm font-semibold ${
-                                  selected ? 'text-foreground' : 'text-muted-foreground'
-                                }`}
-                              >
-                                {label}
-                              </Text>
+                              <Text className="text-sm font-semibold text-foreground">{label}</Text>
                               <Text className="text-xs text-muted-foreground">{desc}</Text>
                             </View>
-                            {selected && <Check size={16} color={Theme.colors.primary} />}
+                            {selected && <Check size={16} color={Theme.brand.colorDark} />}
                           </View>
                         </TouchableOpacity>
                       );
@@ -381,17 +390,30 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
               {/* sticky bottom-0 bg-card — Footer */}
               <View className="border-t border-border bg-card">
                 <View style={[{ padding: 16 }, webContainerStyle]}>
-                  <TouchableOpacity
-                    onPress={handleCreate}
-                    disabled={!name.trim() || loading || uploading}
-                    className={`w-full py-3 rounded-xl bg-primary items-center ${
-                      !name.trim() || loading || uploading ? 'opacity-50' : ''
-                    }`}
+                  <Pressable
+                    onPress={() => {
+                      if (!canCreate) return;
+                      void handleCreate();
+                    }}
+                    disabled={!canCreate}
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: !canCreate }}
+                    style={!canCreate && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined}
+                    className={cn(
+                      'w-full items-center rounded-xl py-3',
+                      canCreate
+                        ? 'cursor-pointer bg-primary active:opacity-90'
+                        : 'cursor-not-allowed bg-primary/40 opacity-50',
+                    )}
                   >
-                    <Text className="text-primary-foreground font-semibold text-sm">
-                      {loading ? 'Creating…' : 'Create Collection'}
-                    </Text>
-                  </TouchableOpacity>
+                    {loading ? (
+                      <ActivityIndicator color={Theme.colors.primaryForeground} />
+                    ) : (
+                      <Text className="text-sm font-semibold text-primary-foreground">
+                        Create Collection
+                      </Text>
+                    )}
+                  </Pressable>
                 </View>
               </View>
             </View>

@@ -75,7 +75,7 @@ export function ConfirmPreviewCard({
       </View>
 
       {tip.length > 0 ? (
-        <View className="mx-4 mb-3 rounded-lg border-l-4 border-primary bg-primary/5 p-3">
+        <View className="mx-4 mb-3 rounded-lg border-l-4 border-primary bg-accent p-3">
           <Text className="text-sm italic text-foreground">&quot;{tip}&quot;</Text>
         </View>
       ) : null}
@@ -84,8 +84,8 @@ export function ConfirmPreviewCard({
         <View className="flex-row items-center gap-1.5 px-4 pb-2">
           <Star
             size={14}
-            color={Theme.colors.accentForeground}
-            fill={Theme.colors.accentForeground}
+            color={Theme.colors.ratingStar}
+            fill={Theme.colors.ratingStar}
           />
           <Text className="text-sm font-semibold text-foreground">{ratingDisplay}</Text>
         </View>

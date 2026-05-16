@@ -15,7 +15,7 @@ const USER_CIRCLE_PALETTE: { accent: string; iconBg: string }[] = [
   { accent: '#ca8a04', iconBg: '#fef9c3' },
   { accent: '#dc2626', iconBg: '#fee2e2' },
   { accent: '#0d9488', iconBg: '#ccfbf1' },
-  { accent: '#ea580c', iconBg: '#ffedd5' },
+  { accent: '#B7C7CF', iconBg: '#E4EBEE' },
 ];
 
 function pickUserStyle(index: number) {

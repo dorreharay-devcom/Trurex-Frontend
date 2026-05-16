@@ -1,5 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { ChevronRight, Plus, Search, Users, X } from 'lucide-react-native';
 import { CircleAssignmentSheet } from '~/components/circles/CircleAssignmentSheet';
 import { CircleDetailScreen } from '~/components/circles/CircleDetailScreen';
@@ -20,7 +28,11 @@ import {
   type ConnectionScopeTab,
 } from '~/hooks/circles/useScopedConnectionUserSearch';
 import { Theme } from '~/theme/Theme';
+import { connectionScopeTabStyle } from '~/utils/circleTabUtils';
+import { cn } from '~/utils/general';
 import { webContainerStyle } from '~/utils';
+
+const isWeb = Platform.OS === 'web';
 
 type Props = { isActive: boolean; onUserPress?: (userId: string) => void };
 
@@ -148,9 +160,17 @@ function CirclesListContent({
                 vm.createMutation.mutate();
               }}
               disabled={!vm.newName.trim() || vm.createMutation.isPending}
-              className={`items-center rounded-xl py-3 ${
-                vm.newName.trim() && !vm.createMutation.isPending ? 'bg-primary' : 'bg-primary/40'
-              }`}
+              style={
+                (!vm.newName.trim() || vm.createMutation.isPending) && isWeb
+                  ? ({ cursor: 'not-allowed' } as const)
+                  : undefined
+              }
+              className={cn(
+                'items-center rounded-xl py-3',
+                vm.newName.trim() && !vm.createMutation.isPending
+                  ? 'cursor-pointer bg-primary active:opacity-90'
+                  : 'cursor-not-allowed bg-primary/40 opacity-50',
+              )}
             >
               {vm.createMutation.isPending ? (
                 <ActivityIndicator color={Theme.colors.primaryForeground} />
@@ -220,19 +240,15 @@ function CirclesListContent({
                 ] as const
               ).map(([id, label]) => {
                 const active = connTab === id;
+                const tab = connectionScopeTabStyle(active);
                 return (
                   <Pressable
                     key={id}
                     onPress={() => setConnTab(id)}
-                    className={`flex-row items-center rounded-xl border px-3 py-2 ${
-                      active ? 'border-primary/40 bg-primary/10' : 'border-border bg-card'
-                    }`}
+                    style={tab.pressableStyle}
+                    className={tab.pressableClassName}
                   >
-                    <Text
-                      className={`text-xs font-semibold ${active ? 'text-primary' : 'text-muted-foreground'}`}
-                    >
-                      {label}
-                    </Text>
+                    <Text className={tab.textClassName}>{label}</Text>
                   </Pressable>
                 );
               })}

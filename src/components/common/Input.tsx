@@ -58,9 +58,9 @@ const Input = ({
           />
           <TouchableOpacity onPress={() => setShowPassword((v) => !v)} className="px-3">
             {showPassword ? (
-              <EyeOff size={16} color={Theme.colors.muted} />
-            ) : (
               <Eye size={16} color={Theme.colors.muted} />
+            ) : (
+              <EyeOff size={16} color={Theme.colors.muted} />
             )}
           </TouchableOpacity>
         </View>
