@@ -19,11 +19,16 @@ import ProfileHeader from './ProfileHeader';
 import CurrentlySection from './CurrentlySection';
 import EditProfile from './EditProfile';
 import CollectionCard from './CollectionCard';
+import {
+  ProfileCardSkeleton,
+  ProfileCollectionsSkeleton,
+  ProfileRexGridSkeleton,
+} from './skeleton';
 import { useMyCollections, useAddRexToCollection } from '~/hooks/useCollections';
 import { useFollowUser } from '~/hooks/useFollowUser';
 import { useSavedRexes } from '~/hooks/useGems';
 import { useMyRexes } from '~/hooks/useDiscovery';
-import { ChevronLeft, UserX } from 'lucide-react-native';
+import { ChevronLeft, Star, UserX } from 'lucide-react-native';
 import CollectionDetailView from '~/components/faves/CollectionDetailView';
 import { OverlayModal } from '~/components/common/OverlayModal';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
@@ -88,35 +93,17 @@ const AnimatedRexCard: React.FC<{
           <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
             {rec.location || rec.category}
           </Text>
-          <Text className="text-[10px] font-medium text-primary">
-            ★ {rec.rating}
-          </Text>
+          {rec.rating != null && rec.rating > 0 ? (
+            <View className="mt-1 flex-row items-center gap-1">
+              <Star size={10} color={Theme.colors.ratingStar} fill={Theme.colors.ratingStar} />
+              <Text className="text-[10px] font-medium text-rating-star">
+                {rec.rating % 1 === 0 ? String(rec.rating) : rec.rating.toFixed(1)}
+              </Text>
+            </View>
+          ) : null}
         </View>
       </TouchableOpacity>
     </Animated.View>
-  );
-};
-
-const CollectionSkeleton: React.FC = () => {
-  const opacity = useRef(new Animated.Value(0.4)).current;
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 0.4, duration: 700, useNativeDriver: true }),
-      ]),
-    ).start();
-  }, [opacity]);
-  return (
-    <View className="flex-row gap-3 px-4 py-4">
-      {[1, 2, 3].map((i) => (
-        <Animated.View
-          key={i}
-          style={{ opacity, width: 140, height: 178 }}
-          className="rounded-xl bg-muted"
-        />
-      ))}
-    </View>
   );
 };
 
@@ -249,11 +236,7 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
   }, [fetchProfile]);
 
   if (loading) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <ActivityIndicator color={Theme.colors.primary} />
-      </View>
-    );
+    return <ProfileCardSkeleton windowWidth={windowWidth} showBack={!!onBack} />;
   }
 
   if (notFound) {
@@ -367,8 +350,8 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
           <View className="pb-4">
             {activeTab === ProfileTab.Recs &&
               (rexesLoading ? (
-                <View className="items-center py-8">
-                  <ActivityIndicator color={Theme.colors.primary} />
+                <View className="p-4">
+                  <ProfileRexGridSkeleton windowWidth={windowWidth} />
                 </View>
               ) : myRexes.length === 0 ? (
                 <Text className="text-sm text-muted-foreground text-center py-8">No rexes yet</Text>
@@ -397,7 +380,7 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
 
             {activeTab === ProfileTab.Collections &&
               (collectionsLoading ? (
-                <CollectionSkeleton />
+                <ProfileCollectionsSkeleton />
               ) : myCollections.length === 0 ? (
                 <Text className="text-sm text-muted-foreground text-center py-8">
                   No collections yet

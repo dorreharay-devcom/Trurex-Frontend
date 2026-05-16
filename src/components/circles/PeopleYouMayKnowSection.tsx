@@ -1,13 +1,6 @@
 import React, { useCallback } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-  useWindowDimensions,
-} from 'react-native';
+import { Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { UserPlus, X } from 'lucide-react-native';
 import {
@@ -206,11 +199,13 @@ export function PeopleYouMayKnowSection({ isActive, onUserPress }: Props) {
 
   if (isLoading && rows.length === 0) {
     return (
-      <View className="mt-10 items-center py-6">
-        <Text className="mb-3 self-stretch text-base font-semibold text-foreground">
-          People you might know
-        </Text>
-        <ActivityIndicator color={Theme.colors.primary} />
+      <View className="mt-10">
+        <Text className="mb-3 text-base font-semibold text-foreground">People you might know</Text>
+        <View className="gap-2">
+          {[1, 2, 3].map((i) => (
+            <View key={i} className="h-16 rounded-xl bg-border/40" />
+          ))}
+        </View>
       </View>
     );
   }
