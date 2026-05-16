@@ -32,7 +32,7 @@ export const TabBar: React.FC<TabBarProps> = ({ currentTab, onTabChange }) => {
   if (isDesktop) {
     return (
       <View className="bg-card border-b border-border">
-        <View className="max-w-[1280px] w-full self-center flex-row px-4">
+        <View className="w-full flex-row px-4 sm:px-6 lg:px-8">
           {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
             const active = currentTab === id;
             return (

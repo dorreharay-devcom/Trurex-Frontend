@@ -54,10 +54,8 @@ export const Header: React.FC<HeaderProps> = ({
   }, [user?.id, avatarRefreshKey]);
 
   return (
-    <View className="border-b border-border bg-card" style={{ paddingTop: topPad }}>
-      <View
-        className={`flex-row items-center justify-between pl-0 pr-4 pb-2 sm:pr-6 ${isWeb ? 'max-w-[1280px] w-full self-center' : ''}`}
-      >
+    <View className="w-full border-b border-border bg-card" style={{ paddingTop: topPad }}>
+      <View className="w-full flex-row items-center justify-between px-4 pb-2 sm:px-6 lg:px-8">
         <Image
           source={require('../../../assets/truRexLogo.png')}
           style={{ width: 80, height: 28, resizeMode: 'contain' }}
