@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput } from 'react-native';
 import { CREATE_REC_REVIEW_MAX } from '~/constants/recommendation/createScorecard';
+import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import { webNoOutline } from '../../search/common/webInputOutline';
 
@@ -40,7 +41,7 @@ export function ScorecardReview({
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor={Theme.colors.secondaryText}
-        className="flex min-h-[90px] w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground focus:outline-none focus:border-primary"
+        className={`flex min-h-[90px] w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
         style={[webNoOutline, textFieldCaretStyle]}
         multiline
         textAlignVertical="top"

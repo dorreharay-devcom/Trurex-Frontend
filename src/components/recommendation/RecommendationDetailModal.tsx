@@ -398,7 +398,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                 }}
                 accessibilityRole="button"
                 accessibilityLabel={`View ${user.name}'s profile`}
-                className="flex-row items-center gap-3 rounded-xl border border-border bg-muted/50 p-4 active:opacity-70"
+                className="flex-row items-center gap-3 rounded-xl bg-border/40 p-4 active:opacity-90"
               >
                 <SignedUserAvatar name={user.name} avatar={user.avatar} className="h-10 w-10" />
                 <View className="flex-1">
@@ -411,9 +411,9 @@ export const RecommendationDetailModal: React.FC<Props> = ({
               </Pressable>
 
               {recommendation.description ? (
-                <View className="rounded-xl border-l-4 border-primary bg-primary/5 p-4">
+                <View className="rounded-xl border-l-4 border-primary bg-accent p-4">
                   <View className="flex-row items-start gap-2">
-                    <Quote size={20} color={Theme.colors.primary} style={{ marginTop: 2 }} />
+                    <Quote size={20} color={Theme.brand.colorDark} style={{ marginTop: 2 }} />
                     <Text className="flex-1 text-base italic leading-relaxed text-foreground">
                       &quot;{recommendation.description}&quot;
                     </Text>
@@ -437,8 +437,8 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                               <Star
                                 key={n}
                                 size={14}
-                                color={filled ? Theme.colors.accentForeground : Theme.colors.border}
-                                fill={filled ? Theme.colors.accentForeground : 'transparent'}
+                                color={filled ? Theme.colors.ratingStar : Theme.colors.border}
+                                fill={filled ? Theme.colors.ratingStar : 'transparent'}
                               />
                             );
                           })}
@@ -461,9 +461,9 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                     {(recommendation.tags ?? []).map((tag) => (
                       <View
                         key={tag}
-                        className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5"
+                        className="rounded-full border border-border/80 bg-border/40 px-3 py-1.5"
                       >
-                        <Text className="text-sm font-medium text-primary">{tag}</Text>
+                        <Text className="text-sm font-medium text-foreground">{tag}</Text>
                       </View>
                     ))}
                   </View>

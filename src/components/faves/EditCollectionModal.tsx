@@ -29,11 +29,19 @@ import {
 import { generateRexImageStoragePath } from '~/utils/photos/photoUtils';
 import { isWeb, webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
+import { cn } from '~/utils/general';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { useAuth } from '~/services/AuthContext';
 
-const VISIBILITY_OPTIONS: { value: CollectionVisibility; label: string; sublabel: string; Icon: React.ComponentType<any> }[] = [
+const collectionFieldBg = { backgroundColor: Theme.colors.searchFieldBackground };
+
+const VISIBILITY_OPTIONS: {
+  value: CollectionVisibility;
+  label: string;
+  sublabel: string;
+  Icon: React.ComponentType<any>;
+}[] = [
   { value: 'private', label: 'Private', sublabel: 'Only you', Icon: Lock },
   { value: 'shared', label: 'Circles', sublabel: 'Your circles', Icon: Users },
   { value: 'public', label: 'Public', sublabel: 'Everyone', Icon: Globe },
@@ -88,7 +96,9 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
   // Sync form fields when collection changes (e.g. modal reopened for different collection)
   const [name, setName] = useState(collection.display_name);
   const [description, setDescription] = useState(collection.description ?? '');
-  const [visibility, setVisibility] = useState<CollectionVisibility>(collection.visibility ?? 'private');
+  const [visibility, setVisibility] = useState<CollectionVisibility>(
+    collection.visibility ?? 'private',
+  );
   useEffect(() => {
     setName(collection.display_name);
     setDescription(collection.description ?? '');
@@ -260,8 +270,9 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
                     value={name}
                     onChangeText={(v) => setName(v.slice(0, 60))}
                     placeholder="Collection name"
-                    placeholderTextColor="#737373"
-                    className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground"
+                    placeholderTextColor={Theme.colors.secondaryText}
+                    style={collectionFieldBg}
+                    className="w-full px-3 py-2.5 rounded-xl border border-border text-sm text-foreground"
                   />
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">
                     {name.length}/60
@@ -270,7 +281,9 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
 
                 {/* Visibility */}
                 <View>
-                  <Text className="text-xs font-semibold text-muted-foreground mb-1.5">Visibility</Text>
+                  <Text className="text-xs font-semibold text-muted-foreground mb-1.5">
+                    Visibility
+                  </Text>
                   <View className="flex-row gap-2">
                     {VISIBILITY_OPTIONS.map(({ value, label, sublabel, Icon }) => {
                       const active = visibility === value;
@@ -279,11 +292,22 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
                           key={value}
                           onPress={() => setVisibility(value)}
                           activeOpacity={0.7}
-                          className={`flex-1 items-center py-3 rounded-xl border ${active ? 'bg-primary/10 border-primary' : 'bg-muted border-border'}`}
+                          style={active ? undefined : collectionFieldBg}
+                          className={cn(
+                            'flex-1 items-center py-3 rounded-xl border',
+                            active ? 'border-primary bg-accent' : 'border-border',
+                          )}
                         >
-                          <Icon size={16} color={active ? Theme.colors.primary : Theme.colors.secondaryText} />
-                          <Text className={`text-xs font-semibold mt-1 ${active ? 'text-primary' : 'text-foreground'}`}>{label}</Text>
-                          <Text className={`text-[10px] mt-0.5 ${active ? 'text-primary/70' : 'text-muted-foreground'}`}>{sublabel}</Text>
+                          <Icon
+                            size={16}
+                            color={active ? Theme.brand.colorDark : Theme.colors.secondaryText}
+                          />
+                          <Text className="mt-1 text-xs font-semibold text-foreground">
+                            {label}
+                          </Text>
+                          <Text className="mt-0.5 text-[10px] text-muted-foreground">
+                            {sublabel}
+                          </Text>
                         </TouchableOpacity>
                       );
                     })}
@@ -299,11 +323,12 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
                     value={description}
                     onChangeText={(v) => setDescription(v.slice(0, 200))}
                     placeholder="What's this list about?"
-                    placeholderTextColor="#737373"
+                    placeholderTextColor={Theme.colors.secondaryText}
                     multiline
                     numberOfLines={2}
                     textAlignVertical="top"
-                    className="w-full px-3 py-2.5 rounded-xl bg-muted border border-border text-sm text-foreground"
+                    style={collectionFieldBg}
+                    className="w-full px-3 py-2.5 rounded-xl border border-border text-sm text-foreground"
                   />
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">
                     {description.length}/200

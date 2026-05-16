@@ -156,7 +156,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
               <View
                 key={i}
                 style={{ width: 160, height: 204, borderRadius: 12 }}
-                className="bg-muted"
+                className="bg-primary"
               />
             ))}
           </View>
@@ -181,7 +181,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
             {[
               { emoji: '🍜', bg: 'bg-purple-500' },
               { emoji: '🏕️', bg: 'bg-sky-500' },
-              { emoji: '📚', bg: 'bg-amber-500' },
+              { emoji: '📚', bg: 'bg-primary' },
             ].map((item, idx) => (
               <View
                 key={idx}
@@ -237,7 +237,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
       {loadingSaved && (
         <View className="gap-3 mb-3">
           {[1, 2].map((i) => (
-            <View key={i} className="h-16 rounded-xl bg-muted" />
+            <View key={i} className="h-16 rounded-xl bg-primary" />
           ))}
         </View>
       )}

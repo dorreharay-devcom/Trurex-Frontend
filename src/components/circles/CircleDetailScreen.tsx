@@ -31,6 +31,7 @@ import { DestructiveActionConfirmModal } from '~/components/common/DestructiveAc
 import {
   DELETE_CIRCLE_CONFIRM_MESSAGE,
   canEditOrDeleteUserCircle,
+  connectionScopeTabStyle,
   getCircleUiPolicy,
 } from '~/utils/circleTabUtils';
 import { webContainerStyle } from '~/utils';
@@ -167,19 +168,15 @@ export function CircleDetailScreen({ vm, onUserPress }: Props) {
                 ] as const
               ).map(([id, label]) => {
                 const active = addConnTab === id;
+                const tab = connectionScopeTabStyle(active);
                 return (
                   <Pressable
                     key={id}
                     onPress={() => setAddConnTab(id)}
-                    className={`flex-row items-center rounded-xl border px-3 py-2 ${
-                      active ? 'border-primary/40 bg-primary/10' : 'border-border bg-card'
-                    }`}
+                    style={tab.pressableStyle}
+                    className={tab.pressableClassName}
                   >
-                    <Text
-                      className={`text-xs font-semibold ${active ? 'text-primary' : 'text-muted-foreground'}`}
-                    >
-                      {label}
-                    </Text>
+                    <Text className={tab.textClassName}>{label}</Text>
                   </Pressable>
                 );
               })}

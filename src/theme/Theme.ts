@@ -9,13 +9,22 @@ export const FontFamily = {
   extrabold: 'HankenGrotesk-ExtraBold',
 } as const;
 
+export const Brand = {
+  color: '#B7C7CF',
+  colorDark: '#8FA3AC',
+  colorLight: '#E4EBEE',
+  colorOnBrand: '#1A2830',
+  colorMuted: '#5A7280',
+} as const;
+
 export const Colors = {
-  primary: '#E9560C',
-  primaryForeground: '#FFF4EB',
+  primary: Brand.color,
+  primaryForeground: Brand.colorOnBrand,
   secondary: '#525252',
   secondaryForeground: '#FAFAFA',
-  accent: '#FFFBEB',
-  accentForeground: '#F59B0A',
+  accent: Brand.colorLight,
+  accentForeground: Brand.colorMuted,
+  ratingStar: '#F59B0A',
 
   background: '#F5F5F5',
   card: '#FAFAFA',
@@ -23,6 +32,7 @@ export const Colors = {
   muted: '#A1A1A1',
   secondaryText: '#737373',
   border: '#D4D4D4',
+  searchFieldBackground: 'hsl(0, 0%, 86%)',
 
   destructive: '#DB2424',
 
@@ -35,7 +45,6 @@ export const Colors = {
   transparent: 'transparent',
 } as const;
 
-/** TextInput caret color (black) — use in `style` */
 export const textFieldCaretStyle = {
   caretColor: Colors.foreground,
 } as TextStyle;
@@ -60,4 +69,5 @@ export const Theme = {
   colors: Colors,
   font: FontFamily,
   size: Size,
+  brand: Brand,
 } as const;

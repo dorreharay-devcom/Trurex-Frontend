@@ -63,10 +63,7 @@ export const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, targe
     target,
   });
   const heading = target?.kind === 'comment' ? 'Report this comment' : 'Report this Rex';
-  const subtext =
-    target?.kind === 'comment'
-      ? "What's the issue with this comment?"
-      : "Help us keep TruRex trustworthy. What's the issue?";
+  const subtext = "Help us keep TruRex trustworthy. What's the issue?";
 
   const onRequestClose = () => {
     onOpenChange(false);
@@ -128,16 +125,21 @@ export const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, targe
               style={{
                 maxHeight: maxSheetHeight,
                 width: '100%',
-                paddingTop: 12,
                 paddingBottom: Math.max(12, insets.bottom + 4),
                 ...(isWeb ? { overflow: 'hidden' as const } : null),
               }}
             >
               <>
-                <View className="mb-1 flex-row items-center justify-end px-2">
+                <View className="flex-row items-center justify-between px-4 pb-3 pt-3">
+                  <View className="min-w-0 flex-1 flex-row items-center gap-2 pr-2">
+                    <ShieldAlert size={20} color={Theme.colors.secondaryText} />
+                    <Text className="text-lg font-semibold text-foreground" numberOfLines={2}>
+                      {heading}
+                    </Text>
+                  </View>
                   <Pressable
                     onPress={onRequestClose}
-                    className="h-10 w-10 items-center justify-center rounded-lg active:opacity-70"
+                    className="h-10 w-10 shrink-0 items-center justify-center rounded-lg active:opacity-70"
                     hitSlop={8}
                     accessibilityLabel="Close report dialog"
                   >
@@ -189,17 +191,7 @@ export const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, targe
                     </View>
                   ) : (
                     <>
-                      <View className="mb-3 flex-row items-start gap-2">
-                        <ShieldAlert
-                          size={20}
-                          color={Theme.colors.secondaryText}
-                          style={{ marginTop: 2 }}
-                        />
-                        <View className="min-w-0 flex-1">
-                          <Text className="text-lg font-semibold text-foreground">{heading}</Text>
-                          <Text className="mt-1 text-sm text-muted-foreground">{subtext}</Text>
-                        </View>
-                      </View>
+                      <Text className="mb-3 text-sm text-muted-foreground">{subtext}</Text>
 
                       <View className="pb-2">
                         {reasonOptions.map((r) => {
@@ -271,28 +263,45 @@ export const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, targe
                     >
                       <Text className="text-sm font-medium text-muted-foreground">Cancel</Text>
                     </Pressable>
-                    <Pressable
-                      onPress={async () => {
-                        if (!user) {
-                          openReportIfSignedIn();
-                          return;
-                        }
-                        const ok = await submit();
-                        if (ok) onRequestClose();
-                      }}
-                      className="rounded-lg bg-primary px-4 py-2.5 active:opacity-50"
-                      disabled={!canSubmit}
-                      accessibilityLabel="Submit report"
-                      accessibilityState={{ disabled: !canSubmit }}
+                    <View
+                      className={cn(!canSubmit && 'cursor-not-allowed')}
+                      style={!canSubmit && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined}
                     >
-                      {isSubmitting ? (
-                        <ActivityIndicator color={Theme.colors.primaryForeground} />
-                      ) : (
-                        <Text className="text-sm font-semibold text-primary-foreground">
-                          Submit report
-                        </Text>
-                      )}
-                    </Pressable>
+                      <Pressable
+                        onPress={async () => {
+                          if (!canSubmit) return;
+                          if (!user) {
+                            openReportIfSignedIn();
+                            return;
+                          }
+                          const ok = await submit();
+                          if (ok) onRequestClose();
+                        }}
+                        disabled={!canSubmit}
+                        className={cn(
+                          'rounded-lg px-4 py-2.5',
+                          canSubmit
+                            ? 'cursor-pointer bg-primary active:opacity-90'
+                            : 'cursor-not-allowed bg-primary/40 opacity-50',
+                        )}
+                        style={!canSubmit && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined}
+                        accessibilityLabel="Submit report"
+                        accessibilityState={{ disabled: !canSubmit }}
+                      >
+                        {isSubmitting ? (
+                          <ActivityIndicator color={Theme.colors.primaryForeground} />
+                        ) : (
+                          <Text
+                            className={cn(
+                              'text-sm font-semibold',
+                              canSubmit ? 'text-primary-foreground' : 'text-primary-foreground/60',
+                            )}
+                          >
+                            Submit report
+                          </Text>
+                        )}
+                      </Pressable>
+                    </View>
                   </View>
                 ) : null}
               </>

@@ -3,6 +3,7 @@ import { View, Text, Pressable } from 'react-native';
 import { Marker } from 'react-native-maps';
 import { Theme } from '~/theme/Theme';
 import type { MapMarkerItem } from '~/types/map/mapMarker';
+import { MAP_PIN_GLYPH_COLOR } from '~/types/map/mapPin';
 import { nativeMarkerStyles as styles } from '~/components/map/common/nativeMarkerStyles';
 
 type Props = {
@@ -30,7 +31,7 @@ export const NativeMarker: React.FC<Props> = ({ marker: m, selected, onPress }) 
           },
         ]}
       >
-        <Text style={styles.glyph} numberOfLines={1}>
+        <Text style={[styles.glyph, { color: MAP_PIN_GLYPH_COLOR[m.pinType] }]} numberOfLines={1}>
           {m.glyph}
         </Text>
       </View>

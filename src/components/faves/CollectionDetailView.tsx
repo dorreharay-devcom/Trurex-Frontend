@@ -234,7 +234,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                       )}
                       {!!item.rating && (
                         <View className="flex-row items-center gap-0.5">
-                          <Star size={10} color={Theme.colors.primary} fill={Theme.colors.primary} />
+                          <Star size={10} color={Theme.colors.ratingStar} fill={Theme.colors.ratingStar} />
                           <Text className="text-[11px] text-muted-foreground">{item.rating}</Text>
                         </View>
                       )}

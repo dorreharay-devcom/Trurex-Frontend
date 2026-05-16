@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   Image,
@@ -18,8 +17,6 @@ import { isWeb } from '~/utils';
 import { NotificationBell } from '~/components/layout/NotificationBell';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
-
-const HEADER_SEARCH_FIELD_BG = 'hsl(0, 0%, 86%)';
 
 interface HeaderProps {
   searchQuery: string;
@@ -80,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="header-search-input w-full min-w-0 shrink rounded-lg border border-border py-1.5 pl-9 pr-4 text-sm text-foreground focus:outline-none focus:ring-2"
               style={[
                 textFieldCaretStyle,
-                { backgroundColor: HEADER_SEARCH_FIELD_BG },
+                { backgroundColor: Theme.colors.searchFieldBackground },
                 Platform.OS === 'web'
                   ? ({
                       overflow: 'hidden',
@@ -102,11 +99,17 @@ export const Header: React.FC<HeaderProps> = ({
           {isMobile ? (
             <TouchableOpacity
               onPress={onAddPress}
-              className="rounded-lg p-2 active:opacity-80"
+              className="flex-row items-center gap-1 rounded-lg p-2 active:opacity-80"
               accessibilityRole="button"
               accessibilityLabel="Add Rex"
             >
               <PlusCircle size={22} color={Theme.colors.primary} />
+              <Image
+                source={require('../../../assets/truRexIcon.png')}
+                style={{ width: 20, height: 20, borderRadius: 4 }}
+                resizeMode="contain"
+                accessibilityIgnoresInvertColors
+              />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
@@ -116,7 +119,12 @@ export const Header: React.FC<HeaderProps> = ({
               accessibilityLabel="Add Rex"
             >
               <PlusCircle size={16} color={Theme.colors.primaryForeground} />
-              <Text className="text-sm font-medium text-primary-foreground">Add Rex</Text>
+              <Image
+                source={require('../../../assets/truRexIcon.png')}
+                style={{ width: 18, height: 18, borderRadius: 4 }}
+                resizeMode="contain"
+                accessibilityIgnoresInvertColors
+              />
             </TouchableOpacity>
           )}
 

@@ -11,11 +11,11 @@ const CARD_HEIGHT = 224;
 
 const GRADIENTS: [string, string][] = [
   ['#9333ea', '#ec4899'],
-  ['#ec4899', '#f97316'],
-  ['#f97316', '#f59e0b'],
+  ['#ec4899', '#B7C7CF'],
+  ['#B7C7CF', '#8FA3AC'],
   ['#14b8a6', '#10b981'],
   ['#0ea5e9', '#6366f1'],
-  ['#d97706', '#eab308'],
+  ['#9BB0BA', '#B7C7CF'],
 ];
 
 function gradientForId(id: string): [string, string] {

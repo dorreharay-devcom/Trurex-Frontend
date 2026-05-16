@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, Pressable, useWindowDimensions, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  Platform,
+  useWindowDimensions,
+  ActivityIndicator,
+} from 'react-native';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ChevronRight, X } from 'lucide-react-native';
 import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';
@@ -38,7 +45,8 @@ import {
 } from '~/utils/recommendation/recCreateFlow';
 import { toastError, toastInfo, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
-import { unknownErrorMessage } from '~/utils';
+import { isWeb, unknownErrorMessage } from '~/utils';
+import { cn } from '~/utils/general';
 import { CreateWizardStepper } from './CreateWizardStepper';
 import { CreateModalBody } from './CreateModalBody';
 
@@ -412,26 +420,50 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
               paddingBottom: layout.minSafeBottom,
             }}
           >
-            <Pressable
-              onPress={() => void handlePrimaryFooter()}
-              disabled={primaryDisabled}
-              accessibilityRole="button"
-              accessibilityLabel={flow.isLastStep ? 'Confirm and post' : 'Continue'}
-              className="inline-flex w-full h-12 flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-4 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:bg-primary/90"
+            <View
+              className={cn('w-full', primaryDisabled && isWeb && 'cursor-not-allowed')}
+              style={
+                primaryDisabled && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined
+              }
             >
-              {submitting ? (
-                <ActivityIndicator color={Theme.colors.primaryForeground} />
-              ) : (
-                <>
-                  <Text className="text-base font-semibold text-primary-foreground">
-                    {flow.isLastStep ? 'Confirm & Post 🦖' : 'Continue'}
-                  </Text>
-                  {!flow.isLastStep && (
-                    <ChevronRight size={16} color={Theme.colors.primaryForeground} />
-                  )}
-                </>
-              )}
-            </Pressable>
+              <Pressable
+                onPress={() => {
+                  if (primaryDisabled) return;
+                  void handlePrimaryFooter();
+                }}
+                disabled={primaryDisabled && Platform.OS !== 'web'}
+                accessibilityRole="button"
+                accessibilityLabel={flow.isLastStep ? 'Confirm and post' : 'Continue'}
+                accessibilityState={{ disabled: primaryDisabled }}
+                style={
+                  primaryDisabled && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined
+                }
+                className={cn(
+                  'flex h-12 w-full flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2',
+                  primaryDisabled
+                    ? 'cursor-not-allowed bg-primary/40 opacity-50'
+                    : 'cursor-pointer bg-primary active:bg-primary/90',
+                )}
+              >
+                {submitting ? (
+                  <ActivityIndicator color={Theme.colors.primaryForeground} />
+                ) : (
+                  <>
+                    <Text
+                      pointerEvents="none"
+                      className="text-base font-semibold text-primary-foreground"
+                    >
+                      {flow.isLastStep ? 'Confirm & Post 🦖' : 'Continue'}
+                    </Text>
+                    {!flow.isLastStep && (
+                      <View pointerEvents="none">
+                        <ChevronRight size={16} color={Theme.colors.primaryForeground} />
+                      </View>
+                    )}
+                  </>
+                )}
+              </Pressable>
+            </View>
           </View>
         </View>
       </View>

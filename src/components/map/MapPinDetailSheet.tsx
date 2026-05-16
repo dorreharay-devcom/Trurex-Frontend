@@ -97,7 +97,7 @@ export const MapPinDetailSheet: React.FC<Props> = ({
 
         <View className="mb-3 flex-row flex-wrap items-center gap-3">
           {pin.rating != null && pin.rating > 0 ? (
-            <Text className="text-xs font-semibold text-accent-foreground">★ {pin.rating}/5</Text>
+            <Text className="text-xs font-semibold text-rating-star">★ {pin.rating}/5</Text>
           ) : null}
           {pin.scoreValueForMoney != null ? (
             <Text className="text-xs text-muted-foreground">💰 {pin.scoreValueForMoney}/5</Text>

@@ -24,17 +24,18 @@ module.exports = {
         foreground: '#171717', // hsl(0 0% 9%)
         card: '#FAFAFA', // hsl(0 0% 98%)
         'card-foreground': '#171717',
-        primary: '#E9560C', // hsl(20 90% 48%)
-        'primary-foreground': '#FFF4EB', // hsl(33 100% 96%)
+        primary: '#B7C7CF',
+        'primary-foreground': '#1A2830',
         secondary: '#525252', // hsl(0 0% 32%)
         'secondary-foreground': '#FAFAFA',
         muted: '#A1A1A1', // hsl(0 0% 63%)
         'muted-foreground': '#737373', // secondary body / links (was wrongly near-black)
-        accent: '#FFFBEB', // hsl(47 100% 96%)
-        'accent-foreground': '#F59B0A', // hsl(37 92% 50%)
+        accent: '#E4EBEE',
+        'accent-foreground': '#5A7280',
+        'rating-star': '#F59B0A',
         destructive: '#DB2424', // hsl(0 72% 50%)
         border: '#D4D4D4', // hsl(0 0% 83%)
-        ring: '#D4D4D4',
+        ring: '#B7C7CF',
         gold: '#CCAB66',
         sand: '#E4DBCD', // hsl(35 30% 85%)
         'sand-dark': '#3D3529', // hsl(35 20% 20%)

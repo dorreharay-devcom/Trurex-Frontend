@@ -8,6 +8,7 @@ type PressProps = {
 };
 
 const LIKE_ICON_SIZE = 15;
+const LIKE_ACTIVE_COLOR = Theme.colors.destructive;
 
 type LikeActionProps = {
   count: number;
@@ -19,7 +20,7 @@ type LikeActionProps = {
 export function LikeAction({ count, liked, disabled, onPress }: LikeActionProps) {
   const label = liked ? 'Unlike' : 'Like';
   const countLabel = count > 0 ? String(count) : '';
-  const countColor = liked ? Theme.colors.primary : Theme.colors.secondaryText;
+  const countColor = liked ? LIKE_ACTIVE_COLOR : Theme.colors.secondaryText;
   if (Platform.OS === 'web') {
     return (
       <Pressable
@@ -33,8 +34,8 @@ export function LikeAction({ count, liked, disabled, onPress }: LikeActionProps)
       >
         <Heart
           size={LIKE_ICON_SIZE}
-          color={liked ? Theme.colors.primary : Theme.colors.secondaryText}
-          fill={liked ? Theme.colors.primary : 'transparent'}
+          color={liked ? LIKE_ACTIVE_COLOR : Theme.colors.secondaryText}
+          fill={liked ? LIKE_ACTIVE_COLOR : 'transparent'}
         />
         {countLabel ? (
           <Text
@@ -59,8 +60,8 @@ export function LikeAction({ count, liked, disabled, onPress }: LikeActionProps)
     >
       <Heart
         size={LIKE_ICON_SIZE}
-        color={liked ? Theme.colors.primary : Theme.colors.secondaryText}
-        fill={liked ? Theme.colors.primary : 'transparent'}
+        color={liked ? LIKE_ACTIVE_COLOR : Theme.colors.secondaryText}
+        fill={liked ? LIKE_ACTIVE_COLOR : 'transparent'}
       />
       {countLabel ? (
         <Text
@@ -81,7 +82,7 @@ export function ReplyAction({ onPress }: PressProps) {
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel="Reply"
-        className="flex-row cursor-pointer items-center gap-1 rounded-md bg-transparent px-0 py-0.5 text-[11px] font-medium text-muted-foreground transition-colors hover:text-primary active:opacity-70"
+        className="flex-row cursor-pointer items-center gap-1 rounded-md bg-transparent px-0 py-0.5 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground active:opacity-70"
       >
         <Reply size={11} />
         <Text className="text-inherit">Reply</Text>

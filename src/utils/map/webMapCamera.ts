@@ -1,4 +1,5 @@
 import type { MapMarkerItem } from '~/types/map/mapMarker';
+import { MAP_PIN_GLYPH_COLOR } from '~/types/map/mapPin';
 
 export function isValidMapCoordinate(lat: number, lng: number): boolean {
   return (
@@ -8,6 +9,7 @@ export function isValidMapCoordinate(lat: number, lng: number): boolean {
 
 export function createWebMapPinIconUrl(marker: MapMarkerItem, size = 36): string {
   const h = size + 10;
+  const glyphFill = MAP_PIN_GLYPH_COLOR[marker.pinType];
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${h}" viewBox="0 0 ${size} ${h}">
       <path d="M${size / 2} ${size + 8} C${size / 2} ${size + 8} ${size - 2} ${size * 0.6} ${size - 2} ${size * 0.42}
@@ -15,7 +17,7 @@ export function createWebMapPinIconUrl(marker: MapMarkerItem, size = 36): string
         C2 ${size * 0.6} ${size / 2} ${size + 8} ${size / 2} ${size + 8}Z"
         fill="${marker.pinColor}" stroke="white" stroke-width="2"/>
       <text x="${size / 2}" y="${size * 0.45}" text-anchor="middle" dominant-baseline="central"
-        fill="white" font-size="${size * 0.35}" font-family="system-ui">${marker.glyph}</text>
+        fill="${glyphFill}" font-size="${size * 0.35}" font-family="system-ui">${marker.glyph}</text>
     </svg>`;
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }

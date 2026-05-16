@@ -49,7 +49,7 @@ export function SearchPlaceRow({ place, categoryRows, selected, onSelect }: Prop
       <View className="min-w-0 flex-1">
         <Text className="text-base font-semibold text-foreground">{place.title}</Text>
         <Text className="mt-0.5 text-sm text-muted-foreground">{place.subtitle}</Text>
-        <Text className="text-xs text-primary mt-1">{categoryLine}</Text>
+        <Text className="mt-1 text-xs text-muted-foreground">{categoryLine}</Text>
       </View>
     </Pressable>
   );

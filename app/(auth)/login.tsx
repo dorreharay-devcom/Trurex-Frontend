@@ -98,7 +98,7 @@ export default function LoginScreen() {
                 variant={ButtonVariant.Link}
                 onPress={() => {}}
                 title="Forgot password?"
-                textClassName="text-xs text-accent font-medium hover:underline"
+                textClassName="text-xs text-muted-foreground hover:underline"
               />
             </Link>
           }
