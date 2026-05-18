@@ -33,3 +33,18 @@ export function toastInfo(title: string, message?: string) {
     ...base,
   });
 }
+
+const MODAL_DISMISS_TOAST_DELAY_MS = 320;
+
+function toastAfterDismiss(onDismiss: () => void, show: () => void) {
+  onDismiss();
+  setTimeout(show, MODAL_DISMISS_TOAST_DELAY_MS);
+}
+
+export function toastSuccessAfterDismiss(onDismiss: () => void, title: string, message?: string) {
+  toastAfterDismiss(onDismiss, () => toastSuccess(title, message));
+}
+
+export function toastErrorAfterDismiss(onDismiss: () => void, title: string, message?: string) {
+  toastAfterDismiss(onDismiss, () => toastError(title, message));
+}

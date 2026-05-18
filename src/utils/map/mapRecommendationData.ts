@@ -149,13 +149,20 @@ export function pinRowPassesLayerVisibility(row: MapPinRow, layers: PinVisibilit
   return pinTypeVisible(pinType, layers);
 }
 
+export function isOwnRecommendation(
+  rec: Pick<Recommendation, 'authorId'>,
+  currentUserId: string | null | undefined,
+): boolean {
+  const uid = currentUserId?.trim() ?? '';
+  const author = rec.authorId?.trim() ?? '';
+  return uid.length > 0 && author.length > 0 && author === uid;
+}
+
 export function deriveMapPinType(
   rec: Recommendation,
   currentUserId: string | null | undefined,
 ): MapPinType {
-  const uid = currentUserId?.trim() ?? '';
-  const author = rec.authorId?.trim() ?? '';
-  const own = uid.length > 0 && author.length > 0 && author === uid;
+  const own = isOwnRecommendation(rec, currentUserId);
   const saved = rec.isSaved;
 
   if (own && saved) return 'overlap';

@@ -45,6 +45,7 @@ export function useMapScreen({ onRecommendationPress }: Params) {
   userCoordsRef.current = userCoords;
 
   const [recenterTo, setRecenterTo] = useState<MapRecenterTarget | null>(null);
+  const [savedByRecId, setSavedByRecId] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedBounds(bounds), BOUNDS_DEBOUNCE_MS);
@@ -161,10 +162,35 @@ export function useMapScreen({ onRecommendationPress }: Params) {
 
   const locatedRecs = useMemo(() => filterLocatedRecommendations(fetchedRecs), [fetchedRecs]);
 
-  const layerFiltered = useMemo(
-    () => filterRecommendationsByPinLayers(locatedRecs, layers, userId),
-    [locatedRecs, layers, userId],
+  const withSavedOverride = useCallback(
+    (rec: Recommendation): Recommendation => {
+      if (!(rec.id in savedByRecId)) return rec;
+      return { ...rec, isSaved: savedByRecId[rec.id] };
+    },
+    [savedByRecId],
   );
+
+  const layerFiltered = useMemo(
+    () => filterRecommendationsByPinLayers(locatedRecs, layers, userId).map(withSavedOverride),
+    [locatedRecs, layers, userId, withSavedOverride],
+  );
+
+  const markRecSaved = useCallback((recId: string) => {
+    setSavedByRecId((prev) => ({ ...prev, [recId]: true }));
+  }, []);
+
+  const markRecUnsaved = useCallback((recId: string) => {
+    setSavedByRecId((prev) => ({ ...prev, [recId]: false }));
+  }, []);
+
+  const clearRecSavedOverride = useCallback((recId: string) => {
+    setSavedByRecId((prev) => {
+      if (!(recId in prev)) return prev;
+      const next = { ...prev };
+      delete next[recId];
+      return next;
+    });
+  }, []);
 
   const mapMarkers: MapMarkerItem[] = useMemo(() => {
     const filteredPins = pinRows.filter((row) => pinRowPassesLayerVisibility(row, layers));
@@ -263,5 +289,8 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     locateMe,
     focusOnRecommendation,
     locatedRecsForList: layerFiltered,
+    markRecSaved,
+    markRecUnsaved,
+    clearRecSavedOverride,
   };
 }

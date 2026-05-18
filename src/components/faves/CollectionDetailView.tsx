@@ -116,34 +116,6 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
 
   const ListHeader = (
     <View style={webContainerStyle} className="px-4">
-      <View className="flex-row items-center justify-between py-4">
-        <TouchableOpacity onPress={onBack} className="flex-row items-center gap-1">
-          <ArrowLeft size={16} color={Theme.colors.muted} />
-          <Text className="text-sm text-muted-foreground">Back</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          ref={menuButtonRef as any}
-          onPress={() => {
-            menuButtonRef.current?.measure(
-              (
-                _x: number,
-                _y: number,
-                width: number,
-                height: number,
-                pageX: number,
-                pageY: number,
-              ) => {
-                setMenuPos({ top: pageY + height + 4, right: screenWidth - pageX - width });
-              },
-            );
-            setShowMenu((v) => !v);
-          }}
-          className="p-2"
-        >
-          <MoreVertical size={18} color={Theme.colors.muted} />
-        </TouchableOpacity>
-      </View>
-
       {coverUri && (
         <View className="rounded-xl overflow-hidden mb-4" style={{ height: 144 }}>
           <Image source={{ uri: coverUri }} className="w-full h-full" contentFit="cover" />
@@ -189,6 +161,34 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
 
   return (
     <>
+      <View className="w-full flex-row items-center justify-between px-4 py-4">
+        <TouchableOpacity onPress={onBack} className="flex-row items-center gap-1">
+          <ArrowLeft size={16} color={Theme.colors.muted} />
+          <Text className="text-sm text-muted-foreground">Back</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          ref={menuButtonRef as any}
+          onPress={() => {
+            menuButtonRef.current?.measure(
+              (
+                _x: number,
+                _y: number,
+                width: number,
+                height: number,
+                pageX: number,
+                pageY: number,
+              ) => {
+                setMenuPos({ top: pageY + height + 4, right: screenWidth - pageX - width });
+              },
+            );
+            setShowMenu((v) => !v);
+          }}
+          className="p-2"
+        >
+          <MoreVertical size={18} color={Theme.colors.muted} />
+        </TouchableOpacity>
+      </View>
+
       <FlatList
         data={detail.rexes}
         keyExtractor={(item) => item.rex_id}

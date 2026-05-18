@@ -13,13 +13,14 @@ import {
   StyleSheet,
   useWindowDimensions,
   Animated,
+  Easing,
 } from 'react-native';
-import { Plus, Check, Image as ImageIcon, AlertCircle } from 'lucide-react-native';
+import { Plus, Check, Image as ImageIcon, AlertCircle, Trash2, Bookmark } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { useQueryClient } from '@tanstack/react-query';
 import { CollectionsApi, UserCollection } from '~/api/CollectionsApi';
 import { useAuth } from '~/services/AuthContext';
-import { toastSuccess, toastError } from '~/utils/appToast';
+import { toastError, toastSuccess, toastSuccessAfterDismiss } from '~/utils/appToast';
 import { isWeb, webContainerStyle } from '~/utils';
 import { cn } from '~/utils/general';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
@@ -28,8 +29,10 @@ import { unknownErrorMessage } from '~/utils';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { Theme } from '~/theme/Theme';
+import { modalConfig } from '~/constants/recommendation/modalConfig';
 
 const collectionFieldBg = { backgroundColor: Theme.colors.searchFieldBackground };
+const SHEET_CHROME_HEIGHT = 220;
 
 export interface RecSummary {
   id: string;
@@ -48,6 +51,10 @@ export interface AddToCollectionSheetProps {
   rec: RecSummary | null;
   onClose: () => void;
   onRemove?: () => void;
+  onUnsaved?: () => void;
+  onUnsaveFailed?: () => void;
+  onSaveRexFailed?: () => void;
+  onSaved?: () => void;
 }
 
 const CollectionRow: React.FC<{
@@ -89,7 +96,16 @@ const CollectionRow: React.FC<{
   );
 };
 
-const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, onClose, onRemove }) => {
+const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({
+  open,
+  rec,
+  onClose,
+  onRemove,
+  onUnsaved,
+  onUnsaveFailed,
+  onSaveRexFailed,
+  onSaved,
+}) => {
   const { user } = useAuth();
   const { height } = useWindowDimensions();
   const queryClient = useQueryClient();
@@ -98,32 +114,55 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
   const [collections, setCollections] = useState<CollectionWithCount[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [original, setOriginal] = useState<Set<string>>(new Set());
-  const [isInAnyCollection, setIsInAnyCollection] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showNewCollection, setShowNewCollection] = useState(false);
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
+  const [isRexSaved, setIsRexSaved] = useState(false);
+  const [removing, setRemoving] = useState(false);
+  const [savingUncollected, setSavingUncollected] = useState(false);
 
-  const suppressSaveToast = useRef(false);
   const backdropOpacity = useRef(new Animated.Value(0)).current;
-  const sheetTranslateY = useRef(new Animated.Value(600)).current;
+  const sheetTranslateY = useRef(new Animated.Value(height)).current;
+  const sheetMaxHeight = height * 0.75;
+  const listMaxHeight = Math.max(sheetMaxHeight - SHEET_CHROME_HEIGHT, 160);
+  const useNativeDriver = Platform.OS !== 'web';
 
   useEffect(() => {
     if (open && rec) {
       setVisible(true);
+      sheetTranslateY.setValue(height);
       Animated.parallel([
-        Animated.timing(backdropOpacity, { toValue: 1, duration: 250, useNativeDriver: true }),
-        Animated.spring(sheetTranslateY, { toValue: 0, damping: 20, stiffness: 200, useNativeDriver: true }),
+        Animated.timing(backdropOpacity, {
+          toValue: 1,
+          duration: modalConfig.timing.sheetOpenMs,
+          useNativeDriver,
+        }),
+        Animated.timing(sheetTranslateY, {
+          toValue: 0,
+          duration: modalConfig.timing.sheetOpenMs,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver,
+        }),
       ]).start();
     } else if (!open) {
       Animated.parallel([
-        Animated.timing(backdropOpacity, { toValue: 0, duration: 200, useNativeDriver: true }),
-        Animated.timing(sheetTranslateY, { toValue: 600, duration: 220, useNativeDriver: true }),
+        Animated.timing(backdropOpacity, {
+          toValue: 0,
+          duration: modalConfig.timing.sheetCloseMs,
+          useNativeDriver,
+        }),
+        Animated.timing(sheetTranslateY, {
+          toValue: height,
+          duration: modalConfig.timing.sheetCloseMs,
+          easing: Easing.in(Easing.cubic),
+          useNativeDriver,
+        }),
       ]).start(() => setVisible(false));
     }
-  }, [open, rec]);
+  }, [open, rec, height, sheetTranslateY, backdropOpacity, useNativeDriver]);
 
   const loadCollections = useCallback(async () => {
     if (!user || !rec) return;
@@ -137,7 +176,6 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
       const existingSet = new Set(existingIds);
       setOriginal(existingSet);
       setSelected(new Set(existingSet));
-      setIsInAnyCollection(existingIds.length > 0);
       setCollections(cols.map((c) => ({ ...c, item_count: c.rex_count ?? 0 })));
     } catch {
       setError('Failed to load collections');
@@ -152,24 +190,64 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
       setShowNewCollection(false);
       setNewName('');
       setError(null);
+      setRemoving(false);
+      setSavingUncollected(false);
+      setIsRexSaved(Boolean(rec.isSaved));
       loadCollections();
-
-      if (!rec.isSaved) {
-        suppressSaveToast.current = false;
-        CollectionsApi.saveRex(user!.id, rec.id)
-          .then(() => {
-            queryClient.invalidateQueries({ queryKey: ['my-saved-ids'] });
-            queryClient.invalidateQueries({ queryKey: ['my-saved'] });
-            if (!suppressSaveToast.current) toastSuccess('Saved to uncollected');
-          })
-          .catch((e: unknown) => {
-            if (didAccountFrozenMutationToast(e)) return;
-            toastError(unknownErrorMessage(e, 'Failed to save'));
-            onClose();
-          });
-      }
     }
   }, [open, rec, loadCollections]);
+
+  const invalidateSavedQueries = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['my-saved-ids'] });
+    queryClient.invalidateQueries({ queryKey: ['my-saved'] });
+    queryClient.invalidateQueries({ queryKey: ['my-saved-rexes'] });
+    queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
+    queryClient.invalidateQueries({ queryKey: ['mapRexesInBounds'] });
+    queryClient.invalidateQueries({ queryKey: ['mapRexPins'] });
+  }, [queryClient]);
+
+  const ensureRexSaved = useCallback(async () => {
+    if (isRexSaved || !user || !rec) return;
+    await CollectionsApi.saveRex(user.id, rec.id);
+    setIsRexSaved(true);
+    onSaved?.();
+    invalidateSavedQueries();
+  }, [isRexSaved, user, rec, onSaved, invalidateSavedQueries]);
+
+  const handleSaveToUncollected = async () => {
+    if (!user || !rec || isRexSaved || savingUncollected) return;
+    setSavingUncollected(true);
+    try {
+      await ensureRexSaved();
+      toastSuccess('Saved to uncollected');
+    } catch (e: unknown) {
+      if (didAccountFrozenMutationToast(e)) return;
+      onSaveRexFailed?.();
+      toastError('Failed to save', unknownErrorMessage(e, 'Try again.'));
+    } finally {
+      setSavingUncollected(false);
+    }
+  };
+
+  const handleRemoveFromUncollected = async () => {
+    if (!user || !rec || removing) return;
+    setRemoving(true);
+    onUnsaved?.();
+    setIsRexSaved(false);
+    try {
+      await CollectionsApi.unsaveRex(user.id, rec.id);
+      invalidateSavedQueries();
+      onRemove?.();
+      toastSuccess('Removed from saved');
+    } catch (e: unknown) {
+      if (didAccountFrozenMutationToast(e)) return;
+      toastError('Could not remove', unknownErrorMessage(e, 'Try again.'));
+      setIsRexSaved(true);
+      onUnsaveFailed?.();
+    } finally {
+      setRemoving(false);
+    }
+  };
 
   const toggleCollection = (id: string) => {
     setSelected((prev) => {
@@ -188,6 +266,16 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
 
     setSaving(true);
     try {
+      if (toAdd.length > 0) {
+        try {
+          await ensureRexSaved();
+        } catch (e: unknown) {
+          if (didAccountFrozenMutationToast(e)) return;
+          toastError('Failed to save', unknownErrorMessage(e, 'Try again.'));
+          setSaving(false);
+          return;
+        }
+      }
       await Promise.all([
         ...toAdd.map((id) => CollectionsApi.addRexToCollection({ collection_id: id, rex_id: rec.id })),
         ...toRemove.map((id) => CollectionsApi.removeRexFromCollection({ collection_id: id, rex_id: rec.id })),
@@ -209,12 +297,12 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
     setCreating(true);
     setError(null);
     try {
+      await ensureRexSaved();
       const collection = await CollectionsApi.createCollection({ display_name: newName.trim() });
       await CollectionsApi.addRexToCollection({ collection_id: collection.id, rex_id: rec.id });
       queryClient.invalidateQueries({ queryKey: ['my-collections'] });
-      toastSuccess(`Added to ${collection.display_name}`);
       setCreating(false);
-      onClose();
+      toastSuccessAfterDismiss(onClose, `Added to ${collection.display_name}`);
     } catch {
       setError('Failed to create collection');
       setCreating(false);
@@ -243,16 +331,16 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
           pointerEvents="box-none"
           style={{ width: '100%' }}
         >
-          <Animated.View style={{ transform: [{ translateY: sheetTranslateY }] }}>
+          <Animated.View style={{ width: '100%', transform: [{ translateY: sheetTranslateY }] }}>
             <View
-              style={{ maxHeight: height * 0.75 }}
-              className="bg-card rounded-t-2xl border-t border-border flex flex-col"
+              style={{ maxHeight: sheetMaxHeight }}
+              className="w-full bg-card rounded-t-2xl border-t border-border"
             >
-              <View style={webContainerStyle} className="items-center py-3">
+              <View className="w-full items-center py-3">
                 <View className="w-10 h-1 rounded-full bg-muted-foreground/30" />
               </View>
 
-              <View style={[{ paddingHorizontal: 16, paddingBottom: 16 }, webContainerStyle]} className="flex-row items-center justify-between">
+              <View className="w-full flex-row items-center justify-between px-4 pb-4">
                 <Text className="text-base font-display font-medium text-foreground">
                   Add to collection
                 </Text>
@@ -265,13 +353,13 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
                 </TouchableOpacity>
               </View>
 
-              <View className="h-px bg-border" style={webContainerStyle} />
+              <View className="h-px w-full bg-border" />
 
               <ScrollView
-                style={styles.list}
+                style={{ maxHeight: listMaxHeight }}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
-                contentContainerStyle={[{ padding: 12, gap: 2 }, webContainerStyle]}
+                contentContainerStyle={[{ padding: 12, gap: 2, minHeight: 160 }, webContainerStyle]}
               >
                 {error && (
                   <TouchableOpacity
@@ -358,18 +446,45 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
                         <Text className="text-sm font-medium text-foreground">Create new collection</Text>
                       </TouchableOpacity>
 
-                      {onRemove && !isInAnyCollection && (
+                      {isRexSaved ? null : (
                         <TouchableOpacity
-                          onPress={() => {
-                            suppressSaveToast.current = true;
-                            onRemove();
-                          }}
+                          onPress={() => void handleSaveToUncollected()}
                           activeOpacity={0.7}
-                          className="w-full flex-row items-center justify-center py-2.5 rounded-lg"
+                          disabled={savingUncollected}
+                          className="w-full flex-row items-center justify-center gap-1.5 py-2.5 rounded-lg border border-border"
                         >
-                          <Text className="text-sm font-medium text-destructive">Remove from uncollected</Text>
+                          {savingUncollected ? (
+                            <ActivityIndicator size="small" color={Theme.colors.foreground} />
+                          ) : (
+                            <>
+                              <Bookmark size={14} color={Theme.colors.foreground} />
+                              <Text className="text-sm font-medium text-foreground">
+                                Save to uncollected
+                              </Text>
+                            </>
+                          )}
                         </TouchableOpacity>
                       )}
+
+                      {isRexSaved ? (
+                        <TouchableOpacity
+                          onPress={() => void handleRemoveFromUncollected()}
+                          activeOpacity={0.7}
+                          disabled={removing}
+                          className="w-full flex-row items-center justify-center gap-1.5 py-2.5 rounded-lg border border-destructive"
+                        >
+                          {removing ? (
+                            <ActivityIndicator size="small" color={Theme.colors.destructive} />
+                          ) : (
+                            <>
+                              <Trash2 size={14} color={Theme.colors.destructive} />
+                              <Text className="text-sm font-medium text-destructive">
+                                Remove from uncollected
+                              </Text>
+                            </>
+                          )}
+                        </TouchableOpacity>
+                      ) : null}
                     </View>
                   )}
                 </View>
@@ -386,7 +501,6 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({ open, rec, 
 const styles = StyleSheet.create({
   backdrop: { backgroundColor: 'rgba(0,0,0,0.4)' },
   outer: { flex: 1, justifyContent: 'flex-end', alignItems: 'center' },
-  list: { flex: 1 },
 });
 
 export default AddToCollectionSheet;
