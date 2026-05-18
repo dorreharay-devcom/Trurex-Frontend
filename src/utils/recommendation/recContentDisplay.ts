@@ -7,7 +7,9 @@ export function isHttpUrl(s: string): boolean {
 export function rexCoverStoragePathFromRecommendation(rec: {
   photoPath?: string | null;
   image?: string | null;
+  rexPlaceholderHtml?: string | null;
 }): string | null {
+  if (rec.rexPlaceholderHtml?.trim()) return null;
   const explicit = rec.photoPath?.trim() ?? '';
   if (explicit) return explicit;
   const img = rec.image?.trim() ?? '';
@@ -19,7 +21,9 @@ export function rexCoverStoragePathFromRecommendation(rec: {
 export function rexPhotoStoragePathsFromRecommendation(rec: {
   photoPaths?: string[] | null;
   photoPath?: string | null;
+  rexPlaceholderHtml?: string | null;
 }): string[] {
+  if (rec.rexPlaceholderHtml?.trim()) return [];
   const fromList = rec.photoPaths?.map((p) => p.trim()).filter(Boolean) ?? [];
   if (fromList.length > 0) return fromList;
   const one = rec.photoPath?.trim() ?? '';

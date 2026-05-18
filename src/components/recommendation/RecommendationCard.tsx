@@ -11,6 +11,7 @@ import {
   X,
 } from 'lucide-react-native';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
+import { RexPlaceholderHtml } from '~/components/common/RexPlaceholderHtml';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { likeRex, unlikeRex } from '~/api/rexLikesApi';
@@ -30,6 +31,7 @@ import {
   rexPhotoStoragePathsFromRecommendation,
   valueForMoneyLabel,
 } from '~/utils/recommendation/recContentDisplay';
+import { cn } from '~/utils/general';
 
 export type { Recommendation, RecommendationOpenOptions };
 
@@ -62,10 +64,14 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
 
   const author = rec.user ?? { name: 'Member', handle: '', avatar: '' };
   const tags = rec.tags ?? [];
+  const categoryPlaceholderHtml = rec.rexPlaceholderHtml?.trim() || null;
+  const useCategoryPlaceholder = Boolean(categoryPlaceholderHtml);
   const coverPath = rexCoverStoragePathFromRecommendation(rec);
   const coverHttp = rexCoverRemoteHttpUrl(rec);
   const gallery = rexPhotoStoragePathsFromRecommendation(rec);
-  const galleryCount = Math.max(rec.photoCount ?? 0, gallery.length) || 0;
+  const galleryCount = useCategoryPlaceholder
+    ? 0
+    : Math.max(rec.photoCount ?? 0, gallery.length) || 0;
   const showGalleryHint = galleryCount > 1;
   const maxGalleryDots = 5;
   const galleryDotCount = Math.min(maxGalleryDots, galleryCount);
@@ -134,17 +140,24 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
       </View>
 
       <View
-        className="mx-4 rounded-lg overflow-hidden bg-muted"
+        className={cn(
+          'relative mx-4 overflow-hidden rounded-xl',
+          useCategoryPlaceholder ? 'bg-transparent' : 'bg-muted',
+        )}
         style={{ aspectRatio: 4 / 3 }}
       >
-        <SignedStorageImage
-          bucket={REX_IMAGES_BUCKET}
-          storagePath={coverPath}
-          remoteUri={coverHttp}
-          style={{ width: '100%', height: '100%' }}
-          contentFit="cover"
-          accessibilityLabel={rec.title}
-        />
+        {useCategoryPlaceholder ? (
+          <RexPlaceholderHtml html={categoryPlaceholderHtml!} fit="cover" />
+        ) : (
+          <SignedStorageImage
+            bucket={REX_IMAGES_BUCKET}
+            storagePath={coverPath}
+            remoteUri={coverHttp}
+            style={{ width: '100%', height: '100%' }}
+            contentFit="cover"
+            accessibilityLabel={rec.title}
+          />
+        )}
         {showGalleryHint ? (
           <View className="absolute right-2 top-2 flex-row items-center gap-1 rounded-full bg-black/45 px-2 py-1.5">
             {Array.from({ length: galleryDotCount }, (_, index) => (

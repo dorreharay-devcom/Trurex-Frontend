@@ -37,6 +37,7 @@ export interface CollectionRexEntry {
   category_icon?: string;
   added_at: string;
   photo_path: string | null;
+  rex_placeholder_html?: string | null;
   location?: string | null;
   score_value_for_money?: number | null;
   rating?: number | null;

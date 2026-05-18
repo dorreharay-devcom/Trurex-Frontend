@@ -1,15 +1,10 @@
 import React from 'react';
 import { View, Text, Pressable, Platform, type PressableProps } from 'react-native';
 import { MapPin } from 'lucide-react-native';
-import { SignedStorageImage } from '~/components/common/SignedStorageImage';
-import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
+import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
 import { Theme } from '~/theme/Theme';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { cn } from '~/utils/general';
-import {
-  rexCoverRemoteHttpUrl,
-  rexCoverStoragePathFromRecommendation,
-} from '~/utils/recommendation/recContentDisplay';
 
 type HoverProps = Pick<PressableProps, 'onHoverIn' | 'onHoverOut'>;
 
@@ -21,8 +16,6 @@ type Props = {
 
 export const ListRow: React.FC<Props> = ({ rec, highlighted, onPress, ...hoverProps }) => {
   const tags = rec.tags ?? [];
-  const coverPath = rexCoverStoragePathFromRecommendation(rec);
-  const coverHttp = rexCoverRemoteHttpUrl(rec);
   return (
     <Pressable
       {...hoverProps}
@@ -32,13 +25,7 @@ export const ListRow: React.FC<Props> = ({ rec, highlighted, onPress, ...hoverPr
         Platform.OS === 'web' && highlighted && 'border-primary ring-2 ring-primary/25',
       )}
     >
-      <SignedStorageImage
-        bucket={REX_IMAGES_BUCKET}
-        storagePath={coverPath}
-        remoteUri={coverHttp}
-        className="h-12 w-12 rounded-lg"
-        accessibilityLabel={rec.title}
-      />
+      <RexCoverThumbnail rec={rec} className="h-12 w-12 rounded-lg" />
       <View className="flex-1 min-w-0">
         <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
           {rec.title}

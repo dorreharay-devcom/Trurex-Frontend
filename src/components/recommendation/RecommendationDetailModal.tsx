@@ -21,6 +21,7 @@ import {
 } from 'lucide-react-native';
 import { RexCommentsSection } from '~/components/recommendation/comment';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
+import { RexPlaceholderHtml } from '~/components/common/RexPlaceholderHtml';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { OverlayModal } from '~/components/common/OverlayModal';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
@@ -185,8 +186,14 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     [recommendation],
   );
 
+  const categoryPlaceholderHtml = useMemo(() => {
+    const fromDetail = rexDetail?.rex_placeholder_html?.trim();
+    const fromRec = recommendation?.rexPlaceholderHtml?.trim();
+    return fromDetail || fromRec || null;
+  }, [rexDetail?.rex_placeholder_html, recommendation?.rexPlaceholderHtml]);
+
   const galleryPaths = useMemo(() => {
-    if (!recommendation) return [];
+    if (!recommendation || categoryPlaceholderHtml) return [];
     const normalize = (s: string) => {
       const t = s.trim();
       if (!t || t === 'null' || t === 'undefined') {
@@ -202,7 +209,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
       return fromDetail;
     }
     return rexPhotoStoragePathsFromRecommendation(recommendation);
-  }, [rexDetail, recommendation]);
+  }, [rexDetail, recommendation, categoryPlaceholderHtml]);
 
   const placeLocationLine = useMemo(() => {
     if (!recommendation) return '';
@@ -220,14 +227,15 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     [recommendation],
   );
   const showHero = useMemo(
-    () => galleryPaths.length > 0 || !!(coverPath || coverHttp),
-    [galleryPaths, coverPath, coverHttp],
+    () => galleryPaths.length > 0 || !!(coverPath || coverHttp) || !!categoryPlaceholderHtml,
+    [galleryPaths, coverPath, coverHttp, categoryPlaceholderHtml],
   );
   const showDetailHeroLoading =
     Boolean(visible && recommendation) &&
     detailLoading &&
     galleryPaths.length === 0 &&
-    !(coverPath || coverHttp);
+    !(coverPath || coverHttp) &&
+    !categoryPlaceholderHtml;
 
   const queryClient = useQueryClient();
   const deleteRexMutation = useMutation({
@@ -357,6 +365,10 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                   paths={galleryPaths}
                   accessibilityLabelBase={recommendation.title}
                 />
+              ) : categoryPlaceholderHtml ? (
+                <View className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-transparent">
+                  <RexPlaceholderHtml html={categoryPlaceholderHtml} />
+                </View>
               ) : showHero && (coverPath || coverHttp) ? (
                 <View className="aspect-[16/9] w-full overflow-hidden rounded-xl">
                   <SignedStorageImage

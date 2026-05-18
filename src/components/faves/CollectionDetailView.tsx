@@ -17,7 +17,7 @@ import EditCollectionModal from '~/components/faves/EditCollectionModal';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { toastSuccess } from '~/utils/appToast';
-import { SignedStorageImage } from '~/components/common/SignedStorageImage';
+import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
 import type { Recommendation, RecommendationOpenOptions } from '~/types/recommendation/recommendation';
 
 const VALUE_LABELS = ['Total Steal', 'Budget-Friendly', 'Good Value', 'Worth It', 'Splurge'];
@@ -33,6 +33,7 @@ function entryToRec(entry: CollectionRexEntry): Recommendation {
     categoryId: entry.category_code,
     category: entry.category_name ?? entry.category_code,
     photoPath: entry.photo_path,
+    rexPlaceholderHtml: entry.rex_placeholder_html?.trim() || null,
     location: entry.location ?? undefined,
     rating: entry.rating ?? undefined,
     scoreValueForMoney: entry.score_value_for_money ?? undefined,
@@ -210,14 +211,10 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                   onPress={() => onRecommendationPress?.(entryToRec(item))}
                   className="flex-1 flex-row gap-3 p-3"
                 >
-                  <View className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-                    <SignedStorageImage
-                      bucket={REX_IMAGES_BUCKET}
-                      storagePath={item.photo_path ?? ''}
-                      className="w-full h-full"
-                      accessibilityLabel={item.place_name}
-                    />
-                  </View>
+                  <RexCoverThumbnail
+                    rec={entryToRec(item)}
+                    className="h-16 w-16 rounded-lg flex-shrink-0"
+                  />
                   <View className="flex-1 min-w-0">
                     <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
                       {item.place_name}

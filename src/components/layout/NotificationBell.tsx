@@ -167,10 +167,10 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress 
                   <Pressable
                     onPress={() => followMutation.mutate(n.actor_id!)}
                     disabled={followMutation.isPending}
-                    className="mt-1.5 flex-row items-center gap-1 self-start rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 active:opacity-70"
+                    className="mt-1.5 flex-row items-center gap-1 self-start rounded-full border border-border/80 bg-border/40 px-2.5 py-1 active:opacity-70"
                   >
-                    <UserPlus size={11} color={Theme.colors.primary} />
-                    <Text className="text-[11px] font-medium text-primary">Follow Back</Text>
+                    <UserPlus size={11} color={Theme.colors.foreground} />
+                    <Text className="text-[11px] font-medium text-foreground">Follow Back</Text>
                   </Pressable>
                 )
               ) : null}
@@ -179,9 +179,9 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress 
                   {formatNotificationTime(n.created_at)}
                 </Text>
                 {isTrusted && (
-                  <View className="flex-row items-center gap-1 rounded-full border border-primary/25 bg-primary/10 px-2 py-0.5">
-                    <ShieldCheck size={10} color={Theme.colors.primary} />
-                    <Text className="text-[10px] font-semibold text-primary">Trusted</Text>
+                  <View className="flex-row items-center gap-1 rounded-full border border-border/80 bg-border/40 px-2 py-0.5">
+                    <ShieldCheck size={10} color={Theme.colors.foreground} />
+                    <Text className="text-[10px] font-semibold text-foreground">Trusted</Text>
                   </View>
                 )}
               </View>

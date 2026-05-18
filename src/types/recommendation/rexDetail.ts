@@ -40,4 +40,5 @@ export type RexDetailRow = {
   is_saved: boolean;
   tag_slugs: string[];
   photo_paths: string[];
+  rex_placeholder_html?: string | null;
 };

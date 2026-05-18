@@ -8,7 +8,11 @@ import { fetchPublicUserById } from '~/api/usersApi';
 import { useAuth } from '~/services/AuthContext';
 import { Theme } from '~/theme/Theme';
 import { toastSuccess } from '~/utils/appToast';
-import { buildProfileShareUrl, profileShareSlug } from '~/utils/profileShareUrl';
+import {
+  buildProfileShareUrl,
+  hasProfileUsername,
+  profileShareSlug,
+} from '~/utils/profileShareUrl';
 
 type Props = { isActive: boolean };
 
@@ -28,7 +32,7 @@ export function ShareProfileCard({ isActive }: Props) {
     enabled: !!user?.id && isActive,
   });
 
-  const hasHandle = Boolean(publicUser?.handle?.trim());
+  const hasHandle = hasProfileUsername(publicUser?.handle ?? profileData?.handle);
 
   const shareUrl = useMemo(() => {
     if (!profileData?.userId) return '';
@@ -56,13 +60,9 @@ export function ShareProfileCard({ isActive }: Props) {
           <Text className="text-sm font-semibold text-foreground">Share your profile</Text>
           {isLoading ? (
             <Text className="mt-0.5 text-xs text-muted-foreground">Preparing your link…</Text>
-          ) : !hasHandle ? (
-            <Text className="mt-0.5 text-xs text-muted-foreground">
-              Set a username to get your link
-            </Text>
-          ) : profileData ? (
+          ) : profileData && shareUrl ? (
             <Text className="mt-0.5 text-xs text-muted-foreground" numberOfLines={1}>
-              {profileData.handle}
+              {hasHandle ? profileData.handle : shareUrl}
             </Text>
           ) : null}
         </View>

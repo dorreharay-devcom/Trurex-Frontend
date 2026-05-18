@@ -3,6 +3,7 @@ import { View, useWindowDimensions, type StyleProp, type ViewStyle } from 'react
 import type { Element } from '@native-html/transient-render-engine';
 import RenderHTML from 'react-native-render-html';
 import { cn } from '~/utils/general';
+import { wrapRexPlaceholderHtmlForFeed } from '~/utils/rexPlaceholderHtml';
 import type { RexPlaceholderFit } from '~/components/common/rexPlaceholderFit';
 
 type Props = {
@@ -26,11 +27,11 @@ function useRexPlaceholderDomVisitors(fit: RexPlaceholderFit, boxW: number, boxH
         } else if (boxW > 0 && boxH > 0) {
           next.width = String(boxW);
           next.height = String(boxH);
-          next.preserveaspectratio = 'xMidYMax slice';
+          next.preserveaspectratio = 'xMidYMid slice';
         } else {
           next.width = '100%';
           next.height = '100%';
-          next.preserveaspectratio = 'xMidYMax slice';
+          next.preserveaspectratio = 'xMidYMid slice';
         }
 
         element.attribs = next;
@@ -45,12 +46,13 @@ export function RexPlaceholderHtml({ html, className, style, fit = 'cover' }: Pr
   const [contentWidth, setContentWidth] = useState(() => Math.max(1, Math.min(winW, 800)));
   const [box, setBox] = useState({ w: 0, h: 0 });
   const domVisitors = useRexPlaceholderDomVisitors(fit, box.w, box.h);
+  const documentHtml = useMemo(() => wrapRexPlaceholderHtmlForFeed(html), [html]);
 
-  const renderKey = `${fit}-${box.w}x${box.h}-${html.length}`;
+  const renderKey = `${fit}-${box.w}x${box.h}-${documentHtml.length}`;
 
   return (
     <View
-      className={cn('relative h-full w-full overflow-hidden', className)}
+      className={cn('absolute inset-0 overflow-hidden', className)}
       style={style}
       onLayout={(e) => {
         const { width, height } = e.nativeEvent.layout;
@@ -68,11 +70,12 @@ export function RexPlaceholderHtml({ html, className, style, fit = 'cover' }: Pr
         <RenderHTML
           key={renderKey}
           contentWidth={contentWidth}
-          source={{ html }}
+          source={{ html: documentHtml }}
           domVisitors={domVisitors}
           baseStyle={{ margin: 0, padding: 0, width: '100%', height: '100%' }}
           tagsStyles={{
             body: { margin: 0, padding: 0, width: '100%', height: '100%' },
+            div: { width: '100%', height: '100%', minHeight: '100%' },
           }}
         />
       </View>

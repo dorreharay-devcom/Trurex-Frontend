@@ -4,6 +4,8 @@ import { useRouter } from 'expo-router';
 import { Routes } from '~/constants/routes';
 import * as ImagePicker from 'expo-image-picker';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
+import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
+import { RexPlaceholderHtml } from '~/components/common/RexPlaceholderHtml';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { useAuth } from '~/services/AuthContext';
 import { ProfileApi } from '~/api/ProfileApi';
@@ -52,6 +54,7 @@ const AnimatedRexCard: React.FC<{
   width: number;
   onPress?: () => void;
 }> = ({ rec, index, width, onPress }) => {
+  const placeholderHtml = rec.rexPlaceholderHtml?.trim() || null;
   const opacity = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.95)).current;
 
@@ -79,13 +82,19 @@ const AnimatedRexCard: React.FC<{
         onPress={onPress}
         className="rounded-xl overflow-hidden shadow-card bg-background border border-border"
       >
-        <SignedStorageImage
-          bucket={REX_IMAGES_BUCKET}
-          storagePath={rexCoverStoragePathFromRecommendation(rec)}
-          remoteUri={rexCoverRemoteHttpUrl(rec)}
-          className="aspect-square w-full"
-          accessibilityLabel={rec.title}
-        />
+        {placeholderHtml ? (
+          <View className="relative aspect-square w-full overflow-hidden bg-transparent">
+            <RexPlaceholderHtml html={placeholderHtml} />
+          </View>
+        ) : (
+          <SignedStorageImage
+            bucket={REX_IMAGES_BUCKET}
+            storagePath={rexCoverStoragePathFromRecommendation(rec)}
+            remoteUri={rexCoverRemoteHttpUrl(rec)}
+            className="aspect-square w-full"
+            accessibilityLabel={rec.title}
+          />
+        )}
         <View className="p-2.5">
           <Text className="text-xs font-semibold text-foreground" numberOfLines={1}>
             {rec.title}
@@ -505,15 +514,7 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
                         }}
                         className="flex-row items-center gap-3 p-3 rounded-xl"
                       >
-                        <View className="w-10 h-10 rounded-lg overflow-hidden bg-muted">
-                          <SignedStorageImage
-                            bucket={REX_IMAGES_BUCKET}
-                            storagePath={rexCoverStoragePathFromRecommendation(rec)}
-                            remoteUri={rexCoverRemoteHttpUrl(rec)}
-                            className="w-full h-full"
-                            accessibilityLabel={rec.title}
-                          />
-                        </View>
+                        <RexCoverThumbnail rec={rec} className="h-10 w-10 rounded-lg" />
                         <View className="flex-1">
                           <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
                             {rec.title}
