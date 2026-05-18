@@ -25,6 +25,7 @@ export function rexDetailRowToRecommendation(row: RexDetailRow): Recommendation 
     title: row.place_name?.trim() || 'Place',
     description: bodyText,
     photoPath: photoPath ?? undefined,
+    rexPlaceholderHtml: row.rex_placeholder_html?.trim() || null,
     photoPaths: photoPaths.length > 0 ? photoPaths : undefined,
     photoCount: photoPaths.length,
     categoryId: row.category_code || 'all',

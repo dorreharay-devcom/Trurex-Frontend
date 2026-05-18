@@ -15,9 +15,7 @@ import { Check } from 'lucide-react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAddRexToCollection } from '~/hooks/useCollections';
 import { useSavedRexes } from '~/hooks/useGems';
-import { SignedStorageImage } from '~/components/common/SignedStorageImage';
-import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
-import { rexCoverStoragePathFromRecommendation, rexCoverRemoteHttpUrl } from '~/utils/recommendation/recContentDisplay';
+import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { webContainerStyle } from '~/utils';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
@@ -150,15 +148,7 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({ open,
                       style={isSelected ? { backgroundColor: Theme.colors.accent } : undefined}
                       className="w-full flex-row items-center gap-3 rounded-xl p-3"
                     >
-                      <View className="w-10 h-10 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-                        <SignedStorageImage
-                          bucket={REX_IMAGES_BUCKET}
-                          storagePath={rexCoverStoragePathFromRecommendation(rec)}
-                          remoteUri={rexCoverRemoteHttpUrl(rec)}
-                          className="w-full h-full"
-                          accessibilityLabel={rec.title}
-                        />
-                      </View>
+                      <RexCoverThumbnail rec={rec} className="h-10 w-10 rounded-lg" />
                       <View className="flex-1 min-w-0">
                         <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>{rec.title}</Text>
                         <Text

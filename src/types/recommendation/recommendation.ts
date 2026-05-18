@@ -43,6 +43,7 @@ export interface Recommendation {
   description?: string | null;
   image?: string | null;
   photoPath?: string | null;
+  rexPlaceholderHtml?: string | null;
   photoPaths?: string[];
   photoCount?: number;
   categoryId: string;

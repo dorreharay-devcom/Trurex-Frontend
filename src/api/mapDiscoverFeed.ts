@@ -49,6 +49,9 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
   const photoPath =
     firstNonEmptyString(o, 'photo_path', 'photoPath') ?? (photoPaths[0] ? photoPaths[0] : null);
 
+  const rexPlaceholderHtml =
+    firstNonEmptyString(o, 'rex_placeholder_html', 'rexPlaceholderHtml') ?? null;
+
   const photoCountRaw = o.photo_count;
   const photoCount =
     typeof photoCountRaw === 'number' && Number.isFinite(photoCountRaw)
@@ -97,6 +100,7 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
     description: bodyText,
     image,
     photoPath,
+    rexPlaceholderHtml,
     photoPaths: photoPaths.length > 0 ? photoPaths : undefined,
     photoCount,
     categoryId: categoryCode || 'all',
