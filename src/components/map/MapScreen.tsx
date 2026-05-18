@@ -16,7 +16,12 @@ import { ListRow } from '~/components/map/common/ListRow';
 import { Theme } from '~/theme/Theme';
 import { MapPin, List, LocateFixed } from 'lucide-react-native';
 import { MAP_ACTION_INSET, MAP_LOCATION_PROMPT_TOP } from '~/constants/map/mapUi';
-import { deriveMapPinType, formatDistanceKm, haversineKm } from '~/utils/map/mapRecommendationData';
+import {
+  deriveMapPinType,
+  formatDistanceKm,
+  haversineKm,
+  isOwnRecommendation,
+} from '~/utils/map/mapRecommendationData';
 import { webContainerStyle } from '~/utils';
 
 const MAP_LOCATION_PROMPT_DISMISSED_KEY = 'mapLocationPromptDismissed';
@@ -73,6 +78,9 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
   }, [flow.selectedRec, flow.userCoords]);
 
   const pinType = flow.selectedRec ? deriveMapPinType(flow.selectedRec, flow.userId) : 'network';
+
+  const canSaveSelected =
+    flow.selectedRec != null && !isOwnRecommendation(flow.selectedRec, flow.userId);
 
   const sortedList = useMemo(() => {
     const rows = flow.locatedRecsForList;
@@ -208,16 +216,20 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
                   flow.openRec(flow.selectedRec!);
                   flow.clearSelection();
                 }}
-                onSave={() => {
-                  const r = flow.selectedRec!;
-                  setSaveTarget({
-                    id: r.id,
-                    place_name: r.title,
-                    category_code: r.category,
-                    location: r.location,
-                    isSaved: r.isSaved,
-                  });
-                }}
+                onSave={
+                  canSaveSelected
+                    ? () => {
+                        const r = flow.selectedRec!;
+                        setSaveTarget({
+                          id: r.id,
+                          place_name: r.title,
+                          category_code: r.category,
+                          location: r.location,
+                          isSaved: r.isSaved ?? false,
+                        });
+                      }
+                    : undefined
+                }
               />
             )}
 
@@ -225,6 +237,20 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
               open={!!saveTarget}
               rec={saveTarget}
               onClose={() => setSaveTarget(null)}
+              onSaved={
+                saveTarget ? () => flow.markRecSaved(saveTarget.id) : undefined
+              }
+              onUnsaved={
+                saveTarget ? () => flow.markRecUnsaved(saveTarget.id) : undefined
+              }
+              onUnsaveFailed={
+                saveTarget ? () => flow.markRecSaved(saveTarget.id) : undefined
+              }
+              onSaveRexFailed={
+                saveTarget
+                  ? () => flow.clearRecSavedOverride(saveTarget.id)
+                  : undefined
+              }
             />
           </View>
         ) : (

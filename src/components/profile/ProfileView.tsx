@@ -140,9 +140,6 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
       ],
     );
   }, [router, onSignUp]);
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState<ProfileTab>(ProfileTab.Recs);
   const [avatarUploading, setAvatarUploading] = useState(false);
@@ -161,11 +158,27 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
   const addSheetTranslateY = useRef(new Animated.Value(400)).current;
   const [addSheetVisible, setAddSheetVisible] = useState(false);
 
-  const targetUserId = propUserId || authUser?.id;
-  const isOwnProfile = !propUserId || propUserId === authUser?.id;
-  const { data: myRexes = [], isLoading: rexesLoading } = useMyRexes(targetUserId);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
+  const viewingByHandle = Boolean(propHandle);
+  const viewingByUserId = Boolean(propUserId);
+
+  const isOwnProfile =
+    profile != null
+      ? profile.userId === authUser?.id
+      : viewingByUserId
+        ? propUserId === authUser?.id
+        : !viewingByHandle;
+
+  const profileContentUserId =
+    profile?.userId ??
+    (viewingByUserId ? propUserId : viewingByHandle ? undefined : authUser?.id);
+
+  const { data: myRexes = [], isLoading: rexesLoading } = useMyRexes(profileContentUserId);
   const { data: myCollections = [], isLoading: collectionsLoading } =
-    useMyCollections(targetUserId);
+    useMyCollections(profileContentUserId);
   const { data: savedRexes = [] } = useSavedRexes();
   const { mutate: addRex } = useAddRexToCollection();
 
@@ -212,7 +225,14 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
     }
   }, [propUserId, propHandle, authUser?.id]);
 
-  const { follow, unfollow } = useFollowUser(propUserId ?? '', fetchProfile);
+  const followTargetId = profile?.userId ?? propUserId ?? '';
+  const { follow, unfollow } = useFollowUser(followTargetId, fetchProfile);
+
+  useEffect(() => {
+    setLoading(true);
+    setNotFound(false);
+    setProfile(null);
+  }, [propUserId, propHandle]);
 
   const handleAvatarPress = useCallback(async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -244,7 +264,9 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
     fetchProfile();
   }, [fetchProfile]);
 
-  if (loading) {
+  const awaitingHandleProfile = viewingByHandle && profile == null && !notFound;
+
+  if (loading || awaitingHandleProfile) {
     return <ProfileCardSkeleton windowWidth={windowWidth} showBack={!!onBack} />;
   }
 
