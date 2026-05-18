@@ -60,9 +60,13 @@ export function ShareProfileCard({ isActive }: Props) {
           <Text className="text-sm font-semibold text-foreground">Share your profile</Text>
           {isLoading ? (
             <Text className="mt-0.5 text-xs text-muted-foreground">Preparing your link…</Text>
-          ) : profileData && shareUrl ? (
+          ) : !hasHandle ? (
+            <Text className="mt-0.5 text-xs text-muted-foreground">
+              Set a username to get your link
+            </Text>
+          ) : profileData?.handle ? (
             <Text className="mt-0.5 text-xs text-muted-foreground" numberOfLines={1}>
-              {hasHandle ? profileData.handle : shareUrl}
+              {profileData.handle}
             </Text>
           ) : null}
         </View>

@@ -103,12 +103,12 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({ open,
 
       <View style={styles.outer} pointerEvents="box-none">
         <Animated.View style={{ width: '100%', transform: [{ translateY: sheetTranslateY }] }}>
-          <View className="bg-card rounded-t-2xl border-t border-border" style={{ maxHeight: 500 }}>
-            <View style={webContainerStyle} className="items-center py-3">
+          <View className="w-full bg-card rounded-t-2xl border-t border-border" style={{ maxHeight: 500 }}>
+            <View className="w-full items-center py-3">
               <View className="w-10 h-1 rounded-full bg-muted-foreground/30" />
             </View>
 
-            <View style={[{ paddingHorizontal: 16, paddingBottom: 8 }, webContainerStyle]} className="flex-row items-center justify-between">
+            <View className="w-full flex-row items-center justify-between px-4 pb-3">
               <Text className="text-base font-display font-medium text-foreground">
                 Pick a saved rex
               </Text>
@@ -123,7 +123,7 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({ open,
               </TouchableOpacity>
             </View>
 
-            <View className="h-px bg-border" style={webContainerStyle} />
+            <View className="h-px w-full bg-border" />
 
             <ScrollView
               showsVerticalScrollIndicator={false}

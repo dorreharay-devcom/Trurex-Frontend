@@ -71,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({
               value={searchQuery}
               onChangeText={onSearchChange}
               placeholder="Search recommendations..."
-              placeholderTextColor={Theme.colors.foreground}
+              placeholderTextColor={Theme.colors.secondaryText}
               className="header-search-input w-full min-w-0 shrink rounded-lg border border-border py-1.5 pl-9 pr-4 text-sm text-foreground focus:outline-none focus:ring-2"
               style={[
                 textFieldCaretStyle,
