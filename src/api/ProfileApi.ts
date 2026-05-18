@@ -44,7 +44,7 @@ function toProfileData(data: UserRow | UserProfileResponse | any, email?: string
     return {
       userId: '',
       displayName: 'Anonymous',
-      handle: email ? `@${email.split('@')[0]}` : '@user',
+      handle: '',
       avatarUrl: null,
       trustScore: 0,
       rexCount: 0,
@@ -70,7 +70,7 @@ function toProfileData(data: UserRow | UserProfileResponse | any, email?: string
       ? handle.startsWith('@')
         ? handle
         : `@${handle}`
-      : `@${email?.split('@')[0] ?? 'user'}`,
+      : '',
     bio,
     location,
     avatarUrl,
