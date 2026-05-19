@@ -2,7 +2,7 @@
 module.exports = {
   expo: {
     name: 'truRex',
-    slug: 'truRex',
+    slug: 'trurex',
     scheme: 'trurex',
     version: '1.0.0',
     orientation: 'portrait',
@@ -17,8 +17,12 @@ module.exports = {
     ios: {
       supportsTablet: true,
       bundleIdentifier: 'com.app.trurex',
+      infoPlist: {
+        ITSAppUsesNonExemptEncryption: false,
+      },
     },
     android: {
+      package: 'com.app.trurex',
       adaptiveIcon: {
         foregroundImage: './assets/truRexIcon.png',
         backgroundColor: '#ffffff',

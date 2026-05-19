@@ -144,15 +144,12 @@ export function subcategoryQuestionsOnly(
   return sub ? sortByOrder(sub.questions) : [];
 }
 
-export function resolveVisibilityAndCircles(
+export function resolveCreateRexCircleIds(
   selectedCircleIds: Set<string>,
-): Pick<CreateRexRpcParams, 'p_visibility' | 'circle_ids'> {
+): CreateRexRpcParams['circle_ids'] {
   const ids = [...selectedCircleIds].filter((id) => id !== 'public');
   const uuids = ids.filter(isStrictUuid);
-  if (uuids.length > 0) {
-    return { p_visibility: 'circles', circle_ids: uuids };
-  }
-  return { p_visibility: 'public', circle_ids: null };
+  return uuids.length > 0 ? uuids : null;
 }
 
 export function getPlaceNameForRex(
