@@ -499,7 +499,6 @@ export const RecommendationDetailModal: React.FC<Props> = ({
               <View ref={commentsSectionWrapRef} collapsable={false}>
                 <RexCommentsSection
                   rexId={recommendation.id}
-                  rexOwnerId={recommendation.authorId}
                   onCommentTotalChange={onCommentCountChange}
                   composerAnchorRef={composerAnchorRef}
                   autoFocusComposer={scrollToComments === true}

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Pressable } from 'react-native';
 import { Flag } from 'lucide-react-native';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
+import { canDeleteRexComment } from '~/api/rexCommentsApi';
 import type { RexComment } from '~/types/recommendation/rexComment';
 import { formatCompactRelativeTime } from '~/utils/date';
 import { Theme } from '~/theme/Theme';
@@ -10,7 +11,6 @@ import { DeleteAction, LikeAction, ReplyAction } from './CommentActions';
 export type CommentRowProps = {
   comment: RexComment;
   currentUserId?: string;
-  rexOwnerId?: string;
   isReply?: boolean;
   onReply: (id: string) => void;
   onDelete: (id: string) => void;
@@ -22,7 +22,6 @@ export type CommentRowProps = {
 export const CommentRow: React.FC<CommentRowProps> = ({
   comment,
   currentUserId,
-  rexOwnerId,
   isReply,
   onReply,
   onDelete,
@@ -30,9 +29,7 @@ export const CommentRow: React.FC<CommentRowProps> = ({
   onToggleLike,
   onReport,
 }) => {
-  const canDelete =
-    (currentUserId && currentUserId === comment.author_id) ||
-    (currentUserId && rexOwnerId && currentUserId === rexOwnerId);
+  const canDelete = canDeleteRexComment(comment, currentUserId);
   const name = comment.profile?.display_name?.trim() || 'Member';
   const canReport = Boolean(
     onReport && currentUserId && comment.author_id && currentUserId !== comment.author_id,

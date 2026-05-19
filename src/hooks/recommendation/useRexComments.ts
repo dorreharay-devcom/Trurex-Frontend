@@ -1,42 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Backend, unwrap } from '~/services/AuthService';
-import { likeRexComment, unlikeRexComment } from '~/api/rexLikesApi';
-import type { RexComment, RexCommentRpcNode } from '~/types/recommendation/rexComment';
-
-function mapRpcNodeToComment(node: RexCommentRpcNode): RexComment {
-  return {
-    id: node.id,
-    rex_id: node.rex_id,
-    parent_comment_id: node.parent_comment_id,
-    author_id: node.author_id,
-    body: node.body,
-    created_at: node.created_at,
-    updated_at: node.updated_at,
-    like_count: node.like_count,
-    liked_by_me: node.liked_by_me,
-    profile: {
-      display_name: node.author_display_name,
-      avatar_url: node.author_profile_picture_url,
-    },
-    replies: (node.subcomments ?? []).map(mapRpcNodeToComment),
-  };
-}
-
-function updateCommentInTree(
-  items: RexComment[],
-  commentId: string,
-  map: (c: RexComment) => RexComment,
-): RexComment[] {
-  return items.map((c) => {
-    if (c.id === commentId) {
-      return map(c);
-    }
-    if (c.replies?.length) {
-      return { ...c, replies: updateCommentInTree(c.replies, commentId, map) };
-    }
-    return c;
-  });
-}
+import { Backend } from '~/services/AuthService';
+import {
+  addRexComment,
+  deleteRexComment,
+  getRexComments,
+  likeRexComment,
+  unlikeRexComment,
+} from '~/api/rexCommentsApi';
+import { updateCommentInTree } from '~/utils/recommendation/rexCommentTree';
+import type { RexComment } from '~/types/recommendation/rexComment';
+import { unknownErrorMessage } from '~/utils';
 
 export function useRexComments(rexId: string | undefined) {
   const [comments, setComments] = useState<RexComment[]>([]);
@@ -51,13 +24,7 @@ export function useRexComments(rexId: string | undefined) {
     }
     setLoading(true);
     try {
-      const data = unwrap(
-        await Backend.rpc('get_rex_comments', {
-          input_rex_id: rexId,
-        }),
-      ) as RexCommentRpcNode[] | null;
-      const list = Array.isArray(data) ? data : [];
-      setComments(list.map(mapRpcNodeToComment));
+      setComments(await getRexComments(rexId));
     } catch (e) {
       console.warn('[useRexComments]', e);
       setComments([]);
@@ -71,7 +38,9 @@ export function useRexComments(rexId: string | undefined) {
   }, [fetchComments]);
 
   useEffect(() => {
-    if (!rexId) return;
+    if (!rexId) {
+      return;
+    }
 
     const channel = Backend.channel(`rex-comments-${rexId}`)
       .on(
@@ -95,41 +64,29 @@ export function useRexComments(rexId: string | undefined) {
 
   const addComment = useCallback(
     async (body: string, parentCommentId?: string | null) => {
-      if (!rexId) return;
-      const trimmed = body.trim();
-      if (!trimmed) return;
-
+      if (!rexId) {
+        return;
+      }
       try {
-        unwrap(
-          await Backend.rpc('add_rex_comment', {
-            input_rex_id: rexId,
-            input_body: trimmed,
-            input_parent_comment_id: parentCommentId ?? null,
-          }),
-        );
+        await addRexComment({ rexId, body, parentCommentId }, comments);
         await fetchComments();
       } catch (e: unknown) {
-        const msg =
-          e && typeof e === 'object' && 'message' in e
-            ? String((e as Error).message)
-            : 'Could not post comment';
-        throw new Error(msg);
+        throw new Error(unknownErrorMessage(e, 'Could not post comment'));
       }
     },
-    [rexId, fetchComments],
+    [rexId, fetchComments, comments],
   );
 
   const deleteComment = useCallback(
     async (commentId: string) => {
       try {
-        unwrap(await Backend.from('rex_comments').delete().eq('id', commentId));
+        const deleted = await deleteRexComment(commentId);
+        if (!deleted) {
+          throw new Error('You can only delete your own comments');
+        }
         await fetchComments();
       } catch (e: unknown) {
-        const msg =
-          e && typeof e === 'object' && 'message' in e
-            ? String((e as Error).message)
-            : 'Could not delete';
-        throw new Error(msg);
+        throw new Error(unknownErrorMessage(e, 'Could not delete'));
       }
     },
     [fetchComments],
@@ -145,10 +102,10 @@ export function useRexComments(rexId: string | undefined) {
     const delta = nextLiked ? 1 : -1;
 
     setComments((prev) =>
-      updateCommentInTree(prev, commentId, (c) => ({
-        ...c,
+      updateCommentInTree(prev, commentId, (comment) => ({
+        ...comment,
         liked_by_me: nextLiked,
-        like_count: Math.max(0, (c.like_count ?? 0) + delta),
+        like_count: Math.max(0, (comment.like_count ?? 0) + delta),
       })),
     );
 
@@ -160,10 +117,10 @@ export function useRexComments(rexId: string | undefined) {
       }
     } catch (e) {
       setComments((prev) =>
-        updateCommentInTree(prev, commentId, (c) => ({
-          ...c,
+        updateCommentInTree(prev, commentId, (comment) => ({
+          ...comment,
           liked_by_me: currentlyLiked,
-          like_count: Math.max(0, (c.like_count ?? 0) - delta),
+          like_count: Math.max(0, (comment.like_count ?? 0) - delta),
         })),
       );
       throw e;

@@ -9,11 +9,10 @@ import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError'
 import { unknownErrorMessage } from '~/utils';
 import { CommentComposer } from './common/CommentComposer';
 import { CommentThread } from './common/CommentThread';
-import { totalCommentCount } from './utils/totalCommentCount';
+import { totalRexCommentCount } from '~/utils/recommendation/rexCommentTree';
 
 export type RexCommentsSectionProps = {
   rexId: string;
-  rexOwnerId?: string;
   onCommentTotalChange?: (total: number) => void;
   composerAnchorRef?: React.RefObject<View | null>;
   autoFocusComposer?: boolean;
@@ -23,7 +22,6 @@ export type RexCommentsSectionProps = {
 
 export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
   rexId,
-  rexOwnerId,
   onCommentTotalChange,
   composerAnchorRef,
   autoFocusComposer,
@@ -36,7 +34,7 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const inputRef = useRef<TextInput | null>(null);
 
-  const total = useMemo(() => totalCommentCount(comments), [comments]);
+  const total = useMemo(() => totalRexCommentCount(comments), [comments]);
 
   useEffect(() => {
     onCommentTotalChange?.(total);
@@ -115,7 +113,6 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
               key={c.id}
               root={c}
               currentUserId={user?.id}
-              rexOwnerId={rexOwnerId}
               onReply={startReply}
               onDelete={handleDelete}
               onUserPress={onUserPress}
