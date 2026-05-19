@@ -41,7 +41,7 @@ import {
   getLinkedPlaceId,
   getPlaceNameForRex,
   hasNonPublicMockCircleSelection,
-  resolveVisibilityAndCircles,
+  resolveCreateRexCircleIds,
 } from '~/utils/recommendation/recCreateFlow';
 import { toastError, toastInfo, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
@@ -280,7 +280,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
     }
     setSubmitting(true);
     try {
-      const vis = resolveVisibilityAndCircles(flow.selectedCircleIds);
+      const circle_ids = resolveCreateRexCircleIds(flow.selectedCircleIds);
       const p_question_answers: Record<string, string> = {};
       for (const q of mergedQuestions) {
         const v = flow.questionAnswers[q.code];
@@ -299,8 +299,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
         ),
         p_review: flow.scoreReview.trim() || null,
         p_quick_tip: showQuickTip ? flow.scoreQuickTip.trim() || null : null,
-        p_visibility: vis.p_visibility,
-        circle_ids: vis.circle_ids ?? undefined,
+        circle_ids: circle_ids ?? undefined,
         tag_names: flow.selectedTagSlugs,
         photo_paths: flow.photoStoragePaths.length > 0 ? flow.photoStoragePaths : null,
         p_linked_place_id: getLinkedPlaceId(flow.linkedPlaceId) ?? undefined,
