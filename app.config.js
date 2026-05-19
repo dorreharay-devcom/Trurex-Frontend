@@ -1,16 +1,52 @@
-const appJson = require('./app.json');
-
+/** @type {import('expo/config').ExpoConfig} */
 module.exports = {
   expo: {
-    ...appJson.expo,
+    name: 'truRex',
+    slug: 'truRex',
+    scheme: 'trurex',
+    version: '1.0.0',
+    orientation: 'portrait',
+    icon: './assets/truRexIcon.png',
+    userInterfaceStyle: 'light',
+    newArchEnabled: true,
+    splash: {
+      image: './assets/splash-icon.png',
+      resizeMode: 'contain',
+      backgroundColor: '#ffffff',
+    },
+    ios: {
+      supportsTablet: true,
+    },
     android: {
-      ...appJson.expo.android,
+      adaptiveIcon: {
+        foregroundImage: './assets/truRexIcon.png',
+        backgroundColor: '#ffffff',
+      },
+      edgeToEdgeEnabled: true,
+      predictiveBackGestureEnabled: false,
       config: {
-        ...(appJson.expo.android?.config ?? {}),
         googleMaps: {
           apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? '',
         },
       },
     },
+    web: {
+      bundler: 'metro',
+      output: 'single',
+      favicon: './assets/truRexIcon.png',
+      name: 'TruRex',
+    },
+    plugins: [
+      'expo-web-browser',
+      'expo-router',
+      'expo-secure-store',
+      [
+        'expo-location',
+        {
+          locationWhenInUsePermission:
+            'Allow TruRex to use your location to tag recommendations.',
+        },
+      ],
+    ],
   },
 };

@@ -1,20 +1,19 @@
 import React, { useState } from 'react';
 import { View, Text, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
 import { AuthApi } from '~/api/AuthApi';
 import { Routes } from '~/constants/routes';
 import { Button } from '~/components/common/Button';
 import AuthLayout from '~/components/common/AuthLayout';
 import Input from '~/components/common/Input';
 import { OAuthSocialButtons } from '~/components/auth/OAuthSocialButtons';
-import { isWeb, getRedirectUrl } from '~/utils';
+import { useOAuthSignIn } from '~/hooks/auth/useOAuthSignIn';
+import { getRedirectUrl } from '~/utils';
 import { mapAuthError } from '~/utils/errors';
-
-WebBrowser.maybeCompleteAuthSession();
 
 export default function SignupScreen() {
   const router = useRouter();
+  const { signInWithOAuth, oauthPending } = useOAuthSignIn();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -56,19 +55,6 @@ export default function SignupScreen() {
     }
   };
 
-  const handleOAuth = async (provider: 'google' | 'apple') => {
-    const redirectUrl = getRedirectUrl();
-    try {
-      const data = await AuthApi.signInWithOAuth(provider, redirectUrl);
-      if (!isWeb && data?.url) {
-        await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
-      }
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      Alert.alert(`${provider} sign-up failed`, message);
-    }
-  };
-
   return (
     <AuthLayout>
       <View className="items-center gap-4">
@@ -80,8 +66,9 @@ export default function SignupScreen() {
       </View>
 
       <OAuthSocialButtons
-        onGooglePress={() => handleOAuth('google')}
-        onApplePress={() => handleOAuth('apple')}
+        disabled={oauthPending || loading}
+        onGooglePress={() => signInWithOAuth('google')}
+        onApplePress={() => signInWithOAuth('apple')}
       />
 
       <View className="flex-row items-center gap-3">

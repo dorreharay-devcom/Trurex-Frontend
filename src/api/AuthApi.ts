@@ -71,15 +71,17 @@ export const AuthApi = {
     }
   },
 
-  signInWithOAuth: async (
-    provider: 'google' | 'apple',
-    redirectTo?: string,
-  ): Promise<OAuthResponse['data']> => {
+  signInWithOAuth: async (params: {
+    provider: 'google' | 'apple';
+    redirectTo: string;
+    skipBrowserRedirect?: boolean;
+  }): Promise<OAuthResponse['data']> => {
     return unwrap(
       await Auth.signInWithOAuth({
-        provider,
+        provider: params.provider,
         options: {
-          redirectTo,
+          redirectTo: params.redirectTo,
+          skipBrowserRedirect: params.skipBrowserRedirect,
         },
       }),
     );
