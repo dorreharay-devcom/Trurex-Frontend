@@ -1,4 +1,4 @@
-import * as Linking from 'expo-linking';
+import { makeRedirectUri } from 'expo-auth-session';
 import { Platform, Dimensions, type TextStyle } from 'react-native';
 import { isNonEmptyString } from './guards';
 
@@ -40,5 +40,10 @@ export const formatCurrency = (amount: number, currency: string = 'USD') => {
   }).format(amount);
 };
 
+const APP_SCHEME = 'trurex';
+const AUTH_CALLBACK_PATH = 'auth/callback';
+
 export const getRedirectUrl = () =>
-  isWeb ? `${window.location.origin}/auth/callback` : Linking.createURL('/auth/callback');
+  isWeb
+    ? `${window.location.origin}/${AUTH_CALLBACK_PATH}`
+    : makeRedirectUri({ scheme: APP_SCHEME, path: AUTH_CALLBACK_PATH });

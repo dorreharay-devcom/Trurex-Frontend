@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, ScrollView } from 'react-native';
+import { Platform, View, Text, Pressable, ScrollView } from 'react-native';
 import type { RexSubcategoryOption } from '~/data/rexSubcategoryCatalog';
 import { resolveSubcategoryIcon } from '~/data/rexSubcategoryCatalog';
 import { CreateStepTitle } from '../../CreateStepTitle';
@@ -50,8 +50,11 @@ export function SubCategory({ subCategories, selected, onSelect }: Props) {
                     : 'border-border bg-card active:border-primary/30',
                 )}
               >
-                <View className="w-7 shrink-0 items-center justify-start pt-0.5">
-                  <Text className="text-2xl leading-none">
+                <View className="h-8 w-7 shrink-0 items-center justify-center">
+                  <Text
+                    className="text-2xl leading-none"
+                    style={Platform.OS === 'web' ? undefined : { lineHeight: 30 }}
+                  >
                     {icon.length > 0 ? icon : TYPE_FALLBACK_ICON}
                   </Text>
                 </View>

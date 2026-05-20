@@ -42,6 +42,7 @@ import {
   getPlaceNameForRex,
   hasNonPublicMockCircleSelection,
   resolveCreateRexCircleIds,
+  resolveCreateRexVisibility,
 } from '~/utils/recommendation/recCreateFlow';
 import { toastError, toastInfo, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
@@ -271,7 +272,10 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
         }
       }
     }
-    if (hasNonPublicMockCircleSelection(flow.selectedCircleIds)) {
+    if (
+      !flow.privateRex &&
+      hasNonPublicMockCircleSelection(flow.selectedCircleIds, flow.publicCircleId)
+    ) {
       toastInfo(
         'Circles',
         'Sharing to named circles requires account circle IDs from the server. Select Public only for now, or wire circle loading.',
@@ -280,7 +284,15 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
     }
     setSubmitting(true);
     try {
-      const circle_ids = resolveCreateRexCircleIds(flow.selectedCircleIds);
+      const p_visibility = resolveCreateRexVisibility(
+        flow.selectedCircleIds,
+        flow.privateRex,
+        flow.publicCircleId,
+      );
+      const circle_ids =
+        p_visibility === 'circles'
+          ? resolveCreateRexCircleIds(flow.selectedCircleIds, flow.publicCircleId)
+          : null;
       const p_question_answers: Record<string, string> = {};
       for (const q of mergedQuestions) {
         const v = flow.questionAnswers[q.code];
@@ -299,7 +311,8 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
         ),
         p_review: flow.scoreReview.trim() || null,
         p_quick_tip: showQuickTip ? flow.scoreQuickTip.trim() || null : null,
-        circle_ids: circle_ids ?? undefined,
+        p_visibility,
+        circle_ids: p_visibility === 'circles' ? circle_ids : undefined,
         tag_names: flow.selectedTagSlugs,
         photo_paths: flow.photoStoragePaths.length > 0 ? flow.photoStoragePaths : null,
         p_linked_place_id: getLinkedPlaceId(flow.linkedPlaceId) ?? undefined,
@@ -419,12 +432,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
               paddingBottom: layout.minSafeBottom,
             }}
           >
-            <View
-              className={cn('w-full', primaryDisabled && isWeb && 'cursor-not-allowed')}
-              style={
-                primaryDisabled && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined
-              }
-            >
+            <View className={cn('w-full', primaryDisabled && isWeb && 'cursor-not-allowed')}>
               <Pressable
                 onPress={() => {
                   if (primaryDisabled) return;
@@ -434,9 +442,6 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
                 accessibilityRole="button"
                 accessibilityLabel={flow.isLastStep ? 'Confirm and post' : 'Continue'}
                 accessibilityState={{ disabled: primaryDisabled }}
-                style={
-                  primaryDisabled && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined
-                }
                 className={cn(
                   'flex h-12 w-full flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2',
                   primaryDisabled

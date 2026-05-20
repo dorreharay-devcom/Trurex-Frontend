@@ -116,37 +116,46 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     if (!visible) setDeleteConfirmOpen(false);
   }, [visible]);
 
+  const scrollComposerIntoView = useCallback(() => {
+    try {
+      const targetEl = composerAnchorRef.current ?? commentsSectionWrapRef.current;
+      if (!targetEl) return;
+
+      if (Platform.OS === 'web') {
+        const el = targetEl as unknown as {
+          scrollIntoView?: (o: { behavior?: string; block?: string; inline?: string }) => void;
+        };
+        el?.scrollIntoView?.({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+        return;
+      }
+
+      const scrollNode = findNodeHandle(scrollRef.current);
+      if (!scrollNode) return;
+      targetEl.measureLayout(
+        scrollNode,
+        (_x, y) => {
+          const pad = Platform.OS === 'ios' ? 160 : 96;
+          scrollRef.current?.scrollTo({ y: Math.max(0, y - pad), animated: true });
+        },
+        () => {},
+      );
+    } catch {}
+  }, []);
+
+  const handleComposerFocus = useCallback(() => {
+    if (Platform.OS === 'web') {
+      scrollComposerIntoView();
+      return;
+    }
+    setTimeout(scrollComposerIntoView, 80);
+    setTimeout(scrollComposerIntoView, 340);
+  }, [scrollComposerIntoView]);
+
   useEffect(() => {
     if (!visible || !recommendation || !scrollToComments) return;
 
     let cancelled = false;
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
-
-    const scrollToTarget = () => {
-      try {
-        const targetEl = composerAnchorRef.current ?? commentsSectionWrapRef.current;
-        if (!targetEl) return;
-
-        if (Platform.OS === 'web') {
-          const el = targetEl as unknown as {
-            scrollIntoView?: (o: { behavior?: string; block?: string; inline?: string }) => void;
-          };
-          el?.scrollIntoView?.({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-          return;
-        }
-
-        const scrollNode = findNodeHandle(scrollRef.current);
-        if (!scrollNode) return;
-        targetEl.measureLayout(
-          scrollNode,
-          (_x, y) => {
-            const pad = 32;
-            scrollRef.current?.scrollTo({ y: Math.max(0, y - pad), animated: true });
-          },
-          () => {},
-        );
-      } catch {}
-    };
 
     timeoutId = setTimeout(
       () => {
@@ -154,7 +163,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             if (cancelled) return;
-            scrollToTarget();
+            scrollComposerIntoView();
           });
         });
       },
@@ -165,7 +174,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
       cancelled = true;
       if (timeoutId !== undefined) clearTimeout(timeoutId);
     };
-  }, [visible, scrollToComments, recommendation?.id]);
+  }, [visible, scrollToComments, recommendation?.id, scrollComposerIntoView]);
 
   const { data: rexDetail, isLoading: detailLoading } = useQuery({
     queryKey: ['rexDetail', recommendation?.id] as const,
@@ -286,7 +295,10 @@ export const RecommendationDetailModal: React.FC<Props> = ({
         backdropBackground={layout.backdropBackground}
       >
         <View className="flex-1 min-h-0 flex-col">
-          <View className="sticky top-0 z-10 border-b border-border bg-card/95 px-4 py-4 backdrop-blur sm:px-6">
+          <View
+            className="sticky top-0 z-10 border-b border-border bg-card/95 px-4 py-4 backdrop-blur sm:px-6"
+            style={Platform.OS !== 'web' ? { zIndex: 20, elevation: 20 } : undefined}
+          >
             <View className="flex-row items-center">
               <View className="w-[60px] items-start justify-center">
                 <Pressable
@@ -306,6 +318,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                 {isOwner ? (
                   <Pressable
                     onPress={openDeleteConfirm}
+                    hitSlop={8}
                     accessibilityLabel="Delete this recommendation"
                     accessibilityRole="button"
                     className="h-8 flex-row items-center gap-1 rounded-full border-2 border-destructive bg-destructive/10 px-2.5 active:opacity-90"
@@ -323,6 +336,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                   (recommendation.authorId == null || authUser.id !== recommendation.authorId) ? (
                   <Pressable
                     onPress={openRexReport}
+                    hitSlop={8}
                     accessibilityLabel="Report this recommendation"
                     accessibilityRole="button"
                     className="h-8 flex-row items-center gap-1 rounded-full border-2 border-destructive bg-destructive/10 px-2.5 active:opacity-90"
@@ -349,8 +363,11 @@ export const RecommendationDetailModal: React.FC<Props> = ({
             ref={scrollRef}
             className="flex-1"
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'none'}
+            automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
             showsVerticalScrollIndicator={false}
             contentContainerClassName="items-center pb-8"
+            contentContainerStyle={Platform.OS === 'web' ? undefined : { paddingBottom: 180 }}
           >
             <View className={cn(CREATE_REC_STEP_INNER, 'gap-6')}>
               {showDetailHeroLoading ? (
@@ -504,6 +521,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                   autoFocusComposer={scrollToComments === true}
                   onUserPress={onUserPress}
                   onReportComment={openCommentReport}
+                  onComposerFocus={handleComposerFocus}
                 />
               </View>
 

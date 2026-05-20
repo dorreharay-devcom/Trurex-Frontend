@@ -38,6 +38,7 @@ type CanProceedDeps = {
   selectedSearchPlace: CreateRecSearchPlace | null;
   selectedCategoryId: string | null;
   selectedCircleIds: Set<string>;
+  privateRex: boolean;
   selectedSubcategoryCode: string | null;
   photoStoragePaths: string[];
 };
@@ -57,7 +58,7 @@ function canProceedForStep(stepId: CreateRecStepId, d: CanProceedDeps): boolean 
     case 'photos':
       return true;
     case 'circles':
-      return d.selectedCircleIds.size > 0;
+      return d.privateRex || d.selectedCircleIds.size > 0;
     case 'confirm':
       return true;
   }
@@ -97,6 +98,8 @@ export function useCreateRecWizard() {
   const [scoreValueForMoney, setScoreValueForMoney] = useState<number | null>(null);
   const [scoreReview, setScoreReview] = useState('');
   const [selectedCircleIds, setSelectedCircleIds] = useState<Set<string>>(() => new Set());
+  const [publicCircleId, setPublicCircleId] = useState<string | null>(null);
+  const [privateRex, setPrivateRex] = useState(false);
   const [categoryHasSubcategoryStep, setCategoryHasSubcategoryStep] = useState(false);
 
   const syncCategoryCreateShape = useCallback((config: CategoryCreateConfig | null) => {
@@ -155,6 +158,7 @@ export function useCreateRecWizard() {
         selectedSearchPlace,
         selectedCategoryId,
         selectedCircleIds,
+        privateRex,
         selectedSubcategoryCode,
         photoStoragePaths,
       }),
@@ -165,6 +169,7 @@ export function useCreateRecWizard() {
       selectedSearchPlace,
       selectedCategoryId,
       selectedCircleIds,
+      privateRex,
       selectedSubcategoryCode,
       photoStoragePaths,
     ],
@@ -280,12 +285,15 @@ export function useCreateRecWizard() {
     setScoreValueForMoney(null);
     setScoreReview('');
     setSelectedCircleIds(new Set());
+    setPublicCircleId(null);
+    setPrivateRex(false);
     setCategoryHasSubcategoryStep(false);
   }, []);
 
   const ensureDefaultCircleSelectionFromApiOrder = useCallback((rows: CreateRecCircle[]) => {
     if (!rows.length) return;
     const outerId = rows[rows.length - 1]!.id;
+    setPublicCircleId(outerId);
     setSelectedCircleIds((prev) => {
       if (prev.has('public')) {
         const next = new Set(prev);
@@ -308,13 +316,26 @@ export function useCreateRecWizard() {
     [reset],
   );
 
-  const toggleCircleId = useCallback((id: string) => {
-    setSelectedCircleIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  const toggleCircleId = useCallback(
+    (id: string) => {
+      setSelectedCircleIds((prev) => {
+        if (id === 'public' || id === publicCircleId) {
+          return prev.has(id) ? new Set() : new Set([id]);
+        }
+        const next = new Set(prev);
+        next.delete('public');
+        if (publicCircleId) next.delete(publicCircleId);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    },
+    [publicCircleId],
+  );
+
+  const setPrivateRexSelection = useCallback((selected: boolean) => {
+    setPrivateRex(selected);
+    if (selected) setSelectedCircleIds(new Set());
   }, []);
 
   const setScoreReviewClamped = useCallback((text: string) => {
@@ -395,6 +416,9 @@ export function useCreateRecWizard() {
     scoreReview,
     setScoreReview: setScoreReviewClamped,
     selectedCircleIds,
+    publicCircleId,
+    privateRex,
+    setPrivateRex: setPrivateRexSelection,
     toggleCircleId,
     ensureDefaultCircleSelectionFromApiOrder,
     syncCategoryCreateShape,

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   View,
@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   ScrollView,
   useWindowDimensions,
-  ActivityIndicator,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { TrendingUp, Star, PlusCircle, ChevronDown, ChevronUp } from 'lucide-react-native';
@@ -99,11 +100,13 @@ const DiscoverView = ({
   const onOpenRec = onRecommendationPress ?? onTapRec;
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const listRef = useRef<FlatList<Recommendation>>(null);
   const { pinnedCategoryIds, togglePin, isTogglingPin } = usePinnedCategoryIds();
 
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [saveTarget, setSaveTarget] = useState<RecSummary | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const handleSavePress = useCallback(
     (rec: Recommendation) => {
@@ -182,6 +185,15 @@ const DiscoverView = ({
   }, [hasSearch, searchRows, discoverData]);
 
   const isLoading = hasSearch ? searchLoading : discoverLoading;
+
+  const handleDiscoverScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const shouldShow = event.nativeEvent.contentOffset.y > 600;
+    setShowScrollTop((visible) => (visible === shouldShow ? visible : shouldShow));
+  }, []);
+
+  const scrollToTop = useCallback(() => {
+    listRef.current?.scrollToOffset({ offset: 0, animated: true });
+  }, []);
 
   const ListHeader = (
     <View className="px-4 pt-6 pb-2">
@@ -450,14 +462,18 @@ const DiscoverView = ({
                   return (
                     <TouchableOpacity
                       key={cat.id}
-                      onPress={() => setActiveCategory(cat.code === activeCategory ? 'all' : cat.code)}
+                      onPress={() =>
+                        setActiveCategory(cat.code === activeCategory ? 'all' : cat.code)
+                      }
                       activeOpacity={0.8}
                       className={`flex-row items-center gap-1.5 px-3 py-2 rounded-xl border ${
                         isActive ? 'border-primary/40 bg-primary/10' : 'bg-card border-border'
                       }`}
                     >
                       <Text style={{ fontSize: 16 }}>{cat.emoji}</Text>
-                      <Text className={`text-[10px] font-semibold whitespace-nowrap ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>
+                      <Text
+                        className={`text-[10px] font-semibold whitespace-nowrap ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}
+                      >
                         {cat.label}
                       </Text>
                     </TouchableOpacity>
@@ -487,9 +503,7 @@ const DiscoverView = ({
       </Text>
 
       {isLoading && (
-        <View
-          style={isWeb ? { maxWidth: 680, width: '100%', alignSelf: 'center' } : undefined}
-        >
+        <View style={isWeb ? { maxWidth: 680, width: '100%', alignSelf: 'center' } : undefined}>
           {[1, 2].map((i) => (
             <RecommendationCardSkeleton key={i} />
           ))}
@@ -501,9 +515,12 @@ const DiscoverView = ({
   return (
     <View className="flex-1">
       <FlatList
+        ref={listRef}
         data={isLoading ? [] : filtered}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
+        onScroll={handleDiscoverScroll}
+        scrollEventThrottle={16}
         contentContainerStyle={webContainerStyle}
         contentContainerClassName="pb-24"
         ListHeaderComponent={ListHeader}
@@ -535,14 +552,22 @@ const DiscoverView = ({
             className="px-4 mb-4"
             style={isWeb ? { maxWidth: 680, width: '100%', alignSelf: 'center' } : undefined}
           >
-            <RecommendationCard
-              recommendation={item}
-              onTap={onOpenRec}
-              onSave={handleSavePress}
-            />
+            <RecommendationCard recommendation={item} onTap={onOpenRec} onSave={handleSavePress} />
           </View>
         )}
       />
+
+      {showScrollTop && (
+        <TouchableOpacity
+          onPress={scrollToTop}
+          activeOpacity={0.85}
+          accessibilityRole="button"
+          accessibilityLabel="Scroll to top"
+          className="absolute bottom-[102px] right-[26px] h-14 w-14 items-center justify-center rounded-full border border-primary/30 bg-primary/55"
+        >
+          <ChevronUp size={26} color={Theme.colors.foreground} />
+        </TouchableOpacity>
+      )}
 
       <AddToCollectionSheet
         open={!!saveTarget}

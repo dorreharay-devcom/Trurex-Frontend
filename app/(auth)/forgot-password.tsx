@@ -17,6 +17,7 @@ export default function ForgotPasswordScreen() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string>();
+  const resetDisabled = loading || !email;
 
   const handleReset = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -85,13 +86,15 @@ export default function ForgotPasswordScreen() {
               error={error}
             />
 
-            <Button
-              title="Send reset link"
-              onPress={handleReset}
-              loading={loading}
-              disabled={loading || !email}
-              className="w-full"
-            />
+            <View className={resetDisabled ? 'w-full cursor-not-allowed' : 'w-full'}>
+              <Button
+                title="Send reset link"
+                onPress={handleReset}
+                loading={loading}
+                disabled={resetDisabled}
+                className="w-full"
+              />
+            </View>
           </View>
 
           <Button

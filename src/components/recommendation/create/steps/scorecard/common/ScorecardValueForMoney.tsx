@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { Platform, View, Text, Pressable } from 'react-native';
 import { cn } from '~/utils/general';
 
 const VALUE_LABELS_RIP_OFF = [
@@ -28,7 +28,7 @@ export function ScorecardValueForMoney({ value, onChange, useRipOffLabels }: Pro
   const labels = useRipOffLabels ? VALUE_LABELS_RIP_OFF : VALUE_LABELS_DEFAULT;
 
   return (
-    <View className="space-y-3">
+    <View className="gap-3" style={Platform.OS === 'web' ? undefined : { marginBottom: 8 }}>
       <View className="flex-row items-center justify-between gap-2">
         <Text className="text-xs font-medium uppercase tracking-wider text-black">
           Value for money

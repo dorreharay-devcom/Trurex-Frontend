@@ -2,6 +2,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { Backend } from '~/services/AuthService';
 import { generateRexImageStoragePath } from './photoUtils';
 import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
+import { convertHeicIfNeeded } from './heicConversion';
 
 export async function resizeForUpload(uri: string, maxWidth = 1200): Promise<string> {
   const result = await ImageManipulator.manipulateAsync(uri, [{ resize: { width: maxWidth } }], {
@@ -14,6 +15,38 @@ export async function resizeForUpload(uri: string, maxWidth = 1200): Promise<str
 export async function fetchUriAsBlob(uri: string): Promise<Blob> {
   const response = await fetch(uri);
   return response.blob();
+}
+
+export async function preparePickerImageForUpload(
+  imageUri: string,
+  fileName?: string | null,
+  maxWidth = 1200,
+): Promise<{ blob: Blob; fileName?: string | null }> {
+  const image = await convertHeicIfNeeded({ uri: imageUri, fileName });
+
+  try {
+    const resizedUri = await resizeForUpload(image.uri, maxWidth);
+    const blob = await fetchUriAsBlob(resizedUri);
+
+    return {
+      blob,
+      fileName: image.fileName ?? fileName,
+    };
+  } finally {
+    image.dispose?.();
+  }
+}
+
+export async function preparePickerImageUriForUpload(
+  imageUri: string,
+  fileName?: string | null,
+): Promise<{ uri: string; dispose?: () => void }> {
+  const image = await convertHeicIfNeeded({ uri: imageUri, fileName });
+
+  return {
+    uri: image.uri,
+    dispose: image.dispose,
+  };
 }
 
 export async function uploadBlobToStorageBucket(
@@ -37,9 +70,9 @@ export async function uploadLocalPickerImage(
   maxWidth = 1200,
 ): Promise<string> {
   const name = fileNameHint ?? `photo-${Date.now()}.jpg`;
-  const storagePath = generateRexImageStoragePath(userId, name);
-  const resizedUri = await resizeForUpload(imageUri, maxWidth);
-  const blob = await fetchUriAsBlob(resizedUri);
+  const prepared = await preparePickerImageForUpload(imageUri, name, maxWidth);
+  const storagePath = generateRexImageStoragePath(userId, prepared.fileName ?? name);
+  const blob = prepared.blob;
   await uploadBlobToStorageBucket(bucket, storagePath, blob);
   return storagePath;
 }

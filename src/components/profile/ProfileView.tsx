@@ -37,6 +37,7 @@ import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
 import { useQueryClient } from '@tanstack/react-query';
+import { preparePickerImageUriForUpload } from '~/utils/photos/storageUpload';
 
 enum ProfileTab {
   Recs = 'recs',
@@ -250,7 +251,15 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
     if (!authUser?.id) return;
     try {
       setAvatarUploading(true);
-      await ProfileApi.uploadAvatar(authUser.id, result.assets[0].uri);
+      const prepared = await preparePickerImageUriForUpload(
+        result.assets[0].uri,
+        result.assets[0].fileName,
+      );
+      try {
+        await ProfileApi.uploadAvatar(authUser.id, prepared.uri);
+      } finally {
+        prepared.dispose?.();
+      }
       await fetchProfile();
       onAvatarUpdated?.();
     } catch {

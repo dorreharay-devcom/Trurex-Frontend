@@ -146,10 +146,26 @@ export function subcategoryQuestionsOnly(
 
 export function resolveCreateRexCircleIds(
   selectedCircleIds: Set<string>,
+  publicCircleId?: string | null,
 ): CreateRexRpcParams['circle_ids'] {
-  const ids = [...selectedCircleIds].filter((id) => id !== 'public');
+  const ids = [...selectedCircleIds].filter((id) => id !== 'public' && id !== publicCircleId);
   const uuids = ids.filter(isStrictUuid);
   return uuids.length > 0 ? uuids : null;
+}
+
+export function resolveCreateRexVisibility(
+  selectedCircleIds: Set<string>,
+  privateSelected: boolean,
+  publicCircleId?: string | null,
+): NonNullable<CreateRexRpcParams['p_visibility']> {
+  if (privateSelected) return 'private';
+  if (
+    selectedCircleIds.has('public') ||
+    (publicCircleId != null && selectedCircleIds.has(publicCircleId))
+  ) {
+    return 'public';
+  }
+  return 'circles';
 }
 
 export function getPlaceNameForRex(
@@ -176,8 +192,13 @@ export function buildCategoryRatingsPayload(
   );
 }
 
-export function hasNonPublicMockCircleSelection(selectedCircleIds: Set<string>): boolean {
-  return [...selectedCircleIds].some((id) => id !== 'public' && !isStrictUuid(id));
+export function hasNonPublicMockCircleSelection(
+  selectedCircleIds: Set<string>,
+  publicCircleId?: string | null,
+): boolean {
+  return [...selectedCircleIds].some(
+    (id) => id !== 'public' && id !== publicCircleId && !isStrictUuid(id),
+  );
 }
 
 export type AddYourOwnRecSource = {

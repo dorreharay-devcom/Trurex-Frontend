@@ -22,13 +22,12 @@ import { useUpdateCollection } from '~/hooks/useCollections';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { toastError } from '~/utils/appToast';
 import {
-  fetchUriAsBlob,
+  preparePickerImageForUpload,
   uploadBlobToStorageBucket,
-  resizeForUpload,
 } from '~/utils/photos/storageUpload';
 import { generateRexImageStoragePath } from '~/utils/photos/photoUtils';
 import { isWeb, webContainerStyle } from '~/utils';
-import { Theme } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import { cn } from '~/utils/general';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
@@ -141,10 +140,9 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
     setUploading(true);
     try {
       const fileName = asset.fileName ?? `cover-${Date.now()}.jpg`;
-      const storagePath = generateRexImageStoragePath(user.id, fileName);
-      const resized = await resizeForUpload(asset.uri, 800);
-      const blob = await fetchUriAsBlob(resized);
-      await uploadBlobToStorageBucket(REX_IMAGES_BUCKET, storagePath, blob);
+      const prepared = await preparePickerImageForUpload(asset.uri, fileName, 800);
+      const storagePath = generateRexImageStoragePath(user.id, prepared.fileName ?? fileName);
+      await uploadBlobToStorageBucket(REX_IMAGES_BUCKET, storagePath, prepared.blob);
       setNewCoverStoragePath(storagePath);
     } catch (e: any) {
       toastError('Upload failed', e?.message);
@@ -271,7 +269,7 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
                     onChangeText={(v) => setName(v.slice(0, 60))}
                     placeholder="Collection name"
                     placeholderTextColor={Theme.colors.secondaryText}
-                    style={collectionFieldBg}
+                    style={[collectionFieldBg, textFieldCaretStyle]}
                     className="w-full px-3 py-2.5 rounded-xl border border-border text-sm text-foreground"
                   />
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">
@@ -327,7 +325,7 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
                     multiline
                     numberOfLines={2}
                     textAlignVertical="top"
-                    style={collectionFieldBg}
+                    style={[collectionFieldBg, textFieldCaretStyle]}
                     className="w-full px-3 py-2.5 rounded-xl border border-border text-sm text-foreground"
                   />
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">

@@ -1,17 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import {
-  View,
-  TextInput,
-  Pressable,
-  Text,
-  ScrollView,
-  Platform,
-  StyleSheet,
-} from 'react-native';
+import { View, TextInput, Pressable, Text, ScrollView, Platform, StyleSheet } from 'react-native';
 import { Search, X } from 'lucide-react-native';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { MAP_ACTION_INSET } from '~/constants/map/mapUi';
-import { Theme } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
 import { MAP_SEARCH_SUGGEST_MIN_QUERY_LENGTH } from '~/utils/map/mapSearchSuggestions';
 import { MapSearchRow } from '~/components/map/MapSearchRow';
 
@@ -67,10 +59,7 @@ export function MapSearchBar({
 
   const trimmedLen = value.trim().length;
   const showSuggestions = useMemo(
-    () =>
-      focused &&
-      trimmedLen >= MAP_SEARCH_SUGGEST_MIN_QUERY_LENGTH &&
-      suggestions.length > 0,
+    () => focused && trimmedLen >= MAP_SEARCH_SUGGEST_MIN_QUERY_LENGTH && suggestions.length > 0,
     [focused, trimmedLen, suggestions.length],
   );
 
@@ -90,7 +79,7 @@ export function MapSearchBar({
       <MapSearchRow
         field={
           <View className="relative w-full">
-            <View className="pointer-events-none absolute left-3.5 top-1/2 z-[1] -mt-2">
+            <View pointerEvents="none" className="absolute left-3.5 top-1/2 z-[1] -mt-2">
               <Search size={16} color={Theme.colors.secondaryText} />
             </View>
             <TextInput
@@ -102,6 +91,10 @@ export function MapSearchBar({
               placeholder="Search rex by name…"
               placeholderTextColor={Theme.colors.secondaryText}
               className="rounded-2xl border border-border bg-card/95 py-3 pl-10 pr-10 text-sm text-foreground shadow-md"
+              style={[textFieldCaretStyle, textFieldSingleLineStyle]}
+              multiline={false}
+              numberOfLines={1}
+              scrollEnabled={false}
               accessibilityLabel="Search recommendations by name"
             />
             {value.length > 0 ? (

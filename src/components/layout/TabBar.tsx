@@ -58,6 +58,7 @@ export const TabBar: React.FC<TabBarProps> = ({ currentTab, onTabChange }) => {
       <View className="flex-row">
         {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
           const active = currentTab === id;
+          const color = active ? Theme.colors.accentForeground : Theme.colors.muted;
           return (
             <TouchableOpacity
               key={id}
@@ -65,8 +66,11 @@ export const TabBar: React.FC<TabBarProps> = ({ currentTab, onTabChange }) => {
               activeOpacity={0.7}
               className="flex-1 items-center justify-center pt-2 pb-2 gap-1"
             >
-              <Icon size={20} color={active ? Theme.colors.primary : Theme.colors.muted} />
-              <Text className={`text-[10px] font-semibold ${active ? 'text-primary' : 'text-muted-foreground'}`}>
+              <Icon size={20} color={color} />
+              <Text
+                className="text-[10px] font-semibold"
+                style={{ color: active ? Theme.colors.accentForeground : Theme.colors.secondaryText }}
+              >
                 {label}
               </Text>
             </TouchableOpacity>

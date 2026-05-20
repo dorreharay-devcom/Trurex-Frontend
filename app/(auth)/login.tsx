@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
-import { useRouter, Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { AuthApi } from '~/api/AuthApi';
 import { Routes } from '~/constants/routes';
-import { Button, ButtonVariant } from '~/components/common/Button';
+import { Button } from '~/components/common/Button';
 import AuthLayout from '~/components/common/AuthLayout';
 import Input from '~/components/common/Input';
 import { OAuthSocialButtons } from '~/components/auth/OAuthSocialButtons';
@@ -79,14 +79,16 @@ export default function LoginScreen() {
         <Input
           label="Password"
           labelRight={
-            <Link href={Routes.ForgotPassword} asChild>
-              <Button
-                variant={ButtonVariant.Link}
-                onPress={() => {}}
-                title="Forgot password?"
-                textClassName="text-xs text-muted-foreground hover:underline"
-              />
-            </Link>
+            <TouchableOpacity
+              onPress={() => router.push(Routes.ForgotPassword)}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Forgot password"
+            >
+              <Text className="text-xs font-medium text-muted-foreground hover:underline">
+                Forgot password?
+              </Text>
+            </TouchableOpacity>
           }
           value={password}
           onChangeText={(v) => {
@@ -112,11 +114,14 @@ export default function LoginScreen() {
 
       <View className="flex-row items-center justify-center">
         <Text className="text-sm text-muted-foreground mr-1">Don't have an account?</Text>
-        <Link href={Routes.Signup} asChild>
-          <TouchableOpacity>
-            <Text className="text-sm text-foreground font-medium hover:underline">Sign up</Text>
-          </TouchableOpacity>
-        </Link>
+        <TouchableOpacity
+          onPress={() => router.push(Routes.Signup)}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel="Sign up"
+        >
+          <Text className="text-sm text-foreground font-medium">Sign up</Text>
+        </TouchableOpacity>
       </View>
     </AuthLayout>
   );

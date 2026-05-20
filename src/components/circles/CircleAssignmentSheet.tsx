@@ -20,7 +20,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { CircleApiRow } from '~/api/circlesApi';
 import { addCircleMember, createCircle } from '~/api/circlesApi';
 import { CircleGlyphIcon } from '~/components/circles/common/CircleGlyphIcon';
-import { Theme } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import { isWeb } from '~/utils';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
@@ -230,7 +230,7 @@ export function CircleAssignmentSheet({
                     style={{ maxHeight: Platform.OS === 'web' ? 360 : 320 }}
                     contentContainerStyle={{ paddingBottom: 12 }}
                     keyboardShouldPersistTaps="handled"
-                    showsVerticalScrollIndicator
+                    showsVerticalScrollIndicator={false}
                     scrollEventThrottle={16}
                     onLayout={onScrollViewportLayout}
                     onScroll={onScrollList}
@@ -310,7 +310,7 @@ export function CircleAssignmentSheet({
                             value={newName}
                             onChangeText={setNewName}
                             maxLength={40}
-                            style={collectionFieldBg}
+                            style={[collectionFieldBg, textFieldCaretStyle]}
                             className="rounded-xl border border-border px-3 py-3 text-sm text-foreground"
                           />
                           <TextInput
@@ -320,7 +320,7 @@ export function CircleAssignmentSheet({
                             onChangeText={setNewDesc}
                             maxLength={100}
                             multiline
-                            style={collectionFieldBg}
+                            style={[collectionFieldBg, textFieldCaretStyle]}
                             className="min-h-[44px] rounded-xl border border-border px-3 py-3 text-sm text-foreground"
                           />
                           <Text className="text-xs text-muted-foreground">Color</Text>

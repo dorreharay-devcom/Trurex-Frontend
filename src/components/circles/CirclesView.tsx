@@ -27,7 +27,7 @@ import {
   useScopedConnectionUserSearch,
   type ConnectionScopeTab,
 } from '~/hooks/circles/useScopedConnectionUserSearch';
-import { Theme } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
 import { connectionScopeTabStyle } from '~/utils/circleTabUtils';
 import { cn } from '~/utils/general';
 import { webContainerStyle } from '~/utils';
@@ -129,6 +129,7 @@ function CirclesListContent({
               onChangeText={vm.setNewName}
               maxLength={40}
               className="mb-3 rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground"
+              style={textFieldCaretStyle}
             />
             <TextInput
               placeholder="Description (optional)"
@@ -138,6 +139,7 @@ function CirclesListContent({
               maxLength={100}
               multiline
               className="mb-3 min-h-[44px] rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground"
+              style={textFieldCaretStyle}
             />
             <Text className="mb-2 text-xs text-muted-foreground">Color</Text>
             <View className="mb-4 flex-row flex-wrap gap-2">
@@ -257,7 +259,10 @@ function CirclesListContent({
             </View>
 
             <View className="relative mb-4 w-full max-w-md self-start">
-              <View className="pointer-events-none absolute left-3 top-0 bottom-0 z-10 justify-center">
+              <View
+                pointerEvents="none"
+                className="absolute left-3 top-0 bottom-0 z-10 justify-center"
+              >
                 <Search size={16} color={Theme.colors.muted} />
               </View>
               <TextInput
@@ -266,6 +271,10 @@ function CirclesListContent({
                 placeholder={connSearch.placeholder}
                 placeholderTextColor={Theme.colors.muted}
                 className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground"
+                style={[textFieldCaretStyle, textFieldSingleLineStyle]}
+                multiline={false}
+                numberOfLines={1}
+                scrollEnabled={false}
               />
             </View>
 

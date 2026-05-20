@@ -4,7 +4,7 @@ import { MapPin } from 'lucide-react-native';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { CreateStepTitle } from '../../../CreateStepTitle';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
-import { Theme, textFieldCaretStyle } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
 import { cn } from '~/utils/general';
 import { webNoOutline } from './webInputOutline';
 
@@ -53,9 +53,12 @@ export function SearchManualPanel({
           placeholderTextColor={Theme.colors.secondaryText}
           editable={!tagLocationLoading}
           className={`w-full rounded-[12px] border border-border bg-muted/50 px-4 py-3.5 text-base text-foreground ${INPUT_FOCUS_RING_CLASS}`}
-          style={[webNoOutline, textFieldCaretStyle]}
+          style={[webNoOutline, textFieldCaretStyle, textFieldSingleLineStyle]}
           autoCorrect
           autoCapitalize="words"
+          multiline={false}
+          numberOfLines={1}
+          scrollEnabled={false}
           underlineColorAndroid="transparent"
           selectionColor={Theme.colors.foreground}
         />
@@ -67,9 +70,12 @@ export function SearchManualPanel({
           placeholderTextColor={Theme.colors.secondaryText}
           editable={!tagLocationLoading}
           className={`w-full rounded-[12px] border border-border bg-muted/50 px-4 py-3.5 text-base text-foreground ${INPUT_FOCUS_RING_CLASS}`}
-          style={[webNoOutline, textFieldCaretStyle]}
+          style={[webNoOutline, textFieldCaretStyle, textFieldSingleLineStyle]}
           autoCorrect
           autoCapitalize="sentences"
+          multiline={false}
+          numberOfLines={1}
+          scrollEnabled={false}
           underlineColorAndroid="transparent"
           selectionColor={Theme.colors.foreground}
         />

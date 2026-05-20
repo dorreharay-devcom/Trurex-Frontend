@@ -36,6 +36,8 @@ type Props = {
   onRetry: () => void;
   selectedIds: Set<string>;
   onToggle: (id: string) => void;
+  privateSelected: boolean;
+  onPrivateSelectedChange: (selected: boolean) => void;
   showSensitiveNudge?: boolean;
 };
 
@@ -46,6 +48,8 @@ export const Circles: React.FC<Props> = ({
   onRetry,
   selectedIds,
   onToggle,
+  privateSelected,
+  onPrivateSelectedChange,
   showSensitiveNudge = false,
 }) => {
   const queryClient = useQueryClient();
@@ -184,6 +188,30 @@ export const Circles: React.FC<Props> = ({
             </View>
           ) : null}
 
+          <Pressable
+            onPress={() => onPrivateSelectedChange(!privateSelected)}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: privateSelected }}
+            className="mx-auto flex-row items-center gap-2 active:opacity-90"
+          >
+            <View
+              className={cn(
+                'h-5 w-5 items-center justify-center rounded-md border',
+                privateSelected ? 'border-primary bg-primary' : 'border-primary bg-card',
+              )}
+            >
+              {privateSelected ? <Check size={13} color={Theme.colors.primaryForeground} /> : null}
+            </View>
+            <Text
+              className={cn(
+                'text-sm font-semibold',
+                privateSelected ? 'text-foreground' : 'text-muted-foreground',
+              )}
+            >
+              Make this rex private
+            </Text>
+          </Pressable>
+
           {loadError ? (
             <View className="items-center gap-3 py-4">
               <Text className="text-center text-sm text-destructive">
@@ -211,18 +239,26 @@ export const Circles: React.FC<Props> = ({
               <CirclesRingPicker
                 publicCircle={publicCircle}
                 ringsInnerToBroader={ringsInnerToBroader}
-                selectedIds={selectedIds}
+                selectedIds={privateSelected ? new Set() : selectedIds}
                 onToggle={onToggle}
                 highlightId={highlightId}
                 onHighlightId={setHighlightId}
                 editingId={editingId}
+                disabled={privateSelected}
               />
 
               <Text className="text-center text-sm font-medium text-foreground">
-                {selectedIds.size} circle{selectedIds.size === 1 ? '' : 's'} selected
+                {privateSelected
+                  ? 'Private Rex selected'
+                  : `${selectedIds.size} circle${selectedIds.size === 1 ? '' : 's'} selected`}
               </Text>
 
-              {displayCircle != null ? (
+              {privateSelected ? (
+                <View className="items-center gap-0.5">
+                  <Text className="text-base font-semibold text-foreground">Private</Text>
+                  <Text className="text-xs text-muted-foreground">Only you can see this Rex</Text>
+                </View>
+              ) : displayCircle != null ? (
                 <View className="items-center gap-0.5">
                   <Text className="text-base font-semibold" style={{ color: displayCircle.accent }}>
                     {displayCircle.title}
@@ -272,7 +308,7 @@ export const Circles: React.FC<Props> = ({
                 {editingId == null && !showCreateModal ? (
                   <Pressable
                     onPress={handleAddCircle}
-                    disabled={busy || loadError}
+                    disabled={busy || loadError || privateSelected}
                     accessibilityRole="button"
                     className="flex-row items-center gap-1.5 rounded-full border border-border px-3 py-1.5 active:bg-muted/40 disabled:opacity-50"
                   >
@@ -280,7 +316,7 @@ export const Circles: React.FC<Props> = ({
                     <Text className="text-xs font-medium text-foreground">Add circle</Text>
                   </Pressable>
                 ) : null}
-                {showRenameControl && displayCircle != null ? (
+                {showRenameControl && displayCircle != null && !privateSelected ? (
                   <Pressable
                     onPress={() => {
                       setEditingId(displayCircle.id);

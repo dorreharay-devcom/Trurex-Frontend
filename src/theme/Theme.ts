@@ -1,4 +1,4 @@
-import type { TextStyle } from 'react-native';
+import { Platform, type TextStyle } from 'react-native';
 
 export const FontFamily = {
   light: 'HankenGrotesk-Light',
@@ -47,7 +47,17 @@ export const Colors = {
 
 export const textFieldCaretStyle = {
   caretColor: Colors.foreground,
+  ...(Platform.OS === 'web' ? null : { lineHeight: 20 }),
 } as TextStyle;
+
+export const textFieldSingleLineStyle =
+  Platform.OS === 'web'
+    ? ({
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      } as TextStyle)
+    : ({ overflow: 'hidden' } as TextStyle);
 
 export const Size = {
   icon: {

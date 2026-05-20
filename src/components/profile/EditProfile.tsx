@@ -13,11 +13,14 @@ import { ArrowLeft, Camera, X } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '~/services/AuthContext';
 import { ProfileApi } from '~/api/ProfileApi';
-import { Theme } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import { Button } from '~/components/common/Button';
 import Input from '~/components/common/Input';
+import { SignedStorageImage } from '~/components/common/SignedStorageImage';
+import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
 import { toastError } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { preparePickerImageUriForUpload } from '~/utils/photos/storageUpload';
 
 interface EditProfileProps {
   onClose: () => void;
@@ -28,6 +31,11 @@ interface CurrentlyData {
   listening?: string;
   reading?: string;
 }
+
+type PendingAvatar = {
+  uri: string;
+  dispose?: () => void;
+};
 
 const currentlyFields = [
   { key: 'binging' as const, emoji: '🎬', label: 'Binging' },
@@ -49,6 +57,8 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
   const [location, setLocation] = useState('');
   const [currently, setCurrently] = useState<CurrentlyData>({});
   const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(null);
+  const [pendingAvatar, setPendingAvatar] = useState<PendingAvatar | null>(null);
+  const [avatarRemoved, setAvatarRemoved] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -62,6 +72,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
         setBio(data.bio || '');
         setLocation(data.location || '');
         setCurrentAvatarUrl(data.avatar_url);
+        setAvatarRemoved(false);
         setCurrently({
           binging: data.currently_binging || '',
           listening: data.currently_listening_to || '',
@@ -71,6 +82,10 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
       .catch((e) => console.error('[EditProfile] Initial load failed:', e))
       .finally(() => setLoading(false));
   }, [user]);
+
+  useEffect(() => {
+    return () => pendingAvatar?.dispose?.();
+  }, [pendingAvatar]);
 
   const handleAvatarPick = async () => {
     const { granted } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -88,8 +103,12 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
 
     setUploading(true);
     try {
-      const publicUrl = await ProfileApi.uploadAvatar(user.id, result.assets[0].uri);
-      setCurrentAvatarUrl(publicUrl);
+      const prepared = await preparePickerImageUriForUpload(
+        result.assets[0].uri,
+        result.assets[0].fileName,
+      );
+      setPendingAvatar(prepared);
+      setAvatarRemoved(false);
     } catch (e) {
       const error = e as Error;
       Alert.alert('Upload failed', error.message);
@@ -102,6 +121,17 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
     if (!user) return;
     setSaving(true);
     try {
+      if (pendingAvatar) {
+        const publicUrl = await ProfileApi.uploadAvatar(user.id, pendingAvatar.uri);
+        setCurrentAvatarUrl(publicUrl);
+        setPendingAvatar(null);
+        setAvatarRemoved(false);
+      } else if (avatarRemoved) {
+        await ProfileApi.updateAvatar('');
+        setCurrentAvatarUrl(null);
+        setAvatarRemoved(false);
+      }
+
       await ProfileApi.update(user.id, {
         display_name: displayName,
         handle: handle || null,
@@ -112,9 +142,9 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
         currently_reading: currently.reading || null,
       });
       onClose();
-    } catch (e: any) {
+    } catch (e) {
       if (didAccountFrozenMutationToast(e)) return;
-      const message = e?.message || 'Failed to save profile';
+      const message = e instanceof Error ? e.message : 'Failed to save profile';
       toastError(message);
     } finally {
       setSaving(false);
@@ -161,30 +191,55 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
       >
         {/* Avatar */}
         <View className="items-center gap-3">
-          <TouchableOpacity onPress={handleAvatarPick} activeOpacity={0.85} className="relative">
-            <View className="w-24 h-24 rounded-2xl overflow-hidden border-4 border-border bg-muted">
-              {currentAvatarUrl ? (
-                <Image
-                  source={{ uri: currentAvatarUrl }}
-                  className="w-full h-full"
-                  resizeMode="cover"
-                />
-              ) : (
-                <View className="flex-1 items-center justify-center">
-                  <Text className="text-3xl font-bold text-muted-foreground">
-                    {displayName?.charAt(0)?.toUpperCase() || '?'}
-                  </Text>
+          <View className="relative">
+            <TouchableOpacity onPress={handleAvatarPick} activeOpacity={0.85} className="relative">
+              <View className="w-24 h-24 rounded-2xl overflow-hidden border-4 border-border bg-muted">
+                {pendingAvatar ? (
+                  <Image
+                    source={{ uri: pendingAvatar.uri }}
+                    className="w-full h-full"
+                    resizeMode="cover"
+                  />
+                ) : currentAvatarUrl ? (
+                  <SignedStorageImage
+                    bucket={USER_AVATARS_BUCKET}
+                    storagePath={currentAvatarUrl}
+                    remoteUri={currentAvatarUrl}
+                    className="w-full h-full"
+                  />
+                ) : (
+                  <View className="flex-1 items-center justify-center">
+                    <Text className="text-3xl font-bold text-muted-foreground">
+                      {displayName?.charAt(0)?.toUpperCase() || '?'}
+                    </Text>
+                  </View>
+                )}
+              </View>
+              {(uploading || (!pendingAvatar && !currentAvatarUrl)) && (
+                <View className="absolute inset-0 rounded-2xl bg-muted/50 items-center justify-center">
+                  {uploading ? (
+                    <ActivityIndicator color={Theme.colors.card} size="small" />
+                  ) : (
+                    <Camera size={24} color={Theme.colors.card} />
+                  )}
                 </View>
               )}
-            </View>
-            <View className="absolute inset-0 rounded-2xl bg-foreground/40 items-center justify-center">
-              {uploading ? (
-                <ActivityIndicator color={Theme.colors.card} size="small" />
-              ) : (
-                <Camera size={24} color={Theme.colors.card} />
-              )}
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+            {(pendingAvatar || currentAvatarUrl) && !uploading && (
+              <TouchableOpacity
+                onPress={() => {
+                  setPendingAvatar(null);
+                  setCurrentAvatarUrl(null);
+                  setAvatarRemoved(true);
+                }}
+                activeOpacity={0.8}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                className="absolute -right-2 -top-2 h-7 w-7 items-center justify-center rounded-full bg-card border border-border shadow-card"
+              >
+                <X size={14} color={Theme.colors.foreground} />
+              </TouchableOpacity>
+            )}
+          </View>
           <Text className="text-xs text-muted-foreground">Tap to change photo</Text>
         </View>
 
@@ -213,6 +268,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
                 maxLength={30}
                 autoCapitalize="none"
                 className="flex-1 px-2 py-2.5 text-sm text-foreground"
+                style={textFieldCaretStyle}
               />
             </View>
           </View>
@@ -268,7 +324,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
                     placeholderTextColor={Theme.colors.muted}
                     maxLength={80}
                     className="text-sm text-foreground"
-                    style={{ padding: 0, height: 24 }}
+                    style={[textFieldCaretStyle, { padding: 0, height: 24 }]}
                   />
                 </View>
                 {!!currently[field.key] && (
