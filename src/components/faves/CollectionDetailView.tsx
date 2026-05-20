@@ -1,10 +1,38 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Modal, Pressable, StyleSheet, useWindowDimensions, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  Modal,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  TextInput,
+} from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { ArrowLeft, Plus, MoreVertical, Trash2, Pencil, Share2, BookmarkPlus, BookmarkMinus, MapPin, Star, DollarSign, X, StickyNote, Lock, Globe, Link2 } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  Plus,
+  MoreVertical,
+  Trash2,
+  Pencil,
+  Share2,
+  BookmarkPlus,
+  BookmarkMinus,
+  MapPin,
+  Star,
+  DollarSign,
+  X,
+  StickyNote,
+  Lock,
+  Globe,
+  Link2,
+} from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { webContainerStyle } from '~/utils';
-import { Theme } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import {
   useCollectionDetail,
   useRemoveRexFromCollection,
@@ -18,7 +46,10 @@ import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { toastSuccess } from '~/utils/appToast';
 import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
-import type { Recommendation, RecommendationOpenOptions } from '~/types/recommendation/recommendation';
+import type {
+  Recommendation,
+  RecommendationOpenOptions,
+} from '~/types/recommendation/recommendation';
 
 const VALUE_LABELS = ['Total Steal', 'Budget-Friendly', 'Good Value', 'Worth It', 'Splurge'];
 import type { CollectionRexEntry } from '~/api/CollectionsApi';
@@ -37,9 +68,10 @@ function entryToRec(entry: CollectionRexEntry): Recommendation {
     location: entry.location ?? undefined,
     rating: entry.rating ?? undefined,
     scoreValueForMoney: entry.score_value_for_money ?? undefined,
-    user: (entry.recommender_name || entry.recommender_handle)
-      ? { name: entry.recommender_name ?? '', handle: entry.recommender_handle ?? '', avatar: '' }
-      : null,
+    user:
+      entry.recommender_name || entry.recommender_handle
+        ? { name: entry.recommender_name ?? '', handle: entry.recommender_handle ?? '', avatar: '' }
+        : null,
     timeAgo: '',
     likes: 0,
     comments: 0,
@@ -127,19 +159,21 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
         <Text className="text-sm text-muted-foreground mt-1">{detail.description}</Text>
       )}
       <View className="flex-row items-center gap-3 mt-2">
-        {detail.visibility && (() => {
-          const cfg = detail.visibility === 'public'
-            ? { Icon: Globe, label: 'Public' }
-            : detail.visibility === 'shared'
-              ? { Icon: Link2, label: 'Shared' }
-              : { Icon: Lock, label: 'Private' };
-          return (
-            <View className="flex-row items-center gap-1">
-              <cfg.Icon size={12} color={Theme.colors.muted} />
-              <Text className="text-xs text-muted-foreground">{cfg.label}</Text>
-            </View>
-          );
-        })()}
+        {detail.visibility &&
+          (() => {
+            const cfg =
+              detail.visibility === 'public'
+                ? { Icon: Globe, label: 'Public' }
+                : detail.visibility === 'shared'
+                  ? { Icon: Link2, label: 'Shared' }
+                  : { Icon: Lock, label: 'Private' };
+            return (
+              <View className="flex-row items-center gap-1">
+                <cfg.Icon size={12} color={Theme.colors.muted} />
+                <Text className="text-xs text-muted-foreground">{cfg.label}</Text>
+              </View>
+            );
+          })()}
         <Text className="text-xs text-muted-foreground">
           {detail.rexes.length} rex{detail.rexes.length !== 1 ? 'es' : ''}
         </Text>
@@ -199,8 +233,12 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
         ListEmptyComponent={
           <View className="items-center py-12 gap-1 px-4">
             <Text className="text-3xl mb-1">📦</Text>
-            <Text className="text-base font-semibold text-foreground text-center">Your collection is ready</Text>
-            <Text className="text-sm text-muted-foreground text-center">Start adding recommendations.</Text>
+            <Text className="text-base font-semibold text-foreground text-center">
+              Your collection is ready
+            </Text>
+            <Text className="text-sm text-muted-foreground text-center">
+              Start adding recommendations.
+            </Text>
           </View>
         }
         renderItem={({ item }) => (
@@ -231,7 +269,11 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                       )}
                       {!!item.rating && (
                         <View className="flex-row items-center gap-0.5">
-                          <Star size={10} color={Theme.colors.ratingStar} fill={Theme.colors.ratingStar} />
+                          <Star
+                            size={10}
+                            color={Theme.colors.ratingStar}
+                            fill={Theme.colors.ratingStar}
+                          />
                           <Text className="text-[11px] text-muted-foreground">{item.rating}</Text>
                         </View>
                       )}
@@ -253,7 +295,10 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                 </Pressable>
                 <View className="flex-col items-center justify-center px-2 gap-2">
                   {detail.is_my_collection && (
-                    <Pressable onPress={() => openNoteEditor(item.rex_id, item.note)} className="p-1">
+                    <Pressable
+                      onPress={() => openNoteEditor(item.rex_id, item.note)}
+                      className="p-1"
+                    >
                       <StickyNote
                         size={15}
                         color={item.note ? Theme.colors.primary : Theme.colors.muted}
@@ -264,8 +309,17 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                   {detail.is_my_collection && (
                     <Pressable onPress={() => removeMutation.mutate(item.rex_id)} className="p-1">
                       {({ hovered, pressed }: { hovered?: boolean; pressed?: boolean }) => (
-                        <View className={`w-6 h-6 rounded-full items-center justify-center ${hovered || pressed ? 'bg-destructive/10' : ''}`}>
-                          <X size={12} color={hovered || pressed ? Theme.colors.destructive : Theme.colors.foreground} />
+                        <View
+                          className={`w-6 h-6 rounded-full items-center justify-center ${hovered || pressed ? 'bg-destructive/10' : ''}`}
+                        >
+                          <X
+                            size={12}
+                            color={
+                              hovered || pressed
+                                ? Theme.colors.destructive
+                                : Theme.colors.foreground
+                            }
+                          />
                         </View>
                       )}
                     </Pressable>
@@ -290,14 +344,21 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                     multiline
                     maxLength={140}
                     className="bg-muted/50 rounded-lg px-3 py-2 text-xs text-foreground min-h-[56px]"
+                    style={textFieldCaretStyle}
                   />
                   <View className="flex-row items-center justify-between mt-2">
                     <Text className="text-[10px] text-muted-foreground">{noteText.length}/140</Text>
                     <View className="flex-row gap-2">
-                      <TouchableOpacity onPress={closeNoteEditor} className="px-3 py-1.5 rounded-lg bg-muted">
+                      <TouchableOpacity
+                        onPress={closeNoteEditor}
+                        className="px-3 py-1.5 rounded-lg bg-muted"
+                      >
                         <Text className="text-xs text-muted-foreground">Cancel</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity onPress={() => saveNote(item.rex_id)} className="px-3 py-1.5 rounded-lg bg-primary">
+                      <TouchableOpacity
+                        onPress={() => saveNote(item.rex_id)}
+                        className="px-3 py-1.5 rounded-lg bg-primary"
+                      >
                         <Text className="text-xs font-medium text-primary-foreground">Save</Text>
                       </TouchableOpacity>
                     </View>
@@ -309,7 +370,12 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
         )}
       />
 
-      <Modal visible={showMenu} transparent animationType="fade" onRequestClose={() => setShowMenu(false)}>
+      <Modal
+        visible={showMenu}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowMenu(false)}
+      >
         <Pressable style={StyleSheet.absoluteFill} onPress={() => setShowMenu(false)} />
         <View
           style={{ position: 'absolute', top: menuPos.top, right: menuPos.right, minWidth: 200 }}

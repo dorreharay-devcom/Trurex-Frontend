@@ -18,6 +18,7 @@ export type RexCommentsSectionProps = {
   autoFocusComposer?: boolean;
   onUserPress?: (userId: string) => void;
   onReportComment?: (commentId: string) => void;
+  onComposerFocus?: () => void;
 };
 
 export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
@@ -27,6 +28,7 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
   autoFocusComposer,
   onUserPress,
   onReportComment,
+  onComposerFocus,
 }) => {
   const { user } = useAuth();
   const { comments, loading, addComment, deleteComment, toggleCommentLike } = useRexComments(rexId);
@@ -132,6 +134,7 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
           onSubmit={handlePost}
           replyToId={replyTo}
           onCancelReply={() => setReplyTo(null)}
+          onInputFocus={onComposerFocus}
         />
       ) : null}
     </View>

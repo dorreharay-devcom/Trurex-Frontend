@@ -38,18 +38,17 @@ export function DestructiveActionConfirmModal({
       }}
       accessibilityViewIsModal
     >
-      <>
+      <View className={`flex-1 ${isWeb ? 'items-center justify-center px-4' : 'justify-end'}`}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Dismiss"
           disabled={pending}
-          className={`flex-1 bg-black/50 ${isWeb ? 'items-center justify-center px-4' : 'justify-end'}`}
+          className="absolute bottom-0 left-0 right-0 top-0 bg-black/50"
           onPress={onCancel}
-        >
-        <Pressable
+        />
+        <View
           className={`border border-border bg-card pt-3 pb-8 ${isWeb ? 'w-full rounded-2xl' : 'rounded-t-2xl border-t-0'}`}
           style={isWeb ? { maxWidth: 400 } : undefined}
-          onPress={() => {}}
         >
           <View style={webContainerStyle} className="px-4">
             <View className={`mb-4 items-center ${isWeb ? 'hidden' : ''}`}>
@@ -89,10 +88,9 @@ export function DestructiveActionConfirmModal({
               </Pressable>
             </View>
           </View>
-        </Pressable>
-      </Pressable>
-      <ModalToastLayer />
-      </>
+        </View>
+        <ModalToastLayer />
+      </View>
     </Modal>
   );
 }

@@ -30,6 +30,7 @@ import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import { cn } from '~/utils/general';
 import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
+import { INPUT_FOCUS_BORDER_CLASS } from '~/constants/inputFocus';
 
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 
@@ -204,7 +205,10 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
         >
           <Animated.View style={{ transform: [{ translateY: sheetTranslateY }] }}>
             <View
-              style={{ maxHeight: height * 0.9 }}
+              style={{
+                maxHeight: height * 0.9,
+                ...(Platform.OS === 'web' ? null : { height: height * 0.82 }),
+              }}
               className={`bg-card ${isWeb ? 'rounded-2xl' : 'rounded-t-2xl'} border border-border shadow-elevated overflow-hidden`}
             >
               {/* sticky top-0 bg-card z-10 — Header */}
@@ -277,7 +281,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                     underlineColorAndroid="transparent"
                     selectionColor={Theme.colors.foreground}
                     style={[webNoOutline, textFieldCaretStyle, collectionFieldBg]}
-                    className="w-full rounded-xl border border-border px-4 py-3 text-sm text-foreground focus:outline-none focus:border-primary"
+                    className={`w-full rounded-xl border border-border px-4 py-3 text-sm text-foreground ${INPUT_FOCUS_BORDER_CLASS}`}
                   />
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">
                     {name.length}/60
@@ -300,7 +304,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                     underlineColorAndroid="transparent"
                     selectionColor={Theme.colors.foreground}
                     style={[webNoOutline, textFieldCaretStyle, collectionFieldBg]}
-                    className="flex min-h-[80px] w-full rounded-xl border border-border px-4 py-3 text-sm text-foreground focus:outline-none focus:border-primary"
+                    className={`flex min-h-[80px] w-full rounded-xl border border-border px-4 py-3 text-sm text-foreground ${INPUT_FOCUS_BORDER_CLASS}`}
                   />
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">
                     {description.length}/200
@@ -390,9 +394,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                 <View style={[{ padding: 16 }, webContainerStyle]}>
                   <View
                     className={cn('w-full', !canCreate && isWeb && 'cursor-not-allowed')}
-                    style={
-                      !canCreate && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined
-                    }
+                    style={!canCreate && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined}
                   >
                     <Pressable
                       onPress={() => {
@@ -402,9 +404,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                       disabled={!canCreate && Platform.OS !== 'web'}
                       accessibilityRole="button"
                       accessibilityState={{ disabled: !canCreate }}
-                      style={
-                        !canCreate && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined
-                      }
+                      style={!canCreate && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined}
                       className={cn(
                         'w-full items-center rounded-xl py-3',
                         canCreate

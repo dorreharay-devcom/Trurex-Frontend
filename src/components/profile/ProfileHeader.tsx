@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Share, Platform, ActivityIndicator } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Share2, Camera, LogOut } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import { toastSuccess } from '~/utils/appToast';
@@ -57,15 +56,8 @@ const ProfileHeader = ({
   };
 
   return (
-    <View className="overflow-hidden rounded-t-xl">
-      <LinearGradient
-        colors={[Theme.colors.secondary, Theme.colors.background]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={{ height: 112 }}
-      />
-
-      <View className="px-4 -mt-12">
+    <View className="overflow-hidden rounded-t-xl bg-card">
+      <View className="px-4 pt-5">
         {/* Avatar */}
         <View className="self-start">
           <TouchableOpacity
@@ -73,7 +65,7 @@ const ProfileHeader = ({
             activeOpacity={isOwnProfile ? 0.8 : 1}
             disabled={avatarUploading}
           >
-            <View className="w-24 h-24 rounded-2xl bg-muted overflow-hidden border-4 border-card">
+            <View className="w-24 h-24 rounded-2xl bg-muted overflow-hidden border-4 border-border">
               {profile.avatarUrl ? (
                 <SignedStorageImage
                   bucket={USER_AVATARS_BUCKET}
@@ -104,9 +96,7 @@ const ProfileHeader = ({
         {/* Name & info */}
         <View className="mt-3">
           <View className="flex-row items-center gap-2 flex-wrap">
-            <Text className="text-xl font-bold text-foreground">
-              {profile.displayName}
-            </Text>
+            <Text className="text-xl font-bold text-foreground">{profile.displayName}</Text>
             {profile.relationshipStatus && (
               <View
                 className="px-1.5 py-0.5 rounded-full"
@@ -203,7 +193,9 @@ const ProfileHeader = ({
                       color={isFollowing ? Theme.colors.foreground : Theme.colors.primaryForeground}
                     />
                   ) : (
-                    <Text className={`text-sm font-bold ${isFollowing && !isGuest ? 'text-foreground' : 'text-primary-foreground'}`}>
+                    <Text
+                      className={`text-sm font-bold ${isFollowing && !isGuest ? 'text-foreground' : 'text-primary-foreground'}`}
+                    >
                       {isGuest ? 'Follow' : isFollowing ? 'Following' : 'Follow'}
                     </Text>
                   )}

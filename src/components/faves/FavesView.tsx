@@ -13,13 +13,16 @@ import { Plus, PackageOpen, Search, MapPin, X, Calendar } from 'lucide-react-nat
 import { CollectionsApi } from '~/api/CollectionsApi';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
-import { rexCoverStoragePathFromRecommendation, rexCoverRemoteHttpUrl } from '~/utils/recommendation/recContentDisplay';
+import {
+  rexCoverStoragePathFromRecommendation,
+  rexCoverRemoteHttpUrl,
+} from '~/utils/recommendation/recContentDisplay';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMyCollections, useMySavedCollections } from '~/hooks/useCollections';
 import { useSavedRexes } from '~/hooks/useGems';
 import { useAuth } from '~/services/AuthContext';
 import { webContainerStyle, singleLineEllipsisTextStyle } from '~/utils';
-import { Theme } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
 import type {
   Recommendation,
   RecommendationOpenOptions,
@@ -122,7 +125,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
   const ListHeader = (
     <View className="px-4 pt-6">
       <View className="relative mb-4">
-        <View className="absolute left-3 top-0 bottom-0 justify-center z-10">
+        <View pointerEvents="none" className="absolute left-3 top-0 bottom-0 justify-center z-10">
           <Search size={16} color={Theme.colors.muted} />
         </View>
         <TextInput
@@ -131,6 +134,10 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
           placeholder="Search your saved gems..."
           placeholderTextColor={Theme.colors.muted}
           className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground"
+          style={[textFieldCaretStyle, textFieldSingleLineStyle]}
+          multiline={false}
+          numberOfLines={1}
+          scrollEnabled={false}
         />
       </View>
 
@@ -313,40 +320,48 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
                   <View className="flex-row items-center gap-0.5">
                     <Calendar size={10} color={Theme.colors.muted} />
                     <Text className="text-[10px] text-muted-foreground">
-                      {new Date(item.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {new Date(item.savedAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      })}
                     </Text>
                   </View>
                 ) : null}
-              <View className="flex-row items-center gap-2">
-                <TouchableOpacity
-                  onPress={() =>
-                    setAddToCollectionRec({
-                      id: item.id,
-                      place_name: item.title,
-                      category_code: item.categoryId,
-                      location: item.location,
-                      isSaved: item.isSaved,
-                    })
-                  }
-                  activeOpacity={0.7}
-                  className="flex-row items-center gap-1 px-2.5 py-1.5 rounded-lg border border-border"
-                >
-                  <Plus size={10} color={Theme.colors.foreground} />
-                  <Text className="text-[11px] font-medium text-foreground">Add</Text>
-                </TouchableOpacity>
-                <Pressable
-                  onPress={() => user && setConfirmRemoveUncollected(item)}
-                  className="p-0.5"
-                >
-                  {({ hovered, pressed }: { hovered?: boolean; pressed?: boolean }) => (
-                    <View className={`w-6 h-6 rounded-full items-center justify-center ${hovered || pressed ? 'bg-destructive/10' : ''}`}>
-                      <X size={12} color={hovered || pressed ? Theme.colors.destructive : Theme.colors.muted} />
-                    </View>
-                  )}
-                </Pressable>
+                <View className="flex-row items-center gap-2">
+                  <TouchableOpacity
+                    onPress={() =>
+                      setAddToCollectionRec({
+                        id: item.id,
+                        place_name: item.title,
+                        category_code: item.categoryId,
+                        location: item.location,
+                        isSaved: item.isSaved,
+                      })
+                    }
+                    activeOpacity={0.7}
+                    className="flex-row items-center gap-1 px-2.5 py-1.5 rounded-lg border border-border"
+                  >
+                    <Plus size={10} color={Theme.colors.foreground} />
+                    <Text className="text-[11px] font-medium text-foreground">Add</Text>
+                  </TouchableOpacity>
+                  <Pressable
+                    onPress={() => user && setConfirmRemoveUncollected(item)}
+                    className="p-0.5"
+                  >
+                    {({ hovered, pressed }: { hovered?: boolean; pressed?: boolean }) => (
+                      <View
+                        className={`w-6 h-6 rounded-full items-center justify-center ${hovered || pressed ? 'bg-destructive/10' : ''}`}
+                      >
+                        <X
+                          size={12}
+                          color={hovered || pressed ? Theme.colors.destructive : Theme.colors.muted}
+                        />
+                      </View>
+                    )}
+                  </Pressable>
+                </View>
               </View>
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
           </View>
         )}
         ListEmptyComponent={

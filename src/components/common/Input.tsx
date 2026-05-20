@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { Theme, textFieldCaretStyle } from '~/theme/Theme';
+import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 
 interface InputProps extends TextInputProps {
   label: string;
@@ -48,7 +49,7 @@ const Input = ({
           className={`flex-row items-center rounded-lg border bg-card ${error ? 'border-destructive' : 'border-border'} ${inputClassName ?? ''}`}
         >
           <TextInput
-            className="flex-1 px-3 py-2.5 text-sm text-foreground focus:outline-none"
+            className={`flex-1 px-3 py-2.5 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
             style={caretStyle}
             secureTextEntry={!showPassword}
             placeholderTextColor={Theme.colors.muted}

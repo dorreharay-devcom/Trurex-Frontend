@@ -15,7 +15,14 @@ import {
   Animated,
   Easing,
 } from 'react-native';
-import { Plus, Check, Image as ImageIcon, AlertCircle, Trash2, Bookmark } from 'lucide-react-native';
+import {
+  Plus,
+  Check,
+  Image as ImageIcon,
+  AlertCircle,
+  Trash2,
+  Bookmark,
+} from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { useQueryClient } from '@tanstack/react-query';
 import { CollectionsApi, UserCollection } from '~/api/CollectionsApi';
@@ -28,7 +35,7 @@ import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError'
 import { unknownErrorMessage } from '~/utils';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
-import { Theme } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
 
 const collectionFieldBg = { backgroundColor: Theme.colors.searchFieldBackground };
@@ -259,10 +266,16 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({
   };
 
   const handleDone = async () => {
-    if (!rec) { onClose(); return; }
+    if (!rec) {
+      onClose();
+      return;
+    }
     const toAdd = [...selected].filter((id) => !original.has(id));
     const toRemove = [...original].filter((id) => !selected.has(id));
-    if (toAdd.length === 0 && toRemove.length === 0) { onClose(); return; }
+    if (toAdd.length === 0 && toRemove.length === 0) {
+      onClose();
+      return;
+    }
 
     setSaving(true);
     try {
@@ -277,8 +290,12 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({
         }
       }
       await Promise.all([
-        ...toAdd.map((id) => CollectionsApi.addRexToCollection({ collection_id: id, rex_id: rec.id })),
-        ...toRemove.map((id) => CollectionsApi.removeRexFromCollection({ collection_id: id, rex_id: rec.id })),
+        ...toAdd.map((id) =>
+          CollectionsApi.addRexToCollection({ collection_id: id, rex_id: rec.id }),
+        ),
+        ...toRemove.map((id) =>
+          CollectionsApi.removeRexFromCollection({ collection_id: id, rex_id: rec.id }),
+        ),
       ]);
       queryClient.invalidateQueries({ queryKey: ['my-collections'] });
       queryClient.invalidateQueries({ queryKey: ['collection-detail'] });
@@ -406,7 +423,7 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({
                         returnKeyType="done"
                         onSubmitEditing={handleCreateAndAdd}
                         className="flex-1 rounded-lg border border-border px-3 py-2.5 text-sm text-foreground"
-                        style={collectionFieldBg}
+                        style={[collectionFieldBg, textFieldCaretStyle]}
                       />
                       <Pressable
                         onPress={() => {
@@ -443,7 +460,9 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({
                         className="w-full flex-row items-center justify-center gap-1.5 py-2.5 rounded-lg border border-border"
                       >
                         <Plus size={14} color={Theme.colors.foreground} />
-                        <Text className="text-sm font-medium text-foreground">Create new collection</Text>
+                        <Text className="text-sm font-medium text-foreground">
+                          Create new collection
+                        </Text>
                       </TouchableOpacity>
 
                       {isRexSaved ? null : (

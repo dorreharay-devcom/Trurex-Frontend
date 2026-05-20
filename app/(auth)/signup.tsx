@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, Alert } from 'react-native';
+import { View, Text, Image, Alert, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AuthApi } from '~/api/AuthApi';
 import { Routes } from '~/constants/routes';
@@ -126,12 +126,17 @@ export default function SignupScreen() {
         )}
       </View>
 
-      <Text className="text-sm text-center text-muted-foreground">
-        Already have an account?{' '}
-        <Text className="font-medium text-foreground" onPress={() => router.replace(Routes.Login)}>
-          Sign in
-        </Text>
-      </Text>
+      <View className="flex-row items-center justify-center">
+        <Text className="text-sm text-center text-muted-foreground">Already have an account? </Text>
+        <TouchableOpacity
+          onPress={() => router.replace(Routes.Login)}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel="Sign in"
+        >
+          <Text className="text-sm font-medium text-foreground">Sign in</Text>
+        </TouchableOpacity>
+      </View>
     </AuthLayout>
   );
 }

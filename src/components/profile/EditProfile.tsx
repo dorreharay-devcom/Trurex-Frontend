@@ -13,7 +13,7 @@ import { ArrowLeft, Camera, X } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '~/services/AuthContext';
 import { ProfileApi } from '~/api/ProfileApi';
-import { Theme } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import { Button } from '~/components/common/Button';
 import Input from '~/components/common/Input';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
@@ -268,6 +268,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
                 maxLength={30}
                 autoCapitalize="none"
                 className="flex-1 px-2 py-2.5 text-sm text-foreground"
+                style={textFieldCaretStyle}
               />
             </View>
           </View>
@@ -323,7 +324,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
                     placeholderTextColor={Theme.colors.muted}
                     maxLength={80}
                     className="text-sm text-foreground"
-                    style={{ padding: 0, height: 24 }}
+                    style={[textFieldCaretStyle, { padding: 0, height: 24 }]}
                   />
                 </View>
                 {!!currently[field.key] && (

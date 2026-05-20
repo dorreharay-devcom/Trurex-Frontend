@@ -133,10 +133,11 @@ export function RexImageCarousel({ paths, className, accessibilityLabelBase = 'P
       </View>
 
       <View
-        className="pointer-events-none absolute inset-0 z-10 flex-row items-center justify-between px-1"
+        pointerEvents="box-none"
+        className="absolute inset-0 z-10 flex-row items-center justify-between px-1"
         accessibilityRole="none"
       >
-        <View className="pointer-events-auto">
+        <View>
           <Pressable
             onPress={() => goToReal(realIndex - 1)}
             className="h-10 w-10 items-center justify-center rounded-full bg-black/50 active:bg-black/65"
@@ -146,7 +147,7 @@ export function RexImageCarousel({ paths, className, accessibilityLabelBase = 'P
             <ChevronLeft size={24} color={Theme.colors.white} />
           </Pressable>
         </View>
-        <View className="pointer-events-auto">
+        <View>
           <Pressable
             onPress={() => goToReal(realIndex + 1)}
             className="h-10 w-10 items-center justify-center rounded-full bg-black/50 active:bg-black/65"

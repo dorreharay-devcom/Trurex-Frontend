@@ -69,12 +69,14 @@ export const CommentRow: React.FC<CommentRowProps> = ({
             {canReport ? (
               <Pressable
                 onPress={() => onReport?.(comment.id)}
-                className="h-7 w-7 items-center justify-center rounded-md active:opacity-80"
-                hitSlop={6}
+                className="h-8 w-8 items-center justify-center rounded-md active:opacity-80"
+                hitSlop={10}
                 accessibilityLabel="Report comment"
                 accessibilityRole="button"
               >
-                <Flag size={12} color={Theme.colors.foreground} strokeWidth={1.5} />
+                <View pointerEvents="none">
+                  <Flag size={13} color={Theme.colors.foreground} strokeWidth={1.5} />
+                </View>
               </Pressable>
             ) : null}
           </View>
