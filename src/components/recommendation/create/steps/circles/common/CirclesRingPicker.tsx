@@ -38,6 +38,7 @@ type Props = {
   highlightId: string;
   onHighlightId: (id: string) => void;
   editingId: string | null;
+  disabled?: boolean;
 };
 
 export function CirclesRingPicker({
@@ -48,6 +49,7 @@ export function CirclesRingPicker({
   highlightId,
   onHighlightId,
   editingId,
+  disabled = false,
 }: Props) {
   const { width: windowWidth } = useWindowDimensions();
   const canvas = ringCanvasSize(windowWidth);
@@ -79,7 +81,7 @@ export function CirclesRingPicker({
   const cardBg = Theme.colors.card;
 
   return (
-    <View className="items-center">
+    <View className={cn('items-center', disabled && 'opacity-40')}>
       <View style={{ width: canvas, height: canvas }} className="relative">
         <View className="absolute inset-0" pointerEvents="none">
           {annuli.map(({ key, outer, inner, color }) => (
@@ -127,9 +129,11 @@ export function CirclesRingPicker({
             <Pressable
               key={ring.id}
               onPress={() => {
+                if (disabled) return;
                 onHighlightId(ring.id);
                 if (editingId == null) onToggle(ring.id);
               }}
+              disabled={disabled}
               accessibilityRole="button"
               accessibilityState={{ selected }}
               accessibilityLabel={ring.title}

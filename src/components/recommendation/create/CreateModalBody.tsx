@@ -169,6 +169,8 @@ export const CreateModalBody: React.FC<Props> = ({
             onRetry={() => void refetchCircles()}
             selectedIds={flow.selectedCircleIds}
             onToggle={flow.toggleCircleId}
+            privateSelected={flow.privateRex}
+            onPrivateSelectedChange={flow.setPrivateRex}
             showSensitiveNudge={isSensitiveRexSubcategory(flow.selectedSubcategoryCode)}
           />
         )}
@@ -186,6 +188,7 @@ export const CreateModalBody: React.FC<Props> = ({
             scoreQuickTip={flow.scoreQuickTip}
             scoreReview={flow.scoreReview}
             selectedCircleIds={flow.selectedCircleIds}
+            privateRex={flow.privateRex}
             circleTitleLookup={circleTitleLookup}
             subcategoryLabel={subcategoryLabelForConfirm}
             photoCount={flow.photoStoragePaths.length}

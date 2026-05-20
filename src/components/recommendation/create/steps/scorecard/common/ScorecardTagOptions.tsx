@@ -35,12 +35,16 @@ export function ScorecardTagOptions({ tagOptions, selectedSlugs, onToggle }: Pro
                   onPress={() => onToggle(t.slug)}
                   className={cn(
                     'rounded-full border px-3 py-1.5 active:opacity-90',
-                    on ? 'border-border/80 bg-border/60' : 'border-border bg-muted/50',
+                    on ? 'border-primary bg-primary' : 'border-border bg-muted/50',
                   )}
                   accessibilityRole="button"
                   accessibilityState={{ selected: on }}
                 >
-                  <Text className="text-sm text-foreground">{t.label}</Text>
+                  <Text
+                    className={cn('text-sm', on ? 'text-primary-foreground' : 'text-foreground')}
+                  >
+                    {t.label}
+                  </Text>
                 </Pressable>
               );
             })}

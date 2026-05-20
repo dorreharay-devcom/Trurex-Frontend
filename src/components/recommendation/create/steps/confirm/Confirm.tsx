@@ -29,6 +29,7 @@ type Props = {
   scoreQuickTip: string;
   scoreReview: string;
   selectedCircleIds: Set<string>;
+  privateRex: boolean;
   circleTitleLookup: readonly { id: string; title: string }[];
   subcategoryLabel: string | null;
   photoCount: number;
@@ -49,6 +50,7 @@ export const Confirm: React.FC<Props> = ({
   scoreQuickTip,
   scoreReview,
   selectedCircleIds,
+  privateRex,
   circleTitleLookup,
   subcategoryLabel,
   photoCount,
@@ -87,8 +89,9 @@ export const Confirm: React.FC<Props> = ({
     [selectedTagSlugs, tagOptions],
   );
   const circleTitles = useMemo(
-    () => getConfirmCircleTitles(selectedCircleIds, circleTitleLookup),
-    [selectedCircleIds, circleTitleLookup],
+    () =>
+      privateRex ? ['Only you'] : getConfirmCircleTitles(selectedCircleIds, circleTitleLookup),
+    [privateRex, selectedCircleIds, circleTitleLookup],
   );
 
   const tip = scoreQuickTip.trim();
