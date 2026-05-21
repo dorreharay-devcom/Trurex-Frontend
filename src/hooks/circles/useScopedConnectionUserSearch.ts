@@ -1,8 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import { searchUsers, type SearchUsersScope } from '~/api/usersApi';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  fetchTrustedUsers,
+  fetchUserFollowers,
+  fetchUserFollowing,
+  searchUsers,
+  type SearchUsersScope,
+} from '~/api/usersApi';
 import type { NetworkUserRow } from '~/types/network';
 import { useDebouncedValue } from '~/hooks/useDebouncedValue';
+
+const CONNECTION_PAGE_LIMIT = 50;
+const SEARCH_PAGE_LIMIT = 20;
 
 export type ConnectionScopeTab = 'trusted' | 'followers' | 'following';
 
@@ -10,6 +19,12 @@ export const CONNECTION_TAB_SCOPE: Record<ConnectionScopeTab, SearchUsersScope> 
   trusted: 'trusted',
   followers: 'followers',
   following: 'following',
+};
+
+const CONNECTION_TAB_QUERY_KEY: Record<ConnectionScopeTab, string> = {
+  trusted: 'trusted_users',
+  followers: 'user_followers',
+  following: 'user_following',
 };
 
 export const CONNECTION_TAB_PLACEHOLDER: Record<ConnectionScopeTab, string> = {
@@ -66,6 +81,18 @@ export type ConnectionFallbackVmSlice = {
   followingLoading: boolean;
 };
 
+export type ConnectionFallbackPaginationVmSlice = ConnectionFallbackVmSlice & {
+  trustedHasNextPage: boolean;
+  followersHasNextPage: boolean;
+  followingHasNextPage: boolean;
+  trustedFetchingNextPage: boolean;
+  followersFetchingNextPage: boolean;
+  followingFetchingNextPage: boolean;
+  fetchNextTrustedPage: () => void;
+  fetchNextFollowersPage: () => void;
+  fetchNextFollowingPage: () => void;
+};
+
 export function connectionFallbackRows(
   tab: ConnectionScopeTab,
   vm: ConnectionFallbackVmSlice,
@@ -94,13 +121,108 @@ export function connectionFallbackInitialLoading(
   }
 }
 
+export function connectionFallbackHasNextPage(
+  tab: ConnectionScopeTab,
+  vm: ConnectionFallbackPaginationVmSlice,
+): boolean {
+  switch (tab) {
+    case 'trusted':
+      return vm.trustedHasNextPage;
+    case 'followers':
+      return vm.followersHasNextPage;
+    case 'following':
+      return vm.followingHasNextPage;
+  }
+}
+
+export function connectionFallbackFetchingNextPage(
+  tab: ConnectionScopeTab,
+  vm: ConnectionFallbackPaginationVmSlice,
+): boolean {
+  switch (tab) {
+    case 'trusted':
+      return vm.trustedFetchingNextPage;
+    case 'followers':
+      return vm.followersFetchingNextPage;
+    case 'following':
+      return vm.followingFetchingNextPage;
+  }
+}
+
+export function connectionFallbackFetchNextPage(
+  tab: ConnectionScopeTab,
+  vm: ConnectionFallbackPaginationVmSlice,
+): () => void {
+  switch (tab) {
+    case 'trusted':
+      return vm.fetchNextTrustedPage;
+    case 'followers':
+      return vm.fetchNextFollowersPage;
+    case 'following':
+      return vm.fetchNextFollowingPage;
+  }
+}
+
+export function connectionCountLabel(count: number, hasNextPage: boolean): string {
+  return hasNextPage ? `${count}+` : String(count);
+}
+
+async function fetchConnectionPage(
+  tab: ConnectionScopeTab,
+  subjectUserId: string,
+  offset: number,
+): Promise<NetworkUserRow[]> {
+  switch (tab) {
+    case 'trusted':
+      return fetchTrustedUsers(subjectUserId, CONNECTION_PAGE_LIMIT, offset);
+    case 'followers':
+      return fetchUserFollowers(subjectUserId, CONNECTION_PAGE_LIMIT, offset);
+    case 'following':
+      return fetchUserFollowing(subjectUserId, CONNECTION_PAGE_LIMIT, offset);
+  }
+}
+
+export function useConnectionUsers(
+  tab: ConnectionScopeTab,
+  subjectUserId: string | undefined,
+  enabled: boolean,
+) {
+  const queryKeyRoot = CONNECTION_TAB_QUERY_KEY[tab];
+
+  const query = useInfiniteQuery({
+    queryKey: [queryKeyRoot, subjectUserId, CONNECTION_PAGE_LIMIT],
+    queryFn: ({ pageParam }) => fetchConnectionPage(tab, subjectUserId!, Number(pageParam ?? 0)),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length === CONNECTION_PAGE_LIMIT
+        ? allPages.length * CONNECTION_PAGE_LIMIT
+        : undefined,
+    enabled: Boolean(enabled && subjectUserId),
+  });
+
+  const rows = useMemo(() => query.data?.pages.flat() ?? [], [query.data?.pages]);
+
+  const fetchNextPage = useCallback(() => {
+    if (!query.hasNextPage || query.isFetchingNextPage) return;
+    void query.fetchNextPage();
+  }, [query]);
+
+  return {
+    rows,
+    isInitialLoading: query.isLoading && rows.length === 0,
+    hasNextPage: Boolean(query.hasNextPage),
+    isFetchingNextPage: query.isFetchingNextPage,
+    fetchNextPage,
+  };
+}
+
 export function useScopedConnectionUserSearch(
   tab: ConnectionScopeTab,
   subjectUserId: string | undefined,
   enabled: boolean,
 ) {
-  const [query, setQuery] = useState('');
-  const debouncedSearch = useDebouncedValue(query, 320);
+  const [searchQuery, setQuery] = useState('');
+  const debouncedSearch = useDebouncedValue(searchQuery, 320);
   const trimmedDebounced = debouncedSearch.trim();
   const searchActive = trimmedDebounced.length > 0;
 
@@ -110,23 +232,41 @@ export function useScopedConnectionUserSearch(
 
   const scope = CONNECTION_TAB_SCOPE[tab];
 
-  const { data: searchRows = [], isFetching: searchFetching } = useQuery({
+  const searchQueryResult = useInfiniteQuery({
     queryKey: ['scopedConnectionUsers', scope, subjectUserId, trimmedDebounced],
-    queryFn: () =>
+    queryFn: ({ pageParam }) =>
       searchUsers({
         input_query: trimmedDebounced,
+        input_limit: SEARCH_PAGE_LIMIT,
+        input_offset: Number(pageParam ?? 0),
         input_scope: scope,
         input_user_id: subjectUserId ?? null,
       }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length === SEARCH_PAGE_LIMIT ? allPages.length * SEARCH_PAGE_LIMIT : undefined,
     enabled: Boolean(enabled && subjectUserId && searchActive),
   });
 
+  const searchRows = useMemo(
+    () => searchQueryResult.data?.pages.flat() ?? [],
+    [searchQueryResult.data?.pages],
+  );
+
+  const fetchNextSearchPage = useCallback(() => {
+    if (!searchQueryResult.hasNextPage || searchQueryResult.isFetchingNextPage) return;
+    void searchQueryResult.fetchNextPage();
+  }, [searchQueryResult]);
+
   return {
-    query,
+    query: searchQuery,
     setQuery,
     debouncedSearch,
     searchRows,
-    searchFetching,
+    searchFetching: searchQueryResult.isFetching,
+    searchHasNextPage: Boolean(searchQueryResult.hasNextPage),
+    searchFetchingNextPage: searchQueryResult.isFetchingNextPage,
+    fetchNextSearchPage,
     searchActive,
     placeholder: CONNECTION_TAB_PLACEHOLDER[tab],
   };

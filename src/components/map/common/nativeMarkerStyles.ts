@@ -4,6 +4,10 @@ import { Theme } from '~/theme/Theme';
 export const nativeMarkerStyles = StyleSheet.create({
   markerHit: {
     alignItems: 'center',
+    justifyContent: 'flex-start',
+    width: 44,
+    height: 44,
+    paddingTop: 4,
   },
   tooltipImage: {
     width: 300,

@@ -1,117 +1,32 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { ChevronRight, PlusCircle } from 'lucide-react-native';
-import type { CircleApiRow } from '~/api/circlesApi';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { Theme } from '~/theme/Theme';
 import type { NetworkUserRow } from '~/types/network';
-import { hexToSoftIconBackground, parseCircleAccentHex } from '~/utils/recommendation/recCircles';
 
 type Props = {
   row: NetworkUserRow;
-  circle?: CircleApiRow;
-  additionalCirclesCount?: number;
   onAddToCircle?: () => void;
   allowAddToCircle?: boolean;
   onUserPress?: (userId: string) => void;
 };
 
-function CircleMembershipBadge({
-  circle,
-  accent,
-  badgeBg,
-  extraCount,
-  interactive,
-  onPress,
-}: {
-  circle: CircleApiRow;
-  accent: string | null;
-  badgeBg: string | undefined;
-  extraCount: number;
-  interactive: boolean;
-  onPress?: () => void;
-}) {
-  const shellStyle = accent
-    ? { backgroundColor: badgeBg }
-    : { backgroundColor: Theme.colors.accent };
-  const color = accent ?? Theme.colors.primary;
-  const showExtra = extraCount > 0;
-  const a11y = showExtra ? `${circle.name}, plus ${extraCount} more circles` : circle.name;
-
-  const pill = interactive ? (
-    <Pressable
-      onPress={onPress}
-      hitSlop={6}
-      accessibilityLabel={a11y}
-      className="rounded-full px-2 py-0.5 active:opacity-80"
-      style={shellStyle}
-    >
-      <Text className="text-[10px] font-semibold" style={{ color }} numberOfLines={1}>
-        {circle.name}
-      </Text>
-    </Pressable>
-  ) : (
-    <View
-      accessible
-      accessibilityLabel={a11y}
-      className="rounded-full px-2 py-0.5"
-      style={shellStyle}
-    >
-      <Text className="text-[10px] font-semibold" style={{ color }} numberOfLines={1}>
-        {circle.name}
-      </Text>
-    </View>
-  );
-
-  return (
-    <View className="flex-row items-center gap-1">
-      {pill}
-      {showExtra ? (
-        <View
-          className="min-w-[18px] items-center rounded-full border border-border bg-card px-1 py-px"
-          pointerEvents="none"
-          accessibilityElementsHidden
-        >
-          <Text className="text-[9px] font-bold leading-none text-foreground" numberOfLines={1}>
-            +{extraCount}
-          </Text>
-        </View>
-      ) : null}
-    </View>
-  );
-}
-
 export function NetworkConnectionRow({
   row,
-  circle,
-  additionalCirclesCount = 0,
   onAddToCircle,
   allowAddToCircle = true,
   onUserPress,
 }: Props) {
   const label = row.display_name || 'Member';
-  const accent = circle ? (parseCircleAccentHex(circle) ?? Theme.colors.primary) : null;
-  const badgeBg = accent ? hexToSoftIconBackground(accent, 0.14) : undefined;
 
   const profileBody = (
     <>
       <SignedUserAvatar name={label} avatar={row.avatar_url} className="h-10 w-10" />
       <View className="min-w-0 flex-1">
-        <View className="flex-row flex-wrap items-center gap-1.5">
-          <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
-            {label}
-          </Text>
-          {circle ? (
-            <CircleMembershipBadge
-              circle={circle}
-              accent={accent}
-              badgeBg={badgeBg}
-              extraCount={additionalCirclesCount}
-              interactive={Boolean(allowAddToCircle && onAddToCircle)}
-              onPress={onAddToCircle}
-            />
-          ) : null}
-        </View>
+        <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
+          {label}
+        </Text>
         {row.handle ? (
           <Text className="text-xs text-muted-foreground" numberOfLines={1}>
             @{row.handle}

@@ -1,13 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { ChevronRight, Plus, Search, Users, X } from 'lucide-react-native';
 import { CircleAssignmentSheet } from '~/components/circles/CircleAssignmentSheet';
 import { CircleDetailScreen } from '~/components/circles/CircleDetailScreen';
@@ -15,11 +7,16 @@ import { PeopleYouMayKnowSection } from '~/components/circles/PeopleYouMayKnowSe
 import { ShareProfileCard } from '~/components/circles/ShareProfileCard';
 import {
   CircleGlyphIcon,
+  ConnectionLoadMoreButton,
   NetworkConnectionRow,
   TrustedEmptyState,
 } from '~/components/circles/common';
 import { type CirclesViewModel, useCirclesViewModel } from '~/hooks/circles/useCirclesViewModel';
 import {
+  connectionCountLabel,
+  connectionFallbackFetchingNextPage,
+  connectionFallbackFetchNextPage,
+  connectionFallbackHasNextPage,
   connectionFallbackInitialLoading,
   connectionFallbackRows,
   connectionRowsForDisplay,
@@ -31,8 +28,6 @@ import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Th
 import { connectionScopeTabStyle } from '~/utils/circleTabUtils';
 import { cn } from '~/utils/general';
 import { webContainerStyle } from '~/utils';
-
-const isWeb = Platform.OS === 'web';
 
 type Props = { isActive: boolean; onUserPress?: (userId: string) => void };
 
@@ -81,11 +76,15 @@ function CirclesListContent({
     searchRows: connSearch.searchRows,
     fallbackRows: connFallbackRows,
   });
-
-  const sheetMemberCircleIds = useMemo(() => {
-    if (!circleSheet?.id) return new Set<string>();
-    return vm.circleIdsByMemberUserId.get(circleSheet.id) ?? new Set<string>();
-  }, [circleSheet?.id, vm.circleIdsByMemberUserId]);
+  const connHasNextPage = connSearch.searchActive
+    ? connSearch.searchHasNextPage
+    : connectionFallbackHasNextPage(connTab, vm);
+  const connFetchingNextPage = connSearch.searchActive
+    ? connSearch.searchFetchingNextPage
+    : connectionFallbackFetchingNextPage(connTab, vm);
+  const fetchNextConnPage = connSearch.searchActive
+    ? connSearch.fetchNextSearchPage
+    : connectionFallbackFetchNextPage(connTab, vm);
 
   return (
     <>
@@ -162,11 +161,6 @@ function CirclesListContent({
                 vm.createMutation.mutate();
               }}
               disabled={!vm.newName.trim() || vm.createMutation.isPending}
-              style={
-                (!vm.newName.trim() || vm.createMutation.isPending) && isWeb
-                  ? ({ cursor: 'not-allowed' } as const)
-                  : undefined
-              }
               className={cn(
                 'items-center rounded-xl py-3',
                 vm.newName.trim() && !vm.createMutation.isPending
@@ -238,9 +232,27 @@ function CirclesListContent({
             <View className="mb-4 flex-row flex-wrap gap-2">
               {(
                 [
-                  ['trusted', `Trusted · ${vm.trustedRows.length}`],
-                  ['followers', `Followers · ${vm.followerRows.length}`],
-                  ['following', `Following · ${vm.followingRows.length}`],
+                  [
+                    'trusted',
+                    `Trusted · ${connectionCountLabel(
+                      vm.trustedRows.length,
+                      vm.trustedHasNextPage,
+                    )}`,
+                  ],
+                  [
+                    'followers',
+                    `Followers · ${connectionCountLabel(
+                      vm.followerRows.length,
+                      vm.followersHasNextPage,
+                    )}`,
+                  ],
+                  [
+                    'following',
+                    `Following · ${connectionCountLabel(
+                      vm.followingRows.length,
+                      vm.followingHasNextPage,
+                    )}`,
+                  ],
                 ] as const
               ).map(([id, label]) => {
                 const active = connTab === id;
@@ -290,8 +302,6 @@ function CirclesListContent({
                   <NetworkConnectionRow
                     key={row.user_id}
                     row={row}
-                    circle={vm.circleForMemberUserId.get(row.user_id)}
-                    additionalCirclesCount={vm.extraCircleCountByMemberUserId.get(row.user_id) ?? 0}
                     allowAddToCircle={connTab !== 'following'}
                     onAddToCircle={
                       connTab === 'following'
@@ -305,6 +315,11 @@ function CirclesListContent({
                     onUserPress={onUserPress}
                   />
                 ))}
+                <ConnectionLoadMoreButton
+                  visible={connHasNextPage}
+                  loading={connFetchingNextPage}
+                  onPress={fetchNextConnPage}
+                />
               </View>
             ) : connPhase === 'no_match' ? (
               <View className="items-center py-10">
@@ -338,8 +353,6 @@ function CirclesListContent({
         memberName={circleSheet?.name ?? ''}
         circles={vm.circles}
         circlesLoading={vm.isLoading}
-        memberCircleIds={sheetMemberCircleIds}
-        membershipsLoading={vm.circleAssignmentsLoading}
       />
     </>
   );

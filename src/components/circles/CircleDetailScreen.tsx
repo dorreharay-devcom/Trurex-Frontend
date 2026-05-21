@@ -11,6 +11,7 @@ import {
 import { ArrowLeft, Pencil, Search, Trash2, X } from 'lucide-react-native';
 import {
   CircleConnectionRow,
+  ConnectionLoadMoreButton,
   CircleGlyphIcon,
   CircleMemberRow,
   MembersEmptyState,
@@ -19,6 +20,10 @@ import {
 } from '~/components/circles/common';
 import type { CirclesViewModel } from '~/hooks/circles/useCirclesViewModel';
 import {
+  connectionCountLabel,
+  connectionFallbackFetchingNextPage,
+  connectionFallbackFetchNextPage,
+  connectionFallbackHasNextPage,
   connectionFallbackInitialLoading,
   connectionFallbackRows,
   connectionRowsForDisplay,
@@ -84,6 +89,15 @@ export function CircleDetailScreen({ vm, onUserPress }: Props) {
     searchRows: addSearch.searchRows,
     fallbackRows: addFallbackRows,
   });
+  const addHasNextPage = addSearch.searchActive
+    ? addSearch.searchHasNextPage
+    : connectionFallbackHasNextPage(addConnTab, vm);
+  const addFetchingNextPage = addSearch.searchActive
+    ? addSearch.searchFetchingNextPage
+    : connectionFallbackFetchingNextPage(addConnTab, vm);
+  const fetchNextAddPage = addSearch.searchActive
+    ? addSearch.fetchNextSearchPage
+    : connectionFallbackFetchNextPage(addConnTab, vm);
 
   return (
     <>
@@ -162,9 +176,27 @@ export function CircleDetailScreen({ vm, onUserPress }: Props) {
             <View className="mb-4 flex-row flex-wrap gap-2">
               {(
                 [
-                  ['trusted', `Trusted · ${vm.trustedRows.length}`],
-                  ['following', `Following · ${vm.followingRows.length}`],
-                  ['followers', `Followers · ${vm.followerRows.length}`],
+                  [
+                    'trusted',
+                    `Trusted · ${connectionCountLabel(
+                      vm.trustedRows.length,
+                      vm.trustedHasNextPage,
+                    )}`,
+                  ],
+                  [
+                    'following',
+                    `Following · ${connectionCountLabel(
+                      vm.followingRows.length,
+                      vm.followingHasNextPage,
+                    )}`,
+                  ],
+                  [
+                    'followers',
+                    `Followers · ${connectionCountLabel(
+                      vm.followerRows.length,
+                      vm.followersHasNextPage,
+                    )}`,
+                  ],
                 ] as const
               ).map(([id, label]) => {
                 const active = addConnTab === id;
@@ -216,6 +248,11 @@ export function CircleDetailScreen({ vm, onUserPress }: Props) {
                     onUserPress={onUserPress}
                   />
                 ))}
+                <ConnectionLoadMoreButton
+                  visible={addHasNextPage}
+                  loading={addFetchingNextPage}
+                  onPress={fetchNextAddPage}
+                />
               </View>
             ) : (
               <View className="mb-8 items-center py-8">
