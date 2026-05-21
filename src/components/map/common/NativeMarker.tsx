@@ -15,7 +15,7 @@ type Props = {
 export const NativeMarker: React.FC<Props> = ({ marker: m, selected, onPress }) => (
   <Marker
     coordinate={{ latitude: m.latitude, longitude: m.longitude }}
-    anchor={{ x: 0.5, y: 1 }}
+    anchor={{ x: 0.5, y: 0.91 }}
     onPress={() => onPress(m.id)}
     tracksViewChanges={false}
     zIndex={selected ? 10 : 1}

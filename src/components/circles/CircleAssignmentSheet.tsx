@@ -47,8 +47,6 @@ type Props = {
   memberName: string;
   circles: CircleApiRow[];
   circlesLoading: boolean;
-  memberCircleIds?: ReadonlySet<string>;
-  membershipsLoading?: boolean;
 };
 
 export function CircleAssignmentSheet({
@@ -58,8 +56,6 @@ export function CircleAssignmentSheet({
   memberName,
   circles,
   circlesLoading,
-  memberCircleIds,
-  membershipsLoading = false,
 }: Props) {
   const { width, height } = useWindowDimensions();
   const queryClient = useQueryClient();
@@ -97,7 +93,7 @@ export function CircleAssignmentSheet({
         Animated.timing(sheetTranslateY, { toValue: 600, duration: 220, useNativeDriver: true }),
       ]).start(() => setVisible(false));
     }
-  }, [open]);
+  }, [open, backdropOpacity, sheetTranslateY]);
 
   useEffect(() => {
     if (!open) {
@@ -125,16 +121,12 @@ export function CircleAssignmentSheet({
 
   const assignableCircles = useMemo(() => {
     const sorted = sortCirclesForRingStack(circles);
-    const already = memberCircleIds ?? new Set<string>();
-    return sorted.filter(
-      (c) => (c.system_kind === 'inner_circle' || isUserCreatedCircle(c)) && !already.has(c.id),
-    );
-  }, [circles, memberCircleIds]);
+    return sorted.filter((c) => c.system_kind === 'inner_circle' || isUserCreatedCircle(c));
+  }, [circles]);
 
   const assignMutation = useMutation({
     mutationFn: ({ circleId }: { circleId: string }) => addCircleMember(circleId, memberId),
     onSuccess: (_, vars) => {
-      queryClient.invalidateQueries({ queryKey: ['circleMemberAssignments'] });
       queryClient.invalidateQueries({ queryKey: ['circleMembers', vars.circleId] });
       queryClient.invalidateQueries({ queryKey: ['myCircles'] });
       toastSuccess('Added to circle');
@@ -220,7 +212,7 @@ export function CircleAssignmentSheet({
                 </Pressable>
               </View>
 
-              {circlesLoading || membershipsLoading ? (
+              {circlesLoading ? (
                 <View className="items-center py-8">
                   <ActivityIndicator color={Theme.colors.primary} />
                 </View>
@@ -341,11 +333,6 @@ export function CircleAssignmentSheet({
                           <Pressable
                             onPress={() => void handleCreateAndAssign()}
                             disabled={!newName.trim() || assignInFlight}
-                            style={
-                              (!newName.trim() || assignInFlight) && isWeb
-                                ? ({ cursor: 'not-allowed' } as const)
-                                : undefined
-                            }
                             className={cn(
                               'items-center rounded-xl py-3',
                               newName.trim() && !assignInFlight

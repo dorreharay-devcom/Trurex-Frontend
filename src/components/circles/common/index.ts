@@ -1,4 +1,5 @@
 export { CircleConnectionRow } from './CircleConnectionRow';
+export { ConnectionLoadMoreButton } from './ConnectionLoadMoreButton';
 export { CircleGlyphIcon } from './CircleGlyphIcon';
 export { CircleMemberRow } from './CircleMemberRow';
 export { FollowingEmptyState } from './FollowingEmptyState';

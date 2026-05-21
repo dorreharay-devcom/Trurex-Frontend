@@ -153,11 +153,6 @@ export async function fetchCircleDiscoverFeed(
   return data;
 }
 
-export type CircleMemberAssignment = {
-  circle_id: string;
-  member_user_id: string;
-};
-
 export type CircleMemberProfile = {
   user_id: string;
   display_name: string | null;
@@ -183,26 +178,5 @@ export async function fetchCircleMembers(circleId: string): Promise<CircleMember
   });
   throwRpcIfFailed({ data, error });
   const rows = Array.isArray(data) ? data : [];
-  return rows
-    .map(mapGetCircleMembersRow)
-    .filter((m): m is CircleMemberProfile => m != null);
-}
-
-export async function fetchMyCircleMemberAssignments(): Promise<CircleMemberAssignment[]> {
-  const { data: circlesData, error: ce } = await Backend.from('circles').select('id');
-  throwRpcIfFailed({ data: circlesData, error: ce });
-  const circleIds = (circlesData ?? []).map((c: { id: string }) => c.id);
-  if (circleIds.length === 0) return [];
-
-  const nested = await Promise.all(
-    circleIds.map(async (circle_id) => {
-      try {
-        const members = await fetchCircleMembers(circle_id);
-        return members.map((m) => ({ circle_id, member_user_id: m.user_id }));
-      } catch {
-        return [];
-      }
-    }),
-  );
-  return nested.flat();
+  return rows.map(mapGetCircleMembersRow).filter((m): m is CircleMemberProfile => m != null);
 }

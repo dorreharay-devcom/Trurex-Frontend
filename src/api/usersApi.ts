@@ -69,10 +69,14 @@ function normalizeUserProfileRow(r: Record<string, unknown>): UserProfileRow {
   };
 }
 
-async function fetchUserFollowingInternal(inputUserId: string): Promise<NetworkUserRow[]> {
+async function fetchUserFollowingInternal(
+  inputUserId: string,
+  limit = DEFAULT_LIMIT,
+  offset = 0,
+): Promise<NetworkUserRow[]> {
   const { data, error } = await Backend.rpc('user_following', {
-    input_limit: DEFAULT_LIMIT,
-    input_offset: 0,
+    input_limit: limit,
+    input_offset: offset,
     input_user_id: inputUserId,
   });
   throwRpcIfFailed({ data, error });
@@ -81,15 +85,19 @@ async function fetchUserFollowingInternal(inputUserId: string): Promise<NetworkU
     .filter((u) => u.user_id);
 }
 
-export async function fetchTrustedUsers(inputUserId: string): Promise<NetworkUserRow[]> {
+export async function fetchTrustedUsers(
+  inputUserId: string,
+  limit = DEFAULT_LIMIT,
+  offset = 0,
+): Promise<NetworkUserRow[]> {
   const parseRows = (payload: unknown) =>
     unknownAsArray<Record<string, unknown>>(payload)
       .map(normalizeNetworkRow)
       .filter((u) => u.user_id);
 
   const { data, error } = await Backend.rpc('trusted_users', {
-    input_limit: DEFAULT_LIMIT,
-    input_offset: 0,
+    input_limit: limit,
+    input_offset: offset,
     input_user_id: inputUserId,
   });
   if (!error) {
@@ -104,26 +112,34 @@ export async function fetchTrustedUsers(inputUserId: string): Promise<NetworkUse
   const authId = sessionData.session?.user?.id;
   if (authId != null && authId === inputUserId) {
     const second = await Backend.rpc('trusted_users', {
-      input_limit: DEFAULT_LIMIT,
-      input_offset: 0,
+      input_limit: limit,
+      input_offset: offset,
     });
     if (!second.error) {
       return parseRows(second.data);
     }
   }
 
-  const following = await fetchUserFollowingInternal(inputUserId);
+  const following = await fetchUserFollowingInternal(inputUserId, limit, offset);
   return following.filter((r) => r.relationship_status === 'trusted');
 }
 
-export async function fetchUserFollowing(inputUserId: string): Promise<NetworkUserRow[]> {
-  return fetchUserFollowingInternal(inputUserId);
+export async function fetchUserFollowing(
+  inputUserId: string,
+  limit = DEFAULT_LIMIT,
+  offset = 0,
+): Promise<NetworkUserRow[]> {
+  return fetchUserFollowingInternal(inputUserId, limit, offset);
 }
 
-export async function fetchUserFollowers(inputUserId: string): Promise<NetworkUserRow[]> {
+export async function fetchUserFollowers(
+  inputUserId: string,
+  limit = DEFAULT_LIMIT,
+  offset = 0,
+): Promise<NetworkUserRow[]> {
   const { data, error } = await Backend.rpc('user_followers', {
-    input_limit: DEFAULT_LIMIT,
-    input_offset: 0,
+    input_limit: limit,
+    input_offset: offset,
     input_user_id: inputUserId,
   });
   throwRpcIfFailed({ data, error });
@@ -132,12 +148,7 @@ export async function fetchUserFollowers(inputUserId: string): Promise<NetworkUs
     .filter((u) => u.user_id);
 }
 
-export type SearchUsersScope =
-  | 'all_users'
-  | 'following'
-  | 'followers'
-  | 'trusted'
-  | 'user_network';
+export type SearchUsersScope = 'all_users' | 'following' | 'followers' | 'trusted' | 'user_network';
 
 export async function searchUsers(params: {
   input_query?: string | null;
@@ -147,11 +158,13 @@ export async function searchUsers(params: {
   input_user_id?: string | null;
 }): Promise<NetworkUserRow[]> {
   const q = params.input_query?.trim() ?? '';
+  const scope = params.input_scope ?? 'all_users';
+
   const payload: Record<string, unknown> = {
     input_query: q.length > 0 ? q : null,
     input_limit: params.input_limit ?? 20,
     input_offset: params.input_offset ?? 0,
-    input_scope: params.input_scope ?? 'all_users',
+    input_scope: scope,
   };
   if (params.input_user_id != null && params.input_user_id !== '') {
     payload.input_user_id = params.input_user_id;

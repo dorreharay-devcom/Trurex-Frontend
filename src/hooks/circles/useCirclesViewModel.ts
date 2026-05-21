@@ -5,16 +5,11 @@ import {
   createCircle,
   deleteCircle,
   fetchCircleMembers,
-  fetchMyCircleMemberAssignments,
   removeCircleMember,
   updateCircle,
 } from '~/api/circlesApi';
-import {
-  fetchTrustedUsers,
-  fetchUserFollowers,
-  fetchUserFollowing,
-  filterOneWayFollowing,
-} from '~/api/usersApi';
+import { filterOneWayFollowing } from '~/api/usersApi';
+import { useConnectionUsers } from '~/hooks/circles/useScopedConnectionUserSearch';
 import { useAuth } from '~/services/AuthContext';
 import {
   mapApiCirclesToTabRows,
@@ -75,11 +70,7 @@ export function useCirclesViewModel(isActive: boolean) {
   const detailOpen = !!user && isActive && !!selectedCircleId;
   const connectionsEnabled = !!user && isActive;
 
-  const { data: trustedRows = [], isLoading: trustedLoading } = useQuery({
-    queryKey: ['trusted_users', user?.id],
-    queryFn: () => fetchTrustedUsers(user!.id),
-    enabled: connectionsEnabled && !!user?.id,
-  });
+  const trustedConnection = useConnectionUsers('trusted', user?.id, connectionsEnabled);
 
   const { data: members = [], isLoading: membersLoading } = useQuery({
     queryKey: ['circleMembers', selectedCircleId],
@@ -87,63 +78,16 @@ export function useCirclesViewModel(isActive: boolean) {
     enabled: detailOpen && !!selectedCircleId,
   });
 
-  const { data: followerRows = [], isLoading: followersLoading } = useQuery({
-    queryKey: ['user_followers', user?.id],
-    queryFn: () => fetchUserFollowers(user!.id),
-    enabled: connectionsEnabled && !!user?.id,
-  });
+  const followerConnection = useConnectionUsers('followers', user?.id, connectionsEnabled);
 
-  const { data: followingAll = [], isLoading: followingLoading } = useQuery({
-    queryKey: ['user_following', user?.id],
-    queryFn: () => fetchUserFollowing(user!.id),
-    enabled: connectionsEnabled && !!user?.id,
-  });
+  const followingConnection = useConnectionUsers('following', user?.id, connectionsEnabled);
+  const trustedRows = trustedConnection.rows;
+  const followerRows = followerConnection.rows;
+  const followingAll = followingConnection.rows;
 
   const memberIdSet = useMemo(() => new Set(members.map((m) => m.user_id)), [members]);
 
   const followingOneWay = useMemo(() => filterOneWayFollowing(followingAll), [followingAll]);
-
-  const { data: circleMemberAssignments = [], isLoading: circleAssignmentsLoading } = useQuery({
-    queryKey: ['circleMemberAssignments', user?.id],
-    queryFn: fetchMyCircleMemberAssignments,
-    enabled: connectionsEnabled && !!user?.id,
-  });
-
-  const circleIdsByMemberUserId = useMemo(() => {
-    const map = new Map<string, Set<string>>();
-    for (const a of circleMemberAssignments) {
-      let set = map.get(a.member_user_id);
-      if (!set) {
-        set = new Set<string>();
-        map.set(a.member_user_id, set);
-      }
-      set.add(a.circle_id);
-    }
-    return map;
-  }, [circleMemberAssignments]);
-
-  const circleForMemberUserId = useMemo(() => {
-    const sorted = sortCirclesForRingStack(circles);
-    const idOrder = new Map(sorted.map((c, i) => [c.id, i]));
-    const m = new Map<string, (typeof circles)[number]>();
-    for (const a of circleMemberAssignments) {
-      const c = circles.find((x) => x.id === a.circle_id);
-      if (!c) continue;
-      const rank = idOrder.get(c.id) ?? 999;
-      const prev = m.get(a.member_user_id);
-      if (!prev || rank < (idOrder.get(prev.id) ?? 999)) m.set(a.member_user_id, c);
-    }
-    return m;
-  }, [circleMemberAssignments, circles]);
-
-  const extraCircleCountByMemberUserId = useMemo(() => {
-    const m = new Map<string, number>();
-    for (const [uid, ids] of circleIdsByMemberUserId.entries()) {
-      const extra = ids.size - 1;
-      if (extra > 0) m.set(uid, extra);
-    }
-    return m;
-  }, [circleIdsByMemberUserId]);
 
   const addMemberMutation = useMutation({
     mutationFn: async (vars: { circleId: string; userId: string }) => {
@@ -152,7 +96,6 @@ export function useCirclesViewModel(isActive: boolean) {
     },
     onSuccess: (_, v) => {
       queryClient.invalidateQueries({ queryKey: ['circleMembers', v.circleId] });
-      queryClient.invalidateQueries({ queryKey: ['circleMemberAssignments'] });
       queryClient.invalidateQueries({ queryKey: ['myCircles'] });
       toastSuccess('Added to circle');
     },
@@ -170,7 +113,6 @@ export function useCirclesViewModel(isActive: boolean) {
     },
     onSuccess: (_, v) => {
       queryClient.invalidateQueries({ queryKey: ['circleMembers', v.circleId] });
-      queryClient.invalidateQueries({ queryKey: ['circleMemberAssignments'] });
       queryClient.invalidateQueries({ queryKey: ['myCircles'] });
       toastSuccess('Removed from circle');
     },
@@ -309,16 +251,21 @@ export function useCirclesViewModel(isActive: boolean) {
     membersLoading,
     memberIdSet,
     trustedRows,
-    trustedLoading,
+    trustedLoading: trustedConnection.isInitialLoading,
+    trustedHasNextPage: trustedConnection.hasNextPage,
+    trustedFetchingNextPage: trustedConnection.isFetchingNextPage,
+    fetchNextTrustedPage: trustedConnection.fetchNextPage,
     followerRows,
-    followersLoading,
+    followersLoading: followerConnection.isInitialLoading,
+    followersHasNextPage: followerConnection.hasNextPage,
+    followersFetchingNextPage: followerConnection.isFetchingNextPage,
+    fetchNextFollowersPage: followerConnection.fetchNextPage,
     followingRows: followingAll,
     followingOneWay,
-    followingLoading,
-    circleForMemberUserId,
-    extraCircleCountByMemberUserId,
-    circleIdsByMemberUserId,
-    circleAssignmentsLoading,
+    followingLoading: followingConnection.isInitialLoading,
+    followingHasNextPage: followingConnection.hasNextPage,
+    followingFetchingNextPage: followingConnection.isFetchingNextPage,
+    fetchNextFollowingPage: followingConnection.fetchNextPage,
     addingMemberId,
     removingMemberId,
     createMutation,

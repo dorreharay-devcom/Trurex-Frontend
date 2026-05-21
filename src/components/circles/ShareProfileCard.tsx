@@ -4,15 +4,10 @@ import { Check, Copy, Share2 } from 'lucide-react-native';
 import { useQuery } from '@tanstack/react-query';
 import * as Clipboard from 'expo-clipboard';
 import { ProfileApi } from '~/api/ProfileApi';
-import { fetchPublicUserById } from '~/api/usersApi';
 import { useAuth } from '~/services/AuthContext';
 import { Theme } from '~/theme/Theme';
 import { toastSuccess } from '~/utils/appToast';
-import {
-  buildProfileShareUrl,
-  hasProfileUsername,
-  profileShareSlug,
-} from '~/utils/profileShareUrl';
+import { buildProfileShareUrl, profileShareSlug } from '~/utils/profileShareUrl';
 
 type Props = { isActive: boolean };
 
@@ -20,19 +15,11 @@ export function ShareProfileCard({ isActive }: Props) {
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
 
-  const { data: profileData, isLoading } = useQuery({
+  const { data: profileData } = useQuery({
     queryKey: ['profileShare', user?.id],
     queryFn: () => ProfileApi.getProfile({ userId: user!.id }),
     enabled: !!user?.id && isActive,
   });
-
-  const { data: publicUser } = useQuery({
-    queryKey: ['shareProfile', 'publicUser', user?.id],
-    queryFn: () => fetchPublicUserById(user!.id),
-    enabled: !!user?.id && isActive,
-  });
-
-  const hasHandle = hasProfileUsername(publicUser?.handle ?? profileData?.handle);
 
   const shareUrl = useMemo(() => {
     if (!profileData?.userId) return '';
@@ -58,17 +45,9 @@ export function ShareProfileCard({ isActive }: Props) {
         </View>
         <View className="min-w-0 flex-1">
           <Text className="text-sm font-semibold text-foreground">Share your profile</Text>
-          {isLoading ? (
-            <Text className="mt-0.5 text-xs text-muted-foreground">Preparing your link…</Text>
-          ) : !hasHandle ? (
-            <Text className="mt-0.5 text-xs text-muted-foreground">
-              Set a username to get your link
-            </Text>
-          ) : profileData?.handle ? (
-            <Text className="mt-0.5 text-xs text-muted-foreground" numberOfLines={1}>
-              {profileData.handle}
-            </Text>
-          ) : null}
+          <Text className="mt-0.5 text-xs text-muted-foreground">
+            Set a username to get your link
+          </Text>
         </View>
         <Pressable
           onPress={() => void copyLink()}
