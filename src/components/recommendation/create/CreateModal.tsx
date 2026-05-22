@@ -78,8 +78,8 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
 
   const applyManualGeotag = useCallback(
     (result: ManualPlaceGeotagResult) => {
-      setManualGeotag({ lat: result.lat, lng: result.lng });
       setManualAddress(result.addressLabel);
+      setManualGeotag({ lat: result.lat, lng: result.lng });
     },
     [setManualGeotag, setManualAddress],
   );
@@ -344,6 +344,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
     subcategoryCodeForMerge,
     handleClose,
     showQuickTip,
+    queryClient,
   ]);
 
   const { layout } = modalConfig;

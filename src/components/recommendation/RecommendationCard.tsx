@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, type TextStyle } from 'react-native';
 import {
   Heart,
   MessageCircle,
@@ -32,6 +32,7 @@ import {
   valueForMoneyLabel,
 } from '~/utils/recommendation/recContentDisplay';
 import { cn } from '~/utils/general';
+import { isWeb } from '~/utils';
 
 export type { Recommendation, RecommendationOpenOptions };
 
@@ -78,6 +79,13 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
   const vfmLabel =
     rec.scoreValueForMoney != null ? valueForMoneyLabel(rec.scoreValueForMoney) : null;
   const showStarRating = rec.rating != null && rec.rating > 0;
+  const addressEllipsisStyle = isWeb
+    ? ({
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      } as TextStyle)
+    : undefined;
 
   const toggleLike = async () => {
     if (!user) {
@@ -133,7 +141,10 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           <Text className="text-xs font-medium capitalize text-foreground">{rec.category}</Text>
         </View>
         {onRemove && (
-          <TouchableOpacity onPress={onRemove} className="w-7 h-7 rounded-full bg-destructive items-center justify-center">
+          <TouchableOpacity
+            onPress={onRemove}
+            className="w-7 h-7 rounded-full bg-destructive items-center justify-center"
+          >
             <X size={13} color="white" />
           </TouchableOpacity>
         )}
@@ -171,33 +182,44 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
         ) : null}
         <View className="absolute bottom-0 left-0 right-0 p-3 bg-black/55">
           <Text className="text-lg font-bold text-white">{rec.title}</Text>
-          <View className="mt-1 flex-row flex-wrap items-center gap-x-3 gap-y-1">
+          <View className="mt-1 flex-col items-start gap-y-1">
             {rec.location ? (
-              <View className="flex-row items-center gap-1">
+              <View className="w-full flex-row items-center gap-1">
                 <MapPin size={12} color="rgba(255,255,255,0.8)" />
-                <Text className="text-xs text-white/80">{rec.location}</Text>
-              </View>
-            ) : null}
-            {showStarRating ? (
-              <View className="flex-row items-center gap-1">
-                <Star
-                  size={12}
-                  color={Theme.colors.ratingStar}
-                  fill={Theme.colors.ratingStar}
-                />
-                <Text className="text-xs text-rating-star">
-                  {rec.rating != null && rec.rating % 1 === 0
-                    ? String(rec.rating)
-                    : rec.rating!.toFixed(1)}
+                <Text
+                  className="min-w-0 flex-1 text-xs text-white/80"
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={addressEllipsisStyle}
+                >
+                  {rec.location}
                 </Text>
               </View>
             ) : null}
-            {vfmLabel ? (
-              <View className="flex-row items-center gap-0.5">
-                <DollarSign size={12} color="rgba(255,255,255,0.9)" />
-                <Text className="text-[11px] text-white/90">{vfmLabel}</Text>
+            {(showStarRating || vfmLabel) && (
+              <View className="flex-row items-center gap-x-3 gap-y-1">
+                {showStarRating ? (
+                  <View className="flex-row items-center gap-1">
+                    <Star
+                      size={12}
+                      color={Theme.colors.ratingStar}
+                      fill={Theme.colors.ratingStar}
+                    />
+                    <Text className="text-xs text-rating-star">
+                      {rec.rating != null && rec.rating % 1 === 0
+                        ? String(rec.rating)
+                        : rec.rating!.toFixed(1)}
+                    </Text>
+                  </View>
+                ) : null}
+                {vfmLabel ? (
+                  <View className="flex-row items-center gap-0.5">
+                    <DollarSign size={12} color="rgba(255,255,255,0.9)" />
+                    <Text className="text-[11px] text-white/90">{vfmLabel}</Text>
+                  </View>
+                ) : null}
               </View>
-            ) : null}
+            )}
           </View>
         </View>
       </View>
@@ -209,7 +231,10 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
       {tags.length > 0 && (
         <View className="flex-row flex-wrap gap-1.5 px-4 pt-2">
           {tags.map((tag) => (
-            <View key={tag} className="rounded-full border border-border/80 bg-border/40 px-2 py-0.5">
+            <View
+              key={tag}
+              className="rounded-full border border-border/80 bg-border/40 px-2 py-0.5"
+            >
               <Text className="text-xs font-medium text-foreground">#{tag}</Text>
             </View>
           ))}

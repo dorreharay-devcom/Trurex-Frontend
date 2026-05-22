@@ -1,5 +1,18 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, useWindowDimensions, Animated, Modal, Pressable, StyleSheet, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  useWindowDimensions,
+  Animated,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Platform,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { Routes } from '~/constants/routes';
 import * as ImagePicker from 'expo-image-picker';
@@ -103,14 +116,16 @@ const AnimatedRexCard: React.FC<{
           <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
             {rec.location || rec.category}
           </Text>
-          {rec.rating != null && rec.rating > 0 ? (
-            <View className="mt-1 flex-row items-center gap-1">
-              <Star size={10} color={Theme.colors.ratingStar} fill={Theme.colors.ratingStar} />
-              <Text className="text-[10px] font-medium text-rating-star">
-                {rec.rating % 1 === 0 ? String(rec.rating) : rec.rating.toFixed(1)}
-              </Text>
-            </View>
-          ) : null}
+          <View className="mt-1 h-4 flex-row items-center gap-1">
+            {rec.rating != null && rec.rating > 0 ? (
+              <>
+                <Star size={10} color={Theme.colors.ratingStar} fill={Theme.colors.ratingStar} />
+                <Text className="text-[10px] font-medium text-rating-star">
+                  {rec.rating % 1 === 0 ? String(rec.rating) : rec.rating.toFixed(1)}
+                </Text>
+              </>
+            ) : null}
+          </View>
         </View>
       </TouchableOpacity>
     </Animated.View>
@@ -126,7 +141,14 @@ interface ProfileViewProps {
   onSignUp?: () => void;
 }
 
-const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, onBack, onRexPress, onSignUp }: ProfileViewProps) => {
+const ProfileView = ({
+  userId: propUserId,
+  handle: propHandle,
+  onAvatarUpdated,
+  onBack,
+  onRexPress,
+  onSignUp,
+}: ProfileViewProps) => {
   const { user: authUser, signOut } = useAuth();
   const router = useRouter();
   const isGuest = !authUser;
@@ -137,7 +159,10 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
       'Create an account to follow users and unlock all features.',
       [
         { text: 'Later', style: 'cancel' },
-        { text: 'Sign in / Sign up', onPress: () => onSignUp ? onSignUp() : router.navigate(Routes.Login) },
+        {
+          text: 'Sign in / Sign up',
+          onPress: () => (onSignUp ? onSignUp() : router.navigate(Routes.Login)),
+        },
       ],
     );
   }, [router, onSignUp]);
@@ -174,8 +199,7 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
         : !viewingByHandle;
 
   const profileContentUserId =
-    profile?.userId ??
-    (viewingByUserId ? propUserId : viewingByHandle ? undefined : authUser?.id);
+    profile?.userId ?? (viewingByUserId ? propUserId : viewingByHandle ? undefined : authUser?.id);
 
   const { data: myRexes = [], isLoading: rexesLoading } = useMyRexes(profileContentUserId);
   const { data: myCollections = [], isLoading: collectionsLoading } =
@@ -447,12 +471,15 @@ const ProfileView = ({ userId: propUserId, handle: propHandle, onAvatarUpdated, 
 
       {isGuest && (
         <View className="absolute bottom-0 left-0 right-0 border-t border-border bg-card">
-          <View style={webContainerStyle} className="flex-row items-center justify-between px-4 py-3">
+          <View
+            style={webContainerStyle}
+            className="flex-row items-center justify-between px-4 py-3"
+          >
             <Text className="text-xs text-muted-foreground flex-1 mr-3">
               You have limited access. Sign up to see everything.
             </Text>
             <TouchableOpacity
-              onPress={() => onSignUp ? onSignUp() : router.replace('/')}
+              onPress={() => (onSignUp ? onSignUp() : router.replace('/'))}
               activeOpacity={0.8}
               className="px-4 py-2 rounded-lg bg-primary"
             >

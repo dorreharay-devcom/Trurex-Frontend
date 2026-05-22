@@ -7,6 +7,9 @@ import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
 import { cn } from '~/utils/general';
 import { webNoOutline } from './webInputOutline';
+import type { CreateRecSearchPlace } from '~/types/recommendation/create';
+import { useActiveCategories } from '~/hooks/useActiveCategories';
+import { SearchPlaceRow } from './SearchPlaceRow';
 
 const SCROLL_PAD = 'pb-36';
 
@@ -16,6 +19,11 @@ type Props = {
   manualAddress: string;
   onManualAddressChange: (v: string) => void;
   manualGeotag: { lat: number; lng: number } | null;
+  addressResults: CreateRecSearchPlace[];
+  isSearchingAddress: boolean;
+  showAddressNoResults: boolean;
+  addressSearchErrorMessage: string | null;
+  onSelectManualAddress: (place: CreateRecSearchPlace) => void;
   onTagLocationPress: () => void;
   onBackToSearchSelect: () => void;
   tagLocationLoading: boolean;
@@ -27,10 +35,17 @@ export function SearchManualPanel({
   manualAddress,
   onManualAddressChange,
   manualGeotag,
+  addressResults,
+  isSearchingAddress,
+  showAddressNoResults,
+  addressSearchErrorMessage,
+  onSelectManualAddress,
   onTagLocationPress,
   onBackToSearchSelect,
   tagLocationLoading,
 }: Props) {
+  const { data: categoryRows } = useActiveCategories(true);
+
   return (
     <ScrollView
       className="flex-1"
@@ -66,7 +81,7 @@ export function SearchManualPanel({
         <TextInput
           value={manualAddress}
           onChangeText={onManualAddressChange}
-          placeholder="Address or location (optional)"
+          placeholder="Address or location"
           placeholderTextColor={Theme.colors.secondaryText}
           editable={!tagLocationLoading}
           className={`w-full rounded-[12px] border border-border bg-muted/50 px-4 py-3.5 text-base text-foreground ${INPUT_FOCUS_RING_CLASS}`}
@@ -79,6 +94,35 @@ export function SearchManualPanel({
           underlineColorAndroid="transparent"
           selectionColor={Theme.colors.foreground}
         />
+
+        {addressSearchErrorMessage ? (
+          <Text className="-mt-4 text-sm text-destructive">{addressSearchErrorMessage}</Text>
+        ) : null}
+
+        {isSearchingAddress ? (
+          <View className="-mt-4 items-center py-3">
+            <ActivityIndicator color={Theme.colors.primary} />
+          </View>
+        ) : null}
+
+        {!isSearchingAddress && showAddressNoResults ? (
+          <Text className="-mt-4 text-sm text-muted-foreground">
+            Choose a valid address from suggestions or tag your current location.
+          </Text>
+        ) : null}
+
+        {!isSearchingAddress &&
+          addressResults.map((place) => (
+            <SearchPlaceRow
+              key={place.id}
+              place={place}
+              categoryRows={categoryRows}
+              selected={
+                manualGeotag?.lat === place.latitude && manualGeotag?.lng === place.longitude
+              }
+              onSelect={onSelectManualAddress}
+            />
+          ))}
 
         {tagLocationLoading ? (
           <View className="w-full flex-row items-center gap-2 rounded-lg py-2">
