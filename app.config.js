@@ -1,5 +1,5 @@
 /** @type {import('expo/config').ExpoConfig} */
-const appEnv = process.env.APP_ENV ?? process.env.EXPO_PUBLIC_APP_ENV ?? 'production';
+const appEnv = process.env.APP_ENV ?? 'production';
 const isProduction = appEnv === 'production';
 const appScheme = process.env.EXPO_PUBLIC_APP_SCHEME ?? (isProduction ? 'trurex' : 'trurex-dev');
 const nativeApplicationId = isProduction ? 'com.app.trurex' : 'com.app.trurex.dev';
@@ -59,7 +59,7 @@ module.exports = {
     ],
     extra: {
       appEnv,
-      appTarget: process.env.APP_TARGET ?? process.env.EXPO_PUBLIC_APP_TARGET ?? 'native',
+      appTarget: process.env.APP_TARGET ?? 'native',
       eas: {
         projectId: 'f032cbbd-67b0-4ced-8cfb-a196c47e0a1b',
       },

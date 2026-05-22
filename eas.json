@@ -10,8 +10,6 @@
       "env": {
         "APP_ENV": "development",
         "APP_TARGET": "native",
-        "EXPO_PUBLIC_APP_ENV": "development",
-        "EXPO_PUBLIC_APP_TARGET": "native",
         "EXPO_PUBLIC_APP_SCHEME": "trurex-dev"
       }
     },
@@ -20,8 +18,6 @@
       "env": {
         "APP_ENV": "development",
         "APP_TARGET": "native",
-        "EXPO_PUBLIC_APP_ENV": "development",
-        "EXPO_PUBLIC_APP_TARGET": "native",
         "EXPO_PUBLIC_APP_SCHEME": "trurex-dev"
       }
     },
@@ -30,8 +26,6 @@
       "env": {
         "APP_ENV": "production",
         "APP_TARGET": "native",
-        "EXPO_PUBLIC_APP_ENV": "production",
-        "EXPO_PUBLIC_APP_TARGET": "native",
         "EXPO_PUBLIC_APP_SCHEME": "trurex"
       }
     }
