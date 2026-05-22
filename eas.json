@@ -30,6 +30,10 @@
     }
   },
   "submit": {
+    "development": {
+      "ios": {},
+      "android": {}
+    },
     "production": {}
   }
 }
