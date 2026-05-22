@@ -1,9 +1,14 @@
 /** @type {import('expo/config').ExpoConfig} */
+const appEnv = process.env.APP_ENV ?? process.env.EXPO_PUBLIC_APP_ENV ?? 'production';
+const isProduction = appEnv === 'production';
+const appScheme = process.env.EXPO_PUBLIC_APP_SCHEME ?? (isProduction ? 'trurex' : 'trurex-dev');
+const nativeApplicationId = isProduction ? 'com.app.trurex' : 'com.app.trurex.dev';
+
 module.exports = {
   expo: {
-    name: 'truRex',
+    name: isProduction ? 'truRex' : 'truRex Dev',
     slug: 'trurex',
-    scheme: 'trurex',
+    scheme: appScheme,
     version: '1.0.1',
     orientation: 'portrait',
     icon: './assets/truRexIcon.png',
@@ -16,13 +21,13 @@ module.exports = {
     },
     ios: {
       supportsTablet: true,
-      bundleIdentifier: 'com.app.trurex',
+      bundleIdentifier: nativeApplicationId,
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
       },
     },
     android: {
-      package: 'com.app.trurex',
+      package: nativeApplicationId,
       adaptiveIcon: {
         foregroundImage: './assets/truRexIcon.png',
         backgroundColor: '#ffffff',
@@ -48,12 +53,13 @@ module.exports = {
       [
         'expo-location',
         {
-          locationWhenInUsePermission:
-            'Allow TruRex to use your location to tag recommendations.',
+          locationWhenInUsePermission: 'Allow TruRex to use your location to tag recommendations.',
         },
       ],
     ],
     extra: {
+      appEnv,
+      appTarget: process.env.APP_TARGET ?? process.env.EXPO_PUBLIC_APP_TARGET ?? 'native',
       eas: {
         projectId: 'f032cbbd-67b0-4ced-8cfb-a196c47e0a1b',
       },

@@ -40,7 +40,7 @@ export const formatCurrency = (amount: number, currency: string = 'USD') => {
   }).format(amount);
 };
 
-const APP_SCHEME = 'trurex';
+const APP_SCHEME = process.env.EXPO_PUBLIC_APP_SCHEME ?? 'trurex';
 const AUTH_CALLBACK_PATH = 'auth/callback';
 
 export const getRedirectUrl = () =>

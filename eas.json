@@ -6,13 +6,46 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "APP_ENV": "development",
+        "APP_TARGET": "native",
+        "EXPO_PUBLIC_APP_ENV": "development",
+        "EXPO_PUBLIC_APP_TARGET": "native",
+        "EXPO_PUBLIC_APP_SCHEME": "trurex-dev",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://agomackllxsuvedlakby.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_3miDnhhpxMPrv8WelmdwWw_XRhM8hBz",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_3miDnhhpxMPrv8WelmdwWw_XRhM8hBz",
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyApZZx-u2s-GP1T9qTdOnxUmldcSDSAPhQ"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "APP_ENV": "development",
+        "APP_TARGET": "native",
+        "EXPO_PUBLIC_APP_ENV": "development",
+        "EXPO_PUBLIC_APP_TARGET": "native",
+        "EXPO_PUBLIC_APP_SCHEME": "trurex-dev",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://agomackllxsuvedlakby.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_3miDnhhpxMPrv8WelmdwWw_XRhM8hBz",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_3miDnhhpxMPrv8WelmdwWw_XRhM8hBz",
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyApZZx-u2s-GP1T9qTdOnxUmldcSDSAPhQ"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "APP_ENV": "production",
+        "APP_TARGET": "native",
+        "EXPO_PUBLIC_APP_ENV": "production",
+        "EXPO_PUBLIC_APP_TARGET": "native",
+        "EXPO_PUBLIC_APP_SCHEME": "trurex",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://agomackllxsuvedlakby.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_3miDnhhpxMPrv8WelmdwWw_XRhM8hBz",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_3miDnhhpxMPrv8WelmdwWw_XRhM8hBz",
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyApZZx-u2s-GP1T9qTdOnxUmldcSDSAPhQ"
+      }
     }
   },
   "submit": {
