@@ -11,12 +11,7 @@ import {
 } from 'react-native';
 import { Plus, PackageOpen, Search, MapPin, X, Calendar } from 'lucide-react-native';
 import { CollectionsApi } from '~/api/CollectionsApi';
-import { SignedStorageImage } from '~/components/common/SignedStorageImage';
-import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
-import {
-  rexCoverStoragePathFromRecommendation,
-  rexCoverRemoteHttpUrl,
-} from '~/utils/recommendation/recContentDisplay';
+import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMyCollections, useMySavedCollections } from '~/hooks/useCollections';
 import { useSavedRexes } from '~/hooks/useGems';
@@ -268,15 +263,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
               disabled={!onRecommendationPress}
               className="min-w-0 flex-row items-center gap-3 p-3 rounded-xl bg-card border border-border"
             >
-              <View className="w-12 h-12 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-                <SignedStorageImage
-                  bucket={REX_IMAGES_BUCKET}
-                  storagePath={rexCoverStoragePathFromRecommendation(item)}
-                  remoteUri={rexCoverRemoteHttpUrl(item)}
-                  className="w-full h-full"
-                  accessibilityLabel={item.title}
-                />
-              </View>
+              <RexCoverThumbnail rec={item} className="h-12 w-12 rounded-lg flex-shrink-0" />
               <View className="min-w-0 flex-1 overflow-hidden">
                 <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
                   {item.title}

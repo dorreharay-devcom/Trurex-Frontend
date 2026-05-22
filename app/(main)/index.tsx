@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Text, View, TouchableOpacity } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import { PlusCircle } from 'lucide-react-native';
 import ProfileView from '~/components/profile/ProfileView';
 import FavesView from '~/components/faves/FavesView';
@@ -20,7 +21,10 @@ import type {
 import { useUserConfig } from '~/hooks/useUserConfig';
 
 export default function HomeScreen() {
-  const [currentTab, setCurrentTab] = useState<Tab>('discover');
+  const { tab } = useLocalSearchParams<{ tab?: string }>();
+  const initialTab: Tab =
+    tab === 'faves' || tab === 'circles' || tab === 'map' || tab === 'profile' ? tab : 'discover';
+  const [currentTab, setCurrentTab] = useState<Tab>(initialTab);
   const [searchQuery, setSearchQuery] = useState('');
   const [createRecommendationOpen, setCreateRecommendationOpen] = useState(false);
   const [addYourOwnPrefill, setAddYourOwnPrefill] = useState<AddYourOwnRecSource | null>(null);

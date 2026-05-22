@@ -44,18 +44,18 @@ import {
 import EditCollectionModal from '~/components/faves/EditCollectionModal';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
-import { toastSuccess } from '~/utils/appToast';
+import { toastSuccessAfterDismiss } from '~/utils/appToast';
 import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
 import type {
   Recommendation,
   RecommendationOpenOptions,
 } from '~/types/recommendation/recommendation';
-
-const VALUE_LABELS = ['Total Steal', 'Budget-Friendly', 'Good Value', 'Worth It', 'Splurge'];
 import type { CollectionRexEntry } from '~/api/CollectionsApi';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
+
+const VALUE_LABELS = ['Total Steal', 'Budget-Friendly', 'Good Value', 'Worth It', 'Splurge'];
 
 function entryToRec(entry: CollectionRexEntry): Recommendation {
   return {
@@ -129,11 +129,10 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   const isSaved = savedOverride ?? detail?.is_saved ?? false;
 
   const handleCopyLink = async () => {
-    setShowMenu(false);
     const base =
       typeof window !== 'undefined' ? window.location.origin : 'https://trurex.netlify.app';
     await Clipboard.setStringAsync(`${base}/collection/${collectionId}`);
-    toastSuccess('Link copied!');
+    toastSuccessAfterDismiss(() => setShowMenu(false), 'Link copied!');
   };
   const menuButtonRef = useRef<View>(null);
   const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
@@ -201,7 +200,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
           <Text className="text-sm text-muted-foreground">Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          ref={menuButtonRef as any}
+          ref={menuButtonRef}
           onPress={() => {
             menuButtonRef.current?.measure(
               (
@@ -260,11 +259,17 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                     <Text className="text-xs text-muted-foreground">
                       {item.category_name || item.category_code}
                     </Text>
-                    <View className="flex-row items-center gap-2 mt-1 flex-wrap">
+                    <View className="mt-1 min-w-0 flex-row items-center gap-2 overflow-hidden">
                       {item.location && (
-                        <View className="flex-row items-center gap-0.5">
-                          <MapPin size={10} color={Theme.colors.muted} />
-                          <Text className="text-[11px] text-muted-foreground">{item.location}</Text>
+                        <View className="min-w-0 flex-1 flex-row items-center gap-0.5 overflow-hidden">
+                          <MapPin size={10} color={Theme.colors.muted} style={{ flexShrink: 0 }} />
+                          <Text
+                            className="min-w-0 flex-1 text-[11px] text-muted-foreground"
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                          >
+                            {item.location}
+                          </Text>
                         </View>
                       )}
                       {!!item.rating && (
@@ -287,7 +292,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                       )}
                     </View>
                     {item.recommender_name && (
-                      <Text className="text-[10px] text-primary font-medium mt-0.5">
+                      <Text className="mt-0.5 text-[10px] font-medium text-muted-foreground">
                         Rec'd by {item.recommender_name}
                       </Text>
                     )}
@@ -343,7 +348,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                     placeholderTextColor={Theme.colors.muted}
                     multiline
                     maxLength={140}
-                    className="bg-muted/50 rounded-lg px-3 py-2 text-xs text-foreground min-h-[56px]"
+                    className="min-h-[56px] rounded-lg border border-border bg-muted/50 px-3 py-2 text-xs text-foreground"
                     style={textFieldCaretStyle}
                   />
                   <View className="flex-row items-center justify-between mt-2">
@@ -351,9 +356,9 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                     <View className="flex-row gap-2">
                       <TouchableOpacity
                         onPress={closeNoteEditor}
-                        className="px-3 py-1.5 rounded-lg bg-muted"
+                        className="rounded-lg border border-border bg-card px-3 py-1.5"
                       >
-                        <Text className="text-xs text-muted-foreground">Cancel</Text>
+                        <Text className="text-xs font-medium text-foreground">Cancel</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         onPress={() => saveNote(item.rex_id)}

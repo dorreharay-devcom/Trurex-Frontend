@@ -1,14 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CollectionDetailView from '~/components/faves/CollectionDetailView';
+import AddRexToCollectionSheet from '~/components/faves/AddRexToCollectionSheet';
+import { RecommendationDetailModal } from '~/components/recommendation/RecommendationDetailModal';
 import { Header } from '~/components/layout/Header';
 import { TabBar } from '~/components/layout/TabBar';
+import type {
+  Recommendation,
+  RecommendationOpenOptions,
+} from '~/types/recommendation/recommendation';
 
 export default function CollectionPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const [addToCollectionId, setAddToCollectionId] = useState<string | null>(null);
+  const [previewRecommendation, setPreviewRecommendation] = useState<Recommendation | null>(null);
+  const [previewOptions, setPreviewOptions] = useState<RecommendationOpenOptions>({});
+
+  const openPreview = (rec: Recommendation, options?: RecommendationOpenOptions) => {
+    setPreviewOptions(options ?? {});
+    setPreviewRecommendation(rec);
+  };
+
+  const closePreview = () => {
+    setPreviewRecommendation(null);
+    setPreviewOptions({});
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
@@ -22,10 +41,23 @@ export default function CollectionPage() {
       <View className="flex-1">
         <CollectionDetailView
           collectionId={id}
-          onBack={() => (router.canGoBack() ? router.back() : router.replace('/'))}
-          onAddItem={() => {}}
+          onBack={() => router.replace('/?tab=faves')}
+          onAddItem={(collectionId) => setAddToCollectionId(collectionId)}
+          onRecommendationPress={openPreview}
         />
       </View>
+      <AddRexToCollectionSheet
+        open={!!addToCollectionId}
+        collectionId={addToCollectionId}
+        onClose={() => setAddToCollectionId(null)}
+      />
+      <RecommendationDetailModal
+        visible={previewRecommendation != null}
+        recommendation={previewRecommendation}
+        onClose={closePreview}
+        onCommentCountChange={() => {}}
+        scrollToComments={previewOptions.scrollToComments === true}
+      />
     </SafeAreaView>
   );
 }
