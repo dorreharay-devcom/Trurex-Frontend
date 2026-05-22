@@ -98,18 +98,19 @@ function PeopleYouMayKnowCard({
               {subline}
             </Text>
           ) : null}
-          {suggestion.handle ? (
-            <Text className="mt-0.5 text-xs text-muted-foreground" numberOfLines={1}>
-              @{suggestion.handle}
-            </Text>
-          ) : null}
+          <Text
+            className={`mt-0.5 text-xs text-muted-foreground ${suggestion.handle ? '' : 'opacity-0'}`}
+            numberOfLines={1}
+          >
+            {suggestion.handle ? `@${suggestion.handle}` : '@placeholder'}
+          </Text>
         </View>
       </Pressable>
 
       <View className="mt-1.5 flex-row justify-end">
         {isFollowing ? (
-          <View className="rounded-lg border border-border bg-muted px-3 py-1.5">
-            <Text className="text-xs font-medium text-muted-foreground">Following</Text>
+          <View className="rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5">
+            <Text className="text-xs font-semibold text-foreground">Following</Text>
           </View>
         ) : (
           <Pressable

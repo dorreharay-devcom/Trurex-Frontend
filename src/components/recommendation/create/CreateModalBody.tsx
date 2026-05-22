@@ -108,6 +108,7 @@ export const CreateModalBody: React.FC<Props> = ({
             manualAddress={flow.manualAddress}
             onManualAddressChange={flow.setManualAddress}
             manualGeotag={flow.manualGeotag}
+            onSelectManualAddress={flow.selectManualAddress}
             onOpenManual={flow.openManual}
             onBackToSearchSelect={flow.backToSearchSelect}
             onTagLocationPress={onTagLocation}

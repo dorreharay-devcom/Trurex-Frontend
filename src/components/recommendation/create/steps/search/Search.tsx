@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { CreateRecSearchPlace, SearchEntryMode } from '~/types/recommendation/create';
 import { useRexPlaceSearch } from '~/hooks/recommendation';
 import { SearchManualPanel, SearchSelectPanel } from './common';
@@ -14,6 +14,7 @@ type Props = {
   manualAddress: string;
   onManualAddressChange: (v: string) => void;
   manualGeotag: { lat: number; lng: number } | null;
+  onSelectManualAddress: (place: CreateRecSearchPlace) => void;
   onOpenManual: () => void;
   onBackToSearchSelect: () => void;
   onTagLocationPress: () => void;
@@ -31,6 +32,7 @@ export const Search: React.FC<Props> = ({
   manualAddress,
   onManualAddressChange,
   manualGeotag,
+  onSelectManualAddress,
   onOpenManual,
   onBackToSearchSelect,
   onTagLocationPress,
@@ -41,6 +43,17 @@ export const Search: React.FC<Props> = ({
     searchQuery,
     enabled: selectMode,
   });
+  const manualAddressSearch = useRexPlaceSearch({
+    searchQuery: manualAddress,
+    enabled: mode === 'manual' && manualAddress.trim().length > 0 && manualGeotag == null,
+    minQueryLength: 3,
+  });
+  const manualAddressResults = useMemo(() => {
+    if (manualGeotag != null) return [];
+    return manualAddressSearch.results.filter(
+      (place) => place.latitude != null && place.longitude != null,
+    );
+  }, [manualAddressSearch.results, manualGeotag]);
 
   if (mode === 'manual') {
     return (
@@ -50,6 +63,16 @@ export const Search: React.FC<Props> = ({
         manualAddress={manualAddress}
         onManualAddressChange={onManualAddressChange}
         manualGeotag={manualGeotag}
+        addressResults={manualAddressResults}
+        isSearchingAddress={manualAddressSearch.isSearching}
+        showAddressNoResults={
+          manualGeotag == null &&
+          manualAddressSearch.canSearch &&
+          !manualAddressSearch.isSearching &&
+          manualAddressResults.length === 0
+        }
+        addressSearchErrorMessage={manualAddressSearch.searchErrorMessage}
+        onSelectManualAddress={onSelectManualAddress}
         onTagLocationPress={onTagLocationPress}
         onBackToSearchSelect={onBackToSearchSelect}
         tagLocationLoading={tagLocationLoading}

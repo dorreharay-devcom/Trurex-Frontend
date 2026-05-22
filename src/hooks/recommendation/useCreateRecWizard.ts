@@ -35,6 +35,8 @@ function suggestedCategoryFromSearch(
 type CanProceedDeps = {
   searchMode: SearchEntryMode;
   manualName: string;
+  manualAddress: string;
+  manualGeotag: { lat: number; lng: number } | null;
   selectedSearchPlace: CreateRecSearchPlace | null;
   selectedCategoryId: string | null;
   selectedCircleIds: Set<string>;
@@ -47,7 +49,9 @@ function canProceedForStep(stepId: CreateRecStepId, d: CanProceedDeps): boolean 
   switch (stepId) {
     case 'search':
       return d.searchMode === 'manual'
-        ? d.manualName.trim().length > 0
+        ? d.manualName.trim().length > 0 &&
+            d.manualAddress.trim().length > 0 &&
+            d.manualGeotag != null
         : d.selectedSearchPlace !== null;
     case 'category':
       return d.selectedCategoryId !== null;
@@ -155,6 +159,8 @@ export function useCreateRecWizard() {
       canProceedForStep(stepId, {
         searchMode,
         manualName,
+        manualAddress,
+        manualGeotag,
         selectedSearchPlace,
         selectedCategoryId,
         selectedCircleIds,
@@ -166,6 +172,8 @@ export function useCreateRecWizard() {
       stepId,
       searchMode,
       manualName,
+      manualAddress,
+      manualGeotag,
       selectedSearchPlace,
       selectedCategoryId,
       selectedCircleIds,
@@ -210,6 +218,20 @@ export function useCreateRecWizard() {
     setLinkedPlaceId(null);
   }, []);
 
+  const setManualAddressValue = useCallback((value: string) => {
+    setManualAddress(value);
+    setManualGeotag(null);
+  }, []);
+
+  const selectManualAddress = useCallback((place: CreateRecSearchPlace) => {
+    setManualAddress(place.fullText ?? place.subtitle ?? place.title);
+    setManualGeotag(
+      place.latitude != null && place.longitude != null
+        ? { lat: place.latitude, lng: place.longitude }
+        : null,
+    );
+  }, []);
+
   useEffect(() => {
     setLinkedPlaceId(null);
   }, [selectedCategoryId]);
@@ -226,12 +248,19 @@ export function useCreateRecWizard() {
         if (!name) {
           throw new Error('Enter a place name.');
         }
+        const address = manualAddress.trim();
+        if (!address) {
+          throw new Error('Choose an address or tag your current location.');
+        }
+        if (!manualGeotag) {
+          throw new Error('Choose a valid address from suggestions or tag your current location.');
+        }
         const row = await createManualPlace({
           p_name: name,
           p_category_code: code,
-          p_normalized_address: manualAddress.trim() || null,
-          p_latitude: manualGeotag?.lat ?? null,
-          p_longitude: manualGeotag?.lng ?? null,
+          p_normalized_address: address,
+          p_latitude: manualGeotag.lat,
+          p_longitude: manualGeotag.lng,
         });
         setLinkedPlaceId(row.id);
         return;
@@ -381,9 +410,10 @@ export function useCreateRecWizard() {
     manualName,
     setManualName,
     manualAddress,
-    setManualAddress,
+    setManualAddress: setManualAddressValue,
     manualGeotag,
     setManualGeotag,
+    selectManualAddress,
     setSearchMode,
     isFirstStep,
     isLastStep,
