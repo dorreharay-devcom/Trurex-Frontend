@@ -113,6 +113,7 @@ export default function HomeScreen() {
           <ProfileView
             userId={viewingUserId}
             onAvatarUpdated={() => setAvatarRefreshKey((k) => k + 1)}
+            avatarRefreshKey={avatarRefreshKey}
             onBack={
               viewingUserId
                 ? () => {

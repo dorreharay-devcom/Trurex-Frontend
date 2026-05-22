@@ -23,6 +23,7 @@ interface ProfileHeaderProps {
   onUnfollow?: () => void;
   onGuestAction?: () => void;
   followLoading?: boolean;
+  avatarRefreshKey?: number;
 }
 
 const ProfileHeader = ({
@@ -37,6 +38,7 @@ const ProfileHeader = ({
   onUnfollow,
   onGuestAction,
   followLoading = false,
+  avatarRefreshKey,
 }: ProfileHeaderProps) => {
   const handleShare = async () => {
     const slug = profileShareSlug(profile);
@@ -71,6 +73,7 @@ const ProfileHeader = ({
                   bucket={USER_AVATARS_BUCKET}
                   storagePath={profile.avatarUrl}
                   className="w-full h-full"
+                  cacheVersion={avatarRefreshKey}
                 />
               ) : (
                 <View className="flex-1 items-center justify-center">

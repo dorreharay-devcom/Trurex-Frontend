@@ -136,6 +136,7 @@ interface ProfileViewProps {
   userId?: string;
   handle?: string;
   onAvatarUpdated?: () => void;
+  avatarRefreshKey?: number;
   onBack?: () => void;
   onRexPress?: (rec: Recommendation) => void;
   onSignUp?: () => void;
@@ -145,6 +146,7 @@ const ProfileView = ({
   userId: propUserId,
   handle: propHandle,
   onAvatarUpdated,
+  avatarRefreshKey = 0,
   onBack,
   onRexPress,
   onSignUp,
@@ -344,6 +346,7 @@ const ProfileView = ({
             setIsEditing(false);
             setLoading(true);
             fetchProfile();
+            onAvatarUpdated?.();
           }}
         />
       </ScrollView>
@@ -381,6 +384,7 @@ const ProfileView = ({
               onSignOut={signOut}
               onAvatarPress={handleAvatarPress}
               avatarUploading={avatarUploading}
+              avatarRefreshKey={avatarRefreshKey}
               onFollow={() => follow.mutate()}
               onUnfollow={() => unfollow.mutate()}
               onGuestAction={handleGuestAction}

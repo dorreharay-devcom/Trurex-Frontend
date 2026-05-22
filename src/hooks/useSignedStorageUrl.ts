@@ -114,13 +114,15 @@ export function useSignedStorageUrl(
   bucket: string,
   objectPath: string,
   expiresInSec = 3600,
+  cacheVersion?: string | number,
 ): { uri: string | null; loading: boolean } {
   const rawPath = (objectPath ?? '').trim().replace(/^\/+/, '');
   // If the path already starts with the bucket name, strip it to avoid double-prefixing
   const bucketPrefix = `${bucket}/`;
   const trimmed = rawPath.startsWith(bucketPrefix) ? rawPath.slice(bucketPrefix.length) : rawPath;
 
-  const cacheKey = trimmed ? `${bucket}:${trimmed}` : '';
+  const version = cacheVersion == null ? '' : `:${cacheVersion}`;
+  const cacheKey = trimmed ? `${bucket}:${trimmed}${version}` : '';
 
   const [uri, setUri] = useState<string | null>(() => (cacheKey ? getCached(cacheKey) : null));
   const [loading, setLoading] = useState(() => {
