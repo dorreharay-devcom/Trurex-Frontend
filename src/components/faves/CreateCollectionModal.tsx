@@ -26,7 +26,7 @@ import {
 } from '~/utils/photos/storageUpload';
 import { generateRexImageStoragePath } from '~/utils/photos/photoUtils';
 import { isWeb, webContainerStyle } from '~/utils';
-import { Theme, textFieldCaretStyle } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
 import { cn } from '~/utils/general';
 import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
@@ -145,8 +145,8 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
       const storagePath = generateRexImageStoragePath(user.id, prepared.fileName ?? fileName);
       await uploadBlobToStorageBucket(COLLECTION_COVERS_BUCKET, storagePath, prepared.blob);
       setCoverStoragePath(storagePath);
-    } catch (e: any) {
-      toastError('Upload failed', e?.message);
+    } catch (e: unknown) {
+      toastError('Upload failed', e instanceof Error ? e.message : 'Could not upload cover image.');
       setCoverPreview(null);
       setCoverStoragePath(null);
     } finally {
@@ -280,7 +280,12 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                     placeholderTextColor={Theme.colors.secondaryText}
                     underlineColorAndroid="transparent"
                     selectionColor={Theme.colors.foreground}
-                    style={[webNoOutline, textFieldCaretStyle, collectionFieldBg]}
+                    style={[
+                      webNoOutline,
+                      textFieldCaretStyle,
+                      textFieldSingleLineStyle,
+                      collectionFieldBg,
+                    ]}
                     className={`w-full rounded-xl border border-border px-4 py-3 text-sm text-foreground ${INPUT_FOCUS_BORDER_CLASS}`}
                   />
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">

@@ -99,7 +99,7 @@ export const Header: React.FC<HeaderProps> = ({
             </View>
           </View>
 
-          <View className="flex-row items-center justify-center gap-1" style={{ width: '20%' }}>
+          <View className="flex-row items-center justify-end gap-1" style={{ width: '26%' }}>
             <TouchableOpacity
               onPress={onAddPress}
               className="flex-row items-center gap-1 rounded-lg p-2 active:opacity-80"
@@ -111,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({
             <NotificationBell onUserPress={onUserPress} />
           </View>
 
-          <View className="items-center justify-center" style={{ width: '20%' }}>
+          <View className="items-center justify-center" style={{ width: '14%' }}>
             <TouchableOpacity
               onPress={onProfilePress}
               className={`h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 ${

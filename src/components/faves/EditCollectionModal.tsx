@@ -27,7 +27,7 @@ import {
 } from '~/utils/photos/storageUpload';
 import { generateRexImageStoragePath } from '~/utils/photos/photoUtils';
 import { isWeb, webContainerStyle } from '~/utils';
-import { Theme, textFieldCaretStyle } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
 import { cn } from '~/utils/general';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
@@ -39,7 +39,7 @@ const VISIBILITY_OPTIONS: {
   value: CollectionVisibility;
   label: string;
   sublabel: string;
-  Icon: React.ComponentType<any>;
+  Icon: React.ComponentType<{ size?: number; color?: string }>;
 }[] = [
   { value: 'private', label: 'Private', sublabel: 'Only you', Icon: Lock },
   { value: 'shared', label: 'Circles', sublabel: 'Your circles', Icon: Users },
@@ -144,8 +144,8 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
       const storagePath = generateRexImageStoragePath(user.id, prepared.fileName ?? fileName);
       await uploadBlobToStorageBucket(REX_IMAGES_BUCKET, storagePath, prepared.blob);
       setNewCoverStoragePath(storagePath);
-    } catch (e: any) {
-      toastError('Upload failed', e?.message);
+    } catch (e: unknown) {
+      toastError('Upload failed', e instanceof Error ? e.message : 'Could not upload cover image.');
       setNewCoverPreview(null);
       setNewCoverStoragePath(null);
     } finally {
@@ -269,7 +269,7 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
                     onChangeText={(v) => setName(v.slice(0, 60))}
                     placeholder="Collection name"
                     placeholderTextColor={Theme.colors.secondaryText}
-                    style={[collectionFieldBg, textFieldCaretStyle]}
+                    style={[collectionFieldBg, textFieldCaretStyle, textFieldSingleLineStyle]}
                     className="w-full px-3 py-2.5 rounded-xl border border-border text-sm text-foreground"
                   />
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">

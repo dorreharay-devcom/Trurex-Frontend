@@ -4,12 +4,13 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Platform,
   type TextInputProps,
   type StyleProp,
   type TextStyle,
 } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
-import { Theme, textFieldCaretStyle } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 
 interface InputProps extends TextInputProps {
@@ -33,7 +34,9 @@ const Input = ({
 }: InputProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
-  const caretStyle: StyleProp<TextStyle> = [style, textFieldCaretStyle];
+  const inputStyle: StyleProp<TextStyle> = props.multiline
+    ? [style, textFieldCaretStyle]
+    : [style, textFieldCaretStyle, Platform.OS === 'web' ? null : textFieldSingleLineStyle];
 
   return (
     <View>
@@ -50,7 +53,7 @@ const Input = ({
         >
           <TextInput
             className={`flex-1 px-3 py-2.5 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
-            style={caretStyle}
+            style={inputStyle}
             secureTextEntry={!showPassword}
             placeholderTextColor={Theme.colors.muted}
             autoCapitalize="none"
@@ -68,7 +71,7 @@ const Input = ({
       ) : (
         <TextInput
           className={`w-full rounded-lg border bg-card px-3 py-2.5 text-sm text-foreground ${error ? 'border-destructive' : 'border-border'} ${inputClassName ?? ''}`}
-          style={caretStyle}
+          style={inputStyle}
           placeholderTextColor={Theme.colors.muted}
           autoCapitalize="none"
           selectionColor={Theme.colors.foreground}

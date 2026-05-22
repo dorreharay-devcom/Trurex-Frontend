@@ -228,6 +228,7 @@ export function filterOneWayFollowing(rows: NetworkUserRow[]): NetworkUserRow[] 
 const emptyUserConfig = (): UserConfigRow => ({
   avatar_url: null,
   pinned_category_ids: [],
+  status: null,
 });
 
 function normalizeUserConfigResponse(data: unknown): UserConfigRow {

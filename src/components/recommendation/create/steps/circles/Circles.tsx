@@ -8,7 +8,7 @@ import {
   canRenameCreateRecCircle,
   findRenameableCircleById,
 } from '~/constants/recommendation/createCircles';
-import { Theme, textFieldCaretStyle } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
 import { CreateStepTitle } from '../../CreateStepTitle';
 import { cn } from '~/utils/general';
 import { CirclesRingPicker } from './common/CirclesRingPicker';
@@ -277,7 +277,12 @@ export const Circles: React.FC<Props> = ({
                     placeholder="Circle name"
                     placeholderTextColor={Theme.colors.secondaryText}
                     className="min-w-0 flex-1 rounded-lg border border-border px-3 py-2 text-sm text-foreground"
-                    style={[collectionFieldBg, webNoOutline, textFieldCaretStyle]}
+                    style={[
+                      collectionFieldBg,
+                      webNoOutline,
+                      textFieldCaretStyle,
+                      textFieldSingleLineStyle,
+                    ]}
                     maxLength={32}
                     editable={!busy}
                     onSubmitEditing={() => void handleSaveRename()}

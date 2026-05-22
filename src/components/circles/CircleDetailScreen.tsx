@@ -404,7 +404,7 @@ function EditCircleModal({
             onChangeText={onChangeName}
             maxLength={40}
             className="mb-3 rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground"
-            style={textFieldCaretStyle}
+            style={[textFieldCaretStyle, textFieldSingleLineStyle]}
           />
           <TextInput
             placeholder="Description (optional)"
