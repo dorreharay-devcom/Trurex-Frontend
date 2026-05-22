@@ -6,13 +6,34 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "APP_ENV": "development",
+        "APP_TARGET": "native",
+        "EXPO_PUBLIC_APP_ENV": "development",
+        "EXPO_PUBLIC_APP_TARGET": "native",
+        "EXPO_PUBLIC_APP_SCHEME": "trurex-dev"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "APP_ENV": "development",
+        "APP_TARGET": "native",
+        "EXPO_PUBLIC_APP_ENV": "development",
+        "EXPO_PUBLIC_APP_TARGET": "native",
+        "EXPO_PUBLIC_APP_SCHEME": "trurex-dev"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "APP_ENV": "production",
+        "APP_TARGET": "native",
+        "EXPO_PUBLIC_APP_ENV": "production",
+        "EXPO_PUBLIC_APP_TARGET": "native",
+        "EXPO_PUBLIC_APP_SCHEME": "trurex"
+      }
     }
   },
   "submit": {
