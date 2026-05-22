@@ -45,7 +45,12 @@ export const Header: React.FC<HeaderProps> = ({
   const searchInputRef = useRef<TextInput>(null);
 
   const [avatarPath, setAvatarPath] = useState<string | null>(null);
-  const { uri: avatarUri } = useSignedStorageUrl(USER_AVATARS_BUCKET, avatarPath ?? '');
+  const { uri: avatarUri } = useSignedStorageUrl(
+    USER_AVATARS_BUCKET,
+    avatarPath ?? '',
+    3600,
+    avatarRefreshKey,
+  );
 
   useEffect(() => {
     if (!user?.id) return;

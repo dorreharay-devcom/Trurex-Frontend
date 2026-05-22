@@ -21,6 +21,7 @@ type Props = {
   contentFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
   onLoad?: (e: { source: { width: number; height: number } }) => void;
   skeletonUntilLoaded?: boolean;
+  cacheVersion?: string | number;
 };
 
 export function SignedStorageImage({
@@ -33,12 +34,18 @@ export function SignedStorageImage({
   contentFit = 'cover',
   onLoad,
   skeletonUntilLoaded = false,
+  cacheVersion,
 }: Props) {
   const http = remoteUri?.trim() && isHttpUrl(remoteUri.trim()) ? remoteUri.trim() : null;
   const path = storagePath?.trim() ?? '';
   const useBundledPlaceholder = !http && isRexPlaceholderPhotoPath(path);
 
-  const { uri, loading } = useSignedStorageUrl(bucket, http || useBundledPlaceholder ? '' : path);
+  const { uri, loading } = useSignedStorageUrl(
+    bucket,
+    http || useBundledPlaceholder ? '' : path,
+    3600,
+    cacheVersion,
+  );
   const displayUri = http ?? uri;
 
   const [decoded, setDecoded] = useState(false);
