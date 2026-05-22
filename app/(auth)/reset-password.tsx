@@ -60,7 +60,7 @@ export default function ResetPasswordScreen() {
         <Text className="text-lg font-semibold text-foreground">Set new password</Text>
       </View>
 
-      <View className="space-y-4">
+      <View className={isWeb ? 'space-y-4' : 'gap-4'}>
         <Input
           label="New password"
           value={password}

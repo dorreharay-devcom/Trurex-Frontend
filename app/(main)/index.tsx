@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { Text, View, TouchableOpacity } from 'react-native';
 import { PlusCircle } from 'lucide-react-native';
 import ProfileView from '~/components/profile/ProfileView';
 import FavesView from '~/components/faves/FavesView';
@@ -17,6 +17,7 @@ import type {
   Recommendation,
   RecommendationOpenOptions,
 } from '~/types/recommendation/recommendation';
+import { useUserConfig } from '~/hooks/useUserConfig';
 
 export default function HomeScreen() {
   const [currentTab, setCurrentTab] = useState<Tab>('discover');
@@ -28,6 +29,7 @@ export default function HomeScreen() {
   const [avatarRefreshKey, setAvatarRefreshKey] = useState(0);
   const [viewingUserId, setViewingUserId] = useState<string | undefined>(undefined);
   const [profileReturnTab, setProfileReturnTab] = useState<Tab>('discover');
+  const { isAccountFrozen } = useUserConfig();
 
   const handleCloseCreate = useCallback(() => {
     setCreateRecommendationOpen(false);
@@ -83,6 +85,13 @@ export default function HomeScreen() {
               avatarRefreshKey={avatarRefreshKey}
             />
             <TabBar currentTab={currentTab} onTabChange={handleTabChange} />
+            {isAccountFrozen ? (
+              <View className="w-full items-center bg-primary/45 px-4 py-3">
+                <Text className="text-base font-bold text-primary-foreground">
+                  ❗ Your account is frozen by the admin
+                </Text>
+              </View>
+            ) : null}
           </>
         }
       >

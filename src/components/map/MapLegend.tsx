@@ -39,8 +39,14 @@ export const MapLegend: React.FC = () => {
       </Pressable>
       {!collapsed ? (
         <View
-          className="mt-1 max-w-[188px] self-start gap-1 rounded-lg border border-border bg-card/95 px-2 py-1.5 shadow-md"
-          style={Platform.OS === 'web' ? undefined : { width: 188 }}
+          className="mt-1 self-start gap-1 rounded-lg border border-border bg-card/95 px-2 py-1.5 shadow-md"
+          style={
+            Platform.OS === 'ios'
+              ? { width: 150 }
+              : Platform.OS === 'android'
+                ? { width: 188 }
+                : undefined
+          }
         >
           {legendItems.map((item) => (
             <View key={item.label} className="min-w-0 flex-row items-center gap-1.5 py-0.5">

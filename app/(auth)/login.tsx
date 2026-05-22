@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AuthApi } from '~/api/AuthApi';
 import { Routes } from '~/constants/routes';
@@ -12,6 +12,7 @@ import { mapAuthError } from '~/utils/errors';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const isWeb = Platform.OS === 'web';
   const { signInWithOAuth, oauthPending } = useOAuthSignIn();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -85,7 +86,13 @@ export default function LoginScreen() {
               accessibilityRole="button"
               accessibilityLabel="Forgot password"
             >
-              <Text className="text-xs font-medium text-muted-foreground hover:underline">
+              <Text
+                className={
+                  isWeb
+                    ? 'text-xs font-medium text-muted-foreground hover:underline'
+                    : 'text-xs font-medium text-muted-foreground'
+                }
+              >
                 Forgot password?
               </Text>
             </TouchableOpacity>

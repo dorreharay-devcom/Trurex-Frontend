@@ -35,7 +35,7 @@ import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError'
 import { unknownErrorMessage } from '~/utils';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
-import { Theme, textFieldCaretStyle } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
 
 const collectionFieldBg = { backgroundColor: Theme.colors.searchFieldBackground };
@@ -423,7 +423,7 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({
                         returnKeyType="done"
                         onSubmitEditing={handleCreateAndAdd}
                         className="flex-1 rounded-lg border border-border px-3 py-2.5 text-sm text-foreground"
-                        style={[collectionFieldBg, textFieldCaretStyle]}
+                        style={[collectionFieldBg, textFieldCaretStyle, textFieldSingleLineStyle]}
                       />
                       <Pressable
                         onPress={() => {

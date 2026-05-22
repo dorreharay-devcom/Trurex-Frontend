@@ -26,9 +26,15 @@ export const MapLocationPromptBanner: React.FC<Props> = ({ visible, onAllow, onN
     >
       <View className="rounded-2xl border border-border bg-card p-4 shadow-md">
         <View className="mb-2 flex-row items-center gap-2">
-          <Text accessible={false} className="text-[17px] leading-none">
-            📍
-          </Text>
+          <View className="h-6 w-5 items-center justify-center overflow-visible">
+            <Text
+              accessible={false}
+              className="text-[17px]"
+              style={Platform.OS === 'ios' ? { lineHeight: 22 } : undefined}
+            >
+              📍
+            </Text>
+          </View>
           <Text className="text-sm font-semibold text-foreground">Enable Location</Text>
         </View>
         <Text

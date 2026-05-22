@@ -97,6 +97,7 @@ export const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, targe
       visible={open}
       animationType="fade"
       transparent
+      presentationStyle={Platform.OS === 'ios' ? 'overFullScreen' : undefined}
       onRequestClose={onRequestClose}
       statusBarTranslucent
     >
@@ -284,7 +285,9 @@ export const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, targe
                             ? 'cursor-pointer bg-primary active:opacity-90'
                             : 'cursor-not-allowed bg-primary/40 opacity-50',
                         )}
-                        style={!canSubmit && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined}
+                        style={
+                          !canSubmit && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined
+                        }
                         accessibilityLabel="Submit report"
                         accessibilityState={{ disabled: !canSubmit }}
                       >

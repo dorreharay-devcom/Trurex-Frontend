@@ -1,5 +1,5 @@
 import React, { type ReactNode } from 'react';
-import { ActivityIndicator, Modal, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Modal, Platform, Pressable, Text, View } from 'react-native';
 import { Trash2 } from 'lucide-react-native';
 import { isWeb, webContainerStyle } from '~/utils';
 import { Theme } from '~/theme/Theme';
@@ -33,6 +33,8 @@ export function DestructiveActionConfirmModal({
       visible={visible}
       transparent
       animationType={isWeb ? 'fade' : 'slide'}
+      presentationStyle={Platform.OS === 'ios' ? 'overFullScreen' : undefined}
+      statusBarTranslucent={Platform.OS === 'android'}
       onRequestClose={() => {
         if (!pending) onCancel();
       }}

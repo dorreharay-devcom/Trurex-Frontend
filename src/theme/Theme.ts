@@ -47,7 +47,7 @@ export const Colors = {
 
 export const textFieldCaretStyle = {
   caretColor: Colors.foreground,
-  ...(Platform.OS === 'web' ? null : { lineHeight: 20 }),
+  ...(Platform.OS === 'web' ? null : { fontFamily: FontFamily.regular }),
 } as TextStyle;
 
 export const textFieldSingleLineStyle =
@@ -57,7 +57,11 @@ export const textFieldSingleLineStyle =
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
       } as TextStyle)
-    : ({ overflow: 'hidden' } as TextStyle);
+    : ({
+        overflow: 'hidden',
+        lineHeight: Platform.OS === 'ios' ? 18 : 20,
+        textAlignVertical: 'center',
+      } as TextStyle);
 
 export const Size = {
   icon: {

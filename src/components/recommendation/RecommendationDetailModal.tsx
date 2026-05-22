@@ -4,6 +4,7 @@ import {
   Text,
   ScrollView,
   Pressable,
+  TouchableOpacity,
   useWindowDimensions,
   findNodeHandle,
   Platform,
@@ -81,6 +82,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   const scrollRef = useRef<ScrollView>(null);
   const commentsSectionWrapRef = useRef<View>(null);
   const composerAnchorRef = useRef<View>(null);
+  const recommendationId = recommendation?.id;
 
   const setReport = useCallback((t: ContentReportTarget | null) => setReportTarget(t), []);
   const openRexReport = useCallback(() => {
@@ -152,7 +154,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   }, [scrollComposerIntoView]);
 
   useEffect(() => {
-    if (!visible || !recommendation || !scrollToComments) return;
+    if (!visible || !recommendationId || !scrollToComments) return;
 
     let cancelled = false;
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -174,7 +176,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
       cancelled = true;
       if (timeoutId !== undefined) clearTimeout(timeoutId);
     };
-  }, [visible, scrollToComments, recommendation?.id, scrollComposerIntoView]);
+  }, [visible, scrollToComments, recommendationId, scrollComposerIntoView]);
 
   const { data: rexDetail, isLoading: detailLoading } = useQuery({
     queryKey: ['rexDetail', recommendation?.id] as const,
@@ -297,7 +299,11 @@ export const RecommendationDetailModal: React.FC<Props> = ({
         <View className="flex-1 min-h-0 flex-col">
           <View
             className="sticky top-0 z-10 border-b border-border bg-card/95 px-4 py-4 backdrop-blur sm:px-6"
-            style={Platform.OS !== 'web' ? { zIndex: 20, elevation: 20 } : undefined}
+            style={
+              Platform.OS !== 'web'
+                ? { position: 'relative', zIndex: 50, elevation: 50 }
+                : undefined
+            }
           >
             <View className="flex-row items-center">
               <View className="w-[60px] items-start justify-center">
@@ -316,44 +322,62 @@ export const RecommendationDetailModal: React.FC<Props> = ({
               </Text>
               <View className="min-w-[72px] shrink-0 items-end justify-center">
                 {isOwner ? (
-                  <Pressable
+                  <TouchableOpacity
                     onPress={openDeleteConfirm}
-                    hitSlop={8}
+                    activeOpacity={0.75}
+                    hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
                     accessibilityLabel="Delete this recommendation"
                     accessibilityRole="button"
                     className="h-8 flex-row items-center gap-1 rounded-full border-2 border-destructive bg-destructive/10 px-2.5 active:opacity-90"
+                    style={
+                      Platform.OS !== 'web'
+                        ? { position: 'relative', zIndex: 60, elevation: 60 }
+                        : undefined
+                    }
                   >
-                    <Trash2 size={12} color={Theme.colors.destructive} strokeWidth={2.25} />
+                    <View pointerEvents="none">
+                      <Trash2 size={12} color={Theme.colors.destructive} strokeWidth={2.25} />
+                    </View>
                     <Text
                       className="text-xs font-semibold"
                       style={{ color: Theme.colors.destructive }}
                       numberOfLines={1}
+                      pointerEvents="none"
                     >
                       Delete
                     </Text>
-                  </Pressable>
+                  </TouchableOpacity>
                 ) : authUser &&
                   (recommendation.authorId == null || authUser.id !== recommendation.authorId) ? (
-                  <Pressable
+                  <TouchableOpacity
                     onPress={openRexReport}
-                    hitSlop={8}
+                    activeOpacity={0.75}
+                    hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
                     accessibilityLabel="Report this recommendation"
                     accessibilityRole="button"
                     className="h-8 flex-row items-center gap-1 rounded-full border-2 border-destructive bg-destructive/10 px-2.5 active:opacity-90"
+                    style={
+                      Platform.OS !== 'web'
+                        ? { position: 'relative', zIndex: 60, elevation: 60 }
+                        : undefined
+                    }
                   >
-                    <Flag
-                      size={12}
-                      color={Theme.colors.destructive}
-                      fill={Theme.colors.destructive}
-                    />
+                    <View pointerEvents="none">
+                      <Flag
+                        size={12}
+                        color={Theme.colors.destructive}
+                        fill={Theme.colors.destructive}
+                      />
+                    </View>
                     <Text
                       className="text-xs font-semibold"
                       style={{ color: Theme.colors.destructive }}
                       numberOfLines={1}
+                      pointerEvents="none"
                     >
                       Report
                     </Text>
-                  </Pressable>
+                  </TouchableOpacity>
                 ) : null}
               </View>
             </View>

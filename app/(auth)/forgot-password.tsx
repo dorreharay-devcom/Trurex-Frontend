@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AuthApi } from '~/api/AuthApi';
 import { Routes } from '~/constants/routes';
@@ -13,6 +13,7 @@ import { mapAuthError } from '~/utils/errors';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
+  const isWeb = Platform.OS === 'web';
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -50,7 +51,7 @@ export default function ForgotPasswordScreen() {
       </View>
 
       {sent ? (
-        <View className="items-center space-y-4">
+        <View className={isWeb ? 'items-center space-y-4' : 'items-center gap-4'}>
           <Text className="text-lg font-semibold text-foreground">Check your email</Text>
           <Text className="text-sm text-muted-foreground text-center">
             We sent a password reset link to{' '}
@@ -65,7 +66,7 @@ export default function ForgotPasswordScreen() {
           />
         </View>
       ) : (
-        <View className="space-y-8">
+        <View className={isWeb ? 'space-y-8' : 'gap-8'}>
           <View className="items-center">
             <Text className="text-lg font-semibold text-foreground">Reset your password</Text>
             <Text className="text-sm text-muted-foreground mt-1 text-center">
@@ -73,7 +74,7 @@ export default function ForgotPasswordScreen() {
             </Text>
           </View>
 
-          <View className="space-y-4">
+          <View className={isWeb ? 'space-y-4' : 'gap-4'}>
             <Input
               label="Email"
               value={email}
@@ -86,7 +87,7 @@ export default function ForgotPasswordScreen() {
               error={error}
             />
 
-            <View className={resetDisabled ? 'w-full cursor-not-allowed' : 'w-full'}>
+            <View className={resetDisabled && isWeb ? 'w-full cursor-not-allowed' : 'w-full'}>
               <Button
                 title="Send reset link"
                 onPress={handleReset}

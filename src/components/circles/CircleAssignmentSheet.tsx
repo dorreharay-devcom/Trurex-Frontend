@@ -20,7 +20,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { CircleApiRow } from '~/api/circlesApi';
 import { addCircleMember, createCircle } from '~/api/circlesApi';
 import { CircleGlyphIcon } from '~/components/circles/common/CircleGlyphIcon';
-import { Theme, textFieldCaretStyle } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
 import { isWeb } from '~/utils';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
@@ -302,7 +302,11 @@ export function CircleAssignmentSheet({
                             value={newName}
                             onChangeText={setNewName}
                             maxLength={40}
-                            style={[collectionFieldBg, textFieldCaretStyle]}
+                            style={[
+                              collectionFieldBg,
+                              textFieldCaretStyle,
+                              textFieldSingleLineStyle,
+                            ]}
                             className="rounded-xl border border-border px-3 py-3 text-sm text-foreground"
                           />
                           <TextInput
