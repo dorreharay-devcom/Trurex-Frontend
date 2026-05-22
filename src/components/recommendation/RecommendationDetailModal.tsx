@@ -285,8 +285,9 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   }
 
   const user = recommendation.user ?? { name: 'Member', handle: '', avatar: '' };
+  const effectiveAuthorId = recommendation.authorId ?? rexDetail?.author_id;
   const isOwner =
-    authUser != null && recommendation.authorId != null && authUser.id === recommendation.authorId;
+    authUser != null && effectiveAuthorId != null && authUser.id === effectiveAuthorId;
 
   return (
     <>
@@ -445,9 +446,9 @@ export const RecommendationDetailModal: React.FC<Props> = ({
 
               <Pressable
                 onPress={() => {
-                  if (!recommendation.authorId || !onAuthorPress) return;
+                  if (!effectiveAuthorId || !onAuthorPress) return;
                   onClose();
-                  onAuthorPress(recommendation.authorId);
+                  onAuthorPress(effectiveAuthorId);
                 }}
                 accessibilityRole="button"
                 accessibilityLabel={`View ${user.name}'s profile`}
@@ -458,9 +459,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                   <Text className="text-sm text-muted-foreground">Recommended by</Text>
                   <Text className="font-semibold text-foreground">{user.name}</Text>
                 </View>
-                {recommendation.authorId && (
-                  <ChevronRight size={16} color={Theme.colors.secondaryText} />
-                )}
+                {effectiveAuthorId && <ChevronRight size={16} color={Theme.colors.secondaryText} />}
               </Pressable>
 
               {recommendation.description ? (

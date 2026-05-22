@@ -177,6 +177,13 @@ const ProfileView = ({
     windowHeight,
     onClose: () => setOpenCollectionId(null),
   });
+  const handleCollectionRexPress = useCallback(
+    (rec: Recommendation) => {
+      handleCollectionClose();
+      onRexPress?.(rec);
+    },
+    [handleCollectionClose, onRexPress],
+  );
 
   const queryClient = useQueryClient();
   const [addToCollectionId, setAddToCollectionId] = useState<string | null>(null);
@@ -500,6 +507,7 @@ const ProfileView = ({
             collectionId={openCollectionId}
             onBack={handleCollectionClose}
             onAddItem={(id) => setAddToCollectionId(id)}
+            onRecommendationPress={handleCollectionRexPress}
           />
         )}
       </OverlayModal>
