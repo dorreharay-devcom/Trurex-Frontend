@@ -52,6 +52,8 @@ import { modalConfig } from '~/constants/recommendation/modalConfig';
 import { useQueryClient } from '@tanstack/react-query';
 import { preparePickerImageUriForUpload } from '~/utils/photos/storageUpload';
 
+const COLLECTION_REX_OPEN_DELAY_MS = 120;
+
 enum ProfileTab {
   Recs = 'recs',
   Collections = 'collections',
@@ -189,14 +191,14 @@ const ProfileView = ({
   );
 
   useEffect(() => {
-    if (openCollectionId != null || pendingCollectionRex == null) return;
+    if (pendingCollectionRex == null) return;
     const rec = pendingCollectionRex;
     const timeout = setTimeout(() => {
       setPendingCollectionRex(null);
       onRexPress?.(rec);
-    }, 0);
+    }, COLLECTION_REX_OPEN_DELAY_MS);
     return () => clearTimeout(timeout);
-  }, [openCollectionId, pendingCollectionRex, onRexPress]);
+  }, [pendingCollectionRex, onRexPress]);
 
   const queryClient = useQueryClient();
   const [addToCollectionId, setAddToCollectionId] = useState<string | null>(null);
@@ -552,7 +554,7 @@ const ProfileView = ({
           <Animated.View style={{ width: '100%', transform: [{ translateY: addSheetTranslateY }] }}>
             <View
               className="w-full bg-card rounded-t-2xl border-t border-border"
-              style={{ maxHeight: 400 }}
+              style={{ height: Math.min(400, windowHeight * 0.5), maxHeight: 400 }}
             >
               <View className="w-full items-center py-3">
                 <View className="w-10 h-1 rounded-full bg-muted-foreground/30" />
@@ -563,7 +565,11 @@ const ProfileView = ({
                 </Text>
               </View>
               <View className="h-px w-full bg-border mb-1" />
-              <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                style={{ flex: 1 }}
+              >
                 {savedRexes.length === 0 ? (
                   <Text className="text-sm text-muted-foreground text-center py-6">
                     No saved rexes

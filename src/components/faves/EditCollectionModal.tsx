@@ -205,7 +205,7 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
         >
           <Animated.View style={{ transform: [{ translateY: sheetTranslateY }] }}>
             <View
-              style={{ maxHeight: height * 0.9 }}
+              style={{ height: Math.min(height * 0.9, 680), maxHeight: height * 0.9 }}
               className={`bg-card ${isWeb ? 'rounded-2xl' : 'rounded-t-2xl'} border border-border shadow-elevated overflow-hidden`}
             >
               {/* Header */}
