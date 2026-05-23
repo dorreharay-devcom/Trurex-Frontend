@@ -563,7 +563,8 @@ const DiscoverView = ({
           activeOpacity={0.85}
           accessibilityRole="button"
           accessibilityLabel="Scroll to top"
-          className="absolute bottom-[102px] right-[26px] h-14 w-14 items-center justify-center rounded-full border border-primary/30 bg-primary/55"
+          className="absolute bottom-[102px] h-14 w-14 items-center justify-center rounded-full border border-primary/30 bg-primary/55"
+          style={{ right: 24 }}
         >
           <ChevronUp size={26} color={Theme.colors.foreground} />
         </TouchableOpacity>

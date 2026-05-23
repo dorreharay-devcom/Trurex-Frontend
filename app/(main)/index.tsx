@@ -135,8 +135,9 @@ export default function HomeScreen() {
           }}
           accessibilityRole="button"
           accessibilityLabel="Add Rex"
-          className="absolute right-6 bottom-6 w-14 h-14 rounded-full bg-primary items-center justify-center hover:opacity-90 active:opacity-75 cursor-pointer"
+          className="absolute bottom-6 w-14 h-14 rounded-full bg-primary items-center justify-center hover:opacity-90 active:opacity-75 cursor-pointer"
           style={{
+            right: 24,
             elevation: 4,
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 2 },

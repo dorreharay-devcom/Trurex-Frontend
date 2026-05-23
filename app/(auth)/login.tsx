@@ -42,6 +42,10 @@ export default function LoginScreen() {
     }
   };
 
+  const handleForgotPasswordPress = () => {
+    router.push(Routes.ForgotPassword);
+  };
+
   return (
     <AuthLayout>
       <View className="items-center gap-4">
@@ -81,12 +85,17 @@ export default function LoginScreen() {
           label="Password"
           labelRight={
             <TouchableOpacity
-              onPress={() => router.push(Routes.ForgotPassword)}
-              hitSlop={8}
+              activeOpacity={0.7}
+              onPress={handleForgotPasswordPress}
+              hitSlop={{ top: 8, bottom: 8, left: 12, right: 12 }}
+              style={
+                isWeb ? undefined : { minHeight: 32, paddingLeft: 12, justifyContent: 'center' }
+              }
               accessibilityRole="button"
               accessibilityLabel="Forgot password"
             >
               <Text
+                pointerEvents="none"
                 className={
                   isWeb
                     ? 'text-xs font-medium text-muted-foreground hover:underline'
