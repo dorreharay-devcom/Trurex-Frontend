@@ -10,6 +10,7 @@ import {
   Platform,
   StyleSheet,
   Animated,
+  useWindowDimensions,
 } from 'react-native';
 import { Check } from 'lucide-react-native';
 import { useQueryClient } from '@tanstack/react-query';
@@ -29,7 +30,12 @@ interface AddRexToCollectionSheetProps {
   onClose: () => void;
 }
 
-const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({ open, collectionId, onClose }) => {
+const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({
+  open,
+  collectionId,
+  onClose,
+}) => {
+  const { height } = useWindowDimensions();
   const queryClient = useQueryClient();
   const { data: savedRexes = [], isLoading } = useSavedRexes({ uncollected: true });
   const { mutateAsync: addRex } = useAddRexToCollection();
@@ -47,7 +53,12 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({ open,
       setVisible(true);
       Animated.parallel([
         Animated.timing(backdropOpacity, { toValue: 1, duration: 250, useNativeDriver: true }),
-        Animated.spring(sheetTranslateY, { toValue: 0, damping: 20, stiffness: 200, useNativeDriver: true }),
+        Animated.spring(sheetTranslateY, {
+          toValue: 0,
+          damping: 20,
+          stiffness: 200,
+          useNativeDriver: true,
+        }),
       ]).start();
     } else {
       Animated.parallel([
@@ -67,7 +78,10 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({ open,
   };
 
   const handleDone = async () => {
-    if (!collectionId || selected.size === 0) { onClose(); return; }
+    if (!collectionId || selected.size === 0) {
+      onClose();
+      return;
+    }
     setSaving(true);
     try {
       await Promise.all(
@@ -103,7 +117,10 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({ open,
 
       <View style={styles.outer} pointerEvents="box-none">
         <Animated.View style={{ width: '100%', transform: [{ translateY: sheetTranslateY }] }}>
-          <View className="w-full bg-card rounded-t-2xl border-t border-border" style={{ maxHeight: 500 }}>
+          <View
+            className="w-full bg-card rounded-t-2xl border-t border-border"
+            style={{ height: Math.min(500, height * 0.55), maxHeight: 500 }}
+          >
             <View className="w-full items-center py-3">
               <View className="w-10 h-1 rounded-full bg-muted-foreground/30" />
             </View>
@@ -136,7 +153,9 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({ open,
                   <ActivityIndicator color={Theme.colors.muted} />
                 </View>
               ) : savedRexes.length === 0 ? (
-                <Text className="text-sm text-muted-foreground text-center py-6">No saved rexes</Text>
+                <Text className="text-sm text-muted-foreground text-center py-6">
+                  No saved rexes
+                </Text>
               ) : (
                 savedRexes.map((rec) => {
                   const isSelected = selected.has(rec.id);
@@ -150,7 +169,9 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({ open,
                     >
                       <RexCoverThumbnail rec={rec} className="h-10 w-10 rounded-lg" />
                       <View className="flex-1 min-w-0">
-                        <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>{rec.title}</Text>
+                        <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
+                          {rec.title}
+                        </Text>
                         <Text
                           className={cn(
                             'text-xs font-medium',

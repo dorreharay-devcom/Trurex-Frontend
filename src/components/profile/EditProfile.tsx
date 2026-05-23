@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Platform,
 } from 'react-native';
 import { ArrowLeft, Camera, X } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -258,8 +259,13 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
           {/* Handle — custom layout due to @ prefix */}
           <View>
             <Text className={`${fieldLabelClassName} mb-1.5`}>Handle</Text>
-            <View className="flex-row items-center bg-background border border-border rounded-xl overflow-hidden">
-              <Text className="pl-3 text-sm text-muted-foreground">@</Text>
+            <View className="h-12 flex-row items-center bg-background border border-border rounded-xl overflow-hidden">
+              <Text
+                className="pl-3 text-sm text-muted-foreground"
+                style={Platform.OS === 'web' ? undefined : { lineHeight: 18 }}
+              >
+                @
+              </Text>
               <TextInput
                 value={handle}
                 onChangeText={(t) => setHandle(t.replace(/[^a-zA-Z0-9_]/g, ''))}
@@ -267,8 +273,12 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
                 placeholderTextColor={Theme.colors.muted}
                 maxLength={30}
                 autoCapitalize="none"
-                className="flex-1 px-2 py-2.5 text-sm text-foreground"
-                style={[textFieldCaretStyle, textFieldSingleLineStyle]}
+                className="h-12 flex-1 px-2 text-sm text-foreground"
+                style={[
+                  textFieldCaretStyle,
+                  textFieldSingleLineStyle,
+                  Platform.OS === 'web' ? null : { paddingTop: 0, paddingBottom: 0 },
+                ]}
               />
             </View>
           </View>

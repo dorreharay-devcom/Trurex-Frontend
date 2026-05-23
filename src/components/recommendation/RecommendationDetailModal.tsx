@@ -4,10 +4,10 @@ import {
   Text,
   ScrollView,
   Pressable,
-  TouchableOpacity,
   useWindowDimensions,
   findNodeHandle,
   Platform,
+  StyleSheet,
 } from 'react-native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -52,6 +52,18 @@ import {
 } from '~/utils/recommendation/recContentDisplay';
 import { deleteRexToastMessage } from '~/utils/recommendation/rexDetailToRecommendation';
 import { Skeleton } from '~/components/ui/skeleton';
+
+const styles = StyleSheet.create({
+  headerAction: {
+    minWidth: 88,
+    height: 44,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  headerActionPressed: {
+    opacity: 0.75,
+  },
+});
 
 type Props = {
   visible: boolean;
@@ -323,18 +335,16 @@ export const RecommendationDetailModal: React.FC<Props> = ({
               </Text>
               <View className="w-[96px] shrink-0 items-end justify-center">
                 {isOwner ? (
-                  <TouchableOpacity
+                  <Pressable
                     onPress={openDeleteConfirm}
-                    activeOpacity={0.75}
                     hitSlop={Platform.OS === 'web' ? 8 : undefined}
                     accessibilityLabel="Delete this recommendation"
                     accessibilityRole="button"
                     className="h-11 min-w-[88px] items-end justify-center rounded-full active:opacity-90"
-                    style={
-                      Platform.OS !== 'web'
-                        ? { position: 'relative', zIndex: 60, elevation: 60 }
-                        : undefined
-                    }
+                    style={({ pressed }) => [
+                      Platform.OS !== 'web' ? styles.headerAction : null,
+                      pressed ? styles.headerActionPressed : null,
+                    ]}
                   >
                     <View
                       pointerEvents="none"
@@ -350,21 +360,19 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                         Delete
                       </Text>
                     </View>
-                  </TouchableOpacity>
+                  </Pressable>
                 ) : authUser &&
                   (recommendation.authorId == null || authUser.id !== recommendation.authorId) ? (
-                  <TouchableOpacity
+                  <Pressable
                     onPress={openRexReport}
-                    activeOpacity={0.75}
                     hitSlop={Platform.OS === 'web' ? 8 : undefined}
                     accessibilityLabel="Report this recommendation"
                     accessibilityRole="button"
                     className="h-11 min-w-[88px] items-end justify-center rounded-full active:opacity-90"
-                    style={
-                      Platform.OS !== 'web'
-                        ? { position: 'relative', zIndex: 60, elevation: 60 }
-                        : undefined
-                    }
+                    style={({ pressed }) => [
+                      Platform.OS !== 'web' ? styles.headerAction : null,
+                      pressed ? styles.headerActionPressed : null,
+                    ]}
                   >
                     <View
                       pointerEvents="none"
@@ -384,7 +392,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                         Report
                       </Text>
                     </View>
-                  </TouchableOpacity>
+                  </Pressable>
                 ) : null}
               </View>
             </View>

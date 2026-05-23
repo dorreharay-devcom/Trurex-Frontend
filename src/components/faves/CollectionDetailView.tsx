@@ -169,13 +169,17 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
       </View>
 
       {detail.is_my_collection ? (
-        <TouchableOpacity
+        <Pressable
           onPress={() => onAddItem(collectionId)}
-          className="w-full flex-row items-center justify-center gap-2 py-3 my-4 rounded-xl border-2 border-dashed border-border"
+          accessibilityRole="button"
+          accessibilityLabel="Add to collection"
+          className="my-4 h-12 w-full flex-row items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border active:opacity-80"
         >
-          <Plus size={16} color={Theme.colors.muted} />
-          <Text className="text-sm font-medium text-muted-foreground">Add to Collection</Text>
-        </TouchableOpacity>
+          <View pointerEvents="none" className="flex-row items-center justify-center gap-2">
+            <Plus size={16} color={Theme.colors.muted} />
+            <Text className="text-sm font-medium text-muted-foreground">Add to Collection</Text>
+          </View>
+        </Pressable>
       ) : (
         <View className="h-px bg-border my-4" />
       )}
