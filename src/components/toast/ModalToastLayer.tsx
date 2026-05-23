@@ -4,7 +4,7 @@ import { appToastConfig } from './toastConfig';
 
 export function ModalToastLayer() {
   return (
-    <View pointerEvents="box-none" style={styles.layer}>
+    <View pointerEvents="none" style={styles.layer}>
       <Toast config={appToastConfig} />
     </View>
   );

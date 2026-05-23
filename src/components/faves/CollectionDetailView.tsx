@@ -30,7 +30,6 @@ import {
   Globe,
   Link2,
 } from 'lucide-react-native';
-import { Image } from 'expo-image';
 import { webContainerStyle } from '~/utils';
 import { Theme, textFieldCaretStyle } from '~/theme/Theme';
 import {
@@ -42,8 +41,6 @@ import {
   useUpdateCollectionRexNote,
 } from '~/hooks/useCollections';
 import EditCollectionModal from '~/components/faves/EditCollectionModal';
-import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
-import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { toastSuccessAfterDismiss } from '~/utils/appToast';
 import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
 import type {
@@ -96,7 +93,6 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
 }) => {
   const { width: screenWidth } = useWindowDimensions();
   const { data: detail, isLoading } = useCollectionDetail(collectionId);
-  const { uri: coverUri } = useSignedStorageUrl(REX_IMAGES_BUCKET, detail?.cover_image_path ?? '');
   const [saveTarget, setSaveTarget] = useState<RecSummary | null>(null);
 
   const removeMutation = useRemoveRexFromCollection(collectionId);
@@ -146,13 +142,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   }
 
   const ListHeader = (
-    <View style={webContainerStyle} className="px-4">
-      {coverUri && (
-        <View className="rounded-xl overflow-hidden mb-4" style={{ height: 144 }}>
-          <Image source={{ uri: coverUri }} className="w-full h-full" contentFit="cover" />
-        </View>
-      )}
-
+    <View style={webContainerStyle} className="px-4 pt-1">
       <Text className="text-xl font-bold text-foreground">{detail.display_name}</Text>
       {detail.description && (
         <Text className="text-sm text-muted-foreground mt-1">{detail.description}</Text>

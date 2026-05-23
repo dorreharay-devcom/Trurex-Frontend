@@ -172,6 +172,7 @@ const ProfileView = ({
   const [activeTab, setActiveTab] = useState<ProfileTab>(ProfileTab.Recs);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [openCollectionId, setOpenCollectionId] = useState<string | null>(null);
+  const [pendingCollectionRex, setPendingCollectionRex] = useState<Recommendation | null>(null);
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
   const { layout } = modalConfig;
   const { sheetTranslateY, handleClose: handleCollectionClose } = useOverlaySheetPresentation({
@@ -181,11 +182,21 @@ const ProfileView = ({
   });
   const handleCollectionRexPress = useCallback(
     (rec: Recommendation) => {
+      setPendingCollectionRex(rec);
       handleCollectionClose();
-      onRexPress?.(rec);
     },
-    [handleCollectionClose, onRexPress],
+    [handleCollectionClose],
   );
+
+  useEffect(() => {
+    if (openCollectionId != null || pendingCollectionRex == null) return;
+    const rec = pendingCollectionRex;
+    const timeout = setTimeout(() => {
+      setPendingCollectionRex(null);
+      onRexPress?.(rec);
+    }, 0);
+    return () => clearTimeout(timeout);
+  }, [openCollectionId, pendingCollectionRex, onRexPress]);
 
   const queryClient = useQueryClient();
   const [addToCollectionId, setAddToCollectionId] = useState<string | null>(null);

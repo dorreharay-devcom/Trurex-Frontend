@@ -19,6 +19,12 @@ import type {
   RecommendationOpenOptions,
 } from '~/types/recommendation/recommendation';
 import { useUserConfig } from '~/hooks/useUserConfig';
+import { useAuth } from '~/services/AuthContext';
+
+type ProfileBackTarget = {
+  tab: Tab;
+  userId?: string;
+};
 
 export default function HomeScreen() {
   const { tab } = useLocalSearchParams<{ tab?: string }>();
@@ -32,8 +38,9 @@ export default function HomeScreen() {
   const [previewOptions, setPreviewOptions] = useState<RecommendationOpenOptions>({});
   const [avatarRefreshKey, setAvatarRefreshKey] = useState(0);
   const [viewingUserId, setViewingUserId] = useState<string | undefined>(undefined);
-  const [profileReturnTab, setProfileReturnTab] = useState<Tab>('discover');
+  const [profileBackStack, setProfileBackStack] = useState<ProfileBackTarget[]>([]);
   const { isAccountFrozen } = useUserConfig();
+  const { user: authUser } = useAuth();
 
   const handleCloseCreate = useCallback(() => {
     setCreateRecommendationOpen(false);
@@ -61,19 +68,46 @@ export default function HomeScreen() {
     (userId: string) => {
       setPreviewRecommendation(null);
       setPreviewOptions({});
+      const currentProfileUserId =
+        currentTab === 'profile' ? (viewingUserId ?? authUser?.id) : null;
+      if (currentProfileUserId === userId) {
+        setCurrentTab('profile');
+        return;
+      }
+      setProfileBackStack((stack) => [
+        ...stack,
+        {
+          tab: currentTab,
+          userId: currentTab === 'profile' ? viewingUserId : undefined,
+        },
+      ]);
       setViewingUserId(userId);
-      setProfileReturnTab((prev) => (currentTab !== 'profile' ? currentTab : prev));
       setCurrentTab('profile');
     },
-    [currentTab],
+    [authUser?.id, currentTab, viewingUserId],
   );
 
   const handleCommentCountChange = useCallback((_total: number) => {}, []);
 
   const handleTabChange = useCallback((tab: Tab) => {
+    setProfileBackStack([]);
     if (tab === 'profile') setViewingUserId(undefined);
     setCurrentTab(tab);
   }, []);
+
+  const handleProfileBack = useCallback(() => {
+    const target = profileBackStack[profileBackStack.length - 1];
+    setProfileBackStack((stack) => stack.slice(0, -1));
+
+    if (!target) {
+      setViewingUserId(undefined);
+      setCurrentTab('discover');
+      return;
+    }
+
+    setViewingUserId(target.tab === 'profile' ? target.userId : undefined);
+    setCurrentTab(target.tab);
+  }, [profileBackStack]);
 
   return (
     <View className="min-h-0 flex-1 bg-background">
@@ -114,14 +148,7 @@ export default function HomeScreen() {
             userId={viewingUserId}
             onAvatarUpdated={() => setAvatarRefreshKey((k) => k + 1)}
             avatarRefreshKey={avatarRefreshKey}
-            onBack={
-              viewingUserId
-                ? () => {
-                    setViewingUserId(undefined);
-                    setCurrentTab(profileReturnTab);
-                  }
-                : undefined
-            }
+            onBack={viewingUserId ? handleProfileBack : undefined}
             onRexPress={openPreview}
           />
         )}
