@@ -13,6 +13,7 @@ import { Eye, EyeOff } from 'lucide-react-native';
 import {
   Theme,
   textFieldCaretStyle,
+  textFieldMultilineStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/theme/Theme';
@@ -40,7 +41,7 @@ const Input = ({
   const [showPassword, setShowPassword] = useState(false);
 
   const inputStyle: StyleProp<TextStyle> = props.multiline
-    ? [style, textFieldCaretStyle]
+    ? [style, textFieldCaretStyle, textFieldMultilineStyle]
     : [
         style,
         textFieldCaretStyle,

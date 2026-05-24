@@ -27,6 +27,7 @@ import {
 import {
   Theme,
   textFieldCaretStyle,
+  textFieldMultilineStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/theme/Theme';
@@ -147,7 +148,7 @@ function CirclesListContent({
               maxLength={100}
               multiline
               className="mb-3 min-h-[44px] rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground"
-              style={textFieldCaretStyle}
+              style={[textFieldCaretStyle, textFieldMultilineStyle]}
             />
             <Text className="mb-2 text-xs text-muted-foreground">Color</Text>
             <View className="mb-4 flex-row flex-wrap gap-2">

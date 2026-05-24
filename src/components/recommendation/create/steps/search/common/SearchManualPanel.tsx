@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, Text, TextInput, ScrollView, Pressable, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  ScrollView,
+  Pressable,
+  ActivityIndicator,
+  Platform,
+} from 'react-native';
 import { MapPin } from 'lucide-react-native';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { CreateStepTitle } from '../../../CreateStepTitle';
@@ -83,7 +91,7 @@ export function SearchManualPanel({
           autoCapitalize="words"
           multiline={false}
           numberOfLines={1}
-          scrollEnabled={false}
+          scrollEnabled={Platform.OS !== 'web'}
           underlineColorAndroid="transparent"
           selectionColor={Theme.colors.foreground}
         />
@@ -105,7 +113,7 @@ export function SearchManualPanel({
           autoCapitalize="sentences"
           multiline={false}
           numberOfLines={1}
-          scrollEnabled={false}
+          scrollEnabled={Platform.OS !== 'web'}
           underlineColorAndroid="transparent"
           selectionColor={Theme.colors.foreground}
         />

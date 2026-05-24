@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ShieldAlert, X } from 'lucide-react-native';
-import { Theme, textFieldCaretStyle } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldMultilineStyle } from '~/theme/Theme';
 import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
 import {
   type ContentReportTarget,
@@ -119,8 +119,10 @@ export const ReportContentDialog: React.FC<Props> = ({
         {sheetShell(
           <View
             className={cn(
-              'w-full border border-border bg-card',
-              isWeb ? 'shadow-elevated max-w-full rounded-2xl' : 'rounded-t-2xl',
+              'w-full bg-card',
+              isWeb
+                ? 'max-w-full rounded-2xl border border-border shadow-elevated'
+                : 'rounded-t-2xl border-x border-t border-border',
             )}
             style={{
               maxHeight: maxSheetHeight,
@@ -237,7 +239,12 @@ export const ReportContentDialog: React.FC<Props> = ({
                           multiline
                           numberOfLines={3}
                           className="min-h-[80px] rounded-[12px] border border-border bg-muted/50 px-3 py-2.5 text-sm text-foreground"
-                          style={[textFieldCaretStyle, webTextAreaOutline, webNoOutline]}
+                          style={[
+                            textFieldCaretStyle,
+                            textFieldMultilineStyle,
+                            webTextAreaOutline,
+                            webNoOutline,
+                          ]}
                         />
                         <Text className="text-right text-[10px] text-muted-foreground">
                           {details.length}/{MAX_CONTENT_REPORT_DETAILS}

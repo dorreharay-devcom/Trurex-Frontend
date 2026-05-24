@@ -123,7 +123,11 @@ export function MapSearchBar({
 
       {showSuggestions ? (
         <View className="mt-1.5 w-full overflow-hidden rounded-xl border border-border bg-card/95 shadow-md">
-          <ScrollView keyboardShouldPersistTaps="handled" className="max-h-48">
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            className="max-h-48"
+          >
             {suggestions.map((rec) => (
               <Pressable
                 key={rec.id}

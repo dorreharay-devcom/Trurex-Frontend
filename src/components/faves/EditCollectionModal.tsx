@@ -30,6 +30,7 @@ import { isWeb, webContainerStyle } from '~/utils';
 import {
   Theme,
   textFieldCaretStyle,
+  textFieldMultilineStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/theme/Theme';
@@ -335,7 +336,7 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
                     multiline
                     numberOfLines={2}
                     textAlignVertical="top"
-                    style={[collectionFieldBg, textFieldCaretStyle]}
+                    style={[collectionFieldBg, textFieldCaretStyle, textFieldMultilineStyle]}
                     className="w-full px-3 py-2.5 rounded-xl border border-border text-sm text-foreground"
                   />
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">

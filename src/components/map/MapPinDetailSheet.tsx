@@ -53,7 +53,11 @@ export const MapPinDetailSheet: React.FC<Props> = ({
         <View className="h-1 w-10 rounded-full bg-muted opacity-50" />
       </View>
 
-      <ScrollView className="px-4 pb-6" keyboardShouldPersistTaps="handled">
+      <ScrollView
+        className="px-4 pb-6"
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
         <View className="mb-3 flex-row items-start justify-between">
           <View className="min-w-0 flex-1 pr-2">
             <View className="mb-1 flex-row items-center gap-2">

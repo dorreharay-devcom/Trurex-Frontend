@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TextInput } from 'react-native';
 import { CREATE_REC_REVIEW_MAX } from '~/constants/recommendation/createScorecard';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
-import { Theme, textFieldCaretStyle } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldMultilineStyle } from '~/theme/Theme';
 import { webNoOutline } from '../../search/common/webInputOutline';
 
 type Props = {
@@ -25,9 +25,7 @@ export function ScorecardReview({
     <View>
       <View className="mb-2 flex-row items-center justify-between gap-2">
         <View className="min-w-0 flex-1 flex-row flex-wrap items-center gap-x-2 gap-y-1">
-          <Text className="text-xs font-medium uppercase tracking-wider text-black">
-            {title}
-          </Text>
+          <Text className="text-xs font-medium uppercase tracking-wider text-black">{title}</Text>
           {showOptionalHint ? (
             <Text className="text-[10px] italic text-black opacity-80">optional</Text>
           ) : null}
@@ -42,7 +40,7 @@ export function ScorecardReview({
         placeholder={placeholder}
         placeholderTextColor={Theme.colors.secondaryText}
         className={`flex min-h-[90px] w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
-        style={[webNoOutline, textFieldCaretStyle]}
+        style={[webNoOutline, textFieldCaretStyle, textFieldMultilineStyle]}
         multiline
         textAlignVertical="top"
         maxLength={CREATE_REC_REVIEW_MAX}
