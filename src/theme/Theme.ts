@@ -80,9 +80,21 @@ export const textFieldHeaderSearchStyle =
   Platform.OS === 'web'
     ? null
     : ({
-        height: 36,
+        height: 32,
         fontSize: 14,
-        lineHeight: 18,
+        lineHeight: 17,
+      } as TextStyle);
+
+export const textFieldNativeSingleLineNoWrapStyle =
+  Platform.OS === 'web'
+    ? null
+    : ({
+        height: 48,
+        maxHeight: 48,
+        lineHeight: 22,
+        paddingTop: 0,
+        paddingBottom: 0,
+        textAlignVertical: 'center',
       } as TextStyle);
 
 export const textFieldMultilineStyle =

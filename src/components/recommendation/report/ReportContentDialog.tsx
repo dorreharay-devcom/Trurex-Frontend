@@ -127,7 +127,7 @@ export const ReportContentDialog: React.FC<Props> = ({
             style={{
               maxHeight: maxSheetHeight,
               width: '100%',
-              paddingBottom: Math.max(12, insets.bottom + 4),
+              paddingBottom: isWeb ? 0 : undefined,
               ...(isWeb ? { overflow: 'hidden' as const } : null),
             }}
           >
@@ -256,7 +256,7 @@ export const ReportContentDialog: React.FC<Props> = ({
               </ScrollView>
 
               {user ? (
-                <View className="mt-1 flex-row justify-end gap-2 border-t border-border px-4 pt-3">
+                <View className="mt-1 flex-row justify-end gap-2 border-t border-border px-4 pb-3 pt-3">
                   <Pressable
                     onPress={() => {
                       reset();

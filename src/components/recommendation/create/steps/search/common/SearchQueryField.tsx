@@ -1,9 +1,10 @@
 import React from 'react';
-import { Platform, View, TextInput } from 'react-native';
+import { View, TextInput } from 'react-native';
 import { Search as SearchIcon } from 'lucide-react-native';
 import {
   Theme,
   textFieldCaretStyle,
+  textFieldNativeSingleLineNoWrapStyle,
   textFieldSingleLineLargeHeightStyle,
   textFieldSingleLineStyle,
 } from '~/theme/Theme';
@@ -37,10 +38,11 @@ export function SearchQueryField({ value, onChangeText }: Props) {
           textFieldCaretStyle,
           textFieldSingleLineStyle,
           textFieldSingleLineLargeHeightStyle,
+          textFieldNativeSingleLineNoWrapStyle,
         ]}
         multiline={false}
         numberOfLines={1}
-        scrollEnabled={Platform.OS !== 'web'}
+        scrollEnabled={false}
       />
     </View>
   );
