@@ -8,7 +8,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { ArrowLeft, Pencil, Search, Trash2, X } from 'lucide-react-native';
+import { ArrowLeft, Pencil, Trash2, X } from 'lucide-react-native';
 import {
   CircleConnectionRow,
   ConnectionLoadMoreButton,
@@ -47,6 +47,7 @@ import {
 } from '~/utils/circleTabUtils';
 import { webContainerStyle } from '~/utils';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
+import { ClearableSearchInput } from '~/components/common/ClearableSearchInput';
 
 type Props = { vm: CirclesViewModel; onUserPress?: (userId: string) => void };
 
@@ -220,29 +221,24 @@ export function CircleDetailScreen({ vm, onUserPress }: Props) {
               })}
             </View>
 
-            <View className="relative mb-4 w-full max-w-md self-start">
-              <View
-                pointerEvents="none"
-                className="absolute left-3 top-0 bottom-0 z-10 justify-center"
-              >
-                <Search size={16} color={Theme.colors.muted} />
-              </View>
-              <TextInput
-                value={addSearch.query}
-                onChangeText={addSearch.setQuery}
-                placeholder={addSearch.placeholder}
-                placeholderTextColor={Theme.colors.muted}
-                className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground"
-                style={[
-                  textFieldCaretStyle,
-                  textFieldSingleLineStyle,
-                  textFieldSingleLineDefaultHeightStyle,
-                ]}
-                multiline={false}
-                numberOfLines={1}
-                scrollEnabled={false}
-              />
-            </View>
+            <ClearableSearchInput
+              value={addSearch.query}
+              onChangeText={addSearch.setQuery}
+              placeholder={addSearch.placeholder}
+              placeholderTextColor={Theme.colors.muted}
+              containerClassName="mb-4 w-full max-w-md self-start"
+              iconColor={Theme.colors.muted}
+              clearIconColor={Theme.colors.muted}
+              inputClassName="w-full pl-9 pr-10 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground"
+              inputStyle={[
+                textFieldCaretStyle,
+                textFieldSingleLineStyle,
+                textFieldSingleLineDefaultHeightStyle,
+              ]}
+              multiline={false}
+              numberOfLines={1}
+              scrollEnabled={false}
+            />
 
             {addPhase === 'loading' ? (
               <SectionSpinner className="mb-8 items-center py-4" />

@@ -77,6 +77,11 @@ export function CircleAssignmentSheet({
   const [scrollViewportH, setScrollViewportH] = useState(0);
   const [scrollContentH, setScrollContentH] = useState(0);
   const [scrollY, setScrollY] = useState(0);
+  const [createFormY, setCreateFormY] = useState(0);
+  const [createFormMeasured, setCreateFormMeasured] = useState(false);
+  const [createFocusRequest, setCreateFocusRequest] = useState(0);
+  const scrollRef = useRef<ScrollView>(null);
+  const newNameInputRef = useRef<TextInput>(null);
 
   const showScrollBottomFade =
     scrollContentH > scrollViewportH + 12 && scrollY < scrollContentH - scrollViewportH - 8;
@@ -110,8 +115,50 @@ export function CircleAssignmentSheet({
       setScrollViewportH(0);
       setScrollContentH(0);
       setScrollY(0);
+      setCreateFormY(0);
+      setCreateFormMeasured(false);
+      setCreateFocusRequest(0);
     }
   }, [open]);
+
+  useEffect(() => {
+    if (!open || !showCreate || !createFormMeasured || createFocusRequest === 0) return;
+
+    const scrollTimer = setTimeout(() => {
+      scrollRef.current?.scrollTo({ y: Math.max(0, createFormY - 8), animated: true });
+    }, 50);
+    const focusTimer = setTimeout(
+      () => {
+        newNameInputRef.current?.focus();
+      },
+      Platform.OS === 'web' ? 180 : 120,
+    );
+
+    return () => {
+      clearTimeout(scrollTimer);
+      clearTimeout(focusTimer);
+    };
+  }, [createFocusRequest, createFormMeasured, createFormY, open, showCreate]);
+
+  const openCreateForm = () => {
+    setCreateFormMeasured(false);
+    setCreateFocusRequest((request) => request + 1);
+    setShowCreate(true);
+  };
+
+  const onCreateFormLayout = (e: LayoutChangeEvent) => {
+    setCreateFormY(e.nativeEvent.layout.y);
+    setCreateFormMeasured(true);
+  };
+
+  const resetCreateForm = () => {
+    setShowCreate(false);
+    setNewName('');
+    setNewDesc('');
+    setSelectedColor(PRESET_DEFAULT);
+    setCreateFormY(0);
+    setCreateFormMeasured(false);
+  };
 
   const onScrollList = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     setScrollY(e.nativeEvent.contentOffset.y);
@@ -225,6 +272,7 @@ export function CircleAssignmentSheet({
               ) : (
                 <View className="relative overflow-hidden">
                   <ScrollView
+                    ref={scrollRef}
                     style={{ maxHeight: Platform.OS === 'web' ? 360 : 320 }}
                     contentContainerStyle={{ paddingBottom: 12 }}
                     keyboardShouldPersistTaps="handled"
@@ -282,7 +330,10 @@ export function CircleAssignmentSheet({
                       })}
 
                       {showCreate ? (
-                        <View className="gap-3 rounded-xl border border-border bg-background p-4">
+                        <View
+                          className="gap-3 rounded-xl border border-border bg-background p-4"
+                          onLayout={onCreateFormLayout}
+                        >
                           <View className="flex-row items-center justify-between">
                             <Text
                               className="text-sm font-semibold"
@@ -290,19 +341,12 @@ export function CircleAssignmentSheet({
                             >
                               New Circle
                             </Text>
-                            <Pressable
-                              onPress={() => {
-                                setShowCreate(false);
-                                setNewName('');
-                                setNewDesc('');
-                                setSelectedColor(PRESET_DEFAULT);
-                              }}
-                              hitSlop={8}
-                            >
+                            <Pressable onPress={resetCreateForm} hitSlop={8}>
                               <X size={16} color={Theme.colors.muted} />
                             </Pressable>
                           </View>
                           <TextInput
+                            ref={newNameInputRef}
                             placeholder="Circle name..."
                             placeholderTextColor={Theme.colors.muted}
                             value={newName}
@@ -366,7 +410,7 @@ export function CircleAssignmentSheet({
                         </View>
                       ) : (
                         <Pressable
-                          onPress={() => setShowCreate(true)}
+                          onPress={openCreateForm}
                           disabled={assignInFlight}
                           className="flex-row items-center gap-3 rounded-xl border border-dashed border-border bg-background p-4 active:opacity-90"
                         >

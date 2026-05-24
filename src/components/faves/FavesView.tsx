@@ -4,12 +4,11 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
-  TextInput,
   ScrollView,
   Pressable,
   useWindowDimensions,
 } from 'react-native';
-import { Plus, PackageOpen, Search, MapPin, X, Calendar } from 'lucide-react-native';
+import { Plus, PackageOpen, MapPin, X, Calendar } from 'lucide-react-native';
 import { CollectionsApi } from '~/api/CollectionsApi';
 import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
 import { useQueryClient } from '@tanstack/react-query';
@@ -36,6 +35,7 @@ import { DestructiveActionConfirmModal } from '~/components/common/DestructiveAc
 import { toastError } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { unknownErrorMessage } from '~/utils';
+import { ClearableSearchInput } from '~/components/common/ClearableSearchInput';
 
 type FavesViewProps = {
   commentCountByRexId?: Record<string, number>;
@@ -60,7 +60,10 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
   const { data: myCollections = [], isLoading: loadingMine } = useMyCollections(user?.id);
   const { data: savedCollections = [], isLoading: loadingSavedCollections } =
     useMySavedCollections();
-  const collections = [...myCollections, ...savedCollections];
+  const collections = useMemo(
+    () => [...myCollections, ...savedCollections],
+    [myCollections, savedCollections],
+  );
   const loadingCollections = loadingMine || loadingSavedCollections;
   const { data: savedRexes = [], isLoading: loadingSaved } = useSavedRexes({ uncollected: true });
   const uncollectedRecs = savedRexes;
@@ -124,26 +127,24 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
 
   const ListHeader = (
     <View className="px-4 pt-6">
-      <View className="relative mb-4">
-        <View pointerEvents="none" className="absolute left-3 top-0 bottom-0 justify-center z-10">
-          <Search size={16} color={Theme.colors.muted} />
-        </View>
-        <TextInput
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholder="Search your saved gems..."
-          placeholderTextColor={Theme.colors.muted}
-          className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground"
-          style={[
-            textFieldCaretStyle,
-            textFieldSingleLineStyle,
-            textFieldSingleLineDefaultHeightStyle,
-          ]}
-          multiline={false}
-          numberOfLines={1}
-          scrollEnabled={false}
-        />
-      </View>
+      <ClearableSearchInput
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        placeholder="Search your saved gems..."
+        placeholderTextColor={Theme.colors.muted}
+        containerClassName="mb-4"
+        iconColor={Theme.colors.muted}
+        clearIconColor={Theme.colors.muted}
+        inputClassName="w-full pl-9 pr-10 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground"
+        inputStyle={[
+          textFieldCaretStyle,
+          textFieldSingleLineStyle,
+          textFieldSingleLineDefaultHeightStyle,
+        ]}
+        multiline={false}
+        numberOfLines={1}
+        scrollEnabled={false}
+      />
 
       <View className="flex-row items-center justify-between mb-1">
         <Text className="text-lg font-display font-bold text-foreground">Gems</Text>
