@@ -1,7 +1,12 @@
 import React from 'react';
 import { View, TextInput, Pressable } from 'react-native';
 import { Search, X, SlidersHorizontal } from 'lucide-react-native';
-import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
+import {
+  Theme,
+  textFieldCaretStyle,
+  textFieldSingleLineDefaultHeightStyle,
+  textFieldSingleLineStyle,
+} from '~/theme/Theme';
 
 type Props = {
   value: string;
@@ -28,7 +33,7 @@ export const SearchBar: React.FC<Props> = ({
       placeholder="Search nearby — restaurants, cafés, bars..."
       placeholderTextColor={Theme.colors.muted}
       className="w-full pl-10 pr-24 py-3 rounded-2xl bg-card border border-border text-sm text-foreground"
-      style={[textFieldCaretStyle, textFieldSingleLineStyle]}
+      style={[textFieldCaretStyle, textFieldSingleLineStyle, textFieldSingleLineDefaultHeightStyle]}
       multiline={false}
       numberOfLines={1}
       scrollEnabled={false}

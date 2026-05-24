@@ -182,12 +182,25 @@ const ProfileView = ({
     windowHeight,
     onClose: () => setOpenCollectionId(null),
   });
+  const closeCollection = useCallback(() => {
+    if (Platform.OS === 'web') {
+      handleCollectionClose();
+      return;
+    }
+    setOpenCollectionId(null);
+  }, [handleCollectionClose]);
+
   const handleCollectionRexPress = useCallback(
     (rec: Recommendation) => {
+      if (Platform.OS !== 'web') {
+        setOpenCollectionId(null);
+        onRexPress?.(rec);
+        return;
+      }
       setPendingCollectionRex(rec);
       handleCollectionClose();
     },
-    [handleCollectionClose],
+    [handleCollectionClose, onRexPress],
   );
 
   useEffect(() => {
@@ -367,6 +380,109 @@ const ProfileView = ({
   }
 
   const rexTabCount = myRexes.length;
+  const addToCollectionSheet = (
+    <Modal
+      visible={addSheetVisible}
+      transparent
+      animationType="none"
+      presentationStyle={Platform.OS === 'ios' ? 'overFullScreen' : undefined}
+      statusBarTranslucent={Platform.OS === 'android'}
+      onRequestClose={() => setAddToCollectionId(null)}
+    >
+      <Animated.View
+        style={[
+          StyleSheet.absoluteFill,
+          { backgroundColor: 'rgba(0,0,0,0.5)', opacity: backdropOpacity },
+        ]}
+        pointerEvents="box-none"
+      >
+        <Pressable style={StyleSheet.absoluteFill} onPress={() => setAddToCollectionId(null)} />
+      </Animated.View>
+
+      <View
+        style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }}
+        pointerEvents="box-none"
+      >
+        <Animated.View style={{ width: '100%', transform: [{ translateY: addSheetTranslateY }] }}>
+          <View
+            className="w-full bg-card rounded-t-2xl border-t border-border"
+            style={{ height: Math.min(400, windowHeight * 0.5), maxHeight: 400 }}
+          >
+            <View className="w-full items-center py-3">
+              <View className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+            </View>
+            <View className="w-full px-4 pb-3">
+              <Text className="text-base font-display font-medium text-foreground">
+                Pick a saved rex
+              </Text>
+            </View>
+            <View className="h-px w-full bg-border mb-1" />
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              style={{ flex: 1 }}
+            >
+              {savedRexes.length === 0 ? (
+                <Text className="text-sm text-muted-foreground text-center py-6">
+                  No saved rexes
+                </Text>
+              ) : (
+                <View
+                  style={[{ paddingHorizontal: 16, paddingVertical: 8, gap: 4 }, webContainerStyle]}
+                >
+                  {savedRexes.map((rec) => (
+                    <TouchableOpacity
+                      key={rec.id}
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        if (!addToCollectionId) return;
+                        addRex(
+                          { collection_id: addToCollectionId, rex_id: rec.id },
+                          {
+                            onSuccess: () => {
+                              setAddToCollectionId(null);
+                              queryClient.invalidateQueries({
+                                queryKey: ['collection-detail', openCollectionId],
+                              });
+                            },
+                          },
+                        );
+                      }}
+                      className="flex-row items-center gap-3 p-3 rounded-xl"
+                    >
+                      <RexCoverThumbnail rec={rec} className="h-10 w-10 rounded-lg" />
+                      <View className="flex-1">
+                        <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
+                          {rec.title}
+                        </Text>
+                        <Text className="text-xs text-muted-foreground">{rec.category}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+              <View className="h-4" />
+            </ScrollView>
+          </View>
+        </Animated.View>
+      </View>
+      <ModalToastLayer />
+    </Modal>
+  );
+
+  if (openCollectionId && Platform.OS !== 'web') {
+    return (
+      <>
+        <CollectionDetailView
+          collectionId={openCollectionId}
+          onBack={closeCollection}
+          onAddItem={(id) => setAddToCollectionId(id)}
+          onRecommendationPress={handleCollectionRexPress}
+        />
+        {addToCollectionSheet}
+      </>
+    );
+  }
 
   return (
     <>
@@ -515,110 +631,21 @@ const ProfileView = ({
 
       <OverlayModal
         visible={openCollectionId != null}
-        onRequestClose={handleCollectionClose}
+        onRequestClose={closeCollection}
         contentTranslateY={sheetTranslateY}
         backdropBackground={layout.backdropBackground}
       >
         {openCollectionId && (
           <CollectionDetailView
             collectionId={openCollectionId}
-            onBack={handleCollectionClose}
+            onBack={closeCollection}
             onAddItem={(id) => setAddToCollectionId(id)}
             onRecommendationPress={handleCollectionRexPress}
           />
         )}
       </OverlayModal>
 
-      <Modal
-        visible={addSheetVisible}
-        transparent
-        animationType="none"
-        presentationStyle={Platform.OS === 'ios' ? 'overFullScreen' : undefined}
-        statusBarTranslucent={Platform.OS === 'android'}
-        onRequestClose={() => setAddToCollectionId(null)}
-      >
-        <Animated.View
-          style={[
-            StyleSheet.absoluteFill,
-            { backgroundColor: 'rgba(0,0,0,0.5)', opacity: backdropOpacity },
-          ]}
-          pointerEvents="box-none"
-        >
-          <Pressable style={StyleSheet.absoluteFill} onPress={() => setAddToCollectionId(null)} />
-        </Animated.View>
-
-        <View
-          style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }}
-          pointerEvents="box-none"
-        >
-          <Animated.View style={{ width: '100%', transform: [{ translateY: addSheetTranslateY }] }}>
-            <View
-              className="w-full bg-card rounded-t-2xl border-t border-border"
-              style={{ height: Math.min(400, windowHeight * 0.5), maxHeight: 400 }}
-            >
-              <View className="w-full items-center py-3">
-                <View className="w-10 h-1 rounded-full bg-muted-foreground/30" />
-              </View>
-              <View className="w-full px-4 pb-3">
-                <Text className="text-base font-display font-medium text-foreground">
-                  Pick a saved rex
-                </Text>
-              </View>
-              <View className="h-px w-full bg-border mb-1" />
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-                style={{ flex: 1 }}
-              >
-                {savedRexes.length === 0 ? (
-                  <Text className="text-sm text-muted-foreground text-center py-6">
-                    No saved rexes
-                  </Text>
-                ) : (
-                  <View
-                    style={[
-                      { paddingHorizontal: 16, paddingVertical: 8, gap: 4 },
-                      webContainerStyle,
-                    ]}
-                  >
-                    {savedRexes.map((rec) => (
-                      <TouchableOpacity
-                        key={rec.id}
-                        activeOpacity={0.7}
-                        onPress={() => {
-                          if (!addToCollectionId) return;
-                          addRex(
-                            { collection_id: addToCollectionId, rex_id: rec.id },
-                            {
-                              onSuccess: () => {
-                                setAddToCollectionId(null);
-                                queryClient.invalidateQueries({
-                                  queryKey: ['collection-detail', openCollectionId],
-                                });
-                              },
-                            },
-                          );
-                        }}
-                        className="flex-row items-center gap-3 p-3 rounded-xl"
-                      >
-                        <RexCoverThumbnail rec={rec} className="h-10 w-10 rounded-lg" />
-                        <View className="flex-1">
-                          <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
-                            {rec.title}
-                          </Text>
-                          <Text className="text-xs text-muted-foreground">{rec.category}</Text>
-                        </View>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                )}
-                <View className="h-4" />
-              </ScrollView>
-            </View>
-          </Animated.View>
-        </View>
-        <ModalToastLayer />
-      </Modal>
+      {addToCollectionSheet}
     </>
   );
 };

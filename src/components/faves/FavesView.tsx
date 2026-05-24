@@ -17,7 +17,12 @@ import { useMyCollections, useMySavedCollections } from '~/hooks/useCollections'
 import { useSavedRexes } from '~/hooks/useGems';
 import { useAuth } from '~/services/AuthContext';
 import { webContainerStyle, singleLineEllipsisTextStyle } from '~/utils';
-import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
+import {
+  Theme,
+  textFieldCaretStyle,
+  textFieldSingleLineDefaultHeightStyle,
+  textFieldSingleLineStyle,
+} from '~/theme/Theme';
 import type {
   Recommendation,
   RecommendationOpenOptions,
@@ -129,7 +134,11 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
           placeholder="Search your saved gems..."
           placeholderTextColor={Theme.colors.muted}
           className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground"
-          style={[textFieldCaretStyle, textFieldSingleLineStyle]}
+          style={[
+            textFieldCaretStyle,
+            textFieldSingleLineStyle,
+            textFieldSingleLineDefaultHeightStyle,
+          ]}
           multiline={false}
           numberOfLines={1}
           scrollEnabled={false}

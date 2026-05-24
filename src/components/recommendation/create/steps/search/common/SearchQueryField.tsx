@@ -1,7 +1,12 @@
 import React from 'react';
 import { View, TextInput } from 'react-native';
 import { Search as SearchIcon } from 'lucide-react-native';
-import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
+import {
+  Theme,
+  textFieldCaretStyle,
+  textFieldSingleLineLargeHeightStyle,
+  textFieldSingleLineStyle,
+} from '~/theme/Theme';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 import { webNoOutline } from './webInputOutline';
 
@@ -27,7 +32,12 @@ export function SearchQueryField({ value, onChangeText }: Props) {
         returnKeyType="search"
         underlineColorAndroid="transparent"
         selectionColor={Theme.colors.foreground}
-        style={[webNoOutline, textFieldCaretStyle, textFieldSingleLineStyle]}
+        style={[
+          webNoOutline,
+          textFieldCaretStyle,
+          textFieldSingleLineStyle,
+          textFieldSingleLineLargeHeightStyle,
+        ]}
         multiline={false}
         numberOfLines={1}
         scrollEnabled={false}

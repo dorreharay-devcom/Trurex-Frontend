@@ -3,7 +3,12 @@ import { View, TextInput, Pressable, Text, ScrollView, Platform, StyleSheet } fr
 import { Search, X } from 'lucide-react-native';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { MAP_ACTION_INSET } from '~/constants/map/mapUi';
-import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
+import {
+  Theme,
+  textFieldCaretStyle,
+  textFieldSingleLineDefaultHeightStyle,
+  textFieldSingleLineStyle,
+} from '~/theme/Theme';
 import { MAP_SEARCH_SUGGEST_MIN_QUERY_LENGTH } from '~/utils/map/mapSearchSuggestions';
 import { MapSearchRow } from '~/components/map/MapSearchRow';
 
@@ -91,7 +96,11 @@ export function MapSearchBar({
               placeholder="Search rex by name…"
               placeholderTextColor={Theme.colors.secondaryText}
               className="rounded-2xl border border-border bg-card/95 py-3 pl-10 pr-10 text-sm text-foreground shadow-md"
-              style={[textFieldCaretStyle, textFieldSingleLineStyle]}
+              style={[
+                textFieldCaretStyle,
+                textFieldSingleLineStyle,
+                textFieldSingleLineDefaultHeightStyle,
+              ]}
               multiline={false}
               numberOfLines={1}
               scrollEnabled={false}

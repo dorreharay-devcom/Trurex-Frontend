@@ -31,7 +31,12 @@ import {
   useScopedConnectionUserSearch,
   type ConnectionScopeTab,
 } from '~/hooks/circles/useScopedConnectionUserSearch';
-import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
+import {
+  Theme,
+  textFieldCaretStyle,
+  textFieldSingleLineDefaultHeightStyle,
+  textFieldSingleLineStyle,
+} from '~/theme/Theme';
 import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 import {
   DELETE_CIRCLE_CONFIRM_MESSAGE,
@@ -227,7 +232,11 @@ export function CircleDetailScreen({ vm, onUserPress }: Props) {
                 placeholder={addSearch.placeholder}
                 placeholderTextColor={Theme.colors.muted}
                 className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground"
-                style={[textFieldCaretStyle, textFieldSingleLineStyle]}
+                style={[
+                  textFieldCaretStyle,
+                  textFieldSingleLineStyle,
+                  textFieldSingleLineDefaultHeightStyle,
+                ]}
                 multiline={false}
                 numberOfLines={1}
                 scrollEnabled={false}
@@ -404,7 +413,11 @@ function EditCircleModal({
             onChangeText={onChangeName}
             maxLength={40}
             className="mb-3 rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground"
-            style={[textFieldCaretStyle, textFieldSingleLineStyle]}
+            style={[
+              textFieldCaretStyle,
+              textFieldSingleLineStyle,
+              textFieldSingleLineDefaultHeightStyle,
+            ]}
           />
           <TextInput
             placeholder="Description (optional)"

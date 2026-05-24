@@ -4,7 +4,12 @@ import { MapPin } from 'lucide-react-native';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { CreateStepTitle } from '../../../CreateStepTitle';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
-import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
+import {
+  Theme,
+  textFieldCaretStyle,
+  textFieldSingleLineLargeHeightStyle,
+  textFieldSingleLineStyle,
+} from '~/theme/Theme';
 import { cn } from '~/utils/general';
 import { webNoOutline } from './webInputOutline';
 import type { CreateRecSearchPlace } from '~/types/recommendation/create';
@@ -68,7 +73,12 @@ export function SearchManualPanel({
           placeholderTextColor={Theme.colors.secondaryText}
           editable={!tagLocationLoading}
           className={`w-full rounded-[12px] border border-border bg-muted/50 px-4 py-3.5 text-base text-foreground ${INPUT_FOCUS_RING_CLASS}`}
-          style={[webNoOutline, textFieldCaretStyle, textFieldSingleLineStyle]}
+          style={[
+            webNoOutline,
+            textFieldCaretStyle,
+            textFieldSingleLineStyle,
+            textFieldSingleLineLargeHeightStyle,
+          ]}
           autoCorrect
           autoCapitalize="words"
           multiline={false}
@@ -85,7 +95,12 @@ export function SearchManualPanel({
           placeholderTextColor={Theme.colors.secondaryText}
           editable={!tagLocationLoading}
           className={`w-full rounded-[12px] border border-border bg-muted/50 px-4 py-3.5 text-base text-foreground ${INPUT_FOCUS_RING_CLASS}`}
-          style={[webNoOutline, textFieldCaretStyle, textFieldSingleLineStyle]}
+          style={[
+            webNoOutline,
+            textFieldCaretStyle,
+            textFieldSingleLineStyle,
+            textFieldSingleLineLargeHeightStyle,
+          ]}
           autoCorrect
           autoCapitalize="sentences"
           multiline={false}
@@ -155,7 +170,7 @@ export function SearchManualPanel({
             <Text className="text-sm text-muted-foreground group-hover:text-foreground group-active:text-foreground">
               ←{' '}
             </Text>
-            <Text className="text-sm text-muted-foreground underline-offset-2 decoration-foreground group-hover:text-foreground group-hover:underline group-active:text-foreground group-active:underline">
+            <Text className="text-sm text-muted-foreground group-hover:text-foreground group-active:text-foreground">
               Back to search
             </Text>
           </View>

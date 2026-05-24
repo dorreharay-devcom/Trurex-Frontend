@@ -96,11 +96,7 @@ export default function LoginScreen() {
             >
               <Text
                 pointerEvents="none"
-                className={
-                  isWeb
-                    ? 'text-xs font-medium text-muted-foreground hover:underline'
-                    : 'text-xs font-medium text-muted-foreground'
-                }
+                className="text-xs font-medium text-muted-foreground"
               >
                 Forgot password?
               </Text>

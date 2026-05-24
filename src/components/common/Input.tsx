@@ -10,7 +10,12 @@ import {
   type TextStyle,
 } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
-import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
+import {
+  Theme,
+  textFieldCaretStyle,
+  textFieldSingleLineDefaultHeightStyle,
+  textFieldSingleLineStyle,
+} from '~/theme/Theme';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 
 interface InputProps extends TextInputProps {
@@ -36,7 +41,13 @@ const Input = ({
 
   const inputStyle: StyleProp<TextStyle> = props.multiline
     ? [style, textFieldCaretStyle]
-    : [style, textFieldCaretStyle, Platform.OS === 'web' ? null : textFieldSingleLineStyle];
+    : [
+        style,
+        textFieldCaretStyle,
+        Platform.OS === 'web'
+          ? null
+          : [textFieldSingleLineStyle, textFieldSingleLineDefaultHeightStyle],
+      ];
 
   return (
     <View>

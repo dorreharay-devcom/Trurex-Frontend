@@ -63,6 +63,7 @@ export default function ForgotPasswordScreen() {
             icon={<ArrowLeft size={16} color={Theme.colors.accentForeground} />}
             title="Back to sign in"
             textClassName="text-sm text-accent-foreground font-normal"
+            className="hover:no-underline active:no-underline"
           />
         </View>
       ) : (
@@ -104,7 +105,7 @@ export default function ForgotPasswordScreen() {
             icon={<ArrowLeft size={16} color={Theme.colors.muted} />}
             title="Back to sign in"
             textClassName="text-sm text-muted-foreground font-normal"
-            className="self-center"
+            className="self-center hover:no-underline active:no-underline"
           />
         </View>
       )}

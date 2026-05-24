@@ -10,7 +10,12 @@ import {
   Platform,
 } from 'react-native';
 import { X } from 'lucide-react-native';
-import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
+import {
+  Theme,
+  textFieldCaretStyle,
+  textFieldSingleLineDefaultHeightStyle,
+  textFieldSingleLineStyle,
+} from '~/theme/Theme';
 import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/utils/circleTabUtils';
 import { cn } from '~/utils/general';
 import { isWeb } from '~/utils';
@@ -74,6 +79,7 @@ export function CreateCircleModal({
                 webNoOutline,
                 textFieldCaretStyle,
                 textFieldSingleLineStyle,
+                textFieldSingleLineDefaultHeightStyle,
               ]}
             />
             <TextInput
