@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  ScrollView,
-  Pressable,
-  ActivityIndicator,
-  Platform,
-} from 'react-native';
+import { View, Text, TextInput, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { MapPin } from 'lucide-react-native';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { CreateStepTitle } from '../../../CreateStepTitle';
@@ -15,6 +7,7 @@ import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 import {
   Theme,
   textFieldCaretStyle,
+  textFieldNativeSingleLineNoWrapStyle,
   textFieldSingleLineLargeHeightStyle,
   textFieldSingleLineStyle,
 } from '~/theme/Theme';
@@ -86,12 +79,13 @@ export function SearchManualPanel({
             textFieldCaretStyle,
             textFieldSingleLineStyle,
             textFieldSingleLineLargeHeightStyle,
+            textFieldNativeSingleLineNoWrapStyle,
           ]}
           autoCorrect
           autoCapitalize="words"
           multiline={false}
           numberOfLines={1}
-          scrollEnabled={Platform.OS !== 'web'}
+          scrollEnabled={false}
           underlineColorAndroid="transparent"
           selectionColor={Theme.colors.foreground}
         />
@@ -108,12 +102,13 @@ export function SearchManualPanel({
             textFieldCaretStyle,
             textFieldSingleLineStyle,
             textFieldSingleLineLargeHeightStyle,
+            textFieldNativeSingleLineNoWrapStyle,
           ]}
           autoCorrect
           autoCapitalize="sentences"
           multiline={false}
           numberOfLines={1}
-          scrollEnabled={Platform.OS !== 'web'}
+          scrollEnabled={false}
           underlineColorAndroid="transparent"
           selectionColor={Theme.colors.foreground}
         />
