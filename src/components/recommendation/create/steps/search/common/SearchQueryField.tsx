@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, TextInput } from 'react-native';
-import { Search as SearchIcon } from 'lucide-react-native';
+import { Platform } from 'react-native';
 import {
   Theme,
   textFieldCaretStyle,
@@ -9,7 +8,9 @@ import {
   textFieldSingleLineStyle,
 } from '~/theme/Theme';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
+import { cn } from '~/utils/general';
 import { webNoOutline } from './webInputOutline';
+import { ClearableSearchInput } from '~/components/common/ClearableSearchInput';
 
 type Props = {
   value: string;
@@ -18,32 +19,32 @@ type Props = {
 
 export function SearchQueryField({ value, onChangeText }: Props) {
   return (
-    <View className="relative mb-4 w-full">
-      <View pointerEvents="none" className="absolute left-3.5 top-0 bottom-0 z-10 justify-center">
-        <SearchIcon size={20} color={Theme.colors.secondaryText} />
-      </View>
-      <TextInput
-        value={value}
-        onChangeText={onChangeText}
-        placeholder="Search by name..."
-        placeholderTextColor={Theme.colors.secondaryText}
-        className={`w-full rounded-xl border border-border bg-muted/50 py-3.5 pl-11 pr-4 text-base text-foreground ${INPUT_FOCUS_RING_CLASS}`}
-        autoCorrect={false}
-        autoCapitalize="none"
-        returnKeyType="search"
-        underlineColorAndroid="transparent"
-        selectionColor={Theme.colors.foreground}
-        style={[
-          webNoOutline,
-          textFieldCaretStyle,
-          textFieldSingleLineStyle,
-          textFieldSingleLineLargeHeightStyle,
-          textFieldNativeSingleLineNoWrapStyle,
-        ]}
-        multiline={false}
-        numberOfLines={1}
-        scrollEnabled={false}
-      />
-    </View>
+    <ClearableSearchInput
+      value={value}
+      onChangeText={onChangeText}
+      placeholder="Search by name..."
+      placeholderTextColor={Theme.colors.secondaryText}
+      containerClassName="mb-4"
+      iconClassName="left-3.5"
+      iconColor={Theme.colors.secondaryText}
+      clearIconColor={Theme.colors.secondaryText}
+      iconSize={20}
+      inputClassName={cn(
+        'w-full rounded-xl border border-border bg-muted/50 pl-11 pr-10 text-base text-foreground',
+        Platform.OS === 'web' ? 'py-3.5' : 'py-0',
+        INPUT_FOCUS_RING_CLASS,
+      )}
+      autoCorrect={false}
+      autoCapitalize="none"
+      underlineColorAndroid="transparent"
+      selectionColor={Theme.colors.foreground}
+      inputStyle={[
+        webNoOutline,
+        textFieldCaretStyle,
+        textFieldSingleLineStyle,
+        textFieldSingleLineLargeHeightStyle,
+        textFieldNativeSingleLineNoWrapStyle,
+      ]}
+    />
   );
 }

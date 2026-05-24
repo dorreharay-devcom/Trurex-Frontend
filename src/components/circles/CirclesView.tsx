@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
-import { ChevronRight, Plus, Search, Users, X } from 'lucide-react-native';
+import { ChevronRight, Plus, Users, X } from 'lucide-react-native';
 import { CircleAssignmentSheet } from '~/components/circles/CircleAssignmentSheet';
 import { CircleDetailScreen } from '~/components/circles/CircleDetailScreen';
 import { PeopleYouMayKnowSection } from '~/components/circles/PeopleYouMayKnowSection';
@@ -34,6 +34,7 @@ import {
 import { connectionScopeTabStyle } from '~/utils/circleTabUtils';
 import { cn } from '~/utils/general';
 import { webContainerStyle } from '~/utils';
+import { ClearableSearchInput } from '~/components/common/ClearableSearchInput';
 
 type Props = { isActive: boolean; onUserPress?: (userId: string) => void };
 
@@ -280,29 +281,24 @@ function CirclesListContent({
               })}
             </View>
 
-            <View className="relative mb-4 w-full max-w-md self-start">
-              <View
-                pointerEvents="none"
-                className="absolute left-3 top-0 bottom-0 z-10 justify-center"
-              >
-                <Search size={16} color={Theme.colors.muted} />
-              </View>
-              <TextInput
-                value={connSearch.query}
-                onChangeText={connSearch.setQuery}
-                placeholder={connSearch.placeholder}
-                placeholderTextColor={Theme.colors.muted}
-                className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground"
-                style={[
-                  textFieldCaretStyle,
-                  textFieldSingleLineStyle,
-                  textFieldSingleLineDefaultHeightStyle,
-                ]}
-                multiline={false}
-                numberOfLines={1}
-                scrollEnabled={false}
-              />
-            </View>
+            <ClearableSearchInput
+              value={connSearch.query}
+              onChangeText={connSearch.setQuery}
+              placeholder={connSearch.placeholder}
+              placeholderTextColor={Theme.colors.muted}
+              containerClassName="mb-4 w-full max-w-md self-start"
+              iconColor={Theme.colors.muted}
+              clearIconColor={Theme.colors.muted}
+              inputClassName="w-full pl-9 pr-10 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground"
+              inputStyle={[
+                textFieldCaretStyle,
+                textFieldSingleLineStyle,
+                textFieldSingleLineDefaultHeightStyle,
+              ]}
+              multiline={false}
+              numberOfLines={1}
+              scrollEnabled={false}
+            />
 
             {connPhase === 'loading' ? (
               <View className="gap-2">

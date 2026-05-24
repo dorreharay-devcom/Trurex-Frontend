@@ -8,7 +8,7 @@ import {
   Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Search, PlusCircle, UserCircle2 } from 'lucide-react-native';
+import { PlusCircle, UserCircle2 } from 'lucide-react-native';
 import { useAuth } from '~/services/AuthContext';
 import { ProfileApi } from '~/api/ProfileApi';
 import {
@@ -23,6 +23,7 @@ import { NotificationBell } from '~/components/layout/NotificationBell';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
+import { ClearableSearchInput } from '~/components/common/ClearableSearchInput';
 
 interface HeaderProps {
   searchQuery: string;
@@ -78,38 +79,29 @@ export const Header: React.FC<HeaderProps> = ({
           </View>
 
           <View className="min-w-0 px-1" style={{ width: '40%' }}>
-            <View
-              className="relative w-full min-w-0 justify-center"
-              onTouchStart={() => searchInputRef.current?.focus()}
-            >
-              <View
-                pointerEvents="none"
-                className="absolute left-3 top-0 bottom-0 z-10 justify-center"
-              >
-                <Search size={16} color={Theme.colors.secondaryText} />
-              </View>
-              <TextInput
-                ref={searchInputRef}
-                value={searchQuery}
-                onChangeText={onSearchChange}
-                placeholder="Search rex..."
-                placeholderTextColor={Theme.colors.secondaryText}
-                className={`header-search-input w-full min-w-0 shrink rounded-lg border border-border py-1.5 pl-9 pr-4 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
-                style={[
-                  textFieldCaretStyle,
-                  { backgroundColor: Theme.colors.searchFieldBackground },
-                  textFieldSingleLineStyle,
-                  textFieldSingleLineCompactHeightStyle,
-                  textFieldHeaderSearchStyle,
-                ]}
-                selectionColor={Theme.colors.foreground}
-                returnKeyType="search"
-                underlineColorAndroid="transparent"
-                multiline={false}
-                numberOfLines={1}
-                scrollEnabled={false}
-              />
-            </View>
+            <ClearableSearchInput
+              ref={searchInputRef}
+              value={searchQuery}
+              onChangeText={onSearchChange}
+              placeholder="Search rex..."
+              placeholderTextColor={Theme.colors.secondaryText}
+              containerClassName="min-w-0 justify-center"
+              iconColor={Theme.colors.secondaryText}
+              clearIconColor={Theme.colors.secondaryText}
+              inputClassName={`header-search-input w-full min-w-0 shrink rounded-lg border border-border py-1.5 pl-9 pr-9 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
+              inputStyle={[
+                textFieldCaretStyle,
+                { backgroundColor: Theme.colors.searchFieldBackground },
+                textFieldSingleLineStyle,
+                textFieldSingleLineCompactHeightStyle,
+                textFieldHeaderSearchStyle,
+              ]}
+              selectionColor={Theme.colors.foreground}
+              underlineColorAndroid="transparent"
+              multiline={false}
+              numberOfLines={1}
+              scrollEnabled={false}
+            />
           </View>
 
           <View className="flex-row items-center justify-end gap-1" style={{ width: '26%' }}>
@@ -154,38 +146,29 @@ export const Header: React.FC<HeaderProps> = ({
           />
 
           <View className="mx-4 min-w-0 max-w-md flex-1 sm:mx-8">
-            <View
-              className="relative w-full min-w-0 justify-center"
-              onTouchStart={() => searchInputRef.current?.focus()}
-            >
-              <View
-                pointerEvents="none"
-                className="absolute left-3 top-0 bottom-0 z-10 justify-center"
-              >
-                <Search size={16} color={Theme.colors.secondaryText} />
-              </View>
-              <TextInput
-                ref={searchInputRef}
-                value={searchQuery}
-                onChangeText={onSearchChange}
-                placeholder="Search rex..."
-                placeholderTextColor={Theme.colors.secondaryText}
-                className={`header-search-input w-full min-w-0 shrink rounded-lg border border-border py-1.5 pl-9 pr-4 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
-                style={[
-                  textFieldCaretStyle,
-                  { backgroundColor: Theme.colors.searchFieldBackground },
-                  textFieldSingleLineStyle,
-                  textFieldSingleLineCompactHeightStyle,
-                  textFieldHeaderSearchStyle,
-                ]}
-                selectionColor={Theme.colors.foreground}
-                returnKeyType="search"
-                underlineColorAndroid="transparent"
-                multiline={false}
-                numberOfLines={1}
-                scrollEnabled={false}
-              />
-            </View>
+            <ClearableSearchInput
+              ref={searchInputRef}
+              value={searchQuery}
+              onChangeText={onSearchChange}
+              placeholder="Search rex..."
+              placeholderTextColor={Theme.colors.secondaryText}
+              containerClassName="min-w-0 justify-center"
+              iconColor={Theme.colors.secondaryText}
+              clearIconColor={Theme.colors.secondaryText}
+              inputClassName={`header-search-input w-full min-w-0 shrink rounded-lg border border-border py-1.5 pl-9 pr-9 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
+              inputStyle={[
+                textFieldCaretStyle,
+                { backgroundColor: Theme.colors.searchFieldBackground },
+                textFieldSingleLineStyle,
+                textFieldSingleLineCompactHeightStyle,
+                textFieldHeaderSearchStyle,
+              ]}
+              selectionColor={Theme.colors.foreground}
+              underlineColorAndroid="transparent"
+              multiline={false}
+              numberOfLines={1}
+              scrollEnabled={false}
+            />
           </View>
 
           <View className="shrink-0 flex-row items-center gap-1 sm:gap-2">

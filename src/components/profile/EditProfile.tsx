@@ -46,6 +46,14 @@ const currentlyFields = [
 
 const fieldLabelClassName = 'text-xs text-muted-foreground uppercase tracking-wide';
 
+const normalizeHandleInput = (value: string | null | undefined) =>
+  (value ?? '').trim().replace(/^@+/, '');
+
+const normalizeHandleForSave = (value: string) => {
+  const trimmed = normalizeHandleInput(value);
+  return trimmed ? trimmed.replace(/\s+/g, '').toLowerCase() : null;
+};
+
 const EditProfile = ({ onClose }: EditProfileProps) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -54,6 +62,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
 
   const [displayName, setDisplayName] = useState('');
   const [handle, setHandle] = useState('');
+  const [handleFocused, setHandleFocused] = useState(false);
   const [bio, setBio] = useState('');
   const [location, setLocation] = useState('');
   const [currently, setCurrently] = useState<CurrentlyData>({});
@@ -69,7 +78,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
     ProfileApi.getCurrentUser(user.id)
       .then((data) => {
         setDisplayName(data.display_name || '');
-        setHandle(data.handle || '');
+        setHandle(normalizeHandleInput(data.handle));
         setBio(data.bio || '');
         setLocation(data.location || '');
         setCurrentAvatarUrl(data.avatar_url);
@@ -135,7 +144,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
 
       await ProfileApi.update(user.id, {
         display_name: displayName,
-        handle: handle || null,
+        handle: normalizeHandleForSave(handle),
         bio: bio || null,
         location: location || null,
         currently_binging: currently.binging || null,
@@ -259,7 +268,16 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
           {/* Handle — custom layout due to @ prefix */}
           <View>
             <Text className={`${fieldLabelClassName} mb-1.5`}>Handle</Text>
-            <View className="h-12 flex-row items-center bg-background border border-border rounded-xl overflow-hidden">
+            <View
+              className={`h-12 flex-row items-center overflow-hidden rounded-xl border bg-background ${
+                handleFocused ? 'border-primary' : 'border-border'
+              }`}
+              style={
+                Platform.OS === 'web' && handleFocused
+                  ? { boxShadow: '0 0 0 2px rgba(183, 199, 207, 0.4)' }
+                  : undefined
+              }
+            >
               <Text
                 className="pl-3 text-sm text-muted-foreground"
                 style={Platform.OS === 'web' ? undefined : { lineHeight: 18 }}
@@ -268,15 +286,22 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
               </Text>
               <TextInput
                 value={handle}
-                onChangeText={(t) => setHandle(t.replace(/[^a-zA-Z0-9_]/g, ''))}
+                onChangeText={(t) => setHandle(normalizeHandleInput(t))}
                 placeholder="yourhandle"
                 placeholderTextColor={Theme.colors.muted}
                 maxLength={30}
                 autoCapitalize="none"
+                autoCorrect={false}
+                spellCheck={false}
+                keyboardType={Platform.OS === 'ios' ? 'ascii-capable' : 'default'}
+                textContentType="username"
+                onFocus={() => setHandleFocused(true)}
+                onBlur={() => setHandleFocused(false)}
                 className="h-12 flex-1 px-2 text-sm text-foreground"
                 style={[
                   textFieldCaretStyle,
                   textFieldSingleLineStyle,
+                  Platform.OS === 'web' ? { outlineStyle: 'none' as const } : null,
                   Platform.OS === 'web' ? null : { paddingTop: 0, paddingBottom: 0 },
                 ]}
               />

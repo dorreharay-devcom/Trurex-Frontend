@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, Text, TextInput, ScrollView, Pressable, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  ScrollView,
+  Pressable,
+  ActivityIndicator,
+  Platform,
+} from 'react-native';
 import { MapPin } from 'lucide-react-native';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { CreateStepTitle } from '../../../CreateStepTitle';
@@ -73,7 +81,11 @@ export function SearchManualPanel({
           placeholder="Name of place, person, or service"
           placeholderTextColor={Theme.colors.secondaryText}
           editable={!tagLocationLoading}
-          className={`w-full rounded-[12px] border border-border bg-muted/50 px-4 py-3.5 text-base text-foreground ${INPUT_FOCUS_RING_CLASS}`}
+          className={cn(
+            'w-full rounded-[12px] border border-border bg-muted/50 px-4 text-base text-foreground',
+            Platform.OS === 'web' ? 'py-3.5' : 'py-0',
+            INPUT_FOCUS_RING_CLASS,
+          )}
           style={[
             webNoOutline,
             textFieldCaretStyle,
@@ -83,9 +95,6 @@ export function SearchManualPanel({
           ]}
           autoCorrect
           autoCapitalize="words"
-          multiline={false}
-          numberOfLines={1}
-          scrollEnabled={false}
           underlineColorAndroid="transparent"
           selectionColor={Theme.colors.foreground}
         />
@@ -96,7 +105,11 @@ export function SearchManualPanel({
           placeholder="Address or location"
           placeholderTextColor={Theme.colors.secondaryText}
           editable={!tagLocationLoading}
-          className={`w-full rounded-[12px] border border-border bg-muted/50 px-4 py-3.5 text-base text-foreground ${INPUT_FOCUS_RING_CLASS}`}
+          className={cn(
+            'w-full rounded-[12px] border border-border bg-muted/50 px-4 text-base text-foreground',
+            Platform.OS === 'web' ? 'py-3.5' : 'py-0',
+            INPUT_FOCUS_RING_CLASS,
+          )}
           style={[
             webNoOutline,
             textFieldCaretStyle,
@@ -106,9 +119,6 @@ export function SearchManualPanel({
           ]}
           autoCorrect
           autoCapitalize="sentences"
-          multiline={false}
-          numberOfLines={1}
-          scrollEnabled={false}
           underlineColorAndroid="transparent"
           selectionColor={Theme.colors.foreground}
         />
