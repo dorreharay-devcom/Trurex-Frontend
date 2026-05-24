@@ -97,6 +97,9 @@ export function SearchManualPanel({
           autoCapitalize="words"
           underlineColorAndroid="transparent"
           selectionColor={Theme.colors.foreground}
+          multiline={false}
+          numberOfLines={1}
+          scrollEnabled={false}
         />
 
         <TextInput
@@ -121,6 +124,9 @@ export function SearchManualPanel({
           autoCapitalize="sentences"
           underlineColorAndroid="transparent"
           selectionColor={Theme.colors.foreground}
+          multiline={false}
+          numberOfLines={1}
+          scrollEnabled={false}
         />
 
         {addressSearchErrorMessage ? (

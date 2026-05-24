@@ -42,6 +42,9 @@ export const ClearableSearchInput = forwardRef<TextInput, ClearableSearchInputPr
       clearIconSize = 16,
       onClear,
       returnKeyType = 'search',
+      multiline = false,
+      numberOfLines = 1,
+      scrollEnabled = false,
       ...inputProps
     },
     ref,
@@ -63,6 +66,9 @@ export const ClearableSearchInput = forwardRef<TextInput, ClearableSearchInputPr
           onChangeText={onChangeText}
           returnKeyType={returnKeyType}
           {...inputProps}
+          multiline={multiline}
+          numberOfLines={numberOfLines}
+          scrollEnabled={scrollEnabled}
           clearButtonMode="never"
           className={inputClassName}
           style={inputStyle}

@@ -122,17 +122,14 @@ export function CircleAssignmentSheet({
   }, [open]);
 
   useEffect(() => {
-    if (!open || !showCreate || !createFormMeasured || createFocusRequest === 0) return;
+    if (!isWeb || !open || !showCreate || !createFormMeasured || createFocusRequest === 0) return;
 
     const scrollTimer = setTimeout(() => {
       scrollRef.current?.scrollTo({ y: Math.max(0, createFormY - 8), animated: true });
     }, 50);
-    const focusTimer = setTimeout(
-      () => {
-        newNameInputRef.current?.focus();
-      },
-      Platform.OS === 'web' ? 180 : 120,
-    );
+    const focusTimer = setTimeout(() => {
+      newNameInputRef.current?.focus();
+    }, 180);
 
     return () => {
       clearTimeout(scrollTimer);
@@ -141,8 +138,10 @@ export function CircleAssignmentSheet({
   }, [createFocusRequest, createFormMeasured, createFormY, open, showCreate]);
 
   const openCreateForm = () => {
-    setCreateFormMeasured(false);
-    setCreateFocusRequest((request) => request + 1);
+    if (isWeb) {
+      setCreateFormMeasured(false);
+      setCreateFocusRequest((request) => request + 1);
+    }
     setShowCreate(true);
   };
 
