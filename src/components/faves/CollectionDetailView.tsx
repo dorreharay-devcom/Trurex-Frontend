@@ -31,7 +31,7 @@ import {
   Link2,
 } from 'lucide-react-native';
 import { webContainerStyle } from '~/utils';
-import { Theme, textFieldCaretStyle } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldMultilineStyle } from '~/theme/Theme';
 import {
   useCollectionDetail,
   useRemoveRexFromCollection,
@@ -343,7 +343,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                     multiline
                     maxLength={140}
                     className="min-h-[56px] rounded-lg border border-border bg-muted/50 px-3 py-2 text-xs text-foreground"
-                    style={textFieldCaretStyle}
+                    style={[textFieldCaretStyle, textFieldMultilineStyle]}
                   />
                   <View className="flex-row items-center justify-between mt-2">
                     <Text className="text-[10px] text-muted-foreground">{noteText.length}/140</Text>

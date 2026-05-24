@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TextInput } from 'react-native';
+import { Platform, View, TextInput } from 'react-native';
 import { Search as SearchIcon } from 'lucide-react-native';
 import {
   Theme,
@@ -40,7 +40,7 @@ export function SearchQueryField({ value, onChangeText }: Props) {
         ]}
         multiline={false}
         numberOfLines={1}
-        scrollEnabled={false}
+        scrollEnabled={Platform.OS !== 'web'}
       />
     </View>
   );

@@ -76,6 +76,27 @@ export const textFieldSingleLineDefaultHeightStyle =
 export const textFieldSingleLineLargeHeightStyle =
   Platform.OS === 'web' ? null : ({ height: 48 } as TextStyle);
 
+export const textFieldHeaderSearchStyle =
+  Platform.OS === 'web'
+    ? null
+    : ({
+        height: 36,
+        fontSize: 14,
+        lineHeight: 18,
+      } as TextStyle);
+
+export const textFieldMultilineStyle =
+  Platform.OS === 'web'
+    ? null
+    : ({
+        fontSize: 16,
+        lineHeight: 22,
+        paddingTop: 10,
+        paddingBottom: 10,
+        textAlignVertical: 'top',
+        includeFontPadding: false,
+      } as TextStyle);
+
 export const Size = {
   icon: {
     sm: 14,

@@ -13,6 +13,7 @@ import { X } from 'lucide-react-native';
 import {
   Theme,
   textFieldCaretStyle,
+  textFieldMultilineStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/theme/Theme';
@@ -91,7 +92,12 @@ export function CreateCircleModal({
               multiline
               editable={!creating}
               className="mb-3 min-h-[44px] rounded-xl border border-border px-3 py-3 text-sm text-foreground"
-              style={[collectionFieldBg, webNoOutline, textFieldCaretStyle]}
+              style={[
+                collectionFieldBg,
+                webNoOutline,
+                textFieldCaretStyle,
+                textFieldMultilineStyle,
+              ]}
             />
             <Text className="mb-2 text-xs text-muted-foreground">Color</Text>
             <View className="mb-4 flex-row flex-wrap gap-2">

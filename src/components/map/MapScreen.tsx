@@ -257,6 +257,7 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
           <ScrollView
             className="flex-1 w-full pt-32"
             keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
             contentContainerStyle={webContainerStyle}
             contentContainerClassName="w-full pb-28"
           >

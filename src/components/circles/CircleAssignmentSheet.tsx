@@ -23,6 +23,7 @@ import { CircleGlyphIcon } from '~/components/circles/common/CircleGlyphIcon';
 import {
   Theme,
   textFieldCaretStyle,
+  textFieldMultilineStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/theme/Theme';
@@ -322,7 +323,11 @@ export function CircleAssignmentSheet({
                             onChangeText={setNewDesc}
                             maxLength={100}
                             multiline
-                            style={[collectionFieldBg, textFieldCaretStyle]}
+                            style={[
+                              collectionFieldBg,
+                              textFieldCaretStyle,
+                              textFieldMultilineStyle,
+                            ]}
                             className="min-h-[44px] rounded-xl border border-border px-3 py-3 text-sm text-foreground"
                           />
                           <Text className="text-xs text-muted-foreground">Color</Text>

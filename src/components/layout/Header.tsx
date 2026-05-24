@@ -14,6 +14,7 @@ import { ProfileApi } from '~/api/ProfileApi';
 import {
   Theme,
   textFieldCaretStyle,
+  textFieldHeaderSearchStyle,
   textFieldSingleLineCompactHeightStyle,
   textFieldSingleLineStyle,
 } from '~/theme/Theme';
@@ -99,6 +100,7 @@ export const Header: React.FC<HeaderProps> = ({
                   { backgroundColor: Theme.colors.searchFieldBackground },
                   textFieldSingleLineStyle,
                   textFieldSingleLineCompactHeightStyle,
+                  textFieldHeaderSearchStyle,
                 ]}
                 selectionColor={Theme.colors.foreground}
                 returnKeyType="search"
@@ -174,6 +176,7 @@ export const Header: React.FC<HeaderProps> = ({
                   { backgroundColor: Theme.colors.searchFieldBackground },
                   textFieldSingleLineStyle,
                   textFieldSingleLineCompactHeightStyle,
+                  textFieldHeaderSearchStyle,
                 ]}
                 selectionColor={Theme.colors.foreground}
                 returnKeyType="search"

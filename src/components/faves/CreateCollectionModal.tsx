@@ -29,6 +29,7 @@ import { isWeb, webContainerStyle } from '~/utils';
 import {
   Theme,
   textFieldCaretStyle,
+  textFieldMultilineStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/theme/Theme';
@@ -314,7 +315,12 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                     textAlignVertical="top"
                     underlineColorAndroid="transparent"
                     selectionColor={Theme.colors.foreground}
-                    style={[webNoOutline, textFieldCaretStyle, collectionFieldBg]}
+                    style={[
+                      webNoOutline,
+                      textFieldCaretStyle,
+                      textFieldMultilineStyle,
+                      collectionFieldBg,
+                    ]}
                     className={`flex min-h-[80px] w-full rounded-xl border border-border px-4 py-3 text-sm text-foreground ${INPUT_FOCUS_BORDER_CLASS}`}
                   />
                   <Text className="text-[10px] text-muted-foreground mt-1 text-right">
