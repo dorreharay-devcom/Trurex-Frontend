@@ -9,7 +9,7 @@ module.exports = {
     name: isProduction ? 'truRex' : 'truRex Dev',
     slug: 'trurex',
     scheme: appScheme,
-    version: '1.0.2',
+    version: '1.0.3',
     orientation: 'portrait',
     icon: './assets/truRexIcon.png',
     userInterfaceStyle: 'light',
