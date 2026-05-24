@@ -59,9 +59,22 @@ export const textFieldSingleLineStyle =
       } as TextStyle)
     : ({
         overflow: 'hidden',
-        lineHeight: Platform.OS === 'ios' ? 18 : 20,
+        fontSize: 16,
+        lineHeight: 22,
+        paddingTop: 0,
+        paddingBottom: 0,
         textAlignVertical: 'center',
+        includeFontPadding: false,
       } as TextStyle);
+
+export const textFieldSingleLineCompactHeightStyle =
+  Platform.OS === 'web' ? null : ({ height: 40 } as TextStyle);
+
+export const textFieldSingleLineDefaultHeightStyle =
+  Platform.OS === 'web' ? null : ({ height: 44 } as TextStyle);
+
+export const textFieldSingleLineLargeHeightStyle =
+  Platform.OS === 'web' ? null : ({ height: 48 } as TextStyle);
 
 export const Size = {
   icon: {

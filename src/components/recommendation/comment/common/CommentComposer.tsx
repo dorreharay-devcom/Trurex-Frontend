@@ -2,7 +2,12 @@ import React from 'react';
 import { View, Text, TextInput, Pressable, Platform } from 'react-native';
 import { Reply, Send } from 'lucide-react-native';
 import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
-import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
+import {
+  Theme,
+  textFieldCaretStyle,
+  textFieldSingleLineCompactHeightStyle,
+  textFieldSingleLineStyle,
+} from '~/theme/Theme';
 import { cn } from '~/utils/general';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 
@@ -37,7 +42,11 @@ export const CommentComposer: React.FC<CommentComposerProps> = ({
         <View className="flex-row items-center gap-2">
           <Reply size={12} color={Theme.colors.secondaryText} />
           <Text className="text-xs text-muted-foreground">Replying to a comment</Text>
-          <Pressable onPress={onCancelReply} accessibilityRole="button" className="active:opacity-70">
+          <Pressable
+            onPress={onCancelReply}
+            accessibilityRole="button"
+            className="active:opacity-70"
+          >
             <Text className="text-xs font-medium text-foreground">Cancel</Text>
           </Pressable>
         </View>
@@ -50,7 +59,12 @@ export const CommentComposer: React.FC<CommentComposerProps> = ({
           placeholder="Ask a question or leave a note..."
           placeholderTextColor={Theme.colors.secondaryText}
           className={`min-h-10 min-w-0 flex-1 rounded-xl border border-border/80 bg-border/40 px-3 py-2.5 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
-          style={[webNoOutline, textFieldCaretStyle, textFieldSingleLineStyle]}
+          style={[
+            webNoOutline,
+            textFieldCaretStyle,
+            textFieldSingleLineStyle,
+            textFieldSingleLineCompactHeightStyle,
+          ]}
           onFocus={onInputFocus}
           multiline={false}
           numberOfLines={1}

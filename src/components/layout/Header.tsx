@@ -11,7 +11,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Search, PlusCircle, UserCircle2 } from 'lucide-react-native';
 import { useAuth } from '~/services/AuthContext';
 import { ProfileApi } from '~/api/ProfileApi';
-import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
+import {
+  Theme,
+  textFieldCaretStyle,
+  textFieldSingleLineCompactHeightStyle,
+  textFieldSingleLineStyle,
+} from '~/theme/Theme';
 import { isWeb } from '~/utils';
 import { NotificationBell } from '~/components/layout/NotificationBell';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
@@ -93,6 +98,7 @@ export const Header: React.FC<HeaderProps> = ({
                   textFieldCaretStyle,
                   { backgroundColor: Theme.colors.searchFieldBackground },
                   textFieldSingleLineStyle,
+                  textFieldSingleLineCompactHeightStyle,
                 ]}
                 selectionColor={Theme.colors.foreground}
                 returnKeyType="search"
@@ -167,6 +173,7 @@ export const Header: React.FC<HeaderProps> = ({
                   textFieldCaretStyle,
                   { backgroundColor: Theme.colors.searchFieldBackground },
                   textFieldSingleLineStyle,
+                  textFieldSingleLineCompactHeightStyle,
                 ]}
                 selectionColor={Theme.colors.foreground}
                 returnKeyType="search"

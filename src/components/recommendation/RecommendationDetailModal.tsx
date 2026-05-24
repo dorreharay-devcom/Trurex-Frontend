@@ -565,24 +565,26 @@ export const RecommendationDetailModal: React.FC<Props> = ({
               <View className="h-8" />
             </View>
           </ScrollView>
+          <ReportContentDialog
+            inline
+            open={reportTarget != null}
+            onOpenChange={(o) => {
+              if (!o) setReportTarget(null);
+            }}
+            target={reportTarget}
+          />
+          <DestructiveActionConfirmModal
+            inline
+            visible={deleteConfirmOpen}
+            title="Delete recommendation?"
+            message="This permanently removes this rex and related likes, comments, photos, saves, and collection entries. This can't be undone."
+            confirmLabel="Delete"
+            pending={deleteRexMutation.isPending}
+            onCancel={() => setDeleteConfirmOpen(false)}
+            onConfirm={handleConfirmDeleteRex}
+          />
         </View>
       </OverlayModal>
-      <ReportContentDialog
-        open={reportTarget != null}
-        onOpenChange={(o) => {
-          if (!o) setReportTarget(null);
-        }}
-        target={reportTarget}
-      />
-      <DestructiveActionConfirmModal
-        visible={deleteConfirmOpen}
-        title="Delete recommendation?"
-        message="This permanently removes this rex and related likes, comments, photos, saves, and collection entries. This can't be undone."
-        confirmLabel="Delete"
-        pending={deleteRexMutation.isPending}
-        onCancel={() => setDeleteConfirmOpen(false)}
-        onConfirm={handleConfirmDeleteRex}
-      />
     </>
   );
 };

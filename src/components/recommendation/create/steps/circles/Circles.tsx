@@ -8,7 +8,12 @@ import {
   canRenameCreateRecCircle,
   findRenameableCircleById,
 } from '~/constants/recommendation/createCircles';
-import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
+import {
+  Theme,
+  textFieldCaretStyle,
+  textFieldSingleLineDefaultHeightStyle,
+  textFieldSingleLineStyle,
+} from '~/theme/Theme';
 import { CreateStepTitle } from '../../CreateStepTitle';
 import { cn } from '~/utils/general';
 import { CirclesRingPicker } from './common/CirclesRingPicker';
@@ -282,6 +287,7 @@ export const Circles: React.FC<Props> = ({
                       webNoOutline,
                       textFieldCaretStyle,
                       textFieldSingleLineStyle,
+                      textFieldSingleLineDefaultHeightStyle,
                     ]}
                     maxLength={32}
                     editable={!busy}

@@ -26,7 +26,12 @@ import {
 } from '~/utils/photos/storageUpload';
 import { generateRexImageStoragePath } from '~/utils/photos/photoUtils';
 import { isWeb, webContainerStyle } from '~/utils';
-import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
+import {
+  Theme,
+  textFieldCaretStyle,
+  textFieldSingleLineDefaultHeightStyle,
+  textFieldSingleLineStyle,
+} from '~/theme/Theme';
 import { cn } from '~/utils/general';
 import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
@@ -284,6 +289,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                       webNoOutline,
                       textFieldCaretStyle,
                       textFieldSingleLineStyle,
+                      textFieldSingleLineDefaultHeightStyle,
                       collectionFieldBg,
                     ]}
                     className={`w-full rounded-xl border border-border px-4 py-3 text-sm text-foreground ${INPUT_FOCUS_BORDER_CLASS}`}
