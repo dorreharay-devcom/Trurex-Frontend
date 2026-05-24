@@ -89,8 +89,8 @@ export const textFieldNativeSingleLineNoWrapStyle =
   Platform.OS === 'web'
     ? null
     : ({
-        height: 48,
-        maxHeight: 48,
+        height: 40,
+        maxHeight: 40,
         lineHeight: 22,
         paddingTop: 0,
         paddingBottom: 0,
