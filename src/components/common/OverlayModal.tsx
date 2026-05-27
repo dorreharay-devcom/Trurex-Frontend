@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Animated as RNAnimated,
+  Keyboard,
   Modal,
   View,
   KeyboardAvoidingView,
@@ -36,6 +37,17 @@ export const OverlayModal: React.FC<OverlayModalProps> = ({
   children,
 }) => {
   const insets = useSafeAreaInsets();
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    const show = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    const hide = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
 
   return (
     <Modal
@@ -61,7 +73,9 @@ export const OverlayModal: React.FC<OverlayModalProps> = ({
         </Pressable>
 
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={
+            Platform.OS === 'ios' ? 'padding' : Platform.OS === 'android' ? 'height' : undefined
+          }
           pointerEvents="box-none"
           style={[StyleSheet.absoluteFillObject, { zIndex: 61 }]}
         >
@@ -76,7 +90,7 @@ export const OverlayModal: React.FC<OverlayModalProps> = ({
               className="absolute inset-0 sm:inset-4 sm:top-8 flex flex-col overflow-hidden bg-card sm:rounded-2xl sm:shadow-elevated"
               style={{
                 paddingTop: insets.top,
-                paddingBottom: insets.bottom,
+                paddingBottom: keyboardVisible ? 0 : insets.bottom,
                 ...(Platform.OS === 'android' ? { elevation: 12 } : null),
               }}
             >

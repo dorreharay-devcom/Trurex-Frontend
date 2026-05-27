@@ -13,6 +13,7 @@ export interface UserCollection {
   created_at: string;
   updated_at: string;
   rex_count?: number;
+  total_count?: number;
   is_my_collection: boolean;
   is_saved?: boolean;
 }
@@ -118,8 +119,17 @@ export const CollectionsApi = {
     );
   },
 
-  userCollections: async (userId: string): Promise<UserCollection[]> => {
-    return unwrap(await Backend.rpc('user_collections', { input_user_id: userId }));
+  userCollections: async (
+    userId: string,
+    params: { result_limit?: number; result_offset?: number } = {},
+  ): Promise<UserCollection[]> => {
+    return unwrap(
+      await Backend.rpc('user_collections', {
+        input_user_id: userId,
+        result_limit: params.result_limit ?? 50,
+        result_offset: params.result_offset ?? 0,
+      }),
+    );
   },
 
   saveCollection: async (collectionId: string): Promise<void> => {
@@ -136,7 +146,7 @@ export const CollectionsApi = {
 
   myCollectionIdsForRex: async (rexId: string): Promise<string[]> => {
     const result = unwrap(await Backend.rpc('my_collection_ids_for_rex', { input_rex_id: rexId }));
-    return Array.isArray(result) ? result as string[] : [];
+    return Array.isArray(result) ? (result as string[]) : [];
   },
 
   collectionDetail: async (collectionId: string): Promise<CollectionDetailRow> => {

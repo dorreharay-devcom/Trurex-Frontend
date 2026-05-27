@@ -34,6 +34,8 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
   const { comments, loading, addComment, deleteComment, toggleCommentLike } = useRexComments(rexId);
   const [text, setText] = useState('');
   const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [posting, setPosting] = useState(false);
+  const postingRef = useRef(false);
   const inputRef = useRef<TextInput | null>(null);
 
   const total = useMemo(() => totalRexCommentCount(comments), [comments]);
@@ -50,14 +52,20 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
   }, [autoFocusComposer, user, rexId]);
 
   const handlePost = useCallback(async () => {
-    if (!text.trim()) return;
+    const body = text.trim();
+    if (!body || postingRef.current) return;
+    postingRef.current = true;
+    setPosting(true);
     try {
-      await addComment(text, replyTo);
+      await addComment(body, replyTo);
       setText('');
       setReplyTo(null);
     } catch (e) {
       if (didAccountFrozenMutationToast(e)) return;
       toastError('Comment failed', unknownErrorMessage(e, 'Try again.'));
+    } finally {
+      postingRef.current = false;
+      setPosting(false);
     }
   }, [addComment, replyTo, text]);
 
@@ -132,6 +140,7 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
           text={text}
           onChangeText={setText}
           onSubmit={handlePost}
+          submitting={posting}
           replyToId={replyTo}
           onCancelReply={() => setReplyTo(null)}
           onInputFocus={onComposerFocus}

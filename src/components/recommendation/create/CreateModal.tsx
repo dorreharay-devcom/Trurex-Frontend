@@ -4,6 +4,7 @@ import {
   Text,
   Pressable,
   Platform,
+  Keyboard,
   useWindowDimensions,
   ActivityIndicator,
 } from 'react-native';
@@ -70,11 +71,22 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
     syncCategoryCreateShape,
   } = flow;
   const [submitting, setSubmitting] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const postedSuccessfullyRef = useRef(false);
 
   useEffect(() => {
     if (visible) postedSuccessfullyRef.current = false;
   }, [visible]);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    const show = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    const hide = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
 
   const applyManualGeotag = useCallback(
     (result: ManualPlaceGeotagResult) => {
@@ -425,12 +437,17 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
           subcategoryLabelForConfirm={subcategoryLabelForConfirm}
         />
 
-        <View className="sticky bottom-0 items-center border-t border-border bg-card/95 backdrop-blur px-4 py-4 sm:px-6">
+        <View
+          className={cn(
+            'sticky bottom-0 items-center border-t border-border bg-card/95 backdrop-blur px-4 sm:px-6',
+            keyboardVisible && Platform.OS !== 'web' ? 'py-2' : 'py-4',
+          )}
+        >
           <View
             className="w-full"
             style={{
               maxWidth: CREATE_REC_MODAL_MAX_W,
-              paddingBottom: layout.minSafeBottom,
+              paddingBottom: keyboardVisible && Platform.OS !== 'web' ? 0 : layout.minSafeBottom,
             }}
           >
             <View className={cn('w-full', primaryDisabled && isWeb && 'cursor-not-allowed')}>

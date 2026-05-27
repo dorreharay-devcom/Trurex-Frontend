@@ -50,7 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const isMobile = !isWeb || width < 640;
-  const topPad = Platform.OS === 'web' ? 12 : insets.top;
+  const topPad = Platform.OS === 'web' ? 12 : insets.top + 6;
   const searchInputRef = useRef<TextInput>(null);
 
   const [avatarPath, setAvatarPath] = useState<string | null>(null);

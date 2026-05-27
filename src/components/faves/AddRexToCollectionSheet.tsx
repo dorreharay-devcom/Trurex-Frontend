@@ -23,6 +23,7 @@ import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { Theme } from '~/theme/Theme';
 import { cn } from '~/utils/general';
+import { ConnectionLoadMoreButton } from '~/components/circles/common';
 
 interface AddRexToCollectionSheetProps {
   open: boolean;
@@ -37,7 +38,13 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({
 }) => {
   const { height } = useWindowDimensions();
   const queryClient = useQueryClient();
-  const { data: savedRexes = [], isLoading } = useSavedRexes({ uncollected: true });
+  const {
+    data: savedRexes = [],
+    isLoading,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useSavedRexes({ uncollected: true });
   const { mutateAsync: addRex } = useAddRexToCollection();
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -157,34 +164,41 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({
                   No saved rexes
                 </Text>
               ) : (
-                savedRexes.map((rec) => {
-                  const isSelected = selected.has(rec.id);
-                  return (
-                    <TouchableOpacity
-                      key={rec.id}
-                      onPress={() => toggle(rec.id)}
-                      activeOpacity={0.7}
-                      style={isSelected ? { backgroundColor: Theme.colors.accent } : undefined}
-                      className="w-full flex-row items-center gap-3 rounded-xl p-3"
-                    >
-                      <RexCoverThumbnail rec={rec} className="h-10 w-10 rounded-lg" />
-                      <View className="flex-1 min-w-0">
-                        <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
-                          {rec.title}
-                        </Text>
-                        <Text
-                          className={cn(
-                            'text-xs font-medium',
-                            isSelected ? 'text-foreground' : 'text-muted-foreground',
-                          )}
-                        >
-                          {isSelected ? 'Selected' : rec.category}
-                        </Text>
-                      </View>
-                      {isSelected && <Check size={18} color={Theme.colors.foreground} />}
-                    </TouchableOpacity>
-                  );
-                })
+                <>
+                  {savedRexes.map((rec) => {
+                    const isSelected = selected.has(rec.id);
+                    return (
+                      <TouchableOpacity
+                        key={rec.id}
+                        onPress={() => toggle(rec.id)}
+                        activeOpacity={0.7}
+                        style={isSelected ? { backgroundColor: Theme.colors.accent } : undefined}
+                        className="w-full flex-row items-center gap-3 rounded-xl p-3"
+                      >
+                        <RexCoverThumbnail rec={rec} className="h-10 w-10 rounded-lg" />
+                        <View className="flex-1 min-w-0">
+                          <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
+                            {rec.title}
+                          </Text>
+                          <Text
+                            className={cn(
+                              'text-xs font-medium',
+                              isSelected ? 'text-foreground' : 'text-muted-foreground',
+                            )}
+                          >
+                            {isSelected ? 'Selected' : rec.category}
+                          </Text>
+                        </View>
+                        {isSelected && <Check size={18} color={Theme.colors.foreground} />}
+                      </TouchableOpacity>
+                    );
+                  })}
+                  <ConnectionLoadMoreButton
+                    visible={hasNextPage}
+                    loading={isFetchingNextPage}
+                    onPress={fetchNextPage}
+                  />
+                </>
               )}
             </ScrollView>
           </View>

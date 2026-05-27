@@ -23,11 +23,14 @@ const dismissHitSlop = { top: 10, right: 10, bottom: 10, left: 10 } as const;
 
 const dismissStyles = StyleSheet.create({
   root: {
-    alignSelf: 'flex-start',
-    marginTop: 10,
-    marginRight: 12,
-    paddingLeft: 6,
-    paddingBottom: 4,
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    height: 44,
+    justifyContent: 'center',
+    marginRight: 2,
+    width: 44,
+    zIndex: 2,
+    elevation: 2,
   },
 });
 
@@ -35,6 +38,7 @@ export function ToastDismissButton({ hide }: Pick<AppToastRendererProps, 'hide'>
   return (
     <Pressable
       onPress={() => hide()}
+      onPressIn={() => hide()}
       hitSlop={dismissHitSlop}
       accessibilityRole="button"
       accessibilityLabel="Dismiss notification"

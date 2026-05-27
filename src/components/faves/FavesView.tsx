@@ -31,6 +31,7 @@ import CreateCollectionModal from '~/components/faves/CreateCollectionModal';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import AddRexToCollectionSheet from '~/components/faves/AddRexToCollectionSheet';
 import CollectionCard from '~/components/profile/CollectionCard';
+import { ConnectionLoadMoreButton } from '~/components/circles/common';
 import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 import { toastError } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
@@ -57,7 +58,13 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
   );
   const [removeUncollectedPending, setRemoveUncollectedPending] = useState(false);
 
-  const { data: myCollections = [], isLoading: loadingMine } = useMyCollections(user?.id);
+  const {
+    data: myCollections = [],
+    isLoading: loadingMine,
+    hasNextPage: hasNextCollectionsPage,
+    isFetchingNextPage: isFetchingNextCollectionsPage,
+    fetchNextPage: fetchNextCollectionsPage,
+  } = useMyCollections(user?.id);
   const { data: savedCollections = [], isLoading: loadingSavedCollections } =
     useMySavedCollections();
   const collections = useMemo(
@@ -65,7 +72,16 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
     [myCollections, savedCollections],
   );
   const loadingCollections = loadingMine || loadingSavedCollections;
-  const { data: savedRexes = [], isLoading: loadingSaved } = useSavedRexes({ uncollected: true });
+  const {
+    data: savedRexes = [],
+    isLoading: loadingSaved,
+    hasNextPage: hasNextSavedRexesPage,
+    isFetchingNextPage: isFetchingNextSavedRexesPage,
+    fetchNextPage: fetchNextSavedRexesPage,
+  } = useSavedRexes({
+    uncollected: true,
+    search_term: searchQuery.trim() || null,
+  });
   const uncollectedRecs = savedRexes;
 
   const filteredCollections = useMemo(() => {
@@ -74,16 +90,7 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
     return collections.filter((c) => c.display_name.toLowerCase().includes(q));
   }, [collections, searchQuery]);
 
-  const filteredUncollected = useMemo(() => {
-    if (!searchQuery.trim()) return uncollectedRecs;
-    const q = searchQuery.toLowerCase();
-    return uncollectedRecs.filter(
-      (r) =>
-        r.title.toLowerCase().includes(q) ||
-        r.category.toLowerCase().includes(q) ||
-        (r.location?.toLowerCase() ?? '').includes(q),
-    );
-  }, [uncollectedRecs, searchQuery]);
+  const filteredUncollected = uncollectedRecs;
 
   const confirmRemoveUncollectedRex = async () => {
     if (!user || !confirmRemoveUncollected) return;
@@ -174,19 +181,28 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
           </View>
         </ScrollView>
       ) : filteredCollections.length > 0 ? (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerClassName="gap-3 pb-1 mb-6"
-        >
-          {filteredCollections.map((col) => (
-            <CollectionCard
-              key={col.id}
-              collection={col}
-              onPress={() => setOpenCollectionId(col.id)}
+        <>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerClassName="gap-3 pb-1"
+          >
+            {filteredCollections.map((col) => (
+              <CollectionCard
+                key={col.id}
+                collection={col}
+                onPress={() => setOpenCollectionId(col.id)}
+              />
+            ))}
+          </ScrollView>
+          <View className="mb-6">
+            <ConnectionLoadMoreButton
+              visible={hasNextCollectionsPage}
+              loading={isFetchingNextCollectionsPage}
+              onPress={fetchNextCollectionsPage}
             />
-          ))}
-        </ScrollView>
+          </View>
+        </>
       ) : (
         <View className="items-center mb-6 py-6 px-4 rounded-2xl border border-dashed border-border bg-muted/30">
           <View className="flex-row mb-5">
@@ -358,12 +374,19 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
             <View className="items-center py-10 gap-2">
               <PackageOpen size={28} color={Theme.colors.muted} />
               <Text className="text-sm text-muted-foreground">
-                {filteredUncollected.length === 0 && uncollectedRecs.length > 0
-                  ? 'No matches'
-                  : 'All your Rex are in collections. Nice work.'}
+                {searchQuery.trim() ? 'No matches' : 'All your Rex are in collections. Nice work.'}
               </Text>
             </View>
           )
+        }
+        ListFooterComponent={
+          <View className="px-4">
+            <ConnectionLoadMoreButton
+              visible={!loadingSaved && hasNextSavedRexesPage}
+              loading={isFetchingNextSavedRexesPage}
+              onPress={fetchNextSavedRexesPage}
+            />
+          </View>
         }
       />
 
