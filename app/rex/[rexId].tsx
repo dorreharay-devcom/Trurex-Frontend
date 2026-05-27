@@ -6,12 +6,21 @@ import { useQuery } from '@tanstack/react-query';
 import { Header } from '~/components/layout/Header';
 import { TabBar, type Tab } from '~/components/layout/TabBar';
 import { RecommendationDetailModal } from '~/components/recommendation/RecommendationDetailModal';
+import ProtectedRoute from '~/components/common/ProtectedRoute';
 import { fetchRexDetail } from '~/api/rexDetailApi';
 import { rexDetailRowToRecommendation } from '~/utils/recommendation/rexDetailToRecommendation';
 import { Routes } from '~/constants/routes';
 import { Theme } from '~/theme/Theme';
 
 export default function RexDeepLinkPage() {
+  return (
+    <ProtectedRoute>
+      <RexDeepLinkContent />
+    </ProtectedRoute>
+  );
+}
+
+function RexDeepLinkContent() {
   const raw = useLocalSearchParams<{ rexId: string | string[] }>();
   const rexId = Array.isArray(raw.rexId) ? raw.rexId[0] : raw.rexId;
   const router = useRouter();
@@ -63,6 +72,7 @@ export default function RexDeepLinkPage() {
         onProfilePress={() => handleTabChange('profile')}
         onAddPress={() => {}}
         avatarRefreshKey={avatarRefreshKey}
+        showSearch={false}
       />
       <TabBar currentTab="discover" onTabChange={handleTabChange} />
       {body}

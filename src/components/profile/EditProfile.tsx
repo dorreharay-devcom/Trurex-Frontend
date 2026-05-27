@@ -9,6 +9,7 @@ import {
   Alert,
   Image,
   Platform,
+  type TextStyle,
 } from 'react-native';
 import { ArrowLeft, Camera, X } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -116,6 +117,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
       const prepared = await preparePickerImageUriForUpload(
         result.assets[0].uri,
         result.assets[0].fileName,
+        result.assets[0].mimeType,
       );
       setPendingAvatar(prepared);
       setAvatarRemoved(false);
@@ -301,7 +303,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
                 style={[
                   textFieldCaretStyle,
                   textFieldSingleLineStyle,
-                  Platform.OS === 'web' ? { outlineStyle: 'none' as const } : null,
+                  Platform.OS === 'web' ? ({ outlineStyle: 'none' } as unknown as TextStyle) : null,
                   Platform.OS === 'web' ? null : { paddingTop: 0, paddingBottom: 0 },
                 ]}
               />

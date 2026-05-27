@@ -146,7 +146,7 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
     setUploading(true);
     try {
       const fileName = asset.fileName ?? `cover-${Date.now()}.jpg`;
-      const prepared = await preparePickerImageForUpload(asset.uri, fileName, 800);
+      const prepared = await preparePickerImageForUpload(asset.uri, fileName, asset.mimeType, 800);
       const storagePath = generateRexImageStoragePath(user.id, prepared.fileName ?? fileName);
       await uploadBlobToStorageBucket(REX_IMAGES_BUCKET, storagePath, prepared.blob);
       setNewCoverStoragePath(storagePath);

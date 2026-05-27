@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Modal,
+  Platform,
   Pressable,
+  Share,
   StyleSheet,
   useWindowDimensions,
   TextInput,
@@ -124,11 +126,28 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   const [savedOverride, setSavedOverride] = useState<boolean | null>(null);
   const isSaved = savedOverride ?? detail?.is_saved ?? false;
 
-  const handleCopyLink = async () => {
+  const collectionShareUrl = () => {
     const base =
       typeof window !== 'undefined' ? window.location.origin : 'https://trurex.netlify.app';
-    await Clipboard.setStringAsync(`${base}/collection/${collectionId}`);
-    toastSuccessAfterDismiss(() => setShowMenu(false), 'Link copied!');
+    return `${base}/collection/${collectionId}`;
+  };
+
+  const handleShareCollection = async () => {
+    const url = collectionShareUrl();
+    if (Platform.OS === 'web') {
+      await Clipboard.setStringAsync(url);
+      toastSuccessAfterDismiss(() => setShowMenu(false), 'Link copied!');
+      return;
+    }
+
+    setShowMenu(false);
+    setTimeout(() => {
+      void Share.share({
+        title: detail.display_name,
+        message: `Check out "${detail.display_name}" on TruRex\n${url}`,
+        url,
+      });
+    }, 120);
   };
   const menuButtonRef = useRef<View>(null);
   const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
@@ -375,9 +394,19 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
         animationType="fade"
         onRequestClose={() => setShowMenu(false)}
       >
-        <Pressable style={StyleSheet.absoluteFill} onPress={() => setShowMenu(false)} />
+        <Pressable
+          style={[StyleSheet.absoluteFill, { zIndex: 1 }]}
+          onPress={() => setShowMenu(false)}
+        />
         <View
-          style={{ position: 'absolute', top: menuPos.top, right: menuPos.right, minWidth: 200 }}
+          style={{
+            position: 'absolute',
+            top: menuPos.top,
+            right: menuPos.right,
+            minWidth: 200,
+            zIndex: 2,
+            elevation: 8,
+          }}
           className="bg-card border border-border rounded-xl shadow-lg p-2"
         >
           {detail.is_my_collection ? (
@@ -395,7 +424,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
               </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.7}
-                onPress={handleCopyLink}
+                onPress={handleShareCollection}
                 className="flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md hover:bg-zinc-100"
               >
                 <Share2 size={15} color={Theme.colors.foreground} />
@@ -417,7 +446,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
             <>
               <TouchableOpacity
                 activeOpacity={0.7}
-                onPress={handleCopyLink}
+                onPress={handleShareCollection}
                 className="flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md hover:bg-zinc-100"
               >
                 <Share2 size={15} color={Theme.colors.foreground} />

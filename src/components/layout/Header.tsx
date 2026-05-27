@@ -33,6 +33,7 @@ interface HeaderProps {
   onUserPress?: (userId: string) => void;
   isProfileActive?: boolean;
   avatarRefreshKey?: number;
+  showSearch?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -43,6 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
   onUserPress,
   isProfileActive,
   avatarRefreshKey = 0,
+  showSearch = true,
 }) => {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -78,31 +80,35 @@ export const Header: React.FC<HeaderProps> = ({
             />
           </View>
 
-          <View className="min-w-0 px-1" style={{ width: '40%' }}>
-            <ClearableSearchInput
-              ref={searchInputRef}
-              value={searchQuery}
-              onChangeText={onSearchChange}
-              placeholder="Search rex..."
-              placeholderTextColor={Theme.colors.secondaryText}
-              containerClassName="min-w-0 justify-center"
-              iconColor={Theme.colors.secondaryText}
-              clearIconColor={Theme.colors.secondaryText}
-              inputClassName={`header-search-input w-full min-w-0 shrink rounded-lg border border-border py-1.5 pl-9 pr-9 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
-              inputStyle={[
-                textFieldCaretStyle,
-                { backgroundColor: Theme.colors.searchFieldBackground },
-                textFieldSingleLineStyle,
-                textFieldSingleLineCompactHeightStyle,
-                textFieldHeaderSearchStyle,
-              ]}
-              selectionColor={Theme.colors.foreground}
-              underlineColorAndroid="transparent"
-              multiline={false}
-              numberOfLines={1}
-              scrollEnabled={false}
-            />
-          </View>
+          {showSearch ? (
+            <View className="min-w-0 px-1" style={{ width: '40%' }}>
+              <ClearableSearchInput
+                ref={searchInputRef}
+                value={searchQuery}
+                onChangeText={onSearchChange}
+                placeholder="Search rex..."
+                placeholderTextColor={Theme.colors.secondaryText}
+                containerClassName="min-w-0 justify-center"
+                iconColor={Theme.colors.secondaryText}
+                clearIconColor={Theme.colors.secondaryText}
+                inputClassName={`header-search-input w-full min-w-0 shrink rounded-lg border border-border py-1.5 pl-9 pr-9 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
+                inputStyle={[
+                  textFieldCaretStyle,
+                  { backgroundColor: Theme.colors.searchFieldBackground },
+                  textFieldSingleLineStyle,
+                  textFieldSingleLineCompactHeightStyle,
+                  textFieldHeaderSearchStyle,
+                ]}
+                selectionColor={Theme.colors.foreground}
+                underlineColorAndroid="transparent"
+                multiline={false}
+                numberOfLines={1}
+                scrollEnabled={false}
+              />
+            </View>
+          ) : (
+            <View className="min-w-0 px-1" style={{ width: '40%' }} />
+          )}
 
           <View className="flex-row items-center justify-end gap-1" style={{ width: '26%' }}>
             <TouchableOpacity
@@ -145,31 +151,35 @@ export const Header: React.FC<HeaderProps> = ({
             accessibilityIgnoresInvertColors
           />
 
-          <View className="mx-4 min-w-0 max-w-md flex-1 sm:mx-8">
-            <ClearableSearchInput
-              ref={searchInputRef}
-              value={searchQuery}
-              onChangeText={onSearchChange}
-              placeholder="Search rex..."
-              placeholderTextColor={Theme.colors.secondaryText}
-              containerClassName="min-w-0 justify-center"
-              iconColor={Theme.colors.secondaryText}
-              clearIconColor={Theme.colors.secondaryText}
-              inputClassName={`header-search-input w-full min-w-0 shrink rounded-lg border border-border py-1.5 pl-9 pr-9 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
-              inputStyle={[
-                textFieldCaretStyle,
-                { backgroundColor: Theme.colors.searchFieldBackground },
-                textFieldSingleLineStyle,
-                textFieldSingleLineCompactHeightStyle,
-                textFieldHeaderSearchStyle,
-              ]}
-              selectionColor={Theme.colors.foreground}
-              underlineColorAndroid="transparent"
-              multiline={false}
-              numberOfLines={1}
-              scrollEnabled={false}
-            />
-          </View>
+          {showSearch ? (
+            <View className="mx-4 min-w-0 max-w-md flex-1 sm:mx-8">
+              <ClearableSearchInput
+                ref={searchInputRef}
+                value={searchQuery}
+                onChangeText={onSearchChange}
+                placeholder="Search rex..."
+                placeholderTextColor={Theme.colors.secondaryText}
+                containerClassName="min-w-0 justify-center"
+                iconColor={Theme.colors.secondaryText}
+                clearIconColor={Theme.colors.secondaryText}
+                inputClassName={`header-search-input w-full min-w-0 shrink rounded-lg border border-border py-1.5 pl-9 pr-9 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
+                inputStyle={[
+                  textFieldCaretStyle,
+                  { backgroundColor: Theme.colors.searchFieldBackground },
+                  textFieldSingleLineStyle,
+                  textFieldSingleLineCompactHeightStyle,
+                  textFieldHeaderSearchStyle,
+                ]}
+                selectionColor={Theme.colors.foreground}
+                underlineColorAndroid="transparent"
+                multiline={false}
+                numberOfLines={1}
+                scrollEnabled={false}
+              />
+            </View>
+          ) : (
+            <View className="mx-4 min-w-0 flex-1 sm:mx-8" />
+          )}
 
           <View className="shrink-0 flex-row items-center gap-1 sm:gap-2">
             <TouchableOpacity

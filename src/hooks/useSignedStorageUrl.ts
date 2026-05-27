@@ -2,6 +2,7 @@ import { Platform } from 'react-native';
 import { useEffect, useState } from 'react';
 import { Backend } from '~/services/AuthService';
 import { isNonEmptyString, isPlainObject } from '~/utils/guards';
+import { terminateIfUnauthorizedRequestError } from '~/utils/mutationRestrictionError';
 
 type CacheEntry = { url: string; expiresAt: number };
 
@@ -71,6 +72,10 @@ async function resolveUrl(
   try {
     // 1. Try to create a signed URL first
     const { data, error } = await Backend.storage.from(bucket).createSignedUrl(path, expiresInSec);
+
+    if (error) {
+      terminateIfUnauthorizedRequestError(error);
+    }
 
     if (!error && data) {
       const u = parseSignedUrlData(data);

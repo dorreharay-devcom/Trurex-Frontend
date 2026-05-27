@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { Text, View, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Platform, Text, View, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { PlusCircle } from 'lucide-react-native';
 import ProfileView from '~/components/profile/ProfileView';
@@ -26,10 +26,31 @@ type ProfileBackTarget = {
   userId?: string;
 };
 
+const WEB_TAB_STORAGE_KEY = 'trurex:last-main-tab';
+
+function isTab(value: unknown): value is Tab {
+  return (
+    value === 'discover' ||
+    value === 'faves' ||
+    value === 'circles' ||
+    value === 'map' ||
+    value === 'profile'
+  );
+}
+
+function getStoredWebTab(): Tab | null {
+  if (Platform.OS !== 'web' || typeof window === 'undefined') return null;
+  try {
+    const stored = window.localStorage.getItem(WEB_TAB_STORAGE_KEY);
+    return isTab(stored) ? stored : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function HomeScreen() {
   const { tab } = useLocalSearchParams<{ tab?: string }>();
-  const initialTab: Tab =
-    tab === 'faves' || tab === 'circles' || tab === 'map' || tab === 'profile' ? tab : 'discover';
+  const initialTab: Tab = isTab(tab) ? tab : (getStoredWebTab() ?? 'discover');
   const [currentTab, setCurrentTab] = useState<Tab>(initialTab);
   const [searchQuery, setSearchQuery] = useState('');
   const [createRecommendationOpen, setCreateRecommendationOpen] = useState(false);
@@ -41,6 +62,13 @@ export default function HomeScreen() {
   const [profileBackStack, setProfileBackStack] = useState<ProfileBackTarget[]>([]);
   const { isAccountFrozen } = useUserConfig();
   const { user: authUser } = useAuth();
+
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(WEB_TAB_STORAGE_KEY, currentTab);
+    } catch {}
+  }, [currentTab]);
 
   const handleCloseCreate = useCallback(() => {
     setCreateRecommendationOpen(false);
@@ -121,6 +149,7 @@ export default function HomeScreen() {
               onAddPress={() => setCreateRecommendationOpen(true)}
               onUserPress={openUserProfile}
               avatarRefreshKey={avatarRefreshKey}
+              showSearch={currentTab === 'discover'}
             />
             <TabBar currentTab={currentTab} onTabChange={handleTabChange} />
             {isAccountFrozen ? (

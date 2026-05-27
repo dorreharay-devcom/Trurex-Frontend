@@ -1,6 +1,11 @@
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchUserConfig } from '~/api/usersApi';
 import { useAuth } from '~/services/AuthContext';
+import {
+  isAccountSuspendedStatus,
+  terminateSessionForSuspendedAccount,
+} from '~/utils/accountSuspension';
 
 export function useUserConfig() {
   const { user } = useAuth();
@@ -14,12 +19,19 @@ export function useUserConfig() {
 
   const status = query.data?.status ?? null;
   const isAccountFrozen = status === 'frozen';
+  const isAccountSuspended = isAccountSuspendedStatus(status);
+
+  useEffect(() => {
+    if (!userId || !isAccountSuspended) return;
+    terminateSessionForSuspendedAccount();
+  }, [isAccountSuspended, userId]);
 
   return {
     ...query,
     userConfig: query.data ?? null,
     status,
     isAccountFrozen,
-    isReadOnly: isAccountFrozen,
+    isAccountSuspended,
+    isReadOnly: isAccountFrozen || isAccountSuspended,
   };
 }

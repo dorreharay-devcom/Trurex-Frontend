@@ -4,6 +4,7 @@ import {
   View,
   Text,
   FlatList,
+  ActivityIndicator,
   TouchableOpacity,
   ScrollView,
   useWindowDimensions,
@@ -171,13 +172,22 @@ const DiscoverView = ({
   const remainingCats = useMemo(() => allCats.filter((c) => !isPinned(c)), [allCats, isPinned]);
   const activeCat = allCats.find((c) => c.code === activeCategory);
 
-  const { data: discoverData, isLoading: discoverLoading } = useDiscoverRecommendations(
+  const {
+    data: discoverPages,
+    isLoading: discoverLoading,
+    fetchNextPage: fetchNextDiscoverPage,
+    hasNextPage: hasNextDiscoverPage,
+    isFetchingNextPage: isFetchingNextDiscoverPage,
+  } = useDiscoverRecommendations(
     {
       category_filter: activeCategory !== 'all' ? activeCategory : null,
       tag_filters: activeTag ? [activeTag] : null,
+      result_limit: 20,
     },
     { enabled: !hasSearch },
   );
+
+  const discoverData = useMemo(() => discoverPages?.pages.flat() ?? [], [discoverPages]);
 
   const filtered = useMemo(() => {
     if (hasSearch) return searchRows;
@@ -185,6 +195,19 @@ const DiscoverView = ({
   }, [hasSearch, searchRows, discoverData]);
 
   const isLoading = hasSearch ? searchLoading : discoverLoading;
+
+  const loadMoreDiscover = useCallback(() => {
+    if (hasSearch || !hasNextDiscoverPage || isFetchingNextDiscoverPage || discoverLoading) {
+      return;
+    }
+    fetchNextDiscoverPage();
+  }, [
+    discoverLoading,
+    fetchNextDiscoverPage,
+    hasNextDiscoverPage,
+    hasSearch,
+    isFetchingNextDiscoverPage,
+  ]);
 
   const handleDiscoverScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const shouldShow = event.nativeEvent.contentOffset.y > 600;
@@ -199,33 +222,31 @@ const DiscoverView = ({
     <View className="px-4 pt-6 pb-2">
       {hasSearch && (
         <View className="mb-5">
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-2">
-            <View className="flex-row gap-2 pb-1">
-              {filterChips.map((chip) => {
-                const { Icon } = chip;
-                const isHeaderOn =
-                  chip.active || activeFilter === chip.id
-                    ? 'bg-primary/10 border-primary/40'
-                    : 'bg-card border-border';
-                return (
-                  <TouchableOpacity
-                    key={chip.id}
-                    onPress={() => setActiveFilter(activeFilter === chip.id ? null : chip.id)}
-                    activeOpacity={0.7}
-                    className={`${searchFilterPill} ${isHeaderOn}`}
-                  >
-                    <Icon size={12} color={Theme.colors.foreground} />
-                    <Text className="text-xs font-medium text-foreground">{chip.label}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-              {hasActiveSearchFilters && (
-                <TouchableOpacity onPress={clearAllFilters} className="px-2 justify-center">
-                  <Text className="text-xs text-destructive font-medium">Clear all</Text>
+          <View className="mb-2 flex-row flex-wrap items-center gap-2">
+            {filterChips.map((chip) => {
+              const { Icon } = chip;
+              const isHeaderOn =
+                chip.active || activeFilter === chip.id
+                  ? 'bg-primary/10 border-primary/40'
+                  : 'bg-card border-border';
+              return (
+                <TouchableOpacity
+                  key={chip.id}
+                  onPress={() => setActiveFilter(activeFilter === chip.id ? null : chip.id)}
+                  activeOpacity={0.7}
+                  className={`${searchFilterPill} ${isHeaderOn}`}
+                >
+                  <Icon size={12} color={Theme.colors.foreground} />
+                  <Text className="text-xs font-medium text-foreground">{chip.label}</Text>
                 </TouchableOpacity>
-              )}
-            </View>
-          </ScrollView>
+              );
+            })}
+            {hasActiveSearchFilters && (
+              <TouchableOpacity onPress={clearAllFilters} className="px-2 py-1.5">
+                <Text className="text-xs font-medium text-destructive">Clear all</Text>
+              </TouchableOpacity>
+            )}
+          </View>
 
           {activeFilter && (
             <View className="p-4 bg-card border border-border rounded-xl mb-2">
@@ -520,6 +541,8 @@ const DiscoverView = ({
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         onScroll={handleDiscoverScroll}
+        onEndReached={loadMoreDiscover}
+        onEndReachedThreshold={0.6}
         scrollEventThrottle={16}
         contentContainerStyle={webContainerStyle}
         contentContainerClassName="pb-24"
@@ -555,6 +578,13 @@ const DiscoverView = ({
             <RecommendationCard recommendation={item} onTap={onOpenRec} onSave={handleSavePress} />
           </View>
         )}
+        ListFooterComponent={
+          !hasSearch && isFetchingNextDiscoverPage ? (
+            <View className="items-center py-6">
+              <ActivityIndicator size="small" color={Theme.colors.primary} />
+            </View>
+          ) : null
+        }
       />
 
       {showScrollTop && (

@@ -1,6 +1,11 @@
 import { toastError } from '~/utils/appToast';
 import { unknownErrorMessage } from '~/utils';
 import { isPlainObject } from '~/utils/guards';
+import {
+  ACCOUNT_SUSPENDED_RPC_CODE,
+  terminateSessionIfAccountSuspended,
+  terminateSessionIfUnauthorizedRequest,
+} from '~/utils/accountSuspension';
 
 export const ACCOUNT_FROZEN_RPC_CODE = 'CFRZ1';
 
@@ -31,6 +36,15 @@ export function toastIfAccountFrozenMutationError(error: unknown): void {
   }
 }
 
+export function terminateIfAccountSuspendedRpcError(error: unknown): void {
+  if (rpcErrorCode(error) !== ACCOUNT_SUSPENDED_RPC_CODE) return;
+  terminateSessionIfAccountSuspended(error);
+}
+
+export function terminateIfUnauthorizedRequestError(error: unknown): void {
+  terminateSessionIfUnauthorizedRequest(error);
+}
+
 export function didAccountFrozenMutationToast(error: unknown): boolean {
   if (typeof error !== 'object' || error === null) return false;
   return Boolean(Object.getOwnPropertyDescriptor(error, FROZEN_TOAST_MARK)?.value);
@@ -41,6 +55,8 @@ export function throwRpcIfFailed<T>(result: { data: T | null; error: unknown }):
   error: null;
 } {
   if (result.error) {
+    terminateIfUnauthorizedRequestError(result.error);
+    terminateIfAccountSuspendedRpcError(result.error);
     toastIfAccountFrozenMutationError(result.error);
     throw result.error;
   }

@@ -1,11 +1,12 @@
 import { makeRedirectUri } from 'expo-auth-session';
 import { Platform, Dimensions, type TextStyle } from 'react-native';
-import { isNonEmptyString } from './guards';
+import { isNonEmptyString, isPlainObject } from './guards';
 
 export { cn, type ClassValue } from './general';
 
 export function unknownErrorMessage(error: unknown, fallback: string): string {
   if (error instanceof Error && isNonEmptyString(error.message)) return error.message;
+  if (isPlainObject(error) && isNonEmptyString(error.message)) return error.message;
   return fallback;
 }
 
