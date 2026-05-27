@@ -64,6 +64,8 @@ export function SearchManualPanel({
     <ScrollView
       className="flex-1"
       keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="interactive"
+      automaticallyAdjustKeyboardInsets
       showsVerticalScrollIndicator={false}
       contentContainerClassName={cn('items-center', SCROLL_PAD)}
     >

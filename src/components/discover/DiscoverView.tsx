@@ -34,8 +34,6 @@ import { CATEGORY_ICON_FALLBACK } from '~/utils/recommendation/categoryIconResol
 import { getCategoryImage } from '~/utils/recommendation/categoryImages';
 import { Theme } from '~/theme/Theme';
 import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
-import { useAuth } from '~/services/AuthContext';
-import { toastError } from '~/utils/appToast';
 import { useTrendingTags } from '~/hooks/useTags';
 
 const searchFilterPill = 'flex-row items-center gap-1.5 px-3 py-1.5 rounded-full border';
@@ -99,7 +97,6 @@ const DiscoverView = ({
   onCreateRex,
 }: DiscoverViewProps) => {
   const onOpenRec = onRecommendationPress ?? onTapRec;
-  const { user } = useAuth();
   const queryClient = useQueryClient();
   const listRef = useRef<FlatList<Recommendation>>(null);
   const { pinnedCategoryIds, togglePin, isTogglingPin } = usePinnedCategoryIds();
@@ -109,22 +106,15 @@ const DiscoverView = ({
   const [saveTarget, setSaveTarget] = useState<RecSummary | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  const handleSavePress = useCallback(
-    (rec: Recommendation) => {
-      if (rec.authorId && user && rec.authorId === user.id) {
-        toastError("You can't save your own rex");
-        return;
-      }
-      setSaveTarget({
-        id: rec.id,
-        place_name: rec.title,
-        category_code: rec.categoryId,
-        location: rec.location,
-        isSaved: rec.isSaved,
-      });
-    },
-    [user],
-  );
+  const handleSavePress = useCallback((rec: Recommendation) => {
+    setSaveTarget({
+      id: rec.id,
+      place_name: rec.title,
+      category_code: rec.categoryId,
+      location: rec.location,
+      isSaved: rec.isSaved,
+    });
+  }, []);
   const [editingPinned, setEditingPinned] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
 

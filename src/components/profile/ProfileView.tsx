@@ -4,7 +4,7 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator,
+  KeyboardAvoidingView,
   Alert,
   useWindowDimensions,
   Animated,
@@ -51,6 +51,7 @@ import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation
 import { modalConfig } from '~/constants/recommendation/modalConfig';
 import { useQueryClient } from '@tanstack/react-query';
 import { preparePickerImageUriForUpload } from '~/utils/photos/storageUpload';
+import { ConnectionLoadMoreButton } from '~/components/circles/common';
 
 const COLLECTION_REX_OPEN_DELAY_MS = 120;
 
@@ -237,9 +238,19 @@ const ProfileView = ({
     profile?.userId ?? (viewingByUserId ? propUserId : viewingByHandle ? undefined : authUser?.id);
 
   const { data: myRexes = [], isLoading: rexesLoading } = useMyRexes(profileContentUserId);
-  const { data: myCollections = [], isLoading: collectionsLoading } =
-    useMyCollections(profileContentUserId);
-  const { data: savedRexes = [] } = useSavedRexes();
+  const {
+    data: myCollections = [],
+    isLoading: collectionsLoading,
+    hasNextPage: hasNextCollectionsPage,
+    isFetchingNextPage: isFetchingNextCollectionsPage,
+    fetchNextPage: fetchNextCollectionsPage,
+  } = useMyCollections(profileContentUserId);
+  const {
+    data: savedRexes = [],
+    hasNextPage: hasNextSavedRexesPage,
+    isFetchingNextPage: isFetchingNextSavedRexesPage,
+    fetchNextPage: fetchNextSavedRexesPage,
+  } = useSavedRexes();
   const { mutate: addRex } = useAddRexToCollection();
 
   useEffect(() => {
@@ -363,20 +374,30 @@ const ProfileView = ({
 
   if (isEditing) {
     return (
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={webContainerStyle}
-        contentContainerClassName="p-4 pb-24"
+      <KeyboardAvoidingView
+        behavior={
+          Platform.OS === 'ios' ? 'padding' : Platform.OS === 'android' ? 'height' : undefined
+        }
+        className="min-h-0 flex-1"
       >
-        <EditProfile
-          onClose={() => {
-            setIsEditing(false);
-            setLoading(true);
-            fetchProfile();
-            onAvatarUpdated?.();
-          }}
-        />
-      </ScrollView>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+          automaticallyAdjustKeyboardInsets
+          contentContainerStyle={webContainerStyle}
+          contentContainerClassName="p-4 pb-40"
+        >
+          <EditProfile
+            onClose={() => {
+              setIsEditing(false);
+              setLoading(true);
+              fetchProfile();
+              onAvatarUpdated?.();
+            }}
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
     );
   }
 
@@ -460,6 +481,11 @@ const ProfileView = ({
                       </View>
                     </TouchableOpacity>
                   ))}
+                  <ConnectionLoadMoreButton
+                    visible={hasNextSavedRexesPage}
+                    loading={isFetchingNextSavedRexesPage}
+                    onPress={fetchNextSavedRexesPage}
+                  />
                 </View>
               )}
               <View className="h-4" />
@@ -591,20 +617,27 @@ const ProfileView = ({
                   No collections yet
                 </Text>
               ) : (
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerClassName="gap-3 px-4 py-4"
-                >
-                  {myCollections.map((col) => (
-                    <CollectionCard
-                      key={col.id}
-                      collection={col}
-                      width={140}
-                      onPress={() => setOpenCollectionId(col.id)}
-                    />
-                  ))}
-                </ScrollView>
+                <View className="px-4 py-4">
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerClassName="gap-3"
+                  >
+                    {myCollections.map((col) => (
+                      <CollectionCard
+                        key={col.id}
+                        collection={col}
+                        width={140}
+                        onPress={() => setOpenCollectionId(col.id)}
+                      />
+                    ))}
+                  </ScrollView>
+                  <ConnectionLoadMoreButton
+                    visible={hasNextCollectionsPage}
+                    loading={isFetchingNextCollectionsPage}
+                    onPress={fetchNextCollectionsPage}
+                  />
+                </View>
               ))}
           </View>
         </View>

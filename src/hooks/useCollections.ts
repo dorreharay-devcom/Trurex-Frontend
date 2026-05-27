@@ -1,15 +1,50 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { CollectionsApi, UserCollection, CollectionDetailRow, CollectionVisibility } from '~/api/CollectionsApi';
+import { useMemo, useCallback } from 'react';
+import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  CollectionsApi,
+  UserCollection,
+  CollectionDetailRow,
+  CollectionVisibility,
+} from '~/api/CollectionsApi';
 import { toastSuccess, toastError } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { unknownErrorMessage } from '~/utils';
 
+const USER_COLLECTIONS_PAGE_LIMIT = 50;
+
 export const useMyCollections = (userId?: string) => {
-  return useQuery<UserCollection[]>({
-    queryKey: ['my-collections', userId],
-    queryFn: () => CollectionsApi.userCollections(userId!),
+  const query = useInfiniteQuery({
+    queryKey: ['my-collections', userId, USER_COLLECTIONS_PAGE_LIMIT],
+    queryFn: ({ pageParam }) =>
+      CollectionsApi.userCollections(userId!, {
+        result_limit: USER_COLLECTIONS_PAGE_LIMIT,
+        result_offset: Number(pageParam ?? 0),
+      }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      const totalCount = lastPage[0]?.total_count;
+      const nextOffset = allPages.length * USER_COLLECTIONS_PAGE_LIMIT;
+      if (typeof totalCount === 'number') {
+        return nextOffset < totalCount ? nextOffset : undefined;
+      }
+      return lastPage.length === USER_COLLECTIONS_PAGE_LIMIT ? nextOffset : undefined;
+    },
     enabled: !!userId,
   });
+
+  const rows = useMemo(() => query.data?.pages.flat() ?? [], [query.data?.pages]);
+  const fetchNextPage = useCallback(() => {
+    if (!query.hasNextPage || query.isFetchingNextPage) return;
+    void query.fetchNextPage();
+  }, [query]);
+
+  return {
+    ...query,
+    data: rows,
+    hasNextPage: Boolean(query.hasNextPage),
+    isFetchingNextPage: query.isFetchingNextPage,
+    fetchNextPage,
+  };
 };
 
 export const useMySavedCollections = () => {
@@ -159,18 +194,15 @@ export const useUpdateCollectionRexNote = (collectionId: string) => {
     mutationFn: (params: { rex_id: string; note: string | null }) =>
       CollectionsApi.updateRexNote({ collection_id: collectionId, ...params }),
     onSuccess: (_data, variables) => {
-      queryClient.setQueryData<CollectionDetailRow>(
-        ['collection-detail', collectionId],
-        (prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            rexes: prev.rexes.map((r) =>
-              r.rex_id === variables.rex_id ? { ...r, note: variables.note } : r,
-            ),
-          };
-        },
-      );
+      queryClient.setQueryData<CollectionDetailRow>(['collection-detail', collectionId], (prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          rexes: prev.rexes.map((r) =>
+            r.rex_id === variables.rex_id ? { ...r, note: variables.note } : r,
+          ),
+        };
+      });
     },
     onError: (error: unknown) => {
       if (didAccountFrozenMutationToast(error)) return;

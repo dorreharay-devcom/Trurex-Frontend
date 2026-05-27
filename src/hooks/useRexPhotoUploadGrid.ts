@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
-import { buildLibraryImagePickerOptions } from '~/utils/photos/imagePickerLaunch';
+import { Platform } from 'react-native';
+import { pickLibraryImages } from '~/utils/photos/imagePickerLaunch';
 import { uploadLocalPickerImage } from '~/utils/photos/storageUpload';
 import { toastError } from '~/utils/appToast';
 
@@ -31,19 +32,17 @@ export function useRexPhotoUploadGrid({
     const remaining = maxPhotos - photos.length;
     if (remaining <= 0) return;
 
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) {
-      toastError('Photos', 'Please allow photo library access to add images.');
-      return;
+    if (Platform.OS !== 'web') {
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!perm.granted) {
+        toastError('Photos', 'Please allow photo library access to add images.');
+        return;
+      }
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync(
-      buildLibraryImagePickerOptions(remaining),
-    );
+    const assets = await pickLibraryImages(remaining);
 
-    if (result.canceled || !result.assets?.length) return;
-
-    const assets = result.assets.slice(0, remaining);
+    if (!assets.length) return;
     setUploading(assets.length);
     const newPaths: string[] = [];
 
@@ -56,6 +55,7 @@ export function useRexPhotoUploadGrid({
         const err = e as Error;
         setError(err.message || 'Upload failed');
       } finally {
+        asset.dispose?.();
         setUploading((n) => Math.max(0, n - 1));
       }
     }

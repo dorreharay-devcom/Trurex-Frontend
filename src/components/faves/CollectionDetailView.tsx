@@ -12,6 +12,7 @@ import {
   StyleSheet,
   useWindowDimensions,
   TextInput,
+  KeyboardAvoidingView,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import {
@@ -133,6 +134,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   };
 
   const handleShareCollection = async () => {
+    if (!detail) return;
     const url = collectionShareUrl();
     if (Platform.OS === 'web') {
       await Clipboard.setStringAsync(url);
@@ -207,186 +209,203 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
 
   return (
     <>
-      <View className="w-full flex-row items-center justify-between px-4 py-4">
-        <TouchableOpacity onPress={onBack} className="flex-row items-center gap-1">
-          <ArrowLeft size={16} color={Theme.colors.muted} />
-          <Text className="text-sm text-muted-foreground">Back</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          ref={menuButtonRef}
-          onPress={() => {
-            menuButtonRef.current?.measure(
-              (
-                _x: number,
-                _y: number,
-                width: number,
-                height: number,
-                pageX: number,
-                pageY: number,
-              ) => {
-                setMenuPos({ top: pageY + height + 4, right: screenWidth - pageX - width });
-              },
-            );
-            setShowMenu((v) => !v);
-          }}
-          className="p-2"
-        >
-          <MoreVertical size={18} color={Theme.colors.muted} />
-        </TouchableOpacity>
-      </View>
-
-      <FlatList
-        data={detail.rexes}
-        keyExtractor={(item) => item.rex_id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={webContainerStyle}
-        contentContainerClassName="pb-24"
-        ListHeaderComponent={ListHeader}
-        ListEmptyComponent={
-          <View className="items-center py-12 gap-1 px-4">
-            <Text className="text-3xl mb-1">📦</Text>
-            <Text className="text-base font-semibold text-foreground text-center">
-              Your collection is ready
-            </Text>
-            <Text className="text-sm text-muted-foreground text-center">
-              Start adding recommendations.
-            </Text>
-          </View>
+      <KeyboardAvoidingView
+        behavior={
+          Platform.OS === 'ios' ? 'padding' : Platform.OS === 'android' ? 'height' : undefined
         }
-        renderItem={({ item }) => (
-          <View className="px-4 mb-3">
-            <View className="bg-card border border-border rounded-xl overflow-hidden">
-              <View className="flex-row">
-                <Pressable
-                  onPress={() => onRecommendationPress?.(entryToRec(item))}
-                  className="flex-1 flex-row gap-3 p-3"
-                >
-                  <RexCoverThumbnail
-                    rec={entryToRec(item)}
-                    className="h-16 w-16 rounded-lg flex-shrink-0"
-                  />
-                  <View className="flex-1 min-w-0">
-                    <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
-                      {item.place_name}
-                    </Text>
-                    <Text className="text-xs text-muted-foreground">
-                      {item.category_name || item.category_code}
-                    </Text>
-                    <View className="mt-1 min-w-0 flex-row items-center gap-2 overflow-hidden">
-                      {item.location && (
-                        <View className="min-w-0 flex-1 flex-row items-center gap-0.5 overflow-hidden">
-                          <MapPin size={10} color={Theme.colors.muted} style={{ flexShrink: 0 }} />
-                          <Text
-                            className="min-w-0 flex-1 text-[11px] text-muted-foreground"
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            {item.location}
-                          </Text>
-                        </View>
-                      )}
-                      {!!item.rating && (
-                        <View className="flex-row items-center gap-0.5">
-                          <Star
-                            size={10}
-                            color={Theme.colors.ratingStar}
-                            fill={Theme.colors.ratingStar}
-                          />
-                          <Text className="text-[11px] text-muted-foreground">{item.rating}</Text>
-                        </View>
-                      )}
-                      {!!item.score_value_for_money && (
-                        <View className="flex-row items-center gap-0.5">
-                          <DollarSign size={10} color={Theme.colors.muted} />
-                          <Text className="text-[11px] text-muted-foreground">
-                            {VALUE_LABELS[(item.score_value_for_money ?? 1) - 1]}
-                          </Text>
-                        </View>
+        className="min-h-0 flex-1"
+      >
+        <View className="w-full flex-row items-center justify-between px-4 py-4">
+          <TouchableOpacity onPress={onBack} className="flex-row items-center gap-1">
+            <ArrowLeft size={16} color={Theme.colors.muted} />
+            <Text className="text-sm text-muted-foreground">Back</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            ref={menuButtonRef}
+            onPress={() => {
+              menuButtonRef.current?.measure(
+                (
+                  _x: number,
+                  _y: number,
+                  width: number,
+                  height: number,
+                  pageX: number,
+                  pageY: number,
+                ) => {
+                  setMenuPos({ top: pageY + height + 4, right: screenWidth - pageX - width });
+                },
+              );
+              setShowMenu((v) => !v);
+            }}
+            className="p-2"
+          >
+            <MoreVertical size={18} color={Theme.colors.muted} />
+          </TouchableOpacity>
+        </View>
+
+        <FlatList
+          data={detail.rexes}
+          keyExtractor={(item) => item.rex_id}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+          automaticallyAdjustKeyboardInsets
+          contentContainerStyle={webContainerStyle}
+          contentContainerClassName="pb-36"
+          ListHeaderComponent={ListHeader}
+          ListEmptyComponent={
+            <View className="items-center py-12 gap-1 px-4">
+              <Text className="text-3xl mb-1">📦</Text>
+              <Text className="text-base font-semibold text-foreground text-center">
+                Your collection is ready
+              </Text>
+              <Text className="text-sm text-muted-foreground text-center">
+                Start adding recommendations.
+              </Text>
+            </View>
+          }
+          renderItem={({ item }) => (
+            <View className="px-4 mb-3">
+              <View className="bg-card border border-border rounded-xl overflow-hidden">
+                <View className="flex-row">
+                  <Pressable
+                    onPress={() => onRecommendationPress?.(entryToRec(item))}
+                    className="flex-1 flex-row gap-3 p-3"
+                  >
+                    <RexCoverThumbnail
+                      rec={entryToRec(item)}
+                      className="h-16 w-16 rounded-lg flex-shrink-0"
+                    />
+                    <View className="flex-1 min-w-0">
+                      <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
+                        {item.place_name}
+                      </Text>
+                      <Text className="text-xs text-muted-foreground">
+                        {item.category_name || item.category_code}
+                      </Text>
+                      <View className="mt-1 min-w-0 flex-row items-center gap-2 overflow-hidden">
+                        {item.location && (
+                          <View className="min-w-0 flex-1 flex-row items-center gap-0.5 overflow-hidden">
+                            <MapPin
+                              size={10}
+                              color={Theme.colors.muted}
+                              style={{ flexShrink: 0 }}
+                            />
+                            <Text
+                              className="min-w-0 flex-1 text-[11px] text-muted-foreground"
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                            >
+                              {item.location}
+                            </Text>
+                          </View>
+                        )}
+                        {!!item.rating && (
+                          <View className="flex-row items-center gap-0.5">
+                            <Star
+                              size={10}
+                              color={Theme.colors.ratingStar}
+                              fill={Theme.colors.ratingStar}
+                            />
+                            <Text className="text-[11px] text-muted-foreground">{item.rating}</Text>
+                          </View>
+                        )}
+                        {!!item.score_value_for_money && (
+                          <View className="flex-row items-center gap-0.5">
+                            <DollarSign size={10} color={Theme.colors.muted} />
+                            <Text className="text-[11px] text-muted-foreground">
+                              {VALUE_LABELS[(item.score_value_for_money ?? 1) - 1]}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                      {item.recommender_name && (
+                        <Text className="mt-0.5 text-[10px] font-medium text-muted-foreground">
+                          Rec'd by {item.recommender_name}
+                        </Text>
                       )}
                     </View>
-                    {item.recommender_name && (
-                      <Text className="mt-0.5 text-[10px] font-medium text-muted-foreground">
-                        Rec'd by {item.recommender_name}
-                      </Text>
+                  </Pressable>
+                  <View className="flex-col items-center justify-center px-2 gap-2">
+                    {detail.is_my_collection && (
+                      <Pressable
+                        onPress={() => openNoteEditor(item.rex_id, item.note)}
+                        className="p-1"
+                      >
+                        <StickyNote
+                          size={15}
+                          color={item.note ? Theme.colors.primary : Theme.colors.muted}
+                          fill={item.note ? Theme.colors.primary : 'transparent'}
+                        />
+                      </Pressable>
+                    )}
+                    {detail.is_my_collection && (
+                      <Pressable onPress={() => removeMutation.mutate(item.rex_id)} className="p-1">
+                        {({ hovered, pressed }: { hovered?: boolean; pressed?: boolean }) => (
+                          <View
+                            className={`w-6 h-6 rounded-full items-center justify-center ${hovered || pressed ? 'bg-destructive/10' : ''}`}
+                          >
+                            <X
+                              size={12}
+                              color={
+                                hovered || pressed
+                                  ? Theme.colors.destructive
+                                  : Theme.colors.foreground
+                              }
+                            />
+                          </View>
+                        )}
+                      </Pressable>
                     )}
                   </View>
-                </Pressable>
-                <View className="flex-col items-center justify-center px-2 gap-2">
-                  {detail.is_my_collection && (
-                    <Pressable
-                      onPress={() => openNoteEditor(item.rex_id, item.note)}
-                      className="p-1"
-                    >
-                      <StickyNote
-                        size={15}
-                        color={item.note ? Theme.colors.primary : Theme.colors.muted}
-                        fill={item.note ? Theme.colors.primary : 'transparent'}
-                      />
-                    </Pressable>
-                  )}
-                  {detail.is_my_collection && (
-                    <Pressable onPress={() => removeMutation.mutate(item.rex_id)} className="p-1">
-                      {({ hovered, pressed }: { hovered?: boolean; pressed?: boolean }) => (
-                        <View
-                          className={`w-6 h-6 rounded-full items-center justify-center ${hovered || pressed ? 'bg-destructive/10' : ''}`}
+                </View>
+
+                {item.note && noteItemId !== item.rex_id && (
+                  <View className="mx-3 mb-3 flex-row items-start gap-1.5 bg-muted/50 rounded-lg px-2.5 py-1.5">
+                    <Text className="text-xs text-muted-foreground">💬</Text>
+                    <Text className="text-xs text-muted-foreground italic flex-1">{item.note}</Text>
+                  </View>
+                )}
+
+                {noteItemId === item.rex_id && (
+                  <View className="mx-3 mb-3">
+                    <TextInput
+                      value={noteText}
+                      onChangeText={(t) => setNoteText(t.slice(0, 140))}
+                      placeholder="Add a personal note…"
+                      placeholderTextColor={Theme.colors.muted}
+                      multiline
+                      autoFocus
+                      maxLength={140}
+                      className="min-h-[56px] rounded-lg border border-border bg-muted/50 px-3 py-2 text-xs text-foreground"
+                      style={[textFieldCaretStyle, textFieldMultilineStyle]}
+                    />
+                    <View className="flex-row items-center justify-between mt-2">
+                      <Text className="text-[10px] text-muted-foreground">
+                        {noteText.length}/140
+                      </Text>
+                      <View className="flex-row gap-2">
+                        <TouchableOpacity
+                          onPress={closeNoteEditor}
+                          className="rounded-lg border border-border bg-card px-3 py-1.5"
                         >
-                          <X
-                            size={12}
-                            color={
-                              hovered || pressed
-                                ? Theme.colors.destructive
-                                : Theme.colors.foreground
-                            }
-                          />
-                        </View>
-                      )}
-                    </Pressable>
-                  )}
-                </View>
-              </View>
-
-              {item.note && noteItemId !== item.rex_id && (
-                <View className="mx-3 mb-3 flex-row items-start gap-1.5 bg-muted/50 rounded-lg px-2.5 py-1.5">
-                  <Text className="text-xs text-muted-foreground">💬</Text>
-                  <Text className="text-xs text-muted-foreground italic flex-1">{item.note}</Text>
-                </View>
-              )}
-
-              {noteItemId === item.rex_id && (
-                <View className="mx-3 mb-3">
-                  <TextInput
-                    value={noteText}
-                    onChangeText={(t) => setNoteText(t.slice(0, 140))}
-                    placeholder="Add a personal note…"
-                    placeholderTextColor={Theme.colors.muted}
-                    multiline
-                    maxLength={140}
-                    className="min-h-[56px] rounded-lg border border-border bg-muted/50 px-3 py-2 text-xs text-foreground"
-                    style={[textFieldCaretStyle, textFieldMultilineStyle]}
-                  />
-                  <View className="flex-row items-center justify-between mt-2">
-                    <Text className="text-[10px] text-muted-foreground">{noteText.length}/140</Text>
-                    <View className="flex-row gap-2">
-                      <TouchableOpacity
-                        onPress={closeNoteEditor}
-                        className="rounded-lg border border-border bg-card px-3 py-1.5"
-                      >
-                        <Text className="text-xs font-medium text-foreground">Cancel</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => saveNote(item.rex_id)}
-                        className="px-3 py-1.5 rounded-lg bg-primary"
-                      >
-                        <Text className="text-xs font-medium text-primary-foreground">Save</Text>
-                      </TouchableOpacity>
+                          <Text className="text-xs font-medium text-foreground">Cancel</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => saveNote(item.rex_id)}
+                          className="px-3 py-1.5 rounded-lg bg-primary"
+                        >
+                          <Text className="text-xs font-medium text-primary-foreground">Save</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
                   </View>
-                </View>
-              )}
+                )}
+              </View>
             </View>
-          </View>
-        )}
-      />
+          )}
+        />
+      </KeyboardAvoidingView>
 
       <Modal
         visible={showMenu}

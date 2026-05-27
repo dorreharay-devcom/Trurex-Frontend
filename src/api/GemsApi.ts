@@ -5,6 +5,7 @@ import { mapDiscoverFeedRowSafe } from '~/api/mapDiscoverFeed';
 export interface SavedRexesParams {
   result_limit?: number;
   result_offset?: number;
+  search_term?: string | null;
   uncollected?: boolean;
 }
 
@@ -13,6 +14,7 @@ export const GemsApi = {
     const rpcParams: Record<string, unknown> = {
       result_limit: params.result_limit ?? 20,
       result_offset: params.result_offset ?? 0,
+      search_term: params.search_term?.trim() || null,
     };
     if (params.uncollected === true) rpcParams.uncollected = true;
 

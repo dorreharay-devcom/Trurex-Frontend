@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, Pressable, Platform } from 'react-native';
+import { View, Text, TextInput, Pressable } from 'react-native';
 import { Reply, Send } from 'lucide-react-native';
 import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
 import {
@@ -11,14 +11,13 @@ import {
 import { cn } from '~/utils/general';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 
-const isWeb = Platform.OS === 'web';
-
 export type CommentComposerProps = {
   composerAnchorRef?: React.RefObject<View | null>;
   inputRef: React.RefObject<TextInput | null>;
   text: string;
   onChangeText: (value: string) => void;
   onSubmit: () => void;
+  submitting?: boolean;
   replyToId: string | null;
   onCancelReply: () => void;
   onInputFocus?: () => void;
@@ -30,11 +29,12 @@ export const CommentComposer: React.FC<CommentComposerProps> = ({
   text,
   onChangeText,
   onSubmit,
+  submitting = false,
   replyToId,
   onCancelReply,
   onInputFocus,
 }) => {
-  const canSubmit = text.trim().length > 0;
+  const canSubmit = text.trim().length > 0 && !submitting;
 
   return (
     <View ref={composerAnchorRef} collapsable={false} className="gap-2">
@@ -72,12 +72,10 @@ export const CommentComposer: React.FC<CommentComposerProps> = ({
           underlineColorAndroid="transparent"
           selectionColor={Theme.colors.foreground}
           onSubmitEditing={() => void onSubmit()}
+          editable={!submitting}
           returnKeyType="send"
         />
-        <View
-          className={cn(!canSubmit && 'cursor-not-allowed')}
-          style={!canSubmit && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined}
-        >
+        <View className={cn(!canSubmit && 'cursor-not-allowed')}>
           <Pressable
             onPress={() => {
               if (!canSubmit) return;
@@ -87,7 +85,6 @@ export const CommentComposer: React.FC<CommentComposerProps> = ({
             accessibilityRole="button"
             accessibilityLabel="Send comment"
             accessibilityState={{ disabled: !canSubmit }}
-            style={!canSubmit && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined}
             className={cn(
               'h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border/80',
               canSubmit
