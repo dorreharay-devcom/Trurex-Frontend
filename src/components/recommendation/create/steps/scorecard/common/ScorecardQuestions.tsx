@@ -1,10 +1,9 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { Platform, View, Text, Pressable } from 'react-native';
 import type { CategoryQuestion } from '~/types/recommendation/rexCategoryCreateConfig';
 import { cn } from '~/utils/general';
 
-const OFF_MARKET_HELPER =
-  'Did they provide access to off-market opportunities?';
+const OFF_MARKET_HELPER = 'Did they provide access to off-market opportunities?';
 
 function questionHelperText(q: CategoryQuestion): string | null {
   const fromApi = q.description?.trim();
@@ -34,11 +33,12 @@ export function ScorecardQuestions({
 }: Props) {
   if (questions.length === 0) return null;
 
-  const showSectionHeading =
-    sectionTitle != null && String(sectionTitle).trim().length > 0;
+  const showSectionHeading = sectionTitle != null && String(sectionTitle).trim().length > 0;
+  const nativeEmphasizedSpacing =
+    questionStyle === 'emphasized' && Platform.OS !== 'web' ? { marginTop: 8 } : undefined;
 
   return (
-    <View className="space-y-4">
+    <View className="space-y-4" style={nativeEmphasizedSpacing}>
       {showSectionHeading ? (
         <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           {sectionTitle}
@@ -49,61 +49,58 @@ export function ScorecardQuestions({
         const emphasized = questionStyle === 'emphasized';
 
         return (
-        <View key={q.code} className="space-y-2">
-          <View>
-            <Text
-              className={cn(
-                emphasized
-                  ? 'text-xs font-medium uppercase tracking-wider text-black'
-                  : 'text-sm font-medium text-foreground',
-              )}
-            >
-              {q.display_label}
-            </Text>
-            {helper ? (
+          <View key={q.code} className="space-y-2">
+            <View>
               <Text
                 className={cn(
-                  'mt-0.5',
                   emphasized
-                    ? 'text-[10px] italic text-black opacity-80'
-                    : 'text-xs text-muted-foreground',
+                    ? 'text-xs font-medium uppercase tracking-wider text-black'
+                    : 'text-sm font-medium text-foreground',
                 )}
               >
-                {helper}
+                {q.display_label}
               </Text>
-            ) : null}
-            {q.is_required ? (
-              <Text className="mt-0.5 text-[10px] text-destructive">Required</Text>
-            ) : null}
-          </View>
-          <View className="flex-row flex-wrap gap-2">
-            {q.options.map((opt) => {
-              const selected = answers[q.code] === opt.code;
-              return (
-                <Pressable
-                  key={opt.code}
-                  onPress={() => onSelectOption(q.code, opt.code)}
+              {helper ? (
+                <Text
                   className={cn(
-                    'rounded-full border px-3 active:opacity-90',
-                    emphasized ? 'py-2' : 'py-1.5',
-                    selected ? 'border-primary bg-primary' : 'border-border bg-muted/50',
+                    'mt-0.5',
+                    emphasized
+                      ? 'text-[10px] italic text-black opacity-80'
+                      : 'text-xs text-muted-foreground',
                   )}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected }}
                 >
-                  <Text
+                  {helper}
+                </Text>
+              ) : null}
+              {q.is_required ? (
+                <Text className="mt-0.5 text-[10px] text-destructive">Required</Text>
+              ) : null}
+            </View>
+            <View className="flex-row flex-wrap gap-2">
+              {q.options.map((opt) => {
+                const selected = answers[q.code] === opt.code;
+                return (
+                  <Pressable
+                    key={opt.code}
+                    onPress={() => onSelectOption(q.code, opt.code)}
                     className={cn(
-                      'text-sm',
-                      selected ? 'text-primary-foreground' : 'text-black',
+                      'rounded-full border px-3 active:opacity-90',
+                      emphasized ? 'py-2' : 'py-1.5',
+                      selected ? 'border-primary bg-primary' : 'border-border bg-muted/50',
                     )}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
                   >
-                    {opt.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
+                    <Text
+                      className={cn('text-sm', selected ? 'text-primary-foreground' : 'text-black')}
+                    >
+                      {opt.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
           </View>
-        </View>
         );
       })}
     </View>
