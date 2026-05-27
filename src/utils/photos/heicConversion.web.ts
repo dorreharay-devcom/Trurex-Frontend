@@ -36,12 +36,14 @@ export async function convertHeicIfNeeded(image: MaybeHeicImage): Promise<HeicCo
 
   if (!blob) throw new Error('Could not convert HEIC image.');
 
-  const uri = URL.createObjectURL(blob);
+  const jpegBlob = blob.type === 'image/jpeg' ? blob : new Blob([blob], { type: 'image/jpeg' });
+  const uri = URL.createObjectURL(jpegBlob);
 
   return {
     uri,
     fileName: toJpegFileName(image.fileName),
     mimeType: 'image/jpeg',
+    blob: jpegBlob,
     converted: true,
     dispose: () => URL.revokeObjectURL(uri),
   };

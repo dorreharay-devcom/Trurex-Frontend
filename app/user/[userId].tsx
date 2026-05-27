@@ -6,6 +6,7 @@ import ProfileView from '~/components/profile/ProfileView';
 import { Header } from '~/components/layout/Header';
 import { TabBar, Tab } from '~/components/layout/TabBar';
 import { RecommendationDetailModal } from '~/components/recommendation/RecommendationDetailModal';
+import ProtectedRoute from '~/components/common/ProtectedRoute';
 import type {
   Recommendation,
   RecommendationOpenOptions,
@@ -40,33 +41,36 @@ export default function UserProfilePage() {
   }, []);
 
   return (
-    <SafeAreaProvider>
-      <View className="flex-1 bg-background">
-        <Header
-          searchQuery=""
-          onSearchChange={() => {}}
-          onProfilePress={() => handleTabChange('profile')}
-          onAddPress={() => {}}
-          avatarRefreshKey={avatarRefreshKey}
-        />
-        <TabBar currentTab="profile" onTabChange={handleTabChange} />
-        <View className="flex-1">
-          <ProfileView
-            userId={userId}
-            handle={handle}
-            onBack={() => router.replace('/')}
-            onRexPress={openPreview}
-            onSignUp={() => router.navigate('/(auth)/login')}
+    <ProtectedRoute>
+      <SafeAreaProvider>
+        <View className="flex-1 bg-background">
+          <Header
+            searchQuery=""
+            onSearchChange={() => {}}
+            onProfilePress={() => handleTabChange('profile')}
+            onAddPress={() => {}}
+            avatarRefreshKey={avatarRefreshKey}
+            showSearch={false}
           />
+          <TabBar currentTab="profile" onTabChange={handleTabChange} />
+          <View className="flex-1">
+            <ProfileView
+              userId={userId}
+              handle={handle}
+              onBack={() => router.replace('/')}
+              onRexPress={openPreview}
+              onSignUp={() => router.navigate('/(auth)/login')}
+            />
+          </View>
         </View>
-      </View>
 
-      <RecommendationDetailModal
-        visible={previewRecommendation != null}
-        recommendation={previewRecommendation}
-        onClose={closePreview}
-        scrollToComments={previewOptions.scrollToComments === true}
-      />
-    </SafeAreaProvider>
+        <RecommendationDetailModal
+          visible={previewRecommendation != null}
+          recommendation={previewRecommendation}
+          onClose={closePreview}
+          scrollToComments={previewOptions.scrollToComments === true}
+        />
+      </SafeAreaProvider>
+    </ProtectedRoute>
   );
 }

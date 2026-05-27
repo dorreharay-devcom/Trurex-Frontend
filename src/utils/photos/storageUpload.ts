@@ -20,11 +20,19 @@ export async function fetchUriAsBlob(uri: string): Promise<Blob> {
 export async function preparePickerImageForUpload(
   imageUri: string,
   fileName?: string | null,
+  mimeType?: string | null,
   maxWidth = 1200,
 ): Promise<{ blob: Blob; fileName?: string | null }> {
-  const image = await convertHeicIfNeeded({ uri: imageUri, fileName });
+  const image = await convertHeicIfNeeded({ uri: imageUri, fileName, mimeType });
 
   try {
+    if (image.converted && image.blob) {
+      return {
+        blob: image.blob,
+        fileName: image.fileName ?? fileName,
+      };
+    }
+
     const resizedUri = await resizeForUpload(image.uri, maxWidth);
     const blob = await fetchUriAsBlob(resizedUri);
 
@@ -40,8 +48,9 @@ export async function preparePickerImageForUpload(
 export async function preparePickerImageUriForUpload(
   imageUri: string,
   fileName?: string | null,
+  mimeType?: string | null,
 ): Promise<{ uri: string; dispose?: () => void }> {
-  const image = await convertHeicIfNeeded({ uri: imageUri, fileName });
+  const image = await convertHeicIfNeeded({ uri: imageUri, fileName, mimeType });
 
   return {
     uri: image.uri,
@@ -67,10 +76,11 @@ export async function uploadLocalPickerImage(
   userId: string,
   imageUri: string,
   fileNameHint?: string,
+  mimeType?: string | null,
   maxWidth = 1200,
 ): Promise<string> {
   const name = fileNameHint ?? `photo-${Date.now()}.jpg`;
-  const prepared = await preparePickerImageForUpload(imageUri, name, maxWidth);
+  const prepared = await preparePickerImageForUpload(imageUri, name, mimeType, maxWidth);
   const storagePath = generateRexImageStoragePath(userId, prepared.fileName ?? name);
   const blob = prepared.blob;
   await uploadBlobToStorageBucket(bucket, storagePath, blob);

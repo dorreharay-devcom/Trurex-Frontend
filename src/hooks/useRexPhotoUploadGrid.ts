@@ -50,7 +50,7 @@ export function useRexPhotoUploadGrid({
     for (const asset of assets) {
       try {
         const name = asset.fileName ?? `photo-${Date.now()}.jpg`;
-        const path = await uploadLocalPickerImage(bucket, userId, asset.uri, name);
+        const path = await uploadLocalPickerImage(bucket, userId, asset.uri, name, asset.mimeType);
         newPaths.push(path);
       } catch (e) {
         const err = e as Error;

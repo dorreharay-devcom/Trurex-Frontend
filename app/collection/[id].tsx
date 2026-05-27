@@ -7,6 +7,7 @@ import AddRexToCollectionSheet from '~/components/faves/AddRexToCollectionSheet'
 import { RecommendationDetailModal } from '~/components/recommendation/RecommendationDetailModal';
 import { Header } from '~/components/layout/Header';
 import { TabBar } from '~/components/layout/TabBar';
+import ProtectedRoute from '~/components/common/ProtectedRoute';
 import type {
   Recommendation,
   RecommendationOpenOptions,
@@ -30,34 +31,37 @@ export default function CollectionPage() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      <Header
-        searchQuery=""
-        onSearchChange={() => {}}
-        onProfilePress={() => router.replace('/')}
-        onAddPress={() => router.replace('/')}
-      />
-      <TabBar currentTab="faves" onTabChange={(tab) => router.replace(`/?tab=${tab}`)} />
-      <View className="flex-1">
-        <CollectionDetailView
-          collectionId={id}
-          onBack={() => router.replace('/?tab=faves')}
-          onAddItem={(collectionId) => setAddToCollectionId(collectionId)}
-          onRecommendationPress={openPreview}
+    <ProtectedRoute>
+      <SafeAreaView className="flex-1 bg-background" edges={['top']}>
+        <Header
+          searchQuery=""
+          onSearchChange={() => {}}
+          onProfilePress={() => router.replace('/')}
+          onAddPress={() => router.replace('/')}
+          showSearch={false}
         />
-      </View>
-      <AddRexToCollectionSheet
-        open={!!addToCollectionId}
-        collectionId={addToCollectionId}
-        onClose={() => setAddToCollectionId(null)}
-      />
-      <RecommendationDetailModal
-        visible={previewRecommendation != null}
-        recommendation={previewRecommendation}
-        onClose={closePreview}
-        onCommentCountChange={() => {}}
-        scrollToComments={previewOptions.scrollToComments === true}
-      />
-    </SafeAreaView>
+        <TabBar currentTab="faves" onTabChange={(tab) => router.replace(`/?tab=${tab}`)} />
+        <View className="flex-1">
+          <CollectionDetailView
+            collectionId={id}
+            onBack={() => router.replace('/?tab=faves')}
+            onAddItem={(collectionId) => setAddToCollectionId(collectionId)}
+            onRecommendationPress={openPreview}
+          />
+        </View>
+        <AddRexToCollectionSheet
+          open={!!addToCollectionId}
+          collectionId={addToCollectionId}
+          onClose={() => setAddToCollectionId(null)}
+        />
+        <RecommendationDetailModal
+          visible={previewRecommendation != null}
+          recommendation={previewRecommendation}
+          onClose={closePreview}
+          onCommentCountChange={() => {}}
+          scrollToComments={previewOptions.scrollToComments === true}
+        />
+      </SafeAreaView>
+    </ProtectedRoute>
   );
 }

@@ -313,6 +313,7 @@ const ProfileView = ({
       const prepared = await preparePickerImageUriForUpload(
         result.assets[0].uri,
         result.assets[0].fileName,
+        result.assets[0].mimeType,
       );
       try {
         await ProfileApi.uploadAvatar(authUser.id, prepared.uri);

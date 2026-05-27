@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { DiscoveryApi, DiscoverQueryParams, SearchRexesParams } from '~/api/DiscoveryApi';
 import { getRexCategoryApiCode } from '~/constants/recommendation/rexCategories';
 import { Backend, unwrap } from '~/services/AuthService';
@@ -8,6 +9,7 @@ import type { Recommendation } from '~/types/recommendation/recommendation';
 export type RecencyDayToken = 1 | 7 | 30 | 9999;
 
 const VFM_ALL = [1, 2, 3, 4, 5] as const;
+const DISCOVER_FEED_PAGE_SIZE = 20;
 
 function recencyDaysToCreatedBounds(days: RecencyDayToken[]): {
   created_from: string | null;
@@ -54,15 +56,27 @@ export const useDiscoverRecommendations = (
   params?: DiscoverQueryParams,
   options?: DiscoverRecommendationsOptions,
 ) => {
-  return useQuery({
+  const pageSize = params?.result_limit ?? DISCOVER_FEED_PAGE_SIZE;
+  return useInfiniteQuery({
     queryKey: [
       'discover-recommendations',
       params?.category_filter ?? null,
       [...(params?.tag_filters ?? [])].sort().join(','),
-      params?.result_limit ?? 20,
-      params?.result_offset ?? 0,
+      pageSize,
     ],
-    queryFn: () => DiscoveryApi.getDiscoverRecommendations(params),
+    queryFn: ({ pageParam }) =>
+      DiscoveryApi.getDiscoverRecommendations({
+        ...params,
+        result_limit: pageSize,
+        result_offset: pageParam,
+      }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length < pageSize) {
+        return undefined;
+      }
+      return allPages.length * pageSize;
+    },
     enabled: options?.enabled ?? true,
   });
 };
@@ -98,7 +112,17 @@ function effectiveCategoryFilter(
 export const useSearchRexes = (args: UseSearchRexesArgs, options?: UseSearchRexesOptions) => {
   const trimmed = args.searchTerm.trim();
   const category_filter = effectiveCategoryFilter(args.categoryId, args.searchCategoryFilter);
-  const { created_from, created_to } = recencyDaysToCreatedBounds(args.recencyFilterDays);
+  const recencyKey = args.recencyFilterDays
+    .slice()
+    .sort((a, b) => a - b)
+    .join();
+  const { created_from, created_to } = useMemo(() => {
+    const recencyDays = recencyKey
+      .split(',')
+      .filter(Boolean)
+      .map((d) => Number(d) as RecencyDayToken);
+    return recencyDaysToCreatedBounds(recencyDays);
+  }, [recencyKey]);
   const vfmRpc = vfmForRpc(args.valueForMoneyFilters);
 
   return useQuery({
@@ -108,10 +132,7 @@ export const useSearchRexes = (args: UseSearchRexesArgs, options?: UseSearchRexe
       category_filter,
       [...args.searchCategoryFilter].sort().join(),
       [...args.valueForMoneyFilters].sort().join(),
-      args.recencyFilterDays
-        .slice()
-        .sort((a, b) => a - b)
-        .join(),
+      recencyKey,
       created_from,
       created_to,
       args.result_limit ?? 20,

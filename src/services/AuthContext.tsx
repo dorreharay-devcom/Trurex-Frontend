@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { Auth } from './AuthService';
 import { AuthApi } from '~/api/AuthApi';
+import { registerAccountSuspendedHandler } from '~/utils/accountSuspension';
 
 export enum AuthEvent {
   PasswordRecovery = 'PASSWORD_RECOVERY',
@@ -35,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .then(({ data: { session }, error }) => {
         if (error) {
           console.warn('[Auth]', error.message);
-          const code = (error as any).code;
+          const code = (error as { code?: unknown }).code;
           if (code === 'refresh_token_not_found' || code === 'bad_jwt') {
             Auth.signOut().catch(() => {});
           }
@@ -60,9 +61,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     await AuthApi.signOut();
-  };
+  }, []);
+
+  useEffect(() => registerAccountSuspendedHandler(signOut), [signOut]);
 
   return (
     <AuthContext.Provider value={{ session, user, loading, signOut }}>

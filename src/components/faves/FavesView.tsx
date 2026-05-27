@@ -278,34 +278,26 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
                 <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
                   {item.title}
                 </Text>
-                <View className="mt-1 w-full min-w-0 flex-row flex-wrap items-center gap-2">
-                  <View className="shrink-0 rounded-full border border-[#d4d4d4cc] bg-[#d4d4d466] px-2 py-0.5">
+                <View className="mt-1 items-start">
+                  <View className="rounded-full border border-[#d4d4d4cc] bg-[#d4d4d466] px-2 py-0.5">
                     <Text className="text-[10px] font-medium capitalize text-foreground">
                       {item.category}
                     </Text>
                   </View>
-                  {item.location ? (
-                    <View
-                      className="min-w-0 max-w-full flex-row items-center gap-0.5 overflow-hidden"
-                      style={{
-                        flexGrow: 1,
-                        flexShrink: 1,
-                        flexBasis: 1,
-                        minWidth: 56,
-                      }}
-                    >
-                      <MapPin size={10} color={Theme.colors.muted} style={{ flexShrink: 0 }} />
-                      <Text
-                        className="text-[11px] text-muted-foreground"
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                        style={singleLineEllipsisTextStyle}
-                      >
-                        {item.location}
-                      </Text>
-                    </View>
-                  ) : null}
                 </View>
+                {item.location ? (
+                  <View className="mt-1 min-w-0 flex-row items-center gap-0.5 overflow-hidden">
+                    <MapPin size={10} color={Theme.colors.muted} style={{ flexShrink: 0 }} />
+                    <Text
+                      className="text-[11px] text-muted-foreground"
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={singleLineEllipsisTextStyle}
+                    >
+                      {item.location}
+                    </Text>
+                  </View>
+                ) : null}
                 {item.description ? (
                   <Text className="text-xs text-foreground/70 mt-1" numberOfLines={1}>
                     {item.description}

@@ -6,6 +6,7 @@ export type MaybeHeicImage = {
 
 export type HeicConversionResult = MaybeHeicImage & {
   converted: boolean;
+  blob?: Blob;
   dispose?: () => void;
 };
 
