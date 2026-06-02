@@ -33,7 +33,7 @@ import {
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/theme/Theme';
-import { cn } from '~/utils/general';
+import { cn, webDisabledCursorStyle } from '~/utils/general';
 import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { INPUT_FOCUS_BORDER_CLASS } from '~/constants/inputFocus';
@@ -210,9 +210,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
 
       <View style={styles.overlay} pointerEvents="box-none">
         <KeyboardAvoidingView
-          behavior={
-            Platform.OS === 'ios' ? 'padding' : Platform.OS === 'android' ? 'padding' : undefined
-          }
+          behavior={Platform.OS === 'web' ? undefined : 'padding'}
           pointerEvents="box-none"
           style={{ width: '100%', maxWidth: isWeb ? 512 : width }}
         >
@@ -418,7 +416,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                 <View style={[{ padding: 16 }, webContainerStyle]}>
                   <View
                     className={cn('w-full', !canCreate && isWeb && 'cursor-not-allowed')}
-                    style={!canCreate && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined}
+                    style={!canCreate && isWeb ? webDisabledCursorStyle : undefined}
                   >
                     <Pressable
                       onPress={() => {
@@ -428,7 +426,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
                       disabled={!canCreate && Platform.OS !== 'web'}
                       accessibilityRole="button"
                       accessibilityState={{ disabled: !canCreate }}
-                      style={!canCreate && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined}
+                      style={!canCreate && isWeb ? webDisabledCursorStyle : undefined}
                       className={cn(
                         'w-full items-center rounded-xl py-3',
                         canCreate
