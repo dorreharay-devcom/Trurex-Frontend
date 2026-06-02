@@ -148,7 +148,12 @@ const EditCollectionModal: React.FC<EditCollectionModalProps> = ({
       const fileName = asset.fileName ?? `cover-${Date.now()}.jpg`;
       const prepared = await preparePickerImageForUpload(asset.uri, fileName, asset.mimeType, 800);
       const storagePath = generateRexImageStoragePath(user.id, prepared.fileName ?? fileName);
-      await uploadBlobToStorageBucket(REX_IMAGES_BUCKET, storagePath, prepared.blob);
+      await uploadBlobToStorageBucket(
+        REX_IMAGES_BUCKET,
+        storagePath,
+        prepared.body,
+        prepared.contentType,
+      );
       setNewCoverStoragePath(storagePath);
     } catch (e: unknown) {
       toastError('Upload failed', e instanceof Error ? e.message : 'Could not upload cover image.');

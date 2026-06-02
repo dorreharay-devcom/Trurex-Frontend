@@ -149,7 +149,12 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
       const fileName = asset.fileName ?? `cover-${Date.now()}.jpg`;
       const prepared = await preparePickerImageForUpload(asset.uri, fileName, asset.mimeType, 800);
       const storagePath = generateRexImageStoragePath(user.id, prepared.fileName ?? fileName);
-      await uploadBlobToStorageBucket(COLLECTION_COVERS_BUCKET, storagePath, prepared.blob);
+      await uploadBlobToStorageBucket(
+        COLLECTION_COVERS_BUCKET,
+        storagePath,
+        prepared.body,
+        prepared.contentType,
+      );
       setCoverStoragePath(storagePath);
     } catch (e: unknown) {
       toastError('Upload failed', e instanceof Error ? e.message : 'Could not upload cover image.');
@@ -205,7 +210,9 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
 
       <View style={styles.overlay} pointerEvents="box-none">
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={
+            Platform.OS === 'ios' ? 'padding' : Platform.OS === 'android' ? 'padding' : undefined
+          }
           pointerEvents="box-none"
           style={{ width: '100%', maxWidth: isWeb ? 512 : width }}
         >

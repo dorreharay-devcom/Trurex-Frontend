@@ -36,7 +36,7 @@ export function CategoryTile({
       className={cn(
         'min-w-0 flex-col items-center justify-center rounded-xl border-2 bg-card p-3 active:scale-[0.95] active:opacity-90',
         preventStretch ? 'flex-shrink-0' : 'flex-1',
-        selected ? 'border-primary bg-primary/10 shadow-sm' : 'border-border bg-card',
+        selected ? 'border-primary bg-primary/15' : 'border-border bg-card',
       )}
       style={{
         minHeight: grid.tile.minHeight,

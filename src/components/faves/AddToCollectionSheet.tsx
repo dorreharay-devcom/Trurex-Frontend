@@ -349,7 +349,9 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({
 
       <View style={styles.outer} pointerEvents="box-none">
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={
+            Platform.OS === 'ios' ? 'padding' : Platform.OS === 'android' ? 'padding' : undefined
+          }
           pointerEvents="box-none"
           style={{ width: '100%' }}
         >

@@ -5,6 +5,10 @@ export type LatLng = { lat: number; lng: number };
 
 type GeoErr = GeolocationPositionError;
 
+const NATIVE_POSITION_TIMEOUT_MS = 12000;
+const GOOGLE_GEOLOCATE_TIMEOUT_MS = 5000;
+const REVERSE_GEOCODE_TIMEOUT_MS = 5000;
+
 function mapGeoReject(err: GeoErr | unknown): never {
   const geo = err as GeoErr;
   if (geo?.code === 1) throw new Error('PERMISSION_DENIED');
@@ -65,6 +69,16 @@ async function fetchGoogleGeolocateConsiderIp(): Promise<{ lat: number; lng: num
   return null;
 }
 
+async function resolveGoogleGeolocateFallback(
+  promise: Promise<{ lat: number; lng: number } | null>,
+): Promise<{ lat: number; lng: number } | null> {
+  try {
+    return await withTimeout(promise, GOOGLE_GEOLOCATE_TIMEOUT_MS);
+  } catch {
+    return null;
+  }
+}
+
 function getCurrentPositionWebOnce(
   options: PositionOptions,
   raceMs: number,
@@ -111,7 +125,7 @@ async function getCurrentLocationCoordsWeb(): Promise<LatLng> {
     }
   }
 
-  const google = await googlePromise;
+  const google = await resolveGoogleGeolocateFallback(googlePromise);
   if (google) {
     return google;
   }
@@ -128,7 +142,7 @@ async function getCurrentLocationCoordsNative(): Promise<LatLng> {
 
   const { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== 'granted') {
-    const google = await googlePromise;
+    const google = await resolveGoogleGeolocateFallback(googlePromise);
     if (google) {
       return google;
     }
@@ -136,12 +150,15 @@ async function getCurrentLocationCoordsNative(): Promise<LatLng> {
   }
 
   try {
-    const pos = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Highest,
-    });
+    const pos = await withTimeout(
+      Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Highest,
+      }),
+      NATIVE_POSITION_TIMEOUT_MS,
+    );
     return { lat: pos.coords.latitude, lng: pos.coords.longitude };
   } catch {
-    const google = await googlePromise;
+    const google = await resolveGoogleGeolocateFallback(googlePromise);
     if (google) {
       return google;
     }
@@ -164,8 +181,11 @@ export async function reverseGeocodeLatLng(lat: number, lng: number): Promise<st
     const url = new URL('https://maps.googleapis.com/maps/api/geocode/json');
     url.searchParams.set('latlng', `${lat},${lng}`);
     url.searchParams.set('key', key);
-    const res = await fetch(url.toString());
-    const data = (await res.json()) as {
+    const res = await withTimeout(fetch(url.toString()), REVERSE_GEOCODE_TIMEOUT_MS);
+    const data = (await withTimeout(
+      res.json(),
+      REVERSE_GEOCODE_TIMEOUT_MS,
+    )) as {
       status: string;
       results?: { formatted_address?: string }[];
     };
