@@ -72,6 +72,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
   } = flow;
   const [submitting, setSubmitting] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const postedSuccessfullyRef = useRef(false);
 
   useEffect(() => {
@@ -80,8 +81,14 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
 
   useEffect(() => {
     if (Platform.OS === 'web') return;
-    const show = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
-    const hide = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+    const show = Keyboard.addListener('keyboardDidShow', (event) => {
+      setKeyboardVisible(true);
+      setKeyboardHeight(event.endCoordinates.height);
+    });
+    const hide = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+      setKeyboardHeight(0);
+    });
     return () => {
       show.remove();
       hide.remove();
@@ -360,6 +367,8 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
   ]);
 
   const { layout } = modalConfig;
+  const androidKeyboardFooterOffset =
+    Platform.OS === 'android' && keyboardVisible ? keyboardHeight : 0;
 
   const primaryDisabled =
     submitting ||
@@ -442,6 +451,11 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
             'sticky bottom-0 items-center border-t border-border bg-card/95 backdrop-blur px-4 sm:px-6',
             keyboardVisible && Platform.OS !== 'web' ? 'py-2' : 'py-4',
           )}
+          style={
+            androidKeyboardFooterOffset > 0
+              ? { marginBottom: androidKeyboardFooterOffset }
+              : undefined
+          }
         >
           <View
             className="w-full"

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, ScrollView, Text, Pressable, Platform, StyleSheet } from 'react-native';
+import { View, ScrollView, Text, Pressable, Platform, StyleSheet, Keyboard } from 'react-native';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Recommendation } from '~/types/recommendation/recommendation';
@@ -126,6 +126,14 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
 
   const showNoSearchMatchBanner = mapViewVisible && flow.mapMarkers.length === 0 && hasSearchQuery;
 
+  const handleMarkerPress = useCallback(
+    (id: string) => {
+      if (Platform.OS !== 'web') Keyboard.dismiss();
+      flow.selectMarker(id);
+    },
+    [flow],
+  );
+
   return (
     <View className="relative min-h-0 w-full flex-1 bg-background pt-4">
       <View className="relative min-h-0 w-full flex-1 px-4 pb-5" style={webContainerStyle}>
@@ -142,7 +150,7 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
                 <MarkerMap
                   markers={flow.mapMarkers}
                   selectedId={flow.selectedRecId}
-                  onMarkerPress={flow.selectMarker}
+                  onMarkerPress={handleMarkerPress}
                   onRegionChangeComplete={flow.onBoundsChange}
                   recenterTo={flow.recenterTo}
                 />
@@ -237,19 +245,11 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
               open={!!saveTarget}
               rec={saveTarget}
               onClose={() => setSaveTarget(null)}
-              onSaved={
-                saveTarget ? () => flow.markRecSaved(saveTarget.id) : undefined
-              }
-              onUnsaved={
-                saveTarget ? () => flow.markRecUnsaved(saveTarget.id) : undefined
-              }
-              onUnsaveFailed={
-                saveTarget ? () => flow.markRecSaved(saveTarget.id) : undefined
-              }
+              onSaved={saveTarget ? () => flow.markRecSaved(saveTarget.id) : undefined}
+              onUnsaved={saveTarget ? () => flow.markRecUnsaved(saveTarget.id) : undefined}
+              onUnsaveFailed={saveTarget ? () => flow.markRecSaved(saveTarget.id) : undefined}
               onSaveRexFailed={
-                saveTarget
-                  ? () => flow.clearRecSavedOverride(saveTarget.id)
-                  : undefined
+                saveTarget ? () => flow.clearRecSavedOverride(saveTarget.id) : undefined
               }
             />
           </View>
@@ -257,7 +257,6 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
           <ScrollView
             className="flex-1 w-full pt-32"
             keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
             contentContainerStyle={webContainerStyle}
             contentContainerClassName="w-full pb-28"
           >

@@ -21,7 +21,9 @@ export function ScorecardIntro({
     <View className="items-center space-y-2">
       <CreateStepTitle>{categoryEmoji} Rate your experience</CreateStepTitle>
       {typeTrimmed.length > 0 ? (
-        <Text className="text-center text-sm font-medium text-primary">{typeTrimmed}</Text>
+        <Text className="text-center text-sm font-semibold text-muted-foreground">
+          {typeTrimmed}
+        </Text>
       ) : null}
       <Text className="text-center text-sm text-muted-foreground">
         All fields are optional — share as much or as little as you like

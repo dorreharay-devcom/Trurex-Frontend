@@ -82,7 +82,7 @@ export function SearchManualPanel({
           onChangeText={onManualNameChange}
           placeholder="Name of place, person, or service"
           placeholderTextColor={Theme.colors.secondaryText}
-          editable={!tagLocationLoading}
+          editable={Platform.OS === 'android' || !tagLocationLoading}
           className={cn(
             'w-full rounded-[12px] border border-border bg-muted/50 px-4 text-base text-foreground',
             Platform.OS === 'web' ? 'py-3.5' : 'py-0',
@@ -109,7 +109,7 @@ export function SearchManualPanel({
           onChangeText={onManualAddressChange}
           placeholder="Address or location"
           placeholderTextColor={Theme.colors.secondaryText}
-          editable={!tagLocationLoading}
+          editable={Platform.OS === 'android' || !tagLocationLoading}
           className={cn(
             'w-full rounded-[12px] border border-border bg-muted/50 px-4 text-base text-foreground',
             Platform.OS === 'web' ? 'py-3.5' : 'py-0',

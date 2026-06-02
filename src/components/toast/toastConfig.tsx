@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet } from 'react-native';
+import { Platform, Pressable, StyleSheet } from 'react-native';
 import {
   ErrorToast,
   InfoToast,
@@ -53,7 +53,9 @@ function renderToastRow(Row: ToastRowComponent, props: AppToastRendererProps) {
   return (
     <Row
       {...props}
-      renderTrailingIcon={() => <ToastDismissButton hide={props.hide} />}
+      renderTrailingIcon={
+        Platform.OS === 'web' ? () => <ToastDismissButton hide={props.hide} /> : undefined
+      }
       style={[toastRowStyle, props.style]}
     />
   );

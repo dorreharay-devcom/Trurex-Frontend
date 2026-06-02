@@ -46,7 +46,7 @@ export function SubCategory({ subCategories, selected, onSelect }: Props) {
                 className={cn(
                   'w-full flex-row items-center gap-3 rounded-xl border-2 p-4 active:opacity-95',
                   isSelected
-                    ? 'border-primary bg-primary/5 shadow-sm'
+                    ? 'border-primary bg-primary/15'
                     : 'border-border bg-card active:border-primary/30',
                 )}
               >

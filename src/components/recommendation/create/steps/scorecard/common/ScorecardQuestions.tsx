@@ -33,9 +33,10 @@ export function ScorecardQuestions({
 }: Props) {
   if (questions.length === 0) return null;
 
+  const isNative = Platform.OS !== 'web';
   const showSectionHeading = sectionTitle != null && String(sectionTitle).trim().length > 0;
   const nativeEmphasizedSpacing =
-    questionStyle === 'emphasized' && Platform.OS !== 'web' ? { marginTop: 8 } : undefined;
+    questionStyle === 'emphasized' && isNative ? { marginTop: 8 } : undefined;
 
   return (
     <View className="space-y-4" style={nativeEmphasizedSpacing}>
@@ -68,6 +69,7 @@ export function ScorecardQuestions({
                       ? 'text-[10px] italic text-black opacity-80'
                       : 'text-xs text-muted-foreground',
                   )}
+                  style={isNative ? { marginTop: 4 } : undefined}
                 >
                   {helper}
                 </Text>
@@ -76,7 +78,10 @@ export function ScorecardQuestions({
                 <Text className="mt-0.5 text-[10px] text-destructive">Required</Text>
               ) : null}
             </View>
-            <View className="flex-row flex-wrap gap-2">
+            <View
+              className="flex-row flex-wrap gap-2"
+              style={isNative ? { marginTop: 8 } : undefined}
+            >
               {q.options.map((opt) => {
                 const selected = answers[q.code] === opt.code;
                 return (

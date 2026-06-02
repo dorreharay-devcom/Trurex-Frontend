@@ -42,6 +42,7 @@ import {
   textFieldSingleLineStyle,
 } from '~/theme/Theme';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
+import { webDisabledCursorStyle } from '~/utils/general';
 
 const collectionFieldBg = { backgroundColor: Theme.colors.searchFieldBackground };
 const SHEET_CHROME_HEIGHT = 220;
@@ -349,7 +350,7 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({
 
       <View style={styles.outer} pointerEvents="box-none">
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={Platform.OS === 'web' ? undefined : 'padding'}
           pointerEvents="box-none"
           style={{ width: '100%' }}
         >
@@ -443,7 +444,7 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({
                         disabled={!newName.trim() || creating}
                         style={
                           (!newName.trim() || creating) && isWeb
-                            ? ({ cursor: 'not-allowed' } as const)
+                            ? webDisabledCursorStyle
                             : undefined
                         }
                         className={cn(

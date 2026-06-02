@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { Platform, Share } from 'react-native';
-import * as Linking from 'expo-linking';
 import * as Clipboard from 'expo-clipboard';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { toastSuccess } from '~/utils/appToast';
+import { buildCurrentWebPath, buildPublicWebPath } from '~/utils/shareUrls';
 
 const APP_NAME = 'TruRex';
 
@@ -12,12 +12,12 @@ export type RexShareInput = Pick<Recommendation, 'id' | 'title'>;
 export function getRexShareUrl(rexId: string): string {
   if (Platform.OS === 'web' && typeof window !== 'undefined') {
     try {
-      return `${window.location.origin}/rex/${encodeURIComponent(rexId)}`;
+      return buildCurrentWebPath(`/rex/${encodeURIComponent(rexId)}`);
     } catch {
       return '';
     }
   }
-  return Linking.createURL(`/rex/${rexId}`);
+  return buildPublicWebPath(`/rex/${encodeURIComponent(rexId)}`);
 }
 
 export function buildRexShareContent(rec: RexShareInput): { title: string; message: string } {
