@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -54,6 +54,7 @@ import type { CollectionRexEntry } from '~/api/CollectionsApi';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
+import { buildCurrentWebPath, buildPublicWebPath } from '~/utils/shareUrls';
 
 const VALUE_LABELS = ['Total Steal', 'Budget-Friendly', 'Good Value', 'Worth It', 'Splurge'];
 
@@ -124,13 +125,17 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showUnsaveConfirm, setShowUnsaveConfirm] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [pendingNativeShare, setPendingNativeShare] = useState<{
+    title: string;
+    message: string;
+  } | null>(null);
   const [savedOverride, setSavedOverride] = useState<boolean | null>(null);
   const isSaved = savedOverride ?? detail?.is_saved ?? false;
 
   const collectionShareUrl = () => {
-    const base =
-      typeof window !== 'undefined' ? window.location.origin : 'https://trurex.netlify.app';
-    return `${base}/collection/${collectionId}`;
+    return Platform.OS === 'web'
+      ? buildCurrentWebPath(`/collection/${collectionId}`)
+      : buildPublicWebPath(`/collection/${collectionId}`);
   };
 
   const handleShareCollection = async () => {
@@ -143,16 +148,20 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
     }
 
     setShowMenu(false);
-    setTimeout(() => {
-      void Share.share({
-        title: detail.display_name,
-        message: `Check out "${detail.display_name}" on TruRex\n${url}`,
-        url,
-      });
-    }, 120);
+    setPendingNativeShare({
+      title: detail.display_name,
+      message: `Check out "${detail.display_name}" on TruRex\n${url}`,
+    });
   };
   const menuButtonRef = useRef<View>(null);
   const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
+
+  useEffect(() => {
+    if (showMenu || !pendingNativeShare) return;
+    const payload = pendingNativeShare;
+    setPendingNativeShare(null);
+    void Share.share(payload);
+  }, [pendingNativeShare, showMenu]);
 
   if (isLoading || !detail) {
     return (
@@ -441,14 +450,14 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                 <Pencil size={15} color={Theme.colors.foreground} />
                 <Text className="text-sm text-foreground">Edit details</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.7}
+              <Pressable
                 onPress={handleShareCollection}
-                className="flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md hover:bg-zinc-100"
+                className="flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md active:opacity-80 hover:bg-zinc-100"
+                accessibilityRole="button"
               >
                 <Share2 size={15} color={Theme.colors.foreground} />
                 <Text className="text-sm text-foreground">Share collection</Text>
-              </TouchableOpacity>
+              </Pressable>
               <TouchableOpacity
                 activeOpacity={0.7}
                 onPress={() => {
@@ -463,14 +472,14 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
             </>
           ) : (
             <>
-              <TouchableOpacity
-                activeOpacity={0.7}
+              <Pressable
                 onPress={handleShareCollection}
-                className="flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md hover:bg-zinc-100"
+                className="flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md active:opacity-80 hover:bg-zinc-100"
+                accessibilityRole="button"
               >
                 <Share2 size={15} color={Theme.colors.foreground} />
                 <Text className="text-sm text-foreground">Share collection</Text>
-              </TouchableOpacity>
+              </Pressable>
               <TouchableOpacity
                 activeOpacity={0.7}
                 onPress={() => {

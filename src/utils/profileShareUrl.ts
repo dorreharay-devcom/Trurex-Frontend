@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
-import * as Linking from 'expo-linking';
 import type { ProfileData } from '~/types/profile';
+import { buildCurrentWebPath, buildPublicWebPath } from '~/utils/shareUrls';
 
 export function normalizeProfileHandleSlug(handle: string | null | undefined): string | null {
   if (!handle?.trim()) return null;
@@ -21,6 +21,6 @@ export function profileShareSlug(profile: Pick<ProfileData, 'handle' | 'userId'>
 export function buildProfileShareUrl(slug: string): string {
   if (!slug) return '';
   return Platform.OS === 'web'
-    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/user/${slug}`
-    : Linking.createURL(`/user/${slug}`);
+    ? buildCurrentWebPath(`/user/${slug}`)
+    : buildPublicWebPath(`/user/${slug}`);
 }

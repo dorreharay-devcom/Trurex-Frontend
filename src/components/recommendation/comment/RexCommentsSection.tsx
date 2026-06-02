@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, TextInput, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, TextInput, ActivityIndicator, Platform, Keyboard } from 'react-native';
 import { MessageCircle } from 'lucide-react-native';
 import { useRexComments } from '~/hooks/recommendation/useRexComments';
 import { useAuth } from '~/services/AuthContext';
@@ -86,6 +86,14 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
     inputRef.current?.focus();
   }, []);
 
+  const handleCancelReply = useCallback(() => {
+    setReplyTo(null);
+    if (Platform.OS === 'web') return;
+    setText('');
+    inputRef.current?.blur();
+    Keyboard.dismiss();
+  }, []);
+
   const handleToggleLike = useCallback(
     async (commentId: string, currentlyLiked: boolean) => {
       if (!user) return;
@@ -142,7 +150,7 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
           onSubmit={handlePost}
           submitting={posting}
           replyToId={replyTo}
-          onCancelReply={() => setReplyTo(null)}
+          onCancelReply={handleCancelReply}
           onInputFocus={onComposerFocus}
         />
       ) : null}
