@@ -8,7 +8,6 @@ import {
   Modal,
   Platform,
   Pressable,
-  Share,
   StyleSheet,
   useWindowDimensions,
   TextInput,
@@ -55,6 +54,7 @@ import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollec
 import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { buildCurrentWebPath, buildPublicWebPath } from '~/utils/shareUrls';
+import { shareMobileLink } from '~/utils/mobileShare';
 
 const VALUE_LABELS = ['Total Steal', 'Budget-Friendly', 'Good Value', 'Worth It', 'Splurge'];
 
@@ -128,6 +128,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   const [pendingNativeShare, setPendingNativeShare] = useState<{
     title: string;
     message: string;
+    url: string;
   } | null>(null);
   const [savedOverride, setSavedOverride] = useState<boolean | null>(null);
   const isSaved = savedOverride ?? detail?.is_saved ?? false;
@@ -150,7 +151,8 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
     setShowMenu(false);
     setPendingNativeShare({
       title: detail.display_name,
-      message: `Check out "${detail.display_name}" on TruRex\n${url}`,
+      message: `Check out "${detail.display_name}" on TruRex`,
+      url,
     });
   };
   const menuButtonRef = useRef<View>(null);
@@ -160,7 +162,10 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
     if (showMenu || !pendingNativeShare) return;
     const payload = pendingNativeShare;
     setPendingNativeShare(null);
-    void Share.share(payload);
+    const timeout = setTimeout(() => {
+      void shareMobileLink(payload);
+    }, 180);
+    return () => clearTimeout(timeout);
   }, [pendingNativeShare, showMenu]);
 
   if (isLoading || !detail) {

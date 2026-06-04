@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Share, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
 import { Share2, Camera, LogOut } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import { toastSuccess } from '~/utils/appToast';
 import { buildProfileShareUrl, profileShareSlug } from '~/utils/profileShareUrl';
+import { shareMobileLink } from '~/utils/mobileShare';
 import { Theme } from '~/theme/Theme';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
@@ -49,9 +50,10 @@ const ProfileHeader = ({
         await Clipboard.setStringAsync(url);
         toastSuccess('Link copied!');
       } else {
-        await Share.share({
-          message: `Check out ${isOwnProfile ? 'my' : `${name}'s`} profile on TruRex\n${url}`,
+        await shareMobileLink({
           title: 'TruRex Profile',
+          message: `Check out ${isOwnProfile ? 'my' : `${name}'s`} profile on TruRex`,
+          url,
         });
       }
     } catch {}

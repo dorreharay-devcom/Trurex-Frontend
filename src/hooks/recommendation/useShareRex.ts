@@ -1,9 +1,10 @@
 import { useCallback } from 'react';
-import { Platform, Share } from 'react-native';
+import { Platform } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { toastSuccess } from '~/utils/appToast';
 import { buildCurrentWebPath, buildPublicWebPath } from '~/utils/shareUrls';
+import { shareMobileLink } from '~/utils/mobileShare';
 
 const APP_NAME = 'TruRex';
 
@@ -20,17 +21,22 @@ export function getRexShareUrl(rexId: string): string {
   return buildPublicWebPath(`/rex/${encodeURIComponent(rexId)}`);
 }
 
-export function buildRexShareContent(rec: RexShareInput): { title: string; message: string } {
+export function buildRexShareContent(rec: RexShareInput): {
+  title: string;
+  message: string;
+  mobileMessage: string;
+  url: string;
+} {
   const url = getRexShareUrl(rec.id);
   const title = rec.title;
   const head = `Check out "${title}" on ${APP_NAME}`;
   const message = url ? `${head}\n${url}` : head;
-  return { title, message };
+  return { title, message, mobileMessage: head, url };
 }
 
 export function useShareRex() {
   const shareRecommendation = useCallback(async (rec: RexShareInput) => {
-    const { title, message } = buildRexShareContent(rec);
+    const { title, message, mobileMessage } = buildRexShareContent(rec);
     const url = getRexShareUrl(rec.id);
     try {
       if (Platform.OS === 'web') {
@@ -41,7 +47,7 @@ export function useShareRex() {
         }
         return;
       }
-      await Share.share({ message, title });
+      await shareMobileLink({ title, message: mobileMessage, url });
     } catch {}
   }, []);
 
