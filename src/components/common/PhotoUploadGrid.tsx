@@ -51,7 +51,7 @@ export function PhotoUploadGrid({
               className="absolute right-1 top-1 h-5 w-5 items-center justify-center rounded-full bg-foreground/70"
               accessibilityLabel={`Remove photo ${i + 1}`}
             >
-              <X size={12} color={Theme.colors.primaryForeground} />
+              <X size={12} color={Theme.colors.white} />
             </Pressable>
           </View>
         ))}

@@ -45,6 +45,13 @@ function jpegFileName(fileName?: string | null): string | null | undefined {
   return fileName.replace(/\.[^.]+$/, '') + '.jpg';
 }
 
+function isHeicLikeFile(fileName?: string | null, mimeType?: string | null): boolean {
+  return (
+    /\.(heic|heif)$/i.test(fileName?.trim() ?? '') ||
+    /^image\/hei[cf](?:-sequence)?$/i.test(mimeType?.trim() ?? '')
+  );
+}
+
 export async function resizeForUpload(
   uri: string,
   maxWidth = 1200,
@@ -74,8 +81,8 @@ export async function preparePickerImageForUpload(
     if (image.converted && image.blob) {
       return {
         body: image.blob,
-        fileName: image.fileName ?? fileName,
-        contentType: image.blob.type || mimeType || undefined,
+        fileName: jpegFileName(image.fileName ?? fileName),
+        contentType: JPEG_CONTENT_TYPE,
       };
     }
 
@@ -138,7 +145,10 @@ export async function uploadLocalPickerImage(
 ): Promise<string> {
   const name = fileNameHint ?? `photo-${Date.now()}.jpg`;
   const prepared = await preparePickerImageForUpload(imageUri, name, mimeType, maxWidth);
-  const storagePath = generateRexImageStoragePath(userId, prepared.fileName ?? name);
+  const storageFileName = isHeicLikeFile(prepared.fileName ?? name, prepared.contentType)
+    ? (jpegFileName(prepared.fileName ?? name) ?? `photo-${Date.now()}.jpg`)
+    : (prepared.fileName ?? name);
+  const storagePath = generateRexImageStoragePath(userId, storageFileName);
   await uploadBlobToStorageBucket(bucket, storagePath, prepared.body, prepared.contentType);
   return storagePath;
 }
