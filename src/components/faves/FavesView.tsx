@@ -8,7 +8,7 @@ import {
   Pressable,
   useWindowDimensions,
 } from 'react-native';
-import { Plus, PackageOpen, MapPin, X, Calendar } from 'lucide-react-native';
+import { Plus, PackageOpen, MapPin, X, Calendar, Link2 } from 'lucide-react-native';
 import { CollectionsApi } from '~/api/CollectionsApi';
 import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
 import { useQueryClient } from '@tanstack/react-query';
@@ -301,6 +301,19 @@ const FavesView: React.FC<FavesViewProps> = ({ onRecommendationPress }) => {
                     </Text>
                   </View>
                 </View>
+                {item.isOnlinePlace && item.placeWebsiteUrl ? (
+                  <View className="mt-1 min-w-0 flex-row items-center gap-0.5 overflow-hidden">
+                    <Link2 size={10} color={Theme.colors.muted} style={{ flexShrink: 0 }} />
+                    <Text
+                      className="text-[11px] text-muted-foreground"
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={singleLineEllipsisTextStyle}
+                    >
+                      {item.placeWebsiteUrl}
+                    </Text>
+                  </View>
+                ) : null}
                 {item.location ? (
                   <View className="mt-1 min-w-0 flex-row items-center gap-0.5 overflow-hidden">
                     <MapPin size={10} color={Theme.colors.muted} style={{ flexShrink: 0 }} />

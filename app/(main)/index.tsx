@@ -55,6 +55,7 @@ export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [createRecommendationOpen, setCreateRecommendationOpen] = useState(false);
   const [addYourOwnPrefill, setAddYourOwnPrefill] = useState<AddYourOwnRecSource | null>(null);
+  const [editRexId, setEditRexId] = useState<string | null>(null);
   const [previewRecommendation, setPreviewRecommendation] = useState<Recommendation | null>(null);
   const [previewOptions, setPreviewOptions] = useState<RecommendationOpenOptions>({});
   const [avatarRefreshKey, setAvatarRefreshKey] = useState(0);
@@ -73,10 +74,20 @@ export default function HomeScreen() {
   const handleCloseCreate = useCallback(() => {
     setCreateRecommendationOpen(false);
     setAddYourOwnPrefill(null);
+    setEditRexId(null);
   }, []);
 
   const openCreateFromDetail = useCallback((source: AddYourOwnRecSource) => {
     setAddYourOwnPrefill(source);
+    setEditRexId(null);
+    setCreateRecommendationOpen(true);
+    setPreviewRecommendation(null);
+    setPreviewOptions({});
+  }, []);
+
+  const openEditFromDetail = useCallback((rexId: string) => {
+    setEditRexId(rexId);
+    setAddYourOwnPrefill(null);
     setCreateRecommendationOpen(true);
     setPreviewRecommendation(null);
     setPreviewOptions({});
@@ -146,7 +157,11 @@ export default function HomeScreen() {
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
               onProfilePress={() => handleTabChange('profile')}
-              onAddPress={() => setCreateRecommendationOpen(true)}
+              onAddPress={() => {
+                setAddYourOwnPrefill(null);
+                setEditRexId(null);
+                setCreateRecommendationOpen(true);
+              }}
               onUserPress={openUserProfile}
               avatarRefreshKey={avatarRefreshKey}
               showSearch={currentTab === 'discover'}
@@ -187,6 +202,7 @@ export default function HomeScreen() {
         <TouchableOpacity
           onPress={() => {
             setAddYourOwnPrefill(null);
+            setEditRexId(null);
             setCreateRecommendationOpen(true);
           }}
           accessibilityRole="button"
@@ -209,6 +225,7 @@ export default function HomeScreen() {
         visible={createRecommendationOpen}
         onClose={handleCloseCreate}
         addYourOwnPrefill={addYourOwnPrefill}
+        editRexId={editRexId}
       />
 
       <RecommendationDetailModal
@@ -220,6 +237,7 @@ export default function HomeScreen() {
         scrollToComments={previewOptions.scrollToComments === true}
         onAuthorPress={openUserProfile}
         onUserPress={openUserProfile}
+        onEditRex={openEditFromDetail}
       />
     </View>
   );

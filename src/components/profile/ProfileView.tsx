@@ -18,7 +18,7 @@ import { Routes } from '~/constants/routes';
 import * as ImagePicker from 'expo-image-picker';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
-import { RexPlaceholderHtml } from '~/components/common/RexPlaceholderHtml';
+import { RexPhotoPlaceholder } from '~/components/common/RexPhotoPlaceholder';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { useAuth } from '~/services/AuthContext';
 import { ProfileApi } from '~/api/ProfileApi';
@@ -71,9 +71,11 @@ const AnimatedRexCard: React.FC<{
   width: number;
   onPress?: () => void;
 }> = ({ rec, index, width, onPress }) => {
-  const placeholderHtml = rec.rexPlaceholderHtml?.trim() || null;
   const opacity = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.95)).current;
+  const coverPath = rexCoverStoragePathFromRecommendation(rec);
+  const coverHttp = rexCoverRemoteHttpUrl(rec);
+  const hasCoverImage = Boolean(coverPath || coverHttp);
 
   useEffect(() => {
     Animated.parallel([
@@ -99,16 +101,20 @@ const AnimatedRexCard: React.FC<{
         onPress={onPress}
         className="rounded-xl overflow-hidden shadow-card bg-background border border-border"
       >
-        {placeholderHtml ? (
-          <View className="relative aspect-square w-full overflow-hidden bg-transparent">
-            <RexPlaceholderHtml html={placeholderHtml} />
-          </View>
-        ) : (
+        {hasCoverImage ? (
           <SignedStorageImage
             bucket={REX_IMAGES_BUCKET}
-            storagePath={rexCoverStoragePathFromRecommendation(rec)}
-            remoteUri={rexCoverRemoteHttpUrl(rec)}
+            storagePath={coverPath}
+            remoteUri={coverHttp}
             className="aspect-square w-full"
+            accessibilityLabel={rec.title}
+          />
+        ) : (
+          <RexPhotoPlaceholder
+            categoryIcon={rec.categoryIcon}
+            colors={rec.placeholderColors}
+            className="aspect-square w-full"
+            emojiSize={40}
             accessibilityLabel={rec.title}
           />
         )}

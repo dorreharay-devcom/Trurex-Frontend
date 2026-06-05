@@ -15,12 +15,15 @@ export type RexDetailRow = {
   subcategory_display_name: string;
   place_id: string | null;
   place_name: string;
+  is_online_place?: boolean | null;
+  place_website_url?: string | null;
   place_location?: string | null;
   description: string | null;
   reason: string | null;
   review: string | null;
   score_value_for_money: number | null;
-  quick_tip: string | null;
+  must_know: string | null;
+  quick_tip?: string | null;
   category_ratings: Record<string, CategoryRatingRead>;
   question_answers: Record<
     string,
@@ -40,5 +43,26 @@ export type RexDetailRow = {
   is_saved: boolean;
   tag_slugs: string[];
   photo_paths: string[];
-  rex_placeholder_html?: string | null;
+  placeholder_colors?: string[] | null;
+};
+
+export type RexForEditRow = {
+  id: string;
+  category_code: string;
+  subcategory_code: string;
+  place_id: string | null;
+  place_name: string;
+  is_online_place: boolean;
+  place_website_url: string | null;
+  description: string | null;
+  reason: string | null;
+  review: string | null;
+  score_value_for_money: number | null;
+  must_know: string | null;
+  category_ratings: Record<string, CategoryRatingRead>;
+  question_answers: Record<string, string>;
+  visibility: 'public' | 'private' | 'circles';
+  circle_ids: string[];
+  tag_slugs: string[];
+  photo_paths: string[];
 };

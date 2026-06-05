@@ -11,6 +11,8 @@ export type CategoryRatingDimension = {
   code: string;
   display_label: string;
   description: string | null;
+  scale_left?: string | null;
+  scale_right?: string | null;
   sort_order: number;
 };
 
@@ -59,8 +61,14 @@ export type CreateRexRpcParams = {
   tag_names: string[];
   photo_paths: string[] | null;
   p_linked_place_id?: string | null;
-  p_quick_tip?: string | null;
+  p_is_online_place?: boolean | null;
+  p_place_website_url?: string | null;
+  p_must_know?: string | null;
   p_category_ratings: Record<string, number>;
   p_question_answers: Record<string, string>;
   p_score_value_for_money?: number | null;
+};
+
+export type UpdateRexRpcParams = CreateRexRpcParams & {
+  p_rex_id: string;
 };

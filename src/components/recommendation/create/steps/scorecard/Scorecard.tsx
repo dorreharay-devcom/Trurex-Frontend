@@ -21,6 +21,7 @@ import {
 
 type Props = {
   selectedCategoryId: string | null;
+  categoryDisplayName?: string | null;
   showQuickTip: boolean;
   useExperienceReviewCopy: boolean;
   subcategoryStarTitle: string | null;
@@ -47,6 +48,7 @@ type Props = {
 
 export const Scorecard: React.FC<Props> = ({
   selectedCategoryId,
+  categoryDisplayName,
   showQuickTip,
   useExperienceReviewCopy,
   subcategoryStarTitle,
@@ -163,7 +165,12 @@ export const Scorecard: React.FC<Props> = ({
             />
 
             {showQuickTip ? (
-              <ScorecardQuickTip value={quickTip} onChangeText={onQuickTipChange} />
+              <ScorecardQuickTip
+                value={quickTip}
+                onChangeText={onQuickTipChange}
+                categoryCode={selectedCategoryId}
+                categoryDisplayName={categoryDisplayName}
+              />
             ) : null}
 
             <ScorecardValueForMoney

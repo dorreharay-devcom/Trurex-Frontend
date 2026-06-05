@@ -38,8 +38,10 @@ export interface CollectionRexEntry {
   category_icon?: string;
   added_at: string;
   photo_path: string | null;
-  rex_placeholder_html?: string | null;
+  placeholder_colors?: string[] | null;
   location?: string | null;
+  is_online_place?: boolean | null;
+  place_website_url?: string | null;
   score_value_for_money?: number | null;
   rating?: number | null;
   recommender_name?: string | null;

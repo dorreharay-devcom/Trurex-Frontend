@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, View, Platform } from 'react-native';
 import { Theme } from '~/theme/Theme';
-import { cn } from '~/utils/general';
+import { cn, webDisabledCursorStyle } from '~/utils/general';
 
 const isWeb = Platform.OS === 'web';
 
@@ -77,7 +77,7 @@ export const Button: React.FC<ButtonProps> = ({
       activeOpacity={0.7}
       onPress={onPress}
       disabled={isDisabled}
-      style={isDisabled && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined}
+      style={isDisabled && isWeb ? webDisabledCursorStyle : undefined}
       className={cn(
         'flex-row items-center justify-center',
         buttonVariants[variant],

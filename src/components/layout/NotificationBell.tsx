@@ -12,7 +12,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { Bell, CheckCheck, ShieldCheck, UserPlus, UserCheck } from 'lucide-react-native';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNotifications } from '~/hooks/useNotifications';
 import { followUser } from '~/api/usersApi';
@@ -20,6 +20,7 @@ import { Theme } from '~/theme/Theme';
 import { formatCompactRelativeTime } from '~/utils/date';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
+import type { AppNotification } from '~/types/notification/appNotification';
 
 function formatNotificationTime(iso: string): string {
   const c = formatCompactRelativeTime(iso);
@@ -55,6 +56,7 @@ interface NotificationBellProps {
 
 export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress }) => {
   const { notifications, unreadCount, loading, markAllAsRead, markOneAsRead } = useNotifications();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [anchor, setAnchor] = useState<{ top: number; right: number } | null>(null);
   const bellWrapRef = useRef<View>(null);
@@ -83,6 +85,13 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress 
     mutationFn: followUser,
     onSuccess: (_data, actorId) => {
       setFollowedIds((prev) => new Set(prev).add(actorId));
+      queryClient.setQueryData<AppNotification[]>(['notifications'], (prev) =>
+        prev?.map((n) =>
+          FOLLOWABLE_TYPES.has(n.type) && n.actor_id === actorId
+            ? { ...n, show_followback: false }
+            : n,
+        ) ?? [],
+      );
     },
   });
 
@@ -127,6 +136,9 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress 
         const recTitle =
           data && typeof data.recommendation_title === 'string' ? data.recommendation_title : '';
         const isTrusted = n.type === 'trusted';
+        const canShowFollowBack =
+          FOLLOWABLE_TYPES.has(n.type) && !!n.actor_id && n.show_followback === true;
+        const didFollowBack = !!n.actor_id && followedIds.has(n.actor_id);
         const description =
           n.title ??
           (isTrusted
@@ -157,8 +169,8 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress 
               <Text className="text-sm text-foreground" numberOfLines={3}>
                 {description}
               </Text>
-              {FOLLOWABLE_TYPES.has(n.type) && n.actor_id ? (
-                followedIds.has(n.actor_id) ? (
+              {canShowFollowBack || didFollowBack ? (
+                didFollowBack ? (
                   <View className="mt-1.5 flex-row items-center gap-1 self-start rounded-full border border-border bg-muted px-2.5 py-1">
                     <UserCheck size={11} color={Theme.colors.secondaryText} />
                     <Text className="text-[11px] text-muted-foreground">Following</Text>

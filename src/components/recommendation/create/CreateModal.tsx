@@ -8,6 +8,7 @@ import {
   useWindowDimensions,
   ActivityIndicator,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ChevronRight, X } from 'lucide-react-native';
 import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';
@@ -28,6 +29,8 @@ import {
   fetchAllCategoryCreateConfigs,
   fetchCategoryCreateConfig,
   createRex,
+  fetchRexForEdit,
+  updateRex,
   discardDraftRexData,
 } from '~/api/rexCreateApi';
 import {
@@ -52,19 +55,28 @@ import { cn } from '~/utils/general';
 import { CreateWizardStepper } from './CreateWizardStepper';
 import { CreateModalBody } from './CreateModalBody';
 
+const DYNO_IMAGE_SOURCE = require('../../../../assets/dyno.svg');
+
 type Props = {
   visible: boolean;
   onClose: () => void;
   addYourOwnPrefill?: AddYourOwnRecSource | null;
+  editRexId?: string | null;
 };
 
-export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefill = null }) => {
+export const CreateModal: React.FC<Props> = ({
+  visible,
+  onClose,
+  addYourOwnPrefill = null,
+  editRexId = null,
+}) => {
   const { height: windowHeight } = useWindowDimensions();
   const queryClient = useQueryClient();
   const flow = useCreateRecWizard();
   const {
     reset,
     applyAddYourOwnPrefill,
+    applyEditPrefill,
     setManualGeotag,
     setManualAddress,
     syncFormToConfig,
@@ -73,10 +85,16 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
   const [submitting, setSubmitting] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const postedSuccessfullyRef = useRef(false);
+  const appliedEditIdRef = useRef<string | null>(null);
+  const isEditMode = editRexId != null;
 
   useEffect(() => {
     if (visible) postedSuccessfullyRef.current = false;
   }, [visible]);
+
+  useEffect(() => {
+    if (!visible) appliedEditIdRef.current = null;
+  }, [visible, editRexId]);
 
   useEffect(() => {
     if (Platform.OS === 'web') return;
@@ -116,6 +134,28 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
     if (!visible || !addYourOwnPrefill) return;
     applyAddYourOwnPrefill(addYourOwnPrefill);
   }, [visible, addYourOwnPrefill, applyAddYourOwnPrefill]);
+
+  const {
+    data: editRow,
+    isLoading: editLoading,
+    isError: editLoadError,
+  } = useQuery({
+    queryKey: ['rexForEdit', editRexId],
+    queryFn: () => fetchRexForEdit(editRexId!),
+    enabled: visible && editRexId != null,
+    staleTime: 0,
+  });
+
+  useLayoutEffect(() => {
+    if (!visible || !editRow || appliedEditIdRef.current === editRow.id) return;
+    applyEditPrefill(editRow);
+    appliedEditIdRef.current = editRow.id;
+  }, [visible, editRow, applyEditPrefill]);
+
+  useEffect(() => {
+    if (!visible || !editLoadError) return;
+    toastError('Could not load Rex', 'This Rex may no longer be editable.');
+  }, [visible, editLoadError]);
 
   const abandonDraftAndClose = useCallback(() => {
     handleClose();
@@ -324,14 +364,19 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
           flow.searchMode,
           flow.selectedSearchPlace,
           flow.manualName,
+          flow.onlineName,
         ),
         p_review: flow.scoreReview.trim() || null,
-        p_quick_tip: showQuickTip ? flow.scoreQuickTip.trim() || null : null,
+        p_must_know: showQuickTip ? flow.scoreQuickTip.trim() || null : null,
         p_visibility,
         circle_ids: p_visibility === 'circles' ? circle_ids : undefined,
         tag_names: flow.selectedTagSlugs,
         photo_paths: flow.photoStoragePaths.length > 0 ? flow.photoStoragePaths : null,
-        p_linked_place_id: getLinkedPlaceId(flow.linkedPlaceId) ?? undefined,
+        p_linked_place_id:
+          flow.searchMode === 'online' ? null : getLinkedPlaceId(flow.linkedPlaceId) ?? undefined,
+        p_is_online_place: flow.searchMode === 'online',
+        p_place_website_url:
+          flow.searchMode === 'online' ? flow.onlineWebsiteUrl.trim() || null : null,
         p_category_ratings: buildCategoryRatingsPayload(flow.categoryRatings),
         p_question_answers: p_question_answers,
         p_score_value_for_money:
@@ -341,14 +386,31 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
         ...(subcategoryCodeForMerge ? { p_subcategory_code: subcategoryCodeForMerge } : {}),
       };
 
-      await createRex(params);
+      if (isEditMode) {
+        await updateRex({
+          ...params,
+          p_rex_id: editRexId,
+        });
+      } else {
+        await createRex(params);
+      }
       postedSuccessfullyRef.current = true;
-      toastSuccess('Posted', 'Your recommendation is live.');
+      toastSuccess(isEditMode ? 'Updated' : 'Posted', isEditMode ? 'Your Rex was updated.' : 'Your recommendation is live.');
       queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
+      queryClient.invalidateQueries({ queryKey: ['search-rexes'] });
+      queryClient.invalidateQueries({ queryKey: ['my-rexes'] });
+      queryClient.invalidateQueries({ queryKey: ['my-saved-rexes'] });
+      queryClient.invalidateQueries({ queryKey: ['collection-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['mapRexesInBounds'] });
+      queryClient.invalidateQueries({ queryKey: ['mapRexPins'] });
+      if (isEditMode) {
+        queryClient.invalidateQueries({ queryKey: ['rexDetail', editRexId] });
+        queryClient.invalidateQueries({ queryKey: ['rexForEdit', editRexId] });
+      }
       handleClose();
     } catch (e) {
       if (didAccountFrozenMutationToast(e)) return;
-      toastError('Could not post', unknownErrorMessage(e, 'Something went wrong.'));
+      toastError(isEditMode ? 'Could not update' : 'Could not post', unknownErrorMessage(e, 'Something went wrong.'));
     } finally {
       setSubmitting(false);
     }
@@ -361,6 +423,8 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
     handleClose,
     showQuickTip,
     queryClient,
+    isEditMode,
+    editRexId,
   ]);
 
   const { layout } = modalConfig;
@@ -369,6 +433,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
 
   const primaryDisabled =
     submitting ||
+    editLoading ||
     isGeotagging ||
     (!flow.isLastStep && !flow.canProceed) ||
     (flow.isLastStep && submitting);
@@ -398,7 +463,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
               </Pressable>
             </View>
             <Text className="min-w-0 flex-1 text-center text-lg font-display font-semibold text-foreground">
-              New Rex
+              {isEditMode ? 'Edit Rex' : 'New Rex'}
             </Text>
             <View className="w-[72px] items-end justify-center">
               {!flow.isFirstStep ? (
@@ -418,7 +483,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
           <CreateWizardStepper steps={flow.activeSteps} currentIndex={flow.stepIndex} />
         </View>
 
-        {configLoading && flow.selectedCategoryId ? (
+        {(editLoading || (configLoading && flow.selectedCategoryId)) ? (
           <View className="absolute left-0 right-0 top-24 z-20 items-center py-2">
             <ActivityIndicator color={Theme.colors.primary} />
           </View>
@@ -466,7 +531,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
                 }}
                 disabled={primaryDisabled && Platform.OS !== 'web'}
                 accessibilityRole="button"
-                accessibilityLabel={flow.isLastStep ? 'Confirm and post' : 'Continue'}
+                accessibilityLabel={flow.isLastStep ? (isEditMode ? 'Save Rex changes' : 'Confirm and post') : 'Continue'}
                 accessibilityState={{ disabled: primaryDisabled }}
                 className={cn(
                   'flex h-12 w-full flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2',
@@ -483,8 +548,16 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
                       pointerEvents="none"
                       className="text-base font-semibold text-primary-foreground"
                     >
-                      {flow.isLastStep ? 'Confirm & Post 🦖' : 'Continue'}
+                      {flow.isLastStep ? (isEditMode ? 'Save Changes' : 'Confirm & Post') : 'Continue'}
                     </Text>
+                    {flow.isLastStep ? (
+                      <Image
+                        source={DYNO_IMAGE_SOURCE}
+                        style={{ width: 20, height: 20 }}
+                        contentFit="contain"
+                        accessibilityLabel="TruRex dinosaur"
+                      />
+                    ) : null}
                     {!flow.isLastStep && (
                       <View pointerEvents="none">
                         <ChevronRight size={16} color={Theme.colors.primaryForeground} />

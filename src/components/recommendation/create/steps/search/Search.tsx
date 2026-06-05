@@ -14,6 +14,11 @@ type Props = {
   manualAddress: string;
   onManualAddressChange: (v: string) => void;
   manualGeotag: { lat: number; lng: number } | null;
+  onlineName: string;
+  onOnlineNameChange: (v: string) => void;
+  onlineWebsiteUrl: string;
+  onOnlineWebsiteUrlChange: (v: string) => void;
+  onOnlinePlaceChange: (selected: boolean) => void;
   onSelectManualAddress: (place: CreateRecSearchPlace) => void;
   onOpenManual: () => void;
   onBackToSearchSelect: () => void;
@@ -32,6 +37,11 @@ export const Search: React.FC<Props> = ({
   manualAddress,
   onManualAddressChange,
   manualGeotag,
+  onlineName,
+  onOnlineNameChange,
+  onlineWebsiteUrl,
+  onOnlineWebsiteUrlChange,
+  onOnlinePlaceChange,
   onSelectManualAddress,
   onOpenManual,
   onBackToSearchSelect,
@@ -84,6 +94,12 @@ export const Search: React.FC<Props> = ({
     <SearchSelectPanel
       searchQuery={searchQuery}
       onSearchQueryChange={onSearchQueryChange}
+      onlineSelected={mode === 'online'}
+      onOnlineSelectedChange={onOnlinePlaceChange}
+      onlineName={onlineName}
+      onOnlineNameChange={onOnlineNameChange}
+      onlineWebsiteUrl={onlineWebsiteUrl}
+      onOnlineWebsiteUrlChange={onOnlineWebsiteUrlChange}
       selectedSearchPlace={selectedSearchPlace}
       onSelectPlace={onSelectPlace}
       results={placeSearch.results}

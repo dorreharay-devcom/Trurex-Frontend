@@ -172,7 +172,11 @@ export function getPlaceNameForRex(
   searchMode: SearchEntryMode,
   selectedSearchPlace: CreateRecSearchPlace | null,
   manualName: string,
+  onlineName: string,
 ): string {
+  if (searchMode === 'online') {
+    return onlineName.trim() || 'Place';
+  }
   if (searchMode === 'manual') {
     return manualName.trim() || 'Place';
   }
@@ -364,7 +368,16 @@ export function getConfirmPreviewPlace(
   manualName: string,
   manualAddress: string,
   _manualGeotag: { lat: number; lng: number } | null,
+  onlineName = '',
+  onlineWebsiteUrl = '',
 ): ConfirmPreviewPlace {
+  if (searchMode === 'online') {
+    const website = onlineWebsiteUrl.trim();
+    return {
+      title: onlineName.trim() || '—',
+      addressLines: website ? [website] : ['No fixed address'],
+    };
+  }
   if (searchMode === 'manual') {
     const addr = manualAddress.trim();
     return {

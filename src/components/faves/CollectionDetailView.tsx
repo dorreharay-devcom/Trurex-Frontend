@@ -60,9 +60,12 @@ function entryToRec(entry: CollectionRexEntry): Recommendation {
     title: entry.place_name,
     categoryId: entry.category_code,
     category: entry.category_name ?? entry.category_code,
+    categoryIcon: entry.category_icon ?? null,
     photoPath: entry.photo_path,
-    rexPlaceholderHtml: entry.rex_placeholder_html?.trim() || null,
+    placeholderColors: entry.placeholder_colors ?? null,
     location: entry.location ?? undefined,
+    placeWebsiteUrl: entry.place_website_url?.trim() || null,
+    isOnlinePlace: entry.is_online_place ?? null,
     rating: entry.rating ?? undefined,
     scoreValueForMoney: entry.score_value_for_money ?? undefined,
     user:
@@ -351,6 +354,18 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                       <Text className="text-xs text-muted-foreground">
                         {item.category_name || item.category_code}
                       </Text>
+                      {item.is_online_place && item.place_website_url ? (
+                        <View className="mt-1 min-w-0 flex-row items-center gap-0.5 overflow-hidden">
+                          <Link2 size={10} color={Theme.colors.muted} style={{ flexShrink: 0 }} />
+                          <Text
+                            className="min-w-0 flex-1 text-[11px] text-muted-foreground"
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                          >
+                            {item.place_website_url}
+                          </Text>
+                        </View>
+                      ) : null}
                       <View className="mt-1 min-w-0 flex-row items-center gap-2 overflow-hidden">
                         {item.location && (
                           <View className="min-w-0 flex-1 flex-row items-center gap-0.5 overflow-hidden">

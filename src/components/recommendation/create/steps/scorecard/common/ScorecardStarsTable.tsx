@@ -27,43 +27,58 @@ export function ScorecardStarsTable({
         {dimensions.map((dim, index) => {
           const value = scores[dim.code] ?? 0;
           const isLast = index === dimensions.length - 1;
+          const scaleLeft = dim.scale_left?.trim();
+          const scaleRight = dim.scale_right?.trim();
+          const hasScaleLabels = Boolean(scaleLeft || scaleRight);
           return (
             <View
               key={dim.code}
               className={cn(
-                'flex-row items-center justify-between gap-3 py-2',
+                'py-3',
                 !isLast && 'border-b border-border/50',
               )}
             >
-              <View className="min-w-0 flex-1">
-                <Text className="text-sm text-foreground">{dim.display_label}</Text>
-                {dim.description ? (
-                  <Text className="mt-0.5 text-xs italic text-muted-foreground">
-                    {dim.description}
+              <View className="flex-row items-start justify-between gap-3">
+                <View className="min-w-0 flex-1">
+                  <Text className="text-sm text-foreground">{dim.display_label}</Text>
+                  {dim.description ? (
+                    <Text className="mt-0.5 text-xs italic text-muted-foreground">
+                      {dim.description}
+                    </Text>
+                  ) : null}
+                </View>
+                <View className="shrink-0 flex-row gap-0.5">
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const active = star <= value;
+                    return (
+                      <Pressable
+                        key={star}
+                        hitSlop={4}
+                        onPress={() => onStarChange(dim.code, star === value ? 0 : star)}
+                        accessibilityRole="button"
+                        accessibilityLabel={`${dim.display_label}: ${active ? star : 'zero'} of 5 stars`}
+                        className="p-0.5 active:opacity-90"
+                      >
+                        <Star
+                          size={20}
+                          color={active ? Theme.colors.ratingStar : Theme.colors.border}
+                          fill={active ? Theme.colors.ratingStar : 'transparent'}
+                        />
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              </View>
+              {hasScaleLabels ? (
+                <View className="mt-1 flex-row justify-between gap-3">
+                  <Text className="min-w-0 flex-1 text-[11px] text-muted-foreground opacity-75">
+                    {scaleLeft ?? ''}
                   </Text>
-                ) : null}
-              </View>
-              <View className="shrink-0 flex-row gap-0.5">
-                {[1, 2, 3, 4, 5].map((star) => {
-                  const active = star <= value;
-                  return (
-                    <Pressable
-                      key={star}
-                      hitSlop={4}
-                      onPress={() => onStarChange(dim.code, star === value ? 0 : star)}
-                      accessibilityRole="button"
-                      accessibilityLabel={`${dim.display_label}: ${active ? star : 'zero'} of 5 stars`}
-                      className="p-0.5 active:opacity-90"
-                    >
-                      <Star
-                        size={20}
-                        color={active ? Theme.colors.ratingStar : Theme.colors.border}
-                        fill={active ? Theme.colors.ratingStar : 'transparent'}
-                      />
-                    </Pressable>
-                  );
-                })}
-              </View>
+                  <Text className="min-w-0 flex-1 text-right text-[11px] text-muted-foreground opacity-75">
+                    {scaleRight ?? ''}
+                  </Text>
+                </View>
+              ) : null}
             </View>
           );
         })}

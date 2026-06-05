@@ -17,7 +17,7 @@ function normalizeHandle(raw: string | null): string {
 export function rexDetailRowToRecommendation(row: RexDetailRow): Recommendation {
   const photoPaths = row.photo_paths?.filter((p) => p.trim().length > 0) ?? [];
   const photoPath = photoPaths[0] ?? null;
-  const bodyText = row.review ?? row.description ?? row.quick_tip ?? null;
+  const bodyText = row.review ?? row.description ?? row.must_know ?? row.quick_tip ?? null;
   const rating = averageScoreFromCategoryRatings(row.category_ratings);
 
   return {
@@ -25,14 +25,16 @@ export function rexDetailRowToRecommendation(row: RexDetailRow): Recommendation 
     title: row.place_name?.trim() || 'Place',
     description: bodyText,
     photoPath: photoPath ?? undefined,
-    rexPlaceholderHtml: row.rex_placeholder_html?.trim() || null,
     photoPaths: photoPaths.length > 0 ? photoPaths : undefined,
     photoCount: photoPaths.length,
+    placeholderColors: row.placeholder_colors?.map((c) => c.trim()).filter(Boolean) ?? null,
     categoryId: row.category_code || 'all',
     category: row.category_name?.trim() || 'Uncategorized',
     categoryIcon: row.category_icon,
     authorId: row.author_id,
     location: row.place_location?.trim() || undefined,
+    placeWebsiteUrl: row.place_website_url?.trim() || null,
+    isOnlinePlace: row.is_online_place ?? null,
     rating: rating ?? null,
     scoreValueForMoney: row.score_value_for_money,
     tags: row.tag_slugs?.length ? row.tag_slugs : null,

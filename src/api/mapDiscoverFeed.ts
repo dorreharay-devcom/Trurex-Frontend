@@ -19,6 +19,12 @@ function parseTags(o: Record<string, unknown>): string[] | null {
   return null;
 }
 
+function parseStringList(raw: unknown): string[] | null {
+  if (!Array.isArray(raw)) return null;
+  const values = raw.map((x) => String(x).trim()).filter(Boolean);
+  return values.length > 0 ? values : null;
+}
+
 function normalizeHandle(raw: string): string {
   if (!raw) return '';
   const t = raw.trim();
@@ -48,9 +54,6 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
 
   const photoPath =
     firstNonEmptyString(o, 'photo_path', 'photoPath') ?? (photoPaths[0] ? photoPaths[0] : null);
-
-  const rexPlaceholderHtml =
-    firstNonEmptyString(o, 'rex_placeholder_html', 'rexPlaceholderHtml') ?? null;
 
   const photoCountRaw = o.photo_count;
   const photoCount =
@@ -91,7 +94,8 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
     (fromDimensions != null && fromDimensions > 0 ? fromDimensions : null);
 
   const bodyText =
-    firstNonEmptyString(o, 'review', 'description') ?? firstNonEmptyString(o, 'quick_tip');
+    firstNonEmptyString(o, 'review', 'description') ??
+    firstNonEmptyString(o, 'must_know', 'quick_tip');
 
   return {
     id,
@@ -100,13 +104,15 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
     description: bodyText,
     image,
     photoPath,
-    rexPlaceholderHtml,
     photoPaths: photoPaths.length > 0 ? photoPaths : undefined,
     photoCount,
+    placeholderColors: parseStringList(o.placeholder_colors ?? o.placeholderColors),
     categoryId: categoryCode || 'all',
     category: categoryLabel,
     categoryIcon,
     location: firstNonEmptyString(o, 'place_location') ?? undefined,
+    placeWebsiteUrl: firstNonEmptyString(o, 'place_website_url', 'placeWebsiteUrl') ?? null,
+    isOnlinePlace: firstBoolean(o, 'is_online_place', 'isOnlinePlace'),
     latitude: optionalFiniteNumber(o, 'latitude'),
     longitude: optionalFiniteNumber(o, 'longitude'),
     rating,

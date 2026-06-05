@@ -8,6 +8,7 @@ import {
   findNodeHandle,
   Platform,
   StyleSheet,
+  Linking,
 } from 'react-native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -19,10 +20,12 @@ import {
   ChevronRight,
   Flag,
   Trash2,
+  Pencil,
+  Link2,
 } from 'lucide-react-native';
 import { RexCommentsSection } from '~/components/recommendation/comment';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
-import { RexPlaceholderHtml } from '~/components/common/RexPlaceholderHtml';
+import { RexPhotoPlaceholder } from '~/components/common/RexPhotoPlaceholder';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { OverlayModal } from '~/components/common/OverlayModal';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
@@ -65,6 +68,13 @@ const styles = StyleSheet.create({
   },
 });
 
+function normalizeWebsiteUrl(raw: string): string | null {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  if (/^[a-z][a-z\d+\-.]*:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
 type Props = {
   visible: boolean;
   recommendation: Recommendation | null;
@@ -74,6 +84,7 @@ type Props = {
   scrollToComments?: boolean;
   onAuthorPress?: (authorId: string) => void;
   onUserPress?: (userId: string) => void;
+  onEditRex?: (rexId: string) => void;
 };
 
 export const RecommendationDetailModal: React.FC<Props> = ({
@@ -85,6 +96,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   scrollToComments,
   onAuthorPress,
   onUserPress,
+  onEditRex,
 }) => {
   const { height: windowHeight } = useWindowDimensions();
   const { layout } = modalConfig;
@@ -209,14 +221,8 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     [recommendation],
   );
 
-  const categoryPlaceholderHtml = useMemo(() => {
-    const fromDetail = rexDetail?.rex_placeholder_html?.trim();
-    const fromRec = recommendation?.rexPlaceholderHtml?.trim();
-    return fromDetail || fromRec || null;
-  }, [rexDetail?.rex_placeholder_html, recommendation?.rexPlaceholderHtml]);
-
   const galleryPaths = useMemo(() => {
-    if (!recommendation || categoryPlaceholderHtml) return [];
+    if (!recommendation) return [];
     const normalize = (s: string) => {
       const t = s.trim();
       if (!t || t === 'null' || t === 'undefined') {
@@ -232,7 +238,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
       return fromDetail;
     }
     return rexPhotoStoragePathsFromRecommendation(recommendation);
-  }, [rexDetail, recommendation, categoryPlaceholderHtml]);
+  }, [rexDetail, recommendation]);
 
   const placeLocationLine = useMemo(() => {
     if (!recommendation) return '';
@@ -240,6 +246,18 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     const fromRec = (recommendation.location ?? '').trim();
     return fromDetail || fromRec;
   }, [recommendation, rexDetail?.place_location]);
+
+  const placeWebsiteText = (rexDetail?.place_website_url ?? '').trim();
+  const placeWebsiteHref = useMemo(
+    () => normalizeWebsiteUrl(placeWebsiteText),
+    [placeWebsiteText],
+  );
+  const openPlaceWebsite = useCallback(() => {
+    if (!placeWebsiteHref) return;
+    void Linking.openURL(placeWebsiteHref).catch(() => {
+      toastError('Could not open link', 'Check the site URL and try again.');
+    });
+  }, [placeWebsiteHref]);
 
   const coverPath = useMemo(
     () => (recommendation ? rexCoverStoragePathFromRecommendation(recommendation) : null),
@@ -249,16 +267,15 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     () => (recommendation ? rexCoverRemoteHttpUrl(recommendation) : null),
     [recommendation],
   );
-  const showHero = useMemo(
-    () => galleryPaths.length > 0 || !!(coverPath || coverHttp) || !!categoryPlaceholderHtml,
-    [galleryPaths, coverPath, coverHttp, categoryPlaceholderHtml],
-  );
+  const hasCoverImage = Boolean(coverPath || coverHttp);
+  const showHero = recommendation != null;
   const showDetailHeroLoading =
     Boolean(visible && recommendation) &&
     detailLoading &&
     galleryPaths.length === 0 &&
-    !(coverPath || coverHttp) &&
-    !categoryPlaceholderHtml;
+    !hasCoverImage &&
+    !recommendation?.placeholderColors?.length &&
+    !recommendation?.categoryIcon?.trim();
 
   const queryClient = useQueryClient();
   const deleteRexMutation = useMutation({
@@ -333,34 +350,63 @@ export const RecommendationDetailModal: React.FC<Props> = ({
               <Text className="min-w-0 flex-1 text-center text-lg font-display font-semibold text-foreground">
                 Recommendation
               </Text>
-              <View className="w-[96px] shrink-0 items-end justify-center">
+              <View className="w-[152px] shrink-0 items-end justify-center">
                 {isOwner ? (
-                  <Pressable
-                    onPress={openDeleteConfirm}
-                    hitSlop={Platform.OS === 'web' ? 8 : undefined}
-                    accessibilityLabel="Delete this recommendation"
-                    accessibilityRole="button"
-                    className="h-11 min-w-[88px] items-end justify-center rounded-full active:opacity-90"
-                    style={({ pressed }) => [
-                      Platform.OS !== 'web' ? styles.headerAction : null,
-                      pressed ? styles.headerActionPressed : null,
-                    ]}
-                  >
-                    <View
-                      pointerEvents="none"
-                      className="h-8 flex-row items-center gap-1 rounded-full border-2 border-destructive bg-destructive/10 px-2.5"
-                    >
-                      <Trash2 size={12} color={Theme.colors.destructive} strokeWidth={2.25} />
-                      <Text
-                        className="text-xs font-semibold"
-                        style={{ color: Theme.colors.destructive }}
-                        numberOfLines={1}
-                        pointerEvents="none"
+                  <View className="flex-row items-center justify-end gap-2">
+                    {onEditRex ? (
+                      <Pressable
+                        onPress={() => onEditRex(recommendation.id)}
+                        hitSlop={Platform.OS === 'web' ? 8 : undefined}
+                        accessibilityLabel="Edit this recommendation"
+                        accessibilityRole="button"
+                        className="h-11 items-end justify-center rounded-full active:opacity-90"
+                        style={({ pressed }) => [
+                          pressed ? styles.headerActionPressed : null,
+                        ]}
                       >
-                        Delete
-                      </Text>
-                    </View>
-                  </Pressable>
+                        <View
+                          pointerEvents="none"
+                          className="h-8 min-w-[76px] flex-row items-center justify-center gap-1 rounded-full border-2 border-primary bg-primary/20 px-2.5"
+                        >
+                          <Pencil
+                            size={12}
+                            color={Theme.colors.foreground}
+                            strokeWidth={2.25}
+                          />
+                          <Text
+                            className="text-xs font-semibold text-foreground"
+                            numberOfLines={1}
+                            pointerEvents="none"
+                          >
+                            Edit
+                          </Text>
+                        </View>
+                      </Pressable>
+                    ) : null}
+                    <Pressable
+                      onPress={openDeleteConfirm}
+                      hitSlop={Platform.OS === 'web' ? 8 : undefined}
+                      accessibilityLabel="Delete this recommendation"
+                      accessibilityRole="button"
+                      className="h-11 items-end justify-center rounded-full active:opacity-90"
+                      style={({ pressed }) => [pressed ? styles.headerActionPressed : null]}
+                    >
+                      <View
+                        pointerEvents="none"
+                        className="h-8 min-w-[76px] flex-row items-center justify-center gap-1 rounded-full border-2 border-destructive bg-destructive/10 px-2.5"
+                      >
+                        <Trash2 size={12} color={Theme.colors.destructive} strokeWidth={2.25} />
+                        <Text
+                          className="text-xs font-semibold"
+                          style={{ color: Theme.colors.destructive }}
+                          numberOfLines={1}
+                          pointerEvents="none"
+                        >
+                          Delete
+                        </Text>
+                      </View>
+                    </Pressable>
+                  </View>
                 ) : authUser &&
                   (recommendation.authorId == null || authUser.id !== recommendation.authorId) ? (
                   <Pressable
@@ -421,11 +467,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                   paths={galleryPaths}
                   accessibilityLabelBase={recommendation.title}
                 />
-              ) : categoryPlaceholderHtml ? (
-                <View className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-transparent">
-                  <RexPlaceholderHtml html={categoryPlaceholderHtml} />
-                </View>
-              ) : showHero && (coverPath || coverHttp) ? (
+              ) : showHero && hasCoverImage ? (
                 <View className="aspect-[16/9] w-full overflow-hidden rounded-xl">
                   <SignedStorageImage
                     bucket={REX_IMAGES_BUCKET}
@@ -437,6 +479,14 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                     accessibilityLabel={recommendation.title}
                   />
                 </View>
+              ) : showHero ? (
+                <RexPhotoPlaceholder
+                  categoryIcon={recommendation.categoryIcon}
+                  colors={recommendation.placeholderColors}
+                  className="aspect-[16/9] w-full rounded-xl"
+                  emojiSize={54}
+                  accessibilityLabel={recommendation.title}
+                />
               ) : null}
 
               <View>
@@ -455,6 +505,19 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                     <MapPin size={14} color={Theme.colors.secondaryText} />
                     <Text className="text-sm text-muted-foreground">{placeLocationLine}</Text>
                   </View>
+                ) : null}
+                {placeWebsiteHref ? (
+                  <Pressable
+                    onPress={openPlaceWebsite}
+                    accessibilityRole="link"
+                    accessibilityLabel={`Open ${placeWebsiteText}`}
+                    className="mt-1 flex-row items-center gap-1.5 self-start active:opacity-80"
+                  >
+                    <Link2 size={14} color={Theme.colors.secondaryText} />
+                    <Text className="text-sm font-medium text-foreground" numberOfLines={1}>
+                      {placeWebsiteText}
+                    </Text>
+                  </Pressable>
                 ) : null}
               </View>
 

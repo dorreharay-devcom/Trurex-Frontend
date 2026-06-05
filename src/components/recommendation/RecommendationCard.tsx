@@ -5,13 +5,14 @@ import {
   MessageCircle,
   Share2,
   Bookmark,
+  Link2,
   Star,
   MapPin,
   DollarSign,
   X,
 } from 'lucide-react-native';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
-import { RexPlaceholderHtml } from '~/components/common/RexPlaceholderHtml';
+import { RexPhotoPlaceholder } from '~/components/common/RexPhotoPlaceholder';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { likeRex, unlikeRex } from '~/api/rexLikesApi';
@@ -31,7 +32,6 @@ import {
   rexPhotoStoragePathsFromRecommendation,
   valueForMoneyLabel,
 } from '~/utils/recommendation/recContentDisplay';
-import { cn } from '~/utils/general';
 import { isWeb } from '~/utils';
 
 export type { Recommendation, RecommendationOpenOptions };
@@ -65,20 +65,18 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
 
   const author = rec.user ?? { name: 'Member', handle: '', avatar: '' };
   const tags = rec.tags ?? [];
-  const categoryPlaceholderHtml = rec.rexPlaceholderHtml?.trim() || null;
-  const useCategoryPlaceholder = Boolean(categoryPlaceholderHtml);
   const coverPath = rexCoverStoragePathFromRecommendation(rec);
   const coverHttp = rexCoverRemoteHttpUrl(rec);
+  const hasCoverImage = Boolean(coverPath || coverHttp);
   const gallery = rexPhotoStoragePathsFromRecommendation(rec);
-  const galleryCount = useCategoryPlaceholder
-    ? 0
-    : Math.max(rec.photoCount ?? 0, gallery.length) || 0;
+  const galleryCount = Math.max(rec.photoCount ?? 0, gallery.length) || 0;
   const showGalleryHint = galleryCount > 1;
   const maxGalleryDots = 5;
   const galleryDotCount = Math.min(maxGalleryDots, galleryCount);
   const vfmLabel =
     rec.scoreValueForMoney != null ? valueForMoneyLabel(rec.scoreValueForMoney) : null;
   const showStarRating = rec.rating != null && rec.rating > 0;
+  const placeWebsiteUrl = rec.placeWebsiteUrl?.trim();
   const addressEllipsisStyle = isWeb
     ? ({
         overflow: 'hidden',
@@ -151,21 +149,24 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
       </View>
 
       <View
-        className={cn(
-          'relative mx-4 overflow-hidden rounded-xl',
-          useCategoryPlaceholder ? 'bg-transparent' : 'bg-muted',
-        )}
+        className="relative mx-4 overflow-hidden rounded-xl bg-muted"
         style={{ aspectRatio: 4 / 3 }}
       >
-        {useCategoryPlaceholder ? (
-          <RexPlaceholderHtml html={categoryPlaceholderHtml!} fit="cover" />
-        ) : (
+        {hasCoverImage ? (
           <SignedStorageImage
             bucket={REX_IMAGES_BUCKET}
             storagePath={coverPath}
             remoteUri={coverHttp}
             style={{ width: '100%', height: '100%' }}
             contentFit="cover"
+            accessibilityLabel={rec.title}
+          />
+        ) : (
+          <RexPhotoPlaceholder
+            categoryIcon={rec.categoryIcon}
+            colors={rec.placeholderColors}
+            className="h-full w-full"
+            emojiSize={46}
             accessibilityLabel={rec.title}
           />
         )}
@@ -193,6 +194,19 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
                   style={addressEllipsisStyle}
                 >
                   {rec.location}
+                </Text>
+              </View>
+            ) : null}
+            {placeWebsiteUrl ? (
+              <View className="w-full flex-row items-center gap-1">
+                <Link2 size={12} color="rgba(255,255,255,0.8)" />
+                <Text
+                  className="min-w-0 flex-1 text-xs text-white/80"
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={addressEllipsisStyle}
+                >
+                  {placeWebsiteUrl}
                 </Text>
               </View>
             ) : null}
