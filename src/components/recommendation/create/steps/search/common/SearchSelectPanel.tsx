@@ -58,6 +58,8 @@ export function SearchSelectPanel({
   onOpenManual,
 }: Props) {
   const { data: categoryRows } = useActiveCategories(true);
+  const selectedPlaceAlreadyInResults =
+    selectedSearchPlace != null && results.some((place) => place.id === selectedSearchPlace.id);
 
   return (
     <ScrollView
@@ -92,9 +94,22 @@ export function SearchSelectPanel({
           </View>
         ) : null}
 
-        {!onlineSelected && canSearch && !isSearching && showNoResults && (
+        {!onlineSelected && canSearch && !isSearching && showNoResults && !selectedSearchPlace && (
           <Text className="py-6 text-center text-sm text-muted-foreground">No results found</Text>
         )}
+
+        {!onlineSelected &&
+          canSearch &&
+          !isSearching &&
+          selectedSearchPlace &&
+          !selectedPlaceAlreadyInResults && (
+            <SearchPlaceRow
+              place={selectedSearchPlace}
+              categoryRows={categoryRows}
+              selected
+              onSelect={onSelectPlace}
+            />
+          )}
 
         {!onlineSelected &&
           canSearch &&

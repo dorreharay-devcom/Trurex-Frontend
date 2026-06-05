@@ -20,6 +20,7 @@ import type {
   CategoryRatingDimension,
   CategoryQuestion,
 } from '~/types/recommendation/rexCategoryCreateConfig';
+import type { RexForEditRow } from '~/types/recommendation/rexDetail';
 import type { CreateRecCircle } from '~/constants/recommendation/createCircles';
 import { isStrictUuid } from '~/utils/guards';
 
@@ -93,6 +94,8 @@ function resolveStepIdAfterStepsChange(
 
 export function useCreateRecWizard() {
   const categoryCodePrefillRef = useRef<string | null>(null);
+  const editPrefillRef = useRef<RexForEditRow | null>(null);
+  const editSessionRef = useRef(false);
 
   const [stepId, setStepId] = useState<CreateRecStepId>('search');
   const [searchMode, setSearchMode] = useState<SearchEntryMode>('select');
@@ -132,6 +135,10 @@ export function useCreateRecWizard() {
   }, [activeSteps]);
 
   useEffect(() => {
+    if (editPrefillRef.current?.category_code === selectedCategoryId) {
+      setCategoryHasSubcategoryStep(false);
+      return;
+    }
     setSelectedSubcategoryCode(null);
     setCategoryHasSubcategoryStep(false);
   }, [selectedCategoryId]);
@@ -148,7 +155,7 @@ export function useCreateRecWizard() {
   );
 
   useEffect(() => {
-    if (stepId === 'search') {
+    if (stepId === 'search' && !editSessionRef.current) {
       setSelectedCategoryId(null);
     }
   }, [stepId]);
@@ -199,10 +206,16 @@ export function useCreateRecWizard() {
 
   const syncFormToConfig = useCallback(
     (dimensions: CategoryRatingDimension[], _questions: CategoryQuestion[]) => {
-      setCategoryRatings(Object.fromEntries(dimensions.map((d) => [d.code, null])));
-      setQuestionAnswers({});
-      setSelectedTagSlugs([]);
-      setScoreValueForMoney(null);
+      const edit = editPrefillRef.current;
+      setCategoryRatings(
+        Object.fromEntries(
+          dimensions.map((d) => [d.code, edit?.category_ratings?.[d.code]?.score ?? null]),
+        ),
+      );
+      setQuestionAnswers(edit?.question_answers ?? {});
+      setSelectedTagSlugs(edit?.tag_slugs ?? []);
+      setScoreValueForMoney(edit?.score_value_for_money ?? null);
+      if (edit) editPrefillRef.current = null;
     },
     [],
   );
@@ -311,6 +324,8 @@ export function useCreateRecWizard() {
 
   const reset = useCallback(() => {
     categoryCodePrefillRef.current = null;
+    editPrefillRef.current = null;
+    editSessionRef.current = false;
     setStepId('search');
     setSearchMode('select');
     setSearchQuery('');
@@ -358,6 +373,41 @@ export function useCreateRecWizard() {
       setSearchQuery(source.placeName);
       setSelectedSearchPlace(buildSelectedSearchPlaceFromAddYourOwn(source));
       categoryCodePrefillRef.current = source.categoryCode;
+    },
+    [reset],
+  );
+
+  const applyEditPrefill = useCallback(
+    (row: RexForEditRow) => {
+      reset();
+      editSessionRef.current = true;
+      editPrefillRef.current = row;
+      if (row.is_online_place) {
+        setSearchMode('online');
+        setOnlineName(row.place_name ?? '');
+        setOnlineWebsiteUrl(row.place_website_url ?? '');
+      } else {
+        setSearchMode('select');
+        setSearchQuery(row.place_name ?? '');
+        setSelectedSearchPlace({
+          id: row.place_id ?? row.id,
+          source: 'database',
+          title: row.place_name ?? '',
+          subtitle: '',
+          categoryLabel: '',
+          categoryId: row.category_code,
+          categoryCode: row.category_code,
+          fullText: undefined,
+        });
+        setLinkedPlaceId(row.place_id);
+      }
+      setSelectedCategoryId(row.category_code);
+      setSelectedSubcategoryCode(row.subcategory_code || null);
+      setPhotoStoragePaths(row.photo_paths ?? []);
+      setScoreQuickTip((row.must_know ?? '').slice(0, CREATE_REC_MUST_KNOW_MAX));
+      setScoreReview((row.review ?? '').slice(0, CREATE_REC_REVIEW_MAX));
+      setSelectedCircleIds(new Set(row.visibility === 'circles' ? row.circle_ids : []));
+      setPrivateRex(row.visibility === 'private');
     },
     [reset],
   );
@@ -462,6 +512,7 @@ export function useCreateRecWizard() {
     canContinue: canProceed,
     reset,
     applyAddYourOwnPrefill,
+    applyEditPrefill,
     goNext,
     goBack,
     openManual,

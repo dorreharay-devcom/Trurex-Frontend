@@ -68,3 +68,7 @@ export type CreateRexRpcParams = {
   p_question_answers: Record<string, string>;
   p_score_value_for_money?: number | null;
 };
+
+export type UpdateRexRpcParams = CreateRexRpcParams & {
+  p_rex_id: string;
+};

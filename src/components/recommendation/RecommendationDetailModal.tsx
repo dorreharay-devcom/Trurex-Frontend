@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Flag,
   Trash2,
+  Pencil,
   Link2,
 } from 'lucide-react-native';
 import { RexCommentsSection } from '~/components/recommendation/comment';
@@ -83,6 +84,7 @@ type Props = {
   scrollToComments?: boolean;
   onAuthorPress?: (authorId: string) => void;
   onUserPress?: (userId: string) => void;
+  onEditRex?: (rexId: string) => void;
 };
 
 export const RecommendationDetailModal: React.FC<Props> = ({
@@ -94,6 +96,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   scrollToComments,
   onAuthorPress,
   onUserPress,
+  onEditRex,
 }) => {
   const { height: windowHeight } = useWindowDimensions();
   const { layout } = modalConfig;
@@ -347,34 +350,63 @@ export const RecommendationDetailModal: React.FC<Props> = ({
               <Text className="min-w-0 flex-1 text-center text-lg font-display font-semibold text-foreground">
                 Recommendation
               </Text>
-              <View className="w-[96px] shrink-0 items-end justify-center">
+              <View className="w-[152px] shrink-0 items-end justify-center">
                 {isOwner ? (
-                  <Pressable
-                    onPress={openDeleteConfirm}
-                    hitSlop={Platform.OS === 'web' ? 8 : undefined}
-                    accessibilityLabel="Delete this recommendation"
-                    accessibilityRole="button"
-                    className="h-11 min-w-[88px] items-end justify-center rounded-full active:opacity-90"
-                    style={({ pressed }) => [
-                      Platform.OS !== 'web' ? styles.headerAction : null,
-                      pressed ? styles.headerActionPressed : null,
-                    ]}
-                  >
-                    <View
-                      pointerEvents="none"
-                      className="h-8 flex-row items-center gap-1 rounded-full border-2 border-destructive bg-destructive/10 px-2.5"
-                    >
-                      <Trash2 size={12} color={Theme.colors.destructive} strokeWidth={2.25} />
-                      <Text
-                        className="text-xs font-semibold"
-                        style={{ color: Theme.colors.destructive }}
-                        numberOfLines={1}
-                        pointerEvents="none"
+                  <View className="flex-row items-center justify-end gap-2">
+                    {onEditRex ? (
+                      <Pressable
+                        onPress={() => onEditRex(recommendation.id)}
+                        hitSlop={Platform.OS === 'web' ? 8 : undefined}
+                        accessibilityLabel="Edit this recommendation"
+                        accessibilityRole="button"
+                        className="h-11 items-end justify-center rounded-full active:opacity-90"
+                        style={({ pressed }) => [
+                          pressed ? styles.headerActionPressed : null,
+                        ]}
                       >
-                        Delete
-                      </Text>
-                    </View>
-                  </Pressable>
+                        <View
+                          pointerEvents="none"
+                          className="h-8 min-w-[76px] flex-row items-center justify-center gap-1 rounded-full border-2 border-primary bg-primary/20 px-2.5"
+                        >
+                          <Pencil
+                            size={12}
+                            color={Theme.colors.foreground}
+                            strokeWidth={2.25}
+                          />
+                          <Text
+                            className="text-xs font-semibold text-foreground"
+                            numberOfLines={1}
+                            pointerEvents="none"
+                          >
+                            Edit
+                          </Text>
+                        </View>
+                      </Pressable>
+                    ) : null}
+                    <Pressable
+                      onPress={openDeleteConfirm}
+                      hitSlop={Platform.OS === 'web' ? 8 : undefined}
+                      accessibilityLabel="Delete this recommendation"
+                      accessibilityRole="button"
+                      className="h-11 items-end justify-center rounded-full active:opacity-90"
+                      style={({ pressed }) => [pressed ? styles.headerActionPressed : null]}
+                    >
+                      <View
+                        pointerEvents="none"
+                        className="h-8 min-w-[76px] flex-row items-center justify-center gap-1 rounded-full border-2 border-destructive bg-destructive/10 px-2.5"
+                      >
+                        <Trash2 size={12} color={Theme.colors.destructive} strokeWidth={2.25} />
+                        <Text
+                          className="text-xs font-semibold"
+                          style={{ color: Theme.colors.destructive }}
+                          numberOfLines={1}
+                          pointerEvents="none"
+                        >
+                          Delete
+                        </Text>
+                      </View>
+                    </Pressable>
+                  </View>
                 ) : authUser &&
                   (recommendation.authorId == null || authUser.id !== recommendation.authorId) ? (
                   <Pressable
