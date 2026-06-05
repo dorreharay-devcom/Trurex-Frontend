@@ -1,16 +1,12 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
-  Modal,
   Platform,
   Pressable,
-  Share,
-  StyleSheet,
-  useWindowDimensions,
   TextInput,
   KeyboardAvoidingView,
 } from 'react-native';
@@ -44,7 +40,7 @@ import {
   useUpdateCollectionRexNote,
 } from '~/hooks/useCollections';
 import EditCollectionModal from '~/components/faves/EditCollectionModal';
-import { toastSuccessAfterDismiss } from '~/utils/appToast';
+import { toastError, toastSuccessAfterDismiss } from '~/utils/appToast';
 import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
 import type {
   Recommendation,
@@ -53,8 +49,8 @@ import type {
 import type { CollectionRexEntry } from '~/api/CollectionsApi';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
-import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { buildCurrentWebPath, buildPublicWebPath } from '~/utils/shareUrls';
+import { shareMobileLink } from '~/utils/mobileShare';
 
 const VALUE_LABELS = ['Total Steal', 'Budget-Friendly', 'Good Value', 'Worth It', 'Splurge'];
 
@@ -95,7 +91,6 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   onAddItem,
   onRecommendationPress,
 }) => {
-  const { width: screenWidth } = useWindowDimensions();
   const { data: detail, isLoading } = useCollectionDetail(collectionId);
   const [saveTarget, setSaveTarget] = useState<RecSummary | null>(null);
 
@@ -125,10 +120,6 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showUnsaveConfirm, setShowUnsaveConfirm] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
-  const [pendingNativeShare, setPendingNativeShare] = useState<{
-    title: string;
-    message: string;
-  } | null>(null);
   const [savedOverride, setSavedOverride] = useState<boolean | null>(null);
   const isSaved = savedOverride ?? detail?.is_saved ?? false;
 
@@ -148,20 +139,14 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
     }
 
     setShowMenu(false);
-    setPendingNativeShare({
+    await shareMobileLink({
       title: detail.display_name,
-      message: `Check out "${detail.display_name}" on TruRex\n${url}`,
+      message: `Check out "${detail.display_name}" on TruRex`,
+      url,
+    }).catch(() => {
+      toastError('Share failed', 'Could not open sharing options. Try again.');
     });
   };
-  const menuButtonRef = useRef<View>(null);
-  const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
-
-  useEffect(() => {
-    if (showMenu || !pendingNativeShare) return;
-    const payload = pendingNativeShare;
-    setPendingNativeShare(null);
-    void Share.share(payload);
-  }, [pendingNativeShare, showMenu]);
 
   if (isLoading || !detail) {
     return (
@@ -224,33 +209,107 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
         }
         className="min-h-0 flex-1"
       >
-        <View className="w-full flex-row items-center justify-between px-4 py-4">
+        <View className="relative z-20 w-full flex-row items-center justify-between px-4 py-4">
           <TouchableOpacity onPress={onBack} className="flex-row items-center gap-1">
             <ArrowLeft size={16} color={Theme.colors.muted} />
             <Text className="text-sm text-muted-foreground">Back</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            ref={menuButtonRef}
-            onPress={() => {
-              menuButtonRef.current?.measure(
-                (
-                  _x: number,
-                  _y: number,
-                  width: number,
-                  height: number,
-                  pageX: number,
-                  pageY: number,
-                ) => {
-                  setMenuPos({ top: pageY + height + 4, right: screenWidth - pageX - width });
-                },
-              );
-              setShowMenu((v) => !v);
-            }}
-            className="p-2"
-          >
-            <MoreVertical size={18} color={Theme.colors.muted} />
-          </TouchableOpacity>
+          <View className="relative">
+            <TouchableOpacity onPress={() => setShowMenu((v) => !v)} className="p-2">
+              <MoreVertical size={18} color={Theme.colors.muted} />
+            </TouchableOpacity>
+
+            {showMenu ? (
+              <View
+                className="absolute right-0 top-10 z-20 min-w-[200px] rounded-xl border border-border bg-card p-2 shadow-lg"
+                style={{ elevation: 8 }}
+              >
+                {detail.is_my_collection ? (
+                  <>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        setShowEdit(true);
+                        setShowMenu(false);
+                      }}
+                      className="mx-1 flex-row items-center gap-3 rounded-md px-3 py-2.5 hover:bg-zinc-100"
+                    >
+                      <Pencil size={15} color={Theme.colors.foreground} />
+                      <Text className="text-sm text-foreground">Edit details</Text>
+                    </TouchableOpacity>
+                    <Pressable
+                      onPress={handleShareCollection}
+                      className="mx-1 flex-row items-center gap-3 rounded-md px-3 py-2.5 active:opacity-80 hover:bg-zinc-100"
+                      accessibilityRole="button"
+                    >
+                      <Share2 size={15} color={Theme.colors.foreground} />
+                      <Text className="text-sm text-foreground">Share collection</Text>
+                    </Pressable>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        setShowDeleteConfirm(true);
+                        setShowMenu(false);
+                      }}
+                      className="mx-1 flex-row items-center gap-3 rounded-md px-3 py-2.5 hover:bg-zinc-100"
+                    >
+                      <Trash2 size={15} color={Theme.colors.destructive} />
+                      <Text className="text-sm text-destructive">Delete collection</Text>
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <>
+                    <Pressable
+                      onPress={handleShareCollection}
+                      className="mx-1 flex-row items-center gap-3 rounded-md px-3 py-2.5 active:opacity-80 hover:bg-zinc-100"
+                      accessibilityRole="button"
+                    >
+                      <Share2 size={15} color={Theme.colors.foreground} />
+                      <Text className="text-sm text-foreground">Share collection</Text>
+                    </Pressable>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        setShowMenu(false);
+                        if (isSaved) {
+                          setShowUnsaveConfirm(true);
+                          return;
+                        }
+                        const next = true;
+                        setSavedOverride(next);
+                        save(collectionId, { onError: () => setSavedOverride(false) });
+                      }}
+                      className={`mx-1 flex-row items-center gap-3 rounded-md px-3 py-2.5 ${isSaved ? 'hover:bg-zinc-100' : 'hover:bg-zinc-100'}`}
+                    >
+                      {isSaved ? (
+                        <BookmarkMinus size={15} color={Theme.colors.destructive} />
+                      ) : (
+                        <BookmarkPlus size={15} color={Theme.colors.foreground} />
+                      )}
+                      <Text className={`text-sm ${isSaved ? 'text-destructive' : 'text-foreground'}`}>
+                        {isSaved ? 'Remove from saved' : 'Save to my collections'}
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+            ) : null}
+          </View>
         </View>
+
+        {showMenu ? (
+          <Pressable
+            onPress={() => setShowMenu(false)}
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 0,
+              zIndex: 10,
+            }}
+          />
+        ) : null}
 
         <FlatList
           data={detail.rexes}
@@ -415,99 +474,6 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
           )}
         />
       </KeyboardAvoidingView>
-
-      <Modal
-        visible={showMenu}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowMenu(false)}
-      >
-        <Pressable
-          style={[StyleSheet.absoluteFill, { zIndex: 1 }]}
-          onPress={() => setShowMenu(false)}
-        />
-        <View
-          style={{
-            position: 'absolute',
-            top: menuPos.top,
-            right: menuPos.right,
-            minWidth: 200,
-            zIndex: 2,
-            elevation: 8,
-          }}
-          className="bg-card border border-border rounded-xl shadow-lg p-2"
-        >
-          {detail.is_my_collection ? (
-            <>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={() => {
-                  setShowEdit(true);
-                  setShowMenu(false);
-                }}
-                className="flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md hover:bg-zinc-100"
-              >
-                <Pencil size={15} color={Theme.colors.foreground} />
-                <Text className="text-sm text-foreground">Edit details</Text>
-              </TouchableOpacity>
-              <Pressable
-                onPress={handleShareCollection}
-                className="flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md active:opacity-80 hover:bg-zinc-100"
-                accessibilityRole="button"
-              >
-                <Share2 size={15} color={Theme.colors.foreground} />
-                <Text className="text-sm text-foreground">Share collection</Text>
-              </Pressable>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={() => {
-                  setShowDeleteConfirm(true);
-                  setShowMenu(false);
-                }}
-                className="flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md hover:bg-zinc-100"
-              >
-                <Trash2 size={15} color={Theme.colors.destructive} />
-                <Text className="text-sm text-destructive">Delete collection</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              <Pressable
-                onPress={handleShareCollection}
-                className="flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md active:opacity-80 hover:bg-zinc-100"
-                accessibilityRole="button"
-              >
-                <Share2 size={15} color={Theme.colors.foreground} />
-                <Text className="text-sm text-foreground">Share collection</Text>
-              </Pressable>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={() => {
-                  setShowMenu(false);
-                  if (isSaved) {
-                    setShowUnsaveConfirm(true);
-                    return;
-                  }
-                  const next = true;
-                  setSavedOverride(next);
-                  save(collectionId, { onError: () => setSavedOverride(false) });
-                }}
-                className={`flex-row items-center gap-3 mx-1 px-3 py-2.5 rounded-md ${isSaved ? 'hover:bg-zinc-100' : 'hover:bg-zinc-100'}`}
-              >
-                {isSaved ? (
-                  <BookmarkMinus size={15} color={Theme.colors.destructive} />
-                ) : (
-                  <BookmarkPlus size={15} color={Theme.colors.foreground} />
-                )}
-                <Text className={`text-sm ${isSaved ? 'text-destructive' : 'text-foreground'}`}>
-                  {isSaved ? 'Remove from saved' : 'Save to my collections'}
-                </Text>
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
-        <ModalToastLayer />
-      </Modal>
 
       <EditCollectionModal
         open={showEdit}

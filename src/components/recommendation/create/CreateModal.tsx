@@ -71,7 +71,6 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
     syncCategoryCreateShape,
   } = flow;
   const [submitting, setSubmitting] = useState(false);
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const postedSuccessfullyRef = useRef(false);
 
@@ -82,11 +81,9 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
   useEffect(() => {
     if (Platform.OS === 'web') return;
     const show = Keyboard.addListener('keyboardDidShow', (event) => {
-      setKeyboardVisible(true);
       setKeyboardHeight(event.endCoordinates.height);
     });
     const hide = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardVisible(false);
       setKeyboardHeight(0);
     });
     return () => {
@@ -368,7 +365,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
 
   const { layout } = modalConfig;
   const androidKeyboardFooterOffset =
-    Platform.OS === 'android' && keyboardVisible ? keyboardHeight : 0;
+    Platform.OS === 'android' ? keyboardHeight : 0;
 
   const primaryDisabled =
     submitting ||
@@ -447,10 +444,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
         />
 
         <View
-          className={cn(
-            'sticky bottom-0 items-center border-t border-border bg-card/95 backdrop-blur px-4 sm:px-6',
-            keyboardVisible && Platform.OS !== 'web' ? 'py-2' : 'py-4',
-          )}
+          className="sticky bottom-0 items-center border-t border-border bg-card/95 px-4 py-4 backdrop-blur sm:px-6"
           style={
             androidKeyboardFooterOffset > 0
               ? { marginBottom: androidKeyboardFooterOffset }
@@ -461,7 +455,7 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
             className="w-full"
             style={{
               maxWidth: CREATE_REC_MODAL_MAX_W,
-              paddingBottom: keyboardVisible && Platform.OS !== 'web' ? 0 : layout.minSafeBottom,
+              paddingBottom: layout.minSafeBottom,
             }}
           >
             <View className={cn('w-full', primaryDisabled && isWeb && 'cursor-not-allowed')}>
