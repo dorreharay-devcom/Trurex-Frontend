@@ -8,6 +8,7 @@ import {
   useWindowDimensions,
   ActivityIndicator,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ChevronRight, X } from 'lucide-react-native';
 import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';
@@ -51,6 +52,8 @@ import { isWeb, unknownErrorMessage } from '~/utils';
 import { cn } from '~/utils/general';
 import { CreateWizardStepper } from './CreateWizardStepper';
 import { CreateModalBody } from './CreateModalBody';
+
+const DYNO_IMAGE_SOURCE = require('../../../../assets/dyno.svg');
 
 type Props = {
   visible: boolean;
@@ -324,14 +327,19 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
           flow.searchMode,
           flow.selectedSearchPlace,
           flow.manualName,
+          flow.onlineName,
         ),
         p_review: flow.scoreReview.trim() || null,
-        p_quick_tip: showQuickTip ? flow.scoreQuickTip.trim() || null : null,
+        p_must_know: showQuickTip ? flow.scoreQuickTip.trim() || null : null,
         p_visibility,
         circle_ids: p_visibility === 'circles' ? circle_ids : undefined,
         tag_names: flow.selectedTagSlugs,
         photo_paths: flow.photoStoragePaths.length > 0 ? flow.photoStoragePaths : null,
-        p_linked_place_id: getLinkedPlaceId(flow.linkedPlaceId) ?? undefined,
+        p_linked_place_id:
+          flow.searchMode === 'online' ? null : getLinkedPlaceId(flow.linkedPlaceId) ?? undefined,
+        p_is_online_place: flow.searchMode === 'online',
+        p_place_website_url:
+          flow.searchMode === 'online' ? flow.onlineWebsiteUrl.trim() || null : null,
         p_category_ratings: buildCategoryRatingsPayload(flow.categoryRatings),
         p_question_answers: p_question_answers,
         p_score_value_for_money:
@@ -483,8 +491,16 @@ export const CreateModal: React.FC<Props> = ({ visible, onClose, addYourOwnPrefi
                       pointerEvents="none"
                       className="text-base font-semibold text-primary-foreground"
                     >
-                      {flow.isLastStep ? 'Confirm & Post 🦖' : 'Continue'}
+                      {flow.isLastStep ? 'Confirm & Post' : 'Continue'}
                     </Text>
+                    {flow.isLastStep ? (
+                      <Image
+                        source={DYNO_IMAGE_SOURCE}
+                        style={{ width: 20, height: 20 }}
+                        contentFit="contain"
+                        accessibilityLabel="TruRex dinosaur"
+                      />
+                    ) : null}
                     {!flow.isLastStep && (
                       <View pointerEvents="none">
                         <ChevronRight size={16} color={Theme.colors.primaryForeground} />

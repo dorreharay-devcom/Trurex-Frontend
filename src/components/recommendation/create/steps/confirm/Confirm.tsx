@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, ScrollView } from 'react-native';
+import { Image } from 'expo-image';
 import { useQuery } from '@tanstack/react-query';
 import { getUserProfile } from '~/api/usersApi';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
@@ -16,12 +17,16 @@ import type { CreateRecSearchPlace, SearchEntryMode } from '~/types/recommendati
 import type { CategoryTagOption } from '~/types/recommendation/rexCategoryCreateConfig';
 import { ConfirmPreviewCard } from './common';
 
+const DYNO_IMAGE_SOURCE = require('../../../../../../assets/dyno.svg');
+
 type Props = {
   searchMode: SearchEntryMode;
   selectedSearchPlace: CreateRecSearchPlace | null;
   manualName: string;
   manualAddress: string;
   manualGeotag: { lat: number; lng: number } | null;
+  onlineName: string;
+  onlineWebsiteUrl: string;
   selectedCategoryId: string | null;
   categoryDisplayName: string | null;
   categoryRatings: Record<string, number | null>;
@@ -43,6 +48,8 @@ export const Confirm: React.FC<Props> = ({
   manualName,
   manualAddress,
   manualGeotag,
+  onlineName,
+  onlineWebsiteUrl,
   selectedCategoryId,
   categoryDisplayName,
   categoryRatings,
@@ -76,8 +83,18 @@ export const Confirm: React.FC<Props> = ({
         manualName,
         manualAddress,
         manualGeotag,
+        onlineName,
+        onlineWebsiteUrl,
       ),
-    [searchMode, selectedSearchPlace, manualName, manualAddress, manualGeotag],
+    [
+      searchMode,
+      selectedSearchPlace,
+      manualName,
+      manualAddress,
+      manualGeotag,
+      onlineName,
+      onlineWebsiteUrl,
+    ],
   );
 
   const ratingDisplay = useMemo(
@@ -105,7 +122,15 @@ export const Confirm: React.FC<Props> = ({
     >
       <View className={`${CREATE_REC_STEP_INNER} gap-6`}>
         <View className="items-center space-y-2">
-          <CreateStepTitle>Looking good! 🦖</CreateStepTitle>
+          <View className="flex-row items-center justify-center gap-2">
+            <CreateStepTitle>Looking good!</CreateStepTitle>
+            <Image
+              source={DYNO_IMAGE_SOURCE}
+              style={{ width: 26, height: 26 }}
+              contentFit="contain"
+              accessibilityLabel="TruRex dinosaur"
+            />
+          </View>
           <Text className="text-center text-sm text-muted-foreground">
             Here&apos;s how your recommendation will appear
           </Text>

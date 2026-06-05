@@ -8,23 +8,25 @@ import {
   textFieldSingleLineStyle,
 } from '~/theme/Theme';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
-import { cn } from '~/utils/general';
+import { cn, webDisabledCursorStyle } from '~/utils/general';
 import { webNoOutline } from './webInputOutline';
 import { ClearableSearchInput } from '~/components/common/ClearableSearchInput';
 
 type Props = {
   value: string;
   onChangeText: (q: string) => void;
+  editable?: boolean;
 };
 
-export function SearchQueryField({ value, onChangeText }: Props) {
+export function SearchQueryField({ value, onChangeText, editable = true }: Props) {
   return (
     <ClearableSearchInput
       value={value}
       onChangeText={onChangeText}
       placeholder="Search by name..."
       placeholderTextColor={Theme.colors.secondaryText}
-      containerClassName="mb-4"
+      editable={editable}
+      containerClassName={cn('mb-4', !editable && 'cursor-not-allowed opacity-50')}
       iconClassName="left-3.5"
       iconColor={Theme.colors.secondaryText}
       clearIconColor={Theme.colors.secondaryText}
@@ -44,6 +46,7 @@ export function SearchQueryField({ value, onChangeText }: Props) {
         textFieldSingleLineStyle,
         textFieldSingleLineLargeHeightStyle,
         textFieldNativeSingleLineNoWrapStyle,
+        !editable && Platform.OS === 'web' ? webDisabledCursorStyle : null,
       ]}
     />
   );

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { MapPin, Star } from 'lucide-react-native';
+import { ExternalLink, MapPin, Star } from 'lucide-react-native';
 import { useCategoryIcon } from '~/hooks/useCategoryIcon';
 import type {
   ConfirmAuthorPreview,
@@ -10,6 +10,10 @@ import { Theme } from '~/theme/Theme';
 import { cn } from '~/utils/general';
 
 const TAGS_PREVIEW_MAX = 5;
+
+function isUrlLike(line: string): boolean {
+  return /^(https?:\/\/|www\.|[a-z0-9-]+\.[a-z]{2,})(\S*)$/i.test(line.trim());
+}
 
 type Props = {
   author: ConfirmAuthorPreview;
@@ -66,12 +70,15 @@ export function ConfirmPreviewCard({
 
       <View className="px-4 pb-2">
         <Text className="font-display text-lg font-bold text-foreground">{place.title}</Text>
-        {place.addressLines.map((line) => (
-          <View key={line} className="mt-0.5 flex-row items-center gap-1">
-            <MapPin size={12} color={Theme.colors.secondaryText} />
-            <Text className="flex-1 text-xs text-muted-foreground">{line}</Text>
-          </View>
-        ))}
+        {place.addressLines.map((line) => {
+          const Icon = isUrlLike(line) ? ExternalLink : MapPin;
+          return (
+            <View key={line} className="mt-0.5 flex-row items-center gap-1">
+              <Icon size={12} color={Theme.colors.secondaryText} />
+              <Text className="flex-1 text-xs text-muted-foreground">{line}</Text>
+            </View>
+          );
+        })}
       </View>
 
       {tip.length > 0 ? (

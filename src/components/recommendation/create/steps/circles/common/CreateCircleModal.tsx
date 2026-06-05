@@ -18,7 +18,7 @@ import {
   textFieldSingleLineStyle,
 } from '~/theme/Theme';
 import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/utils/circleTabUtils';
-import { cn } from '~/utils/general';
+import { cn, webDisabledCursorStyle } from '~/utils/general';
 import { isWeb } from '~/utils';
 import { webNoOutline } from '../../search/common/webInputOutline';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
@@ -130,7 +130,7 @@ export function CreateCircleModal({
                   onCreate();
                 }}
                 disabled={!canCreate}
-                style={!canCreate && isWeb ? ({ cursor: 'not-allowed' } as const) : undefined}
+                style={!canCreate && isWeb ? webDisabledCursorStyle : undefined}
                 className={cn(
                   'flex-1 items-center rounded-xl py-3',
                   canCreate

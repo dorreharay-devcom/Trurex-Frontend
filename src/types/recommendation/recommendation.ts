@@ -17,11 +17,14 @@ export type FeedListCardRow = {
   category_icon: string | null;
   category_color: string | null;
   place_name: string;
+  is_online_place?: boolean | null;
+  place_website_url?: string | null;
   description: string | null;
   reason: string | null;
   review: string | null;
   score_value_for_money: number | null;
-  quick_tip: string | null;
+  must_know: string | null;
+  quick_tip?: string | null;
   visibility: 'public' | 'private' | 'circles';
   created_at: string;
   save_count: number;
@@ -30,6 +33,7 @@ export type FeedListCardRow = {
   liked_by_me: boolean;
   is_saved: boolean;
   photo_path: string | null;
+  placeholder_colors?: string[] | null;
   category_ratings: Record<string, CategoryRatingRead>;
 };
 
@@ -43,14 +47,16 @@ export interface Recommendation {
   description?: string | null;
   image?: string | null;
   photoPath?: string | null;
-  rexPlaceholderHtml?: string | null;
   photoPaths?: string[];
   photoCount?: number;
+  placeholderColors?: string[] | null;
   categoryId: string;
   category: string;
   categoryIcon?: string | null;
   authorId?: string;
   location?: string;
+  placeWebsiteUrl?: string | null;
+  isOnlinePlace?: boolean | null;
   latitude?: number;
   longitude?: number;
   rating?: number | null;

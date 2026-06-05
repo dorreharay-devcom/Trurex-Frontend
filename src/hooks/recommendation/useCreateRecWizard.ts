@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createManualPlace, upsertGooglePlace } from '~/api/rexPlacesApi';
-import { CREATE_REC_REVIEW_MAX } from '~/constants/recommendation/createScorecard';
+import {
+  CREATE_REC_MUST_KNOW_MAX,
+  CREATE_REC_REVIEW_MAX,
+} from '~/constants/recommendation/createScorecard';
 import {
   buildSelectedSearchPlaceFromAddYourOwn,
   type AddYourOwnRecSource,
@@ -37,6 +40,7 @@ type CanProceedDeps = {
   manualName: string;
   manualAddress: string;
   manualGeotag: { lat: number; lng: number } | null;
+  onlineName: string;
   selectedSearchPlace: CreateRecSearchPlace | null;
   selectedCategoryId: string | null;
   selectedCircleIds: Set<string>;
@@ -48,11 +52,17 @@ type CanProceedDeps = {
 function canProceedForStep(stepId: CreateRecStepId, d: CanProceedDeps): boolean {
   switch (stepId) {
     case 'search':
-      return d.searchMode === 'manual'
-        ? d.manualName.trim().length > 0 &&
-            d.manualAddress.trim().length > 0 &&
-            d.manualGeotag != null
-        : d.selectedSearchPlace !== null;
+      if (d.searchMode === 'online') {
+        return d.onlineName.trim().length > 0;
+      }
+      if (d.searchMode === 'manual') {
+        return (
+          d.manualName.trim().length > 0 &&
+          d.manualAddress.trim().length > 0 &&
+          d.manualGeotag != null
+        );
+      }
+      return d.selectedSearchPlace !== null;
     case 'category':
       return d.selectedCategoryId !== null;
     case 'type':
@@ -92,6 +102,8 @@ export function useCreateRecWizard() {
   const [manualName, setManualName] = useState('');
   const [manualAddress, setManualAddress] = useState('');
   const [manualGeotag, setManualGeotag] = useState<{ lat: number; lng: number } | null>(null);
+  const [onlineName, setOnlineName] = useState('');
+  const [onlineWebsiteUrl, setOnlineWebsiteUrl] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [selectedSubcategoryCode, setSelectedSubcategoryCode] = useState<string | null>(null);
   const [photoStoragePaths, setPhotoStoragePaths] = useState<string[]>([]);
@@ -161,6 +173,7 @@ export function useCreateRecWizard() {
         manualName,
         manualAddress,
         manualGeotag,
+        onlineName,
         selectedSearchPlace,
         selectedCategoryId,
         selectedCircleIds,
@@ -174,6 +187,7 @@ export function useCreateRecWizard() {
       manualName,
       manualAddress,
       manualGeotag,
+      onlineName,
       selectedSearchPlace,
       selectedCategoryId,
       selectedCircleIds,
@@ -239,6 +253,7 @@ export function useCreateRecWizard() {
   const persistPlaceForCategory = useCallback(
     async (p_category_code: string) => {
       if (linkedPlaceId) return;
+      if (searchMode === 'online') return;
       const code = p_category_code.trim();
       if (!code) {
         throw new Error('Pick a category first.');
@@ -304,6 +319,8 @@ export function useCreateRecWizard() {
     setManualName('');
     setManualAddress('');
     setManualGeotag(null);
+    setOnlineName('');
+    setOnlineWebsiteUrl('');
     setSelectedCategoryId(null);
     setSelectedSubcategoryCode(null);
     setPhotoStoragePaths([]);
@@ -371,6 +388,10 @@ export function useCreateRecWizard() {
     setScoreReview(text.slice(0, CREATE_REC_REVIEW_MAX));
   }, []);
 
+  const setScoreQuickTipClamped = useCallback((text: string) => {
+    setScoreQuickTip(text.slice(0, CREATE_REC_MUST_KNOW_MAX));
+  }, []);
+
   const goNext = useCallback(() => {
     const idx = activeSteps.indexOf(stepId);
     if (idx < 0 || idx >= activeSteps.length - 1) return;
@@ -389,11 +410,26 @@ export function useCreateRecWizard() {
     setLinkedPlaceId(null);
   }, []);
 
+  const setOnlinePlaceSelected = useCallback((selected: boolean) => {
+    setSearchMode(selected ? 'online' : 'select');
+    setSearchQuery('');
+    setSelectedSearchPlace(null);
+    setLinkedPlaceId(null);
+    setManualAddress('');
+    setManualGeotag(null);
+    if (!selected) {
+      setOnlineName('');
+      setOnlineWebsiteUrl('');
+    }
+  }, []);
+
   const backToSearchSelect = useCallback(() => {
     setSearchMode('select');
     setManualName('');
     setManualAddress('');
     setManualGeotag(null);
+    setOnlineName('');
+    setOnlineWebsiteUrl('');
   }, []);
 
   return {
@@ -413,6 +449,11 @@ export function useCreateRecWizard() {
     setManualAddress: setManualAddressValue,
     manualGeotag,
     setManualGeotag,
+    onlineName,
+    setOnlineName,
+    onlineWebsiteUrl,
+    setOnlineWebsiteUrl,
+    setOnlinePlaceSelected,
     selectManualAddress,
     setSearchMode,
     isFirstStep,
@@ -440,7 +481,7 @@ export function useCreateRecWizard() {
     toggleTagSlug,
     syncFormToConfig,
     scoreQuickTip,
-    setScoreQuickTip,
+    setScoreQuickTip: setScoreQuickTipClamped,
     scoreValueForMoney,
     setScoreValueForMoney,
     scoreReview,

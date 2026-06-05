@@ -8,6 +8,7 @@ import {
   findNodeHandle,
   Platform,
   StyleSheet,
+  Linking,
 } from 'react-native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -19,10 +20,11 @@ import {
   ChevronRight,
   Flag,
   Trash2,
+  Link2,
 } from 'lucide-react-native';
 import { RexCommentsSection } from '~/components/recommendation/comment';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
-import { RexPlaceholderHtml } from '~/components/common/RexPlaceholderHtml';
+import { RexPhotoPlaceholder } from '~/components/common/RexPhotoPlaceholder';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { OverlayModal } from '~/components/common/OverlayModal';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
@@ -64,6 +66,13 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
 });
+
+function normalizeWebsiteUrl(raw: string): string | null {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  if (/^[a-z][a-z\d+\-.]*:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
 
 type Props = {
   visible: boolean;
@@ -209,14 +218,8 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     [recommendation],
   );
 
-  const categoryPlaceholderHtml = useMemo(() => {
-    const fromDetail = rexDetail?.rex_placeholder_html?.trim();
-    const fromRec = recommendation?.rexPlaceholderHtml?.trim();
-    return fromDetail || fromRec || null;
-  }, [rexDetail?.rex_placeholder_html, recommendation?.rexPlaceholderHtml]);
-
   const galleryPaths = useMemo(() => {
-    if (!recommendation || categoryPlaceholderHtml) return [];
+    if (!recommendation) return [];
     const normalize = (s: string) => {
       const t = s.trim();
       if (!t || t === 'null' || t === 'undefined') {
@@ -232,7 +235,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
       return fromDetail;
     }
     return rexPhotoStoragePathsFromRecommendation(recommendation);
-  }, [rexDetail, recommendation, categoryPlaceholderHtml]);
+  }, [rexDetail, recommendation]);
 
   const placeLocationLine = useMemo(() => {
     if (!recommendation) return '';
@@ -240,6 +243,18 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     const fromRec = (recommendation.location ?? '').trim();
     return fromDetail || fromRec;
   }, [recommendation, rexDetail?.place_location]);
+
+  const placeWebsiteText = (rexDetail?.place_website_url ?? '').trim();
+  const placeWebsiteHref = useMemo(
+    () => normalizeWebsiteUrl(placeWebsiteText),
+    [placeWebsiteText],
+  );
+  const openPlaceWebsite = useCallback(() => {
+    if (!placeWebsiteHref) return;
+    void Linking.openURL(placeWebsiteHref).catch(() => {
+      toastError('Could not open link', 'Check the site URL and try again.');
+    });
+  }, [placeWebsiteHref]);
 
   const coverPath = useMemo(
     () => (recommendation ? rexCoverStoragePathFromRecommendation(recommendation) : null),
@@ -249,16 +264,15 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     () => (recommendation ? rexCoverRemoteHttpUrl(recommendation) : null),
     [recommendation],
   );
-  const showHero = useMemo(
-    () => galleryPaths.length > 0 || !!(coverPath || coverHttp) || !!categoryPlaceholderHtml,
-    [galleryPaths, coverPath, coverHttp, categoryPlaceholderHtml],
-  );
+  const hasCoverImage = Boolean(coverPath || coverHttp);
+  const showHero = recommendation != null;
   const showDetailHeroLoading =
     Boolean(visible && recommendation) &&
     detailLoading &&
     galleryPaths.length === 0 &&
-    !(coverPath || coverHttp) &&
-    !categoryPlaceholderHtml;
+    !hasCoverImage &&
+    !recommendation?.placeholderColors?.length &&
+    !recommendation?.categoryIcon?.trim();
 
   const queryClient = useQueryClient();
   const deleteRexMutation = useMutation({
@@ -421,11 +435,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                   paths={galleryPaths}
                   accessibilityLabelBase={recommendation.title}
                 />
-              ) : categoryPlaceholderHtml ? (
-                <View className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-transparent">
-                  <RexPlaceholderHtml html={categoryPlaceholderHtml} />
-                </View>
-              ) : showHero && (coverPath || coverHttp) ? (
+              ) : showHero && hasCoverImage ? (
                 <View className="aspect-[16/9] w-full overflow-hidden rounded-xl">
                   <SignedStorageImage
                     bucket={REX_IMAGES_BUCKET}
@@ -437,6 +447,14 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                     accessibilityLabel={recommendation.title}
                   />
                 </View>
+              ) : showHero ? (
+                <RexPhotoPlaceholder
+                  categoryIcon={recommendation.categoryIcon}
+                  colors={recommendation.placeholderColors}
+                  className="aspect-[16/9] w-full rounded-xl"
+                  emojiSize={54}
+                  accessibilityLabel={recommendation.title}
+                />
               ) : null}
 
               <View>
@@ -455,6 +473,19 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                     <MapPin size={14} color={Theme.colors.secondaryText} />
                     <Text className="text-sm text-muted-foreground">{placeLocationLine}</Text>
                   </View>
+                ) : null}
+                {placeWebsiteHref ? (
+                  <Pressable
+                    onPress={openPlaceWebsite}
+                    accessibilityRole="link"
+                    accessibilityLabel={`Open ${placeWebsiteText}`}
+                    className="mt-1 flex-row items-center gap-1.5 self-start active:opacity-80"
+                  >
+                    <Link2 size={14} color={Theme.colors.secondaryText} />
+                    <Text className="text-sm font-medium text-foreground" numberOfLines={1}>
+                      {placeWebsiteText}
+                    </Text>
+                  </Pressable>
                 ) : null}
               </View>
 

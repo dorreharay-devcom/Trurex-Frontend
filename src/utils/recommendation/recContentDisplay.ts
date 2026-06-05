@@ -1,5 +1,3 @@
-import { REX_PHOTO_PLACEHOLDER_STORAGE_PATH } from '~/constants/rexPlaceholderPhoto';
-
 export function isHttpUrl(s: string): boolean {
   return /^https?:\/\//i.test(s.trim());
 }
@@ -7,28 +5,24 @@ export function isHttpUrl(s: string): boolean {
 export function rexCoverStoragePathFromRecommendation(rec: {
   photoPath?: string | null;
   image?: string | null;
-  rexPlaceholderHtml?: string | null;
 }): string | null {
-  if (rec.rexPlaceholderHtml?.trim()) return null;
   const explicit = rec.photoPath?.trim() ?? '';
   if (explicit) return explicit;
   const img = rec.image?.trim() ?? '';
   if (img && !isHttpUrl(img)) return img;
   if (img && isHttpUrl(img)) return null;
-  return REX_PHOTO_PLACEHOLDER_STORAGE_PATH;
+  return null;
 }
 
 export function rexPhotoStoragePathsFromRecommendation(rec: {
   photoPaths?: string[] | null;
   photoPath?: string | null;
-  rexPlaceholderHtml?: string | null;
 }): string[] {
-  if (rec.rexPlaceholderHtml?.trim()) return [];
   const fromList = rec.photoPaths?.map((p) => p.trim()).filter(Boolean) ?? [];
   if (fromList.length > 0) return fromList;
   const one = rec.photoPath?.trim() ?? '';
   if (one) return [one];
-  return [REX_PHOTO_PLACEHOLDER_STORAGE_PATH];
+  return [];
 }
 
 export function rexCoverRemoteHttpUrl(rec: { image?: string | null }): string | null {

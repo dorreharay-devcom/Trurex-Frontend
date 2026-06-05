@@ -17,11 +17,9 @@ export function getMockNotificationsDemo(): AppNotification[] {
       },
       is_read: false,
       created_at: minsAgo(12),
-      actor_profile: {
-        display_name: 'Sam Rivera',
-        avatar_url: null,
-        handle: 'samrivera',
-      },
+      actor_display_name: 'Sam Rivera',
+      actor_avatar_url: null,
+      actor_handle: 'samrivera',
     },
     {
       id: 'mock-2',
@@ -34,11 +32,9 @@ export function getMockNotificationsDemo(): AppNotification[] {
       },
       is_read: false,
       created_at: minsAgo(45),
-      actor_profile: {
-        display_name: 'Jordan Lee',
-        avatar_url: null,
-        handle: 'jordanlee',
-      },
+      actor_display_name: 'Jordan Lee',
+      actor_avatar_url: null,
+      actor_handle: 'jordanlee',
     },
     {
       id: 'mock-3',
@@ -48,11 +44,10 @@ export function getMockNotificationsDemo(): AppNotification[] {
       data: null,
       is_read: true,
       created_at: hoursAgo(3),
-      actor_profile: {
-        display_name: 'Alex Kim',
-        avatar_url: null,
-        handle: 'alexkim',
-      },
+      actor_display_name: 'Alex Kim',
+      actor_avatar_url: null,
+      actor_handle: 'alexkim',
+      show_followback: true,
     },
     {
       id: 'mock-4',
@@ -65,11 +60,9 @@ export function getMockNotificationsDemo(): AppNotification[] {
       },
       is_read: true,
       created_at: hoursAgo(8),
-      actor_profile: {
-        display_name: 'Priya N.',
-        avatar_url: null,
-        handle: 'priyan',
-      },
+      actor_display_name: 'Priya N.',
+      actor_avatar_url: null,
+      actor_handle: 'priyan',
     },
     {
       id: 'mock-5',
@@ -79,11 +72,9 @@ export function getMockNotificationsDemo(): AppNotification[] {
       data: null,
       is_read: false,
       created_at: hoursAgo(26),
-      actor_profile: {
-        display_name: 'Morgan Wells',
-        avatar_url: null,
-        handle: 'morganwells',
-      },
+      actor_display_name: 'Morgan Wells',
+      actor_avatar_url: null,
+      actor_handle: 'morganwells',
     },
     {
       id: 'mock-6',
@@ -96,11 +87,9 @@ export function getMockNotificationsDemo(): AppNotification[] {
       },
       is_read: true,
       created_at: hoursAgo(48),
-      actor_profile: {
-        display_name: "Casey O'Neill",
-        avatar_url: null,
-        handle: 'caseyoneill',
-      },
+      actor_display_name: "Casey O'Neill",
+      actor_avatar_url: null,
+      actor_handle: 'caseyoneill',
     },
   ];
 }

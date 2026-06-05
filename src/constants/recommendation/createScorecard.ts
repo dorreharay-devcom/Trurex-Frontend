@@ -25,5 +25,6 @@ export const CREATE_REC_SCORE_CHIPS = [
 ] as const;
 
 export const CREATE_REC_REVIEW_MAX = 280;
+export const CREATE_REC_MUST_KNOW_MAX = 150;
 
 export const CREATE_REC_SCORE_COUNT = CREATE_REC_SCORE_ROWS.length;

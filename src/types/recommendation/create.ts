@@ -10,7 +10,7 @@ export const CREATE_REC_STEP_ORDER = [
 
 export type CreateRecStepId = (typeof CREATE_REC_STEP_ORDER)[number];
 
-export type SearchEntryMode = 'select' | 'manual';
+export type SearchEntryMode = 'select' | 'manual' | 'online';
 
 export type PlaceSearchSource = 'database' | 'google';
 
