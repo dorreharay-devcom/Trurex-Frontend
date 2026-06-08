@@ -93,10 +93,7 @@ export function useDiscoverSearchFilters({
   }, []);
 
   const toggleRecencyDay = useCallback((d: RecencyDayToken) => {
-    setRecencyFilterDays((prev) => {
-      const next = prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d];
-      return (next as RecencyDayToken[]).sort((a, b) => a - b);
-    });
+    setRecencyFilterDays((prev) => (prev.includes(d) ? [] : [d]));
   }, []);
 
   const filterChips: FilterChip[] = useMemo(() => {
