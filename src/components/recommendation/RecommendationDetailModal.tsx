@@ -347,9 +347,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                   <Text className="text-sm font-medium text-foreground">Back</Text>
                 </Pressable>
               </View>
-              <Text className="min-w-0 flex-1 text-center text-lg font-display font-semibold text-foreground">
-                Recommendation
-              </Text>
+              <View className="min-w-0 flex-1" />
               <View className="w-[152px] shrink-0 items-end justify-center">
                 {isOwner ? (
                   <View className="flex-row items-center justify-end gap-2">

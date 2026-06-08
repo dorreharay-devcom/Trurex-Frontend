@@ -9,6 +9,8 @@ import {
   sortCirclesForRingStack,
 } from '~/utils/recommendation/recCircles';
 import { mapSubcategoriesFromConfig } from '~/data/rexSubcategoryCatalog';
+import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
+import { Skeleton } from '~/components/ui/skeleton';
 import type {
   CategoryCreateConfig,
   CategoryQuestion,
@@ -36,6 +38,7 @@ type Props = {
   showQuickTip: boolean;
   useExperienceReviewCopy: boolean;
   subcategoryLabelForConfirm: string | null;
+  initialLoading?: boolean;
 };
 
 export const CreateModalBody: React.FC<Props> = ({
@@ -55,6 +58,7 @@ export const CreateModalBody: React.FC<Props> = ({
   showQuickTip,
   useExperienceReviewCopy,
   subcategoryLabelForConfirm,
+  initialLoading = false,
 }) => {
   const { ensureDefaultCircleSelectionFromApiOrder } = flow;
   const categoryApiCode = getRexCategoryApiCode(flow.selectedCategoryId);
@@ -96,6 +100,23 @@ export const CreateModalBody: React.FC<Props> = ({
   return (
     <View className="min-h-0 w-full flex-1">
       <RNAnimated.View key={flow.stepId} style={{ flex: 1, width: '100%', opacity: stepOpacity }}>
+        {initialLoading ? (
+          <View className="flex-1 items-center">
+            <View className={CREATE_REC_STEP_INNER}>
+              <View className="items-center space-y-3 px-1 pb-6 pt-8">
+                <Skeleton className="h-7 w-56 rounded-full bg-border/40" />
+                <Skeleton className="h-4 w-64 rounded-full bg-border/40" />
+              </View>
+              <View className="gap-4">
+                <Skeleton className="h-12 w-full rounded-xl bg-border/40" />
+                <Skeleton className="h-20 w-full rounded-xl bg-border/40" />
+                <Skeleton className="h-20 w-full rounded-xl bg-border/40" />
+              </View>
+            </View>
+          </View>
+        ) : null}
+        {!initialLoading && (
+          <>
         {flow.stepId === 'search' && (
           <Search
             mode={flow.searchMode}
@@ -204,6 +225,8 @@ export const CreateModalBody: React.FC<Props> = ({
             selectedTagSlugs={flow.selectedTagSlugs}
             tagOptions={mergedTagOptions}
           />
+        )}
+          </>
         )}
       </RNAnimated.View>
     </View>

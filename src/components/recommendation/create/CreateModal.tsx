@@ -483,12 +483,6 @@ export const CreateModal: React.FC<Props> = ({
           <CreateWizardStepper steps={flow.activeSteps} currentIndex={flow.stepIndex} />
         </View>
 
-        {(editLoading || (configLoading && flow.selectedCategoryId)) ? (
-          <View className="absolute left-0 right-0 top-24 z-20 items-center py-2">
-            <ActivityIndicator color={Theme.colors.primary} />
-          </View>
-        ) : null}
-
         <CreateModalBody
           visible={visible}
           flow={flow}
@@ -506,6 +500,7 @@ export const CreateModal: React.FC<Props> = ({
           showQuickTip={showQuickTip}
           useExperienceReviewCopy={useExperienceReviewCopy}
           subcategoryLabelForConfirm={subcategoryLabelForConfirm}
+          initialLoading={editLoading}
         />
 
         <View
