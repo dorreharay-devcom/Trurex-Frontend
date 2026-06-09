@@ -8,7 +8,7 @@ import AuthLayout from '~/components/common/AuthLayout';
 import Input from '~/components/common/Input';
 import { ArrowLeft } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
-import { getRedirectUrl } from '~/utils';
+import { getResetPasswordRedirectUrl } from '~/utils';
 import { mapAuthError } from '~/utils/errors';
 
 export default function ForgotPasswordScreen() {
@@ -29,7 +29,7 @@ export default function ForgotPasswordScreen() {
 
     setLoading(true);
     setError(undefined);
-    const redirectTo = `${getRedirectUrl()}/reset-password`;
+    const redirectTo = getResetPasswordRedirectUrl();
 
     try {
       await AuthApi.resetPassword(email, redirectTo);

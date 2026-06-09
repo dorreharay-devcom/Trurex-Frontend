@@ -44,7 +44,7 @@ export const MapLegend: React.FC = () => {
             Platform.OS === 'ios'
               ? { width: 150 }
               : Platform.OS === 'android'
-                ? { width: 188 }
+                ? { width: 156 }
                 : undefined
           }
         >

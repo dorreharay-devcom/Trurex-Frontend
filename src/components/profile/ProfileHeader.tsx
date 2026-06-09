@@ -91,11 +91,6 @@ const ProfileHeader = ({
               )}
             </View>
           </TouchableOpacity>
-          <View className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary items-center justify-center">
-            <Text className="text-[10px] font-bold text-primary-foreground">
-              {profile.trustScore}
-            </Text>
-          </View>
         </View>
 
         {/* Name & info */}
@@ -143,13 +138,7 @@ const ProfileHeader = ({
             <Text className="text-lg font-display font-bold text-foreground">
               {profile.rexCount}
             </Text>
-            <Text className="text-xs text-muted-foreground">Rex's</Text>
-          </View>
-          <View className="items-center">
-            <Text className="text-lg font-display font-bold text-rating-star">
-              {profile.trustScore}
-            </Text>
-            <Text className="text-xs text-muted-foreground">Score</Text>
+            <Text className="text-xs text-muted-foreground">Rex</Text>
           </View>
         </View>
 

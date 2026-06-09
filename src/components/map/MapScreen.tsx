@@ -15,7 +15,11 @@ import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollec
 import { ListRow } from '~/components/map/common/ListRow';
 import { Theme } from '~/theme/Theme';
 import { MapPin, List, LocateFixed } from 'lucide-react-native';
-import { MAP_ACTION_INSET, MAP_LOCATION_PROMPT_TOP } from '~/constants/map/mapUi';
+import {
+  MAP_ACTION_INSET,
+  MAP_LOCATION_PROMPT_TOP,
+  MAP_RIGHT_CONTROLS_BOTTOM,
+} from '~/constants/map/mapUi';
 import {
   deriveMapPinType,
   formatDistanceKm,
@@ -177,7 +181,7 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
                   {
                     position: 'absolute',
                     right: MAP_ACTION_INSET,
-                    bottom: MAP_ACTION_INSET,
+                    bottom: MAP_RIGHT_CONTROLS_BOTTOM,
                     zIndex: 1100,
                     elevation: Platform.OS === 'android' ? 12 : 0,
                   },

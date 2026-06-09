@@ -1,12 +1,15 @@
 import { useCallback, useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { GemsApi, SavedRexesParams } from '~/api/GemsApi';
+import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/hooks/useDebouncedValue';
 
 const SAVED_REXES_PAGE_LIMIT = 20;
 
 export const useSavedRexes = (params: SavedRexesParams = {}) => {
   const pageSize = params.result_limit ?? SAVED_REXES_PAGE_LIMIT;
-  const searchTerm = params.search_term?.trim() || null;
+  const rawSearchTerm = params.search_term?.trim() || '';
+  const debouncedRawSearchTerm = useDebouncedValue(rawSearchTerm, DEFAULT_SEARCH_DEBOUNCE_MS);
+  const searchTerm = debouncedRawSearchTerm.trim() || null;
 
   const query = useInfiniteQuery({
     queryKey: ['my-saved-rexes', pageSize, searchTerm, params.uncollected === true],

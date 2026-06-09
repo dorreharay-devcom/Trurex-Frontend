@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { TagsApi, type TagRow } from '~/api/TagsApi';
+import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/hooks/useDebouncedValue';
 
 export const useTrendingTags = () => {
   return useQuery<TagRow[]>({
@@ -10,10 +11,11 @@ export const useTrendingTags = () => {
 };
 
 export const useSearchTags = (searchTerm: string, limit = 20) => {
+  const debouncedSearchTerm = useDebouncedValue(searchTerm.trim(), DEFAULT_SEARCH_DEBOUNCE_MS);
   return useQuery<TagRow[]>({
-    queryKey: ['tags', 'search', searchTerm, limit],
-    queryFn: () => TagsApi.search(searchTerm, limit),
-    enabled: searchTerm.length > 0,
+    queryKey: ['tags', 'search', debouncedSearchTerm, limit],
+    queryFn: () => TagsApi.search(debouncedSearchTerm, limit),
+    enabled: debouncedSearchTerm.length > 0,
     staleTime: 30_000,
   });
 };

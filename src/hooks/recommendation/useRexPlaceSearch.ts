@@ -1,11 +1,10 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { searchPlacesForRex } from '~/api/rexPlacesApi';
-import { useDebouncedValue } from '~/hooks/useDebouncedValue';
+import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/hooks/useDebouncedValue';
 import type { CreateRecSearchPlace } from '~/types/recommendation/create';
 import { mapSearchResponseToPlaces } from '~/utils/recommendation/recPlaceSearch';
 
-const DEFAULT_DEBOUNCE_MS = 350;
 const DEFAULT_MIN_QUERY_LENGTH = 1;
 const STALE_TIME_MS = 30_000;
 const QUERY_KEY_ROOT = 'rexPlaceSearch' as const;
@@ -28,7 +27,7 @@ export type UseRexPlaceSearchResult = {
 export function useRexPlaceSearch({
   searchQuery,
   enabled,
-  debounceMs = DEFAULT_DEBOUNCE_MS,
+  debounceMs = DEFAULT_SEARCH_DEBOUNCE_MS,
   minQueryLength = DEFAULT_MIN_QUERY_LENGTH,
 }: UseRexPlaceSearchOptions): UseRexPlaceSearchResult {
   const debouncedRaw = useDebouncedValue(searchQuery, debounceMs);

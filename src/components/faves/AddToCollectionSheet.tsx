@@ -46,6 +46,7 @@ import { webDisabledCursorStyle } from '~/utils/general';
 
 const collectionFieldBg = { backgroundColor: Theme.colors.searchFieldBackground };
 const SHEET_CHROME_HEIGHT = 220;
+const TOAST_AFTER_SHEET_CLOSE_DELAY_MS = modalConfig.timing.sheetCloseMs + 180;
 
 export interface RecSummary {
   id: string;
@@ -68,6 +69,7 @@ export interface AddToCollectionSheetProps {
   onUnsaveFailed?: () => void;
   onSaveRexFailed?: () => void;
   onSaved?: () => void;
+  onCollectionCreated?: (collectionName: string) => void;
 }
 
 const CollectionRow: React.FC<{
@@ -118,6 +120,7 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({
   onUnsaveFailed,
   onSaveRexFailed,
   onSaved,
+  onCollectionCreated,
 }) => {
   const { user } = useAuth();
   const { height } = useWindowDimensions();
@@ -271,6 +274,16 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({
     });
   };
 
+  const showErrorAfterClose = useCallback(
+    (title: string, message?: string) => {
+      onClose();
+      setTimeout(() => {
+        toastError(title, message);
+      }, TOAST_AFTER_SHEET_CLOSE_DELAY_MS);
+    },
+    [onClose],
+  );
+
   const handleDone = async () => {
     if (!rec) {
       onClose();
@@ -289,9 +302,12 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({
         try {
           await ensureRexSaved();
         } catch (e: unknown) {
-          if (didAccountFrozenMutationToast(e)) return;
-          toastError('Failed to save', unknownErrorMessage(e, 'Try again.'));
           setSaving(false);
+          if (didAccountFrozenMutationToast(e)) {
+            showErrorAfterClose(unknownErrorMessage(e, 'Account is frozen'));
+            return;
+          }
+          showErrorAfterClose('Failed to save', unknownErrorMessage(e, 'Try again.'));
           return;
         }
       }
@@ -307,9 +323,13 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({
       queryClient.invalidateQueries({ queryKey: ['collection-detail'] });
       queryClient.invalidateQueries({ queryKey: ['my-saved-rexes'] });
     } catch (e: unknown) {
-      if (!didAccountFrozenMutationToast(e)) {
-        toastError('Failed to update collections');
+      setSaving(false);
+      if (didAccountFrozenMutationToast(e)) {
+        showErrorAfterClose(unknownErrorMessage(e, 'Account is frozen'));
+        return;
       }
+      showErrorAfterClose('Failed to update collections');
+      return;
     }
     setSaving(false);
     onClose();
@@ -325,7 +345,16 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({
       await CollectionsApi.addRexToCollection({ collection_id: collection.id, rex_id: rec.id });
       queryClient.invalidateQueries({ queryKey: ['my-collections'] });
       setCreating(false);
-      toastSuccessAfterDismiss(onClose, `Added to ${collection.display_name}`);
+      if (onCollectionCreated) {
+        onClose();
+        onCollectionCreated(collection.display_name);
+      } else {
+        toastSuccessAfterDismiss(
+          onClose,
+          'New collection added',
+          `Added to ${collection.display_name}`,
+        );
+      }
     } catch {
       setError('Failed to create collection');
       setCreating(false);

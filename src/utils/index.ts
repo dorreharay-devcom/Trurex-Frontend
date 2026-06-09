@@ -43,8 +43,14 @@ export const formatCurrency = (amount: number, currency: string = 'USD') => {
 
 const APP_SCHEME = process.env.EXPO_PUBLIC_APP_SCHEME ?? 'trurex';
 const AUTH_CALLBACK_PATH = 'auth/callback';
+const RESET_PASSWORD_PATH = 'reset-password';
 
 export const getRedirectUrl = () =>
   isWeb
     ? `${window.location.origin}/${AUTH_CALLBACK_PATH}`
     : makeRedirectUri({ scheme: APP_SCHEME, path: AUTH_CALLBACK_PATH });
+
+export const getResetPasswordRedirectUrl = () =>
+  isWeb
+    ? `${window.location.origin}/${RESET_PASSWORD_PATH}`
+    : makeRedirectUri({ scheme: APP_SCHEME, path: RESET_PASSWORD_PATH });

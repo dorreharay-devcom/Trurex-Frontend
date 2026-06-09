@@ -15,6 +15,14 @@ const BACKEND_KEY =
   process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ||
   '';
 
+const currentWebUrlHasPasswordRecoveryToken = () => {
+  if (Platform.OS !== 'web' || typeof window === 'undefined') return false;
+  const tokenSource = `${window.location.search}${window.location.hash}`;
+  return tokenSource.includes('type=recovery') && tokenSource.includes('access_token=');
+};
+
+export const initialUrlHadPasswordRecoveryToken = currentWebUrlHasPasswordRecoveryToken();
+
 const supabaseFetch: typeof fetch = async (input, init) => {
   const response = await fetch(input, init);
   if (response.status === 401) {
