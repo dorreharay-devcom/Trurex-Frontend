@@ -136,12 +136,19 @@ export default function ResetPasswordScreen() {
   const submitDisabled =
     loading || checkingRecovery || !recoveryReady || !password || !confirmPassword;
 
+  const handleBackToLogin = async () => {
+    try {
+      await AuthApi.signOut();
+    } catch {}
+    router.replace(Routes.Login);
+  };
+
   if (recoveryLinkError) {
     return (
       <ResetPasswordExpiredState
         code={recoveryLinkError.code}
         description={recoveryLinkError.description}
-        onBackToLogin={() => router.replace(Routes.Login)}
+        onBackToLogin={handleBackToLogin}
       />
     );
   }
