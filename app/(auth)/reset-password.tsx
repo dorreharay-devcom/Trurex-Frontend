@@ -9,11 +9,17 @@ import { Button } from '~/components/common/Button';
 import AuthLayout from '~/components/common/AuthLayout';
 import Input from '~/components/common/Input';
 import { mapAuthError } from '~/utils/errors';
+import { ResetPasswordExpiredState } from '~/components/auth/ResetPasswordExpiredState';
 
 type ResetErrors = {
   password?: string;
   confirmPassword?: string;
   general?: string;
+};
+
+type RecoveryLinkError = {
+  code: string | null;
+  description: string | null;
 };
 
 const currentUrlHasPasswordRecoveryToken = () => {
@@ -22,11 +28,25 @@ const currentUrlHasPasswordRecoveryToken = () => {
   return tokenSource.includes('type=recovery') && tokenSource.includes('access_token=');
 };
 
+const getCurrentRecoveryLinkError = (): RecoveryLinkError | null => {
+  if (Platform.OS !== 'web' || typeof window === 'undefined') return null;
+  const params = new URLSearchParams(
+    `${window.location.search.replace(/^\?/, '')}&${window.location.hash.replace(/^#/, '')}`,
+  );
+  const error = params.get('error');
+  if (!error) return null;
+  return {
+    code: params.get('error_code'),
+    description: params.get('error_description'),
+  };
+};
+
 export default function ResetPasswordScreen() {
   const router = useRouter();
   const isWeb = Platform.OS === 'web';
   const hasRecoveryToken =
     initialUrlHadPasswordRecoveryToken || currentUrlHasPasswordRecoveryToken();
+  const recoveryLinkError = getCurrentRecoveryLinkError();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -115,6 +135,16 @@ export default function ResetPasswordScreen() {
 
   const submitDisabled =
     loading || checkingRecovery || !recoveryReady || !password || !confirmPassword;
+
+  if (recoveryLinkError) {
+    return (
+      <ResetPasswordExpiredState
+        code={recoveryLinkError.code}
+        description={recoveryLinkError.description}
+        onBackToLogin={() => router.replace(Routes.Login)}
+      />
+    );
+  }
 
   if (!hasRecoveryToken) {
     return <Redirect href={Routes.Login} />;
