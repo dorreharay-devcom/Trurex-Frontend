@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, Platform } from 'react-native';
 import type { CategoryPickerTile } from '~/constants/recommendation/rexCategories';
 import type { CategoryGridConfig } from '~/types/recommendation/categoryGrid';
 import { Theme } from '~/theme/Theme';
@@ -44,7 +44,14 @@ export function CategoryTile({
       }}
     >
       <View className="w-full items-center gap-1.5">
-        <Text className="text-center text-2xl leading-none">{cat.emoji}</Text>
+        <View className="h-8 items-center justify-center">
+          <Text
+            className="text-center text-2xl"
+            style={Platform.OS === 'web' ? undefined : { lineHeight: 30 }}
+          >
+            {cat.emoji}
+          </Text>
+        </View>
         <Text
           className={cn(
             'w-full text-center text-xs font-medium leading-tight',

@@ -143,11 +143,6 @@ export const useAddRexToCollection = () => {
       CollectionsApi.addRexToCollection(params),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['collection-detail', variables.collection_id] });
-      toastSuccess('Added to collection!');
-    },
-    onError: (error: unknown) => {
-      if (didAccountFrozenMutationToast(error)) return;
-      toastError('Failed to add to collection', unknownErrorMessage(error, 'Try again.'));
     },
   });
 };

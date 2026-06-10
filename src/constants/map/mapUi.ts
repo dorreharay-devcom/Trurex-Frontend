@@ -12,10 +12,13 @@ export const MAP_VIEW_MIN_HEIGHT = 360;
 export const MAP_ACTION_INSET = 20;
 /** Search row (input + list toggle) sits at `MAP_ACTION_INSET`; banner sits below it. */
 export const MAP_LOCATION_PROMPT_TOP = MAP_ACTION_INSET + 56 + 8;
+/** Keep right-side map controls above the global Add Rex FAB. */
+export const MAP_RIGHT_CONTROLS_BOTTOM = MAP_ACTION_INSET + 76;
 export const MAP_LAYER_ABOVE_LOCATE = 52;
 
 /** Zoom +/- stack sits above the layers button (h-10). */
-export const MAP_ZOOM_CONTROLS_BOTTOM = MAP_ACTION_INSET + MAP_LAYER_ABOVE_LOCATE + 40 + 8;
+export const MAP_ZOOM_CONTROLS_BOTTOM =
+  MAP_RIGHT_CONTROLS_BOTTOM + MAP_LAYER_ABOVE_LOCATE + 40 + 8;
 
 export const WEB_INFO_CARD_MAX_W = 320;
 export const WEB_INFO_IMAGE_H = 118;

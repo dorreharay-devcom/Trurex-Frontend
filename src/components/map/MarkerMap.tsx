@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { View, StyleSheet, Platform, Pressable } from 'react-native';
-import MapView, { type Region } from 'react-native-maps';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { View, StyleSheet, Platform, Pressable, type LayoutChangeEvent } from 'react-native';
+import MapView, { PROVIDER_GOOGLE, type Region } from 'react-native-maps';
 import { Minus, Plus } from 'lucide-react-native';
 import type { MapMarkerItem, MapRecenterTarget } from '~/types/map/mapMarker';
 import {
@@ -11,6 +11,8 @@ import {
 import { NativeMarker } from '~/components/map/common/NativeMarker';
 import { MAP_ACTION_INSET, MAP_ZOOM_CONTROLS_BOTTOM } from '~/constants/map/mapUi';
 import { Theme } from '~/theme/Theme';
+
+const ANDROID_TILE_LOAD_TIMEOUT_MS = 2500;
 
 type Props = {
   markers: MapMarkerItem[];
@@ -28,10 +30,26 @@ const MarkerMap: React.FC<Props> = ({
   recenterTo,
 }) => {
   const mapRef = useRef<MapView>(null);
+  const androidTileRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const androidTileRetryCountRef = useRef(0);
   const initialRegion = useMemo(() => regionForMarkers(markers), [markers]);
   const regionRef = useRef<Region>(initialRegion);
   const markersRef = useRef(markers);
   markersRef.current = markers;
+  const [mapLayoutReady, setMapLayoutReady] = useState(Platform.OS !== 'android');
+  const [androidMapKey, setAndroidMapKey] = useState(0);
+
+  const clearAndroidTileRetry = useCallback(() => {
+    if (androidTileRetryRef.current == null) return;
+    clearTimeout(androidTileRetryRef.current);
+    androidTileRetryRef.current = null;
+  }, []);
+
+  const handleContainerLayout = useCallback((event: LayoutChangeEvent) => {
+    if (Platform.OS !== 'android') return;
+    const { width, height } = event.nativeEvent.layout;
+    if (width > 0 && height > 0) setMapLayoutReady(true);
+  }, []);
 
   const handleRegionComplete = useCallback(
     (region: Region) => {
@@ -44,6 +62,24 @@ const MarkerMap: React.FC<Props> = ({
   useEffect(() => {
     regionRef.current = initialRegion;
   }, [initialRegion]);
+
+  useEffect(() => clearAndroidTileRetry, [clearAndroidTileRetry]);
+
+  const handleMapReady = useCallback(() => {
+    if (Platform.OS !== 'android') return;
+    clearAndroidTileRetry();
+    if (androidTileRetryCountRef.current > 0) return;
+    androidTileRetryRef.current = setTimeout(() => {
+      androidTileRetryCountRef.current += 1;
+      setAndroidMapKey((key) => key + 1);
+    }, ANDROID_TILE_LOAD_TIMEOUT_MS);
+  }, [clearAndroidTileRetry]);
+
+  const handleMapLoaded = useCallback(() => {
+    if (Platform.OS !== 'android') return;
+    androidTileRetryCountRef.current = 0;
+    clearAndroidTileRetry();
+  }, [clearAndroidTileRetry]);
 
   useEffect(() => {
     if (!recenterTo) return;
@@ -70,26 +106,38 @@ const MarkerMap: React.FC<Props> = ({
   }, []);
 
   return (
-    <View className="min-h-0 w-full flex-1 overflow-hidden rounded-2xl border border-border bg-card">
-      <MapView
-        ref={mapRef}
-        style={StyleSheet.absoluteFillObject}
-        initialRegion={initialRegion}
-        onRegionChangeComplete={handleRegionComplete}
-        showsPointsOfInterest
-        rotateEnabled={false}
-        pitchEnabled={false}
-        toolbarEnabled={Platform.OS === 'android'}
-      >
-        {markers.map((m) => (
-          <NativeMarker
-            key={m.id}
-            marker={m}
-            selected={selectedId === m.id}
-            onPress={onMarkerPress}
-          />
-        ))}
-      </MapView>
+    <View
+      className="min-h-0 w-full flex-1 overflow-hidden rounded-2xl border border-border bg-card"
+      onLayout={handleContainerLayout}
+    >
+      {mapLayoutReady ? (
+        <MapView
+          key={Platform.OS === 'android' ? `android-map-${androidMapKey}` : 'map'}
+          ref={mapRef}
+          provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
+          style={StyleSheet.absoluteFillObject}
+          initialRegion={initialRegion}
+          onMapReady={handleMapReady}
+          onMapLoaded={handleMapLoaded}
+          onRegionChangeComplete={handleRegionComplete}
+          loadingEnabled={Platform.OS === 'android'}
+          loadingBackgroundColor={Theme.colors.card}
+          loadingIndicatorColor={Theme.colors.primary}
+          showsPointsOfInterest
+          rotateEnabled={false}
+          pitchEnabled={false}
+          toolbarEnabled={Platform.OS === 'android'}
+        >
+          {markers.map((m) => (
+            <NativeMarker
+              key={Platform.OS === 'android' ? `${androidMapKey}-${m.id}` : m.id}
+              marker={m}
+              selected={selectedId === m.id}
+              onPress={onMarkerPress}
+            />
+          ))}
+        </MapView>
+      ) : null}
 
       <View
         pointerEvents="box-none"

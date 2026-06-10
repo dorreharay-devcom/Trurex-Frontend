@@ -209,6 +209,8 @@ export type AddYourOwnRecSource = {
   placeName: string;
   categoryCode: string | null;
   linkedPlaceId: string | null;
+  isOnlinePlace: boolean;
+  placeWebsiteUrl: string | null;
   placeCategoryLabel: string;
   locationLine: string | null;
   latitude: number | null;
@@ -239,10 +241,15 @@ export function buildAddYourOwnRecSource(
 ): AddYourOwnRecSource {
   const placeName = resolvePlaceName(detail, rec);
   const placeCategoryLabel = detail?.category_name?.trim() || rec.category?.trim() || 'Place';
+  const isOnlinePlace = Boolean(detail?.is_online_place ?? rec.isOnlinePlace);
+  const placeWebsiteUrl = (detail?.place_website_url ?? rec.placeWebsiteUrl ?? '').trim() || null;
   return {
     placeName,
     categoryCode: normalizeCategoryCode(detail?.category_code, rec.categoryId),
-    linkedPlaceId: detail?.place_id && detail.place_id.trim() ? detail.place_id.trim() : null,
+    linkedPlaceId:
+      !isOnlinePlace && detail?.place_id && detail.place_id.trim() ? detail.place_id.trim() : null,
+    isOnlinePlace,
+    placeWebsiteUrl,
     placeCategoryLabel,
     locationLine: rec.location ? rec.location.trim() : null,
     latitude: rec.latitude != null && !Number.isNaN(rec.latitude) ? rec.latitude : null,

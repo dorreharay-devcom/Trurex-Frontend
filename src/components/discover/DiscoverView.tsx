@@ -35,8 +35,11 @@ import { getCategoryImage } from '~/utils/recommendation/categoryImages';
 import { Theme } from '~/theme/Theme';
 import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
 import { useTrendingTags } from '~/hooks/useTags';
+import { toastSuccess } from '~/utils/appToast';
+import { modalConfig } from '~/constants/recommendation/modalConfig';
 
 const searchFilterPill = 'flex-row items-center gap-1.5 px-3 py-1.5 rounded-full border';
+const SAVE_SHEET_TOAST_DELAY_MS = modalConfig.timing.sheetCloseMs + 180;
 
 const PILL_SKELETON_WIDTHS = [56, 72, 64, 80, 68, 76, 60, 84] as const;
 
@@ -114,6 +117,12 @@ const DiscoverView = ({
       location: rec.location,
       isSaved: rec.isSaved,
     });
+  }, []);
+
+  const handleCollectionCreated = useCallback((collectionName: string) => {
+    setTimeout(() => {
+      toastSuccess('New collection added', `Added to ${collectionName}`);
+    }, SAVE_SHEET_TOAST_DELAY_MS);
   }, []);
   const [editingPinned, setEditingPinned] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
@@ -597,6 +606,7 @@ const DiscoverView = ({
           queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
         }}
         rec={saveTarget}
+        onCollectionCreated={handleCollectionCreated}
       />
     </View>
   );

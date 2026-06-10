@@ -61,7 +61,7 @@ enum ProfileTab {
 }
 
 const TABS = [
-  { id: ProfileTab.Recs, label: "Rex's" },
+  { id: ProfileTab.Recs, label: 'Rex' },
   { id: ProfileTab.Collections, label: 'Collections' },
 ];
 
@@ -560,7 +560,7 @@ const ProfileView = ({
             {TABS.map((tab) => {
               const label =
                 tab.id === ProfileTab.Recs
-                  ? `Rex's (${rexTabCount})`
+                  ? `Rex (${rexTabCount})`
                   : tab.id === ProfileTab.Collections
                     ? `Collections (${myCollections.length})`
                     : tab.label;

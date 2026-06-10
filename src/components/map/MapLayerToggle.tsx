@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, Switch, Platform } from 'react-native';
 import { Layers } from 'lucide-react-native';
-import { MAP_ACTION_INSET, MAP_LAYER_ABOVE_LOCATE } from '~/constants/map/mapUi';
+import {
+  MAP_ACTION_INSET,
+  MAP_LAYER_ABOVE_LOCATE,
+  MAP_RIGHT_CONTROLS_BOTTOM,
+} from '~/constants/map/mapUi';
 import type { PinVisibility } from '~/types/map/mapPin';
 import { MAP_PIN_COLOR } from '~/types/map/mapPin';
 import { Theme } from '~/theme/Theme';
@@ -34,7 +38,7 @@ export const MapLayerToggle: React.FC<Props> = ({ visibility, onChange }) => {
       style={{
         position: 'absolute',
         right: MAP_ACTION_INSET,
-        bottom: MAP_ACTION_INSET + MAP_LAYER_ABOVE_LOCATE,
+        bottom: MAP_RIGHT_CONTROLS_BOTTOM + MAP_LAYER_ABOVE_LOCATE,
         zIndex: 1100,
         elevation: Platform.OS === 'android' ? 12 : 0,
       }}

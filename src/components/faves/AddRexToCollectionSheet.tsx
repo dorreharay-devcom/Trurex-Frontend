@@ -18,12 +18,14 @@ import { useAddRexToCollection } from '~/hooks/useCollections';
 import { useSavedRexes } from '~/hooks/useGems';
 import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
 import { toastError, toastSuccess } from '~/utils/appToast';
-import { webContainerStyle } from '~/utils';
+import { unknownErrorMessage, webContainerStyle } from '~/utils';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { Theme } from '~/theme/Theme';
 import { cn } from '~/utils/general';
 import { ConnectionLoadMoreButton } from '~/components/circles/common';
+
+const TOAST_AFTER_SHEET_CLOSE_DELAY_MS = 400;
 
 interface AddRexToCollectionSheetProps {
   open: boolean;
@@ -84,6 +86,19 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({
     });
   };
 
+  const showToastAfterClose = (show: () => void) => {
+    onClose();
+    setTimeout(show, TOAST_AFTER_SHEET_CLOSE_DELAY_MS);
+  };
+
+  const showErrorAfterClose = (title: string, message?: string) => {
+    showToastAfterClose(() => toastError(title, message));
+  };
+
+  const showSuccessAfterClose = (count: number) => {
+    showToastAfterClose(() => toastSuccess(`Added ${count} rex${count !== 1 ? 'es' : ''}`));
+  };
+
   const handleDone = async () => {
     if (!collectionId || selected.size === 0) {
       onClose();
@@ -96,14 +111,18 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({
       );
       queryClient.invalidateQueries({ queryKey: ['collection-detail'] });
       queryClient.invalidateQueries({ queryKey: ['my-saved-rexes'] });
-      toastSuccess(`Added ${selected.size} rex${selected.size !== 1 ? 'es' : ''}`);
+      setSaving(false);
+      showSuccessAfterClose(selected.size);
+      return;
     } catch (e: unknown) {
-      if (!didAccountFrozenMutationToast(e)) {
-        toastError('Failed to add rexes');
+      setSaving(false);
+      if (didAccountFrozenMutationToast(e)) {
+        showErrorAfterClose(unknownErrorMessage(e, 'Account is frozen'));
+        return;
       }
+      showErrorAfterClose('Failed to add rexes', unknownErrorMessage(e, 'Try again.'));
+      return;
     }
-    setSaving(false);
-    onClose();
   };
 
   return (

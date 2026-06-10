@@ -370,8 +370,14 @@ export function useCreateRecWizard() {
   const applyAddYourOwnPrefill = useCallback(
     (source: AddYourOwnRecSource) => {
       reset();
-      setSearchQuery(source.placeName);
-      setSelectedSearchPlace(buildSelectedSearchPlaceFromAddYourOwn(source));
+      if (source.isOnlinePlace) {
+        setSearchMode('online');
+        setOnlineName(source.placeName);
+        setOnlineWebsiteUrl(source.placeWebsiteUrl ?? '');
+      } else {
+        setSearchQuery(source.placeName);
+        setSelectedSearchPlace(buildSelectedSearchPlaceFromAddYourOwn(source));
+      }
       categoryCodePrefillRef.current = source.categoryCode;
     },
     [reset],

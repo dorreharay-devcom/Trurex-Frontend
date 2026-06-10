@@ -1,4 +1,4 @@
-import { Redirect, Stack } from 'expo-router';
+import { Redirect, Stack, usePathname } from 'expo-router';
 import { View, ActivityIndicator } from 'react-native';
 import { useAuth } from '~/services/AuthContext';
 import { Routes } from '~/constants/routes';
@@ -6,6 +6,7 @@ import { Theme } from '~/theme/Theme';
 
 export default function AuthLayout() {
   const { session, loading } = useAuth();
+  const pathname = usePathname();
 
   if (loading) {
     return (
@@ -15,7 +16,7 @@ export default function AuthLayout() {
     );
   }
 
-  if (session) {
+  if (session && pathname !== Routes.ResetPassword) {
     return <Redirect href={Routes.Main} />;
   }
 

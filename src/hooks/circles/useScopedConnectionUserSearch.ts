@@ -8,7 +8,7 @@ import {
   type SearchUsersScope,
 } from '~/api/usersApi';
 import type { NetworkUserRow } from '~/types/network';
-import { useDebouncedValue } from '~/hooks/useDebouncedValue';
+import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/hooks/useDebouncedValue';
 
 const CONNECTION_PAGE_LIMIT = 50;
 const SEARCH_PAGE_LIMIT = 20;
@@ -222,7 +222,7 @@ export function useScopedConnectionUserSearch(
   enabled: boolean,
 ) {
   const [searchQuery, setQuery] = useState('');
-  const debouncedSearch = useDebouncedValue(searchQuery, 320);
+  const debouncedSearch = useDebouncedValue(searchQuery, DEFAULT_SEARCH_DEBOUNCE_MS);
   const trimmedDebounced = debouncedSearch.trim();
   const searchActive = trimmedDebounced.length > 0;
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { cn } from '~/utils/general';
 
@@ -42,7 +42,7 @@ export function RexPhotoPlaceholder({
         colors={gradientColors}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        className="absolute inset-0"
+        style={StyleSheet.absoluteFillObject}
       />
       <View className="absolute inset-0 items-center justify-center">
         <Text

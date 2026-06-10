@@ -78,6 +78,9 @@ export function CircleDetailScreen({ vm, onUserPress }: Props) {
   const circleUi = getCircleUiPolicy(selectedCircle);
   const showAddToCircleSection = circleUi.showConnectionsAddPanel;
   const allowRemoveMember = circleUi.allowOwnerRemoveMemberRpc;
+  const canRemoveMembers = Boolean(
+    selfId && selectedCircle.owner_id === selfId && allowRemoveMember,
+  );
 
   const addFallbackRows = connectionFallbackRows(addConnTab, vm);
   const addFallbackLoading = connectionFallbackInitialLoading(addConnTab, vm);
@@ -163,11 +166,7 @@ export function CircleDetailScreen({ vm, onUserPress }: Props) {
                 key={m.user_id}
                 member={m}
                 onUserPress={onUserPress}
-                onRemove={
-                  canManage && allowRemoveMember
-                    ? () => vm.removeFromSelectedCircle(m.user_id)
-                    : undefined
-                }
+                onRemove={canRemoveMembers ? () => vm.removeFromSelectedCircle(m.user_id) : undefined}
                 removing={vm.removingMemberId === m.user_id}
               />
             ))}

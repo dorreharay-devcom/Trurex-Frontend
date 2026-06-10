@@ -17,14 +17,15 @@ import { useAuth } from '~/services/AuthContext';
 import type { PinVisibility } from '~/types/map/mapPin';
 import { DEFAULT_PIN_VISIBILITY } from '~/types/map/mapPin';
 import { mapSearchTitleSuggestions } from '~/utils/map/mapSearchSuggestions';
+import { DEFAULT_SEARCH_DEBOUNCE_MS } from '~/hooks/useDebouncedValue';
 
 type Params = {
   onRecommendationPress?: (rec: Recommendation) => void;
 };
 
 const BOUNDS_DEBOUNCE_MS = 450;
-const SEARCH_DEBOUNCE_MS = 400;
-const SEARCH_SUGGEST_DEBOUNCE_MS = 160;
+const SEARCH_DEBOUNCE_MS = DEFAULT_SEARCH_DEBOUNCE_MS;
+const SEARCH_SUGGEST_DEBOUNCE_MS = DEFAULT_SEARCH_DEBOUNCE_MS;
 
 export function useMapScreen({ onRecommendationPress }: Params) {
   const { user } = useAuth();

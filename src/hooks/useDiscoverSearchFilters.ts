@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { DollarSign, Tag, Clock } from 'lucide-react-native';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { useSearchRexes, type RecencyDayToken } from '~/hooks/useDiscovery';
+import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/hooks/useDebouncedValue';
 
 export const DISCOVER_VALUE_LABELS = [
   'Total Steal',
@@ -46,16 +47,18 @@ export function useDiscoverSearchFilters({
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
   const hasSearch = searchQuery.trim().length > 0;
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, DEFAULT_SEARCH_DEBOUNCE_MS);
+  const hasDebouncedSearch = debouncedSearchQuery.trim().length > 0;
 
   const { data: searchData, isLoading: searchLoading } = useSearchRexes(
     {
-      searchTerm: searchQuery,
+      searchTerm: debouncedSearchQuery,
       categoryId: activeCategory,
       searchCategoryFilter,
       valueForMoneyFilters: vfmFilter,
       recencyFilterDays,
     },
-    { enabled: hasSearch },
+    { enabled: hasDebouncedSearch },
   );
 
   const searchRows = useMemo((): Recommendation[] => {
