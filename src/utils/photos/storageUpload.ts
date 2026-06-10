@@ -8,6 +8,7 @@ import { convertHeicIfNeeded } from './heicConversion';
 type UploadBody = Blob | ArrayBuffer;
 
 const JPEG_CONTENT_TYPE = 'image/jpeg';
+const isNative = Platform.OS !== 'web';
 const BASE64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 const BASE64_VALUES = BASE64_CHARS.split('').reduce<Record<string, number>>((acc, char, index) => {
   acc[char] = index;
@@ -59,7 +60,7 @@ export async function resizeForUpload(
   const result = await ImageManipulator.manipulateAsync(uri, [{ resize: { width: maxWidth } }], {
     compress: 0.82,
     format: ImageManipulator.SaveFormat.JPEG,
-    base64: Platform.OS === 'android',
+    base64: isNative,
   });
   return { uri: result.uri, base64: result.base64 };
 }
@@ -88,7 +89,7 @@ export async function preparePickerImageForUpload(
 
     const resized = await resizeForUpload(image.uri, maxWidth);
 
-    if (Platform.OS === 'android') {
+    if (isNative) {
       if (!resized.base64) throw new Error('Could not read image data.');
       return {
         body: base64ToArrayBuffer(resized.base64),
