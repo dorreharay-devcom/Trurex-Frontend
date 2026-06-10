@@ -6,4 +6,5 @@ export const Routes = {
   Signup: '/signup',
   ForgotPassword: '/forgot-password',
   ResetPassword: '/reset-password',
+  Mfa: '/mfa',
 } as const satisfies Record<string, Href>;

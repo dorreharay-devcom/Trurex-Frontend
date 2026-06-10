@@ -5,7 +5,7 @@ import { Routes } from '~/constants/routes';
 import { Theme } from '~/theme/Theme';
 
 export default function MainLayout() {
-  const { session, loading } = useAuth();
+  const { session, loading, mfaPending } = useAuth();
 
   if (loading) {
     return (
@@ -17,6 +17,10 @@ export default function MainLayout() {
 
   if (!session) {
     return <Redirect href={Routes.Login} />;
+  }
+
+  if (mfaPending) {
+    return <Redirect href={Routes.Mfa} />;
   }
 
   return <Stack screenOptions={{ headerShown: false }} />;
