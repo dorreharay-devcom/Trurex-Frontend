@@ -4,7 +4,6 @@ import {
   Text,
   Pressable,
   Platform,
-  Keyboard,
   useWindowDimensions,
   ActivityIndicator,
 } from 'react-native';
@@ -83,7 +82,6 @@ export const CreateModal: React.FC<Props> = ({
     syncCategoryCreateShape,
   } = flow;
   const [submitting, setSubmitting] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const postedSuccessfullyRef = useRef(false);
   const appliedEditIdRef = useRef<string | null>(null);
   const isEditMode = editRexId != null;
@@ -95,20 +93,6 @@ export const CreateModal: React.FC<Props> = ({
   useEffect(() => {
     if (!visible) appliedEditIdRef.current = null;
   }, [visible, editRexId]);
-
-  useEffect(() => {
-    if (Platform.OS === 'web') return;
-    const show = Keyboard.addListener('keyboardDidShow', (event) => {
-      setKeyboardHeight(event.endCoordinates.height);
-    });
-    const hide = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardHeight(0);
-    });
-    return () => {
-      show.remove();
-      hide.remove();
-    };
-  }, []);
 
   const applyManualGeotag = useCallback(
     (result: ManualPlaceGeotagResult) => {
@@ -373,7 +357,7 @@ export const CreateModal: React.FC<Props> = ({
         tag_names: flow.selectedTagSlugs,
         photo_paths: flow.photoStoragePaths.length > 0 ? flow.photoStoragePaths : null,
         p_linked_place_id:
-          flow.searchMode === 'online' ? null : getLinkedPlaceId(flow.linkedPlaceId) ?? undefined,
+          flow.searchMode === 'online' ? null : (getLinkedPlaceId(flow.linkedPlaceId) ?? undefined),
         p_is_online_place: flow.searchMode === 'online',
         p_place_website_url:
           flow.searchMode === 'online' ? flow.onlineWebsiteUrl.trim() || null : null,
@@ -395,7 +379,10 @@ export const CreateModal: React.FC<Props> = ({
         await createRex(params);
       }
       postedSuccessfullyRef.current = true;
-      toastSuccess(isEditMode ? 'Updated' : 'Posted', isEditMode ? 'Your Rex was updated.' : 'Your recommendation is live.');
+      toastSuccess(
+        isEditMode ? 'Updated' : 'Posted',
+        isEditMode ? 'Your Rex was updated.' : 'Your recommendation is live.',
+      );
       queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
       queryClient.invalidateQueries({ queryKey: ['search-rexes'] });
       queryClient.invalidateQueries({ queryKey: ['my-rexes'] });
@@ -410,7 +397,10 @@ export const CreateModal: React.FC<Props> = ({
       handleClose();
     } catch (e) {
       if (didAccountFrozenMutationToast(e)) return;
-      toastError(isEditMode ? 'Could not update' : 'Could not post', unknownErrorMessage(e, 'Something went wrong.'));
+      toastError(
+        isEditMode ? 'Could not update' : 'Could not post',
+        unknownErrorMessage(e, 'Something went wrong.'),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -428,8 +418,6 @@ export const CreateModal: React.FC<Props> = ({
   ]);
 
   const { layout } = modalConfig;
-  const androidKeyboardFooterOffset =
-    Platform.OS === 'android' ? keyboardHeight : 0;
 
   const primaryDisabled =
     submitting ||
@@ -503,14 +491,7 @@ export const CreateModal: React.FC<Props> = ({
           initialLoading={editLoading}
         />
 
-        <View
-          className="sticky bottom-0 items-center border-t border-border bg-card/95 px-4 py-4 backdrop-blur sm:px-6"
-          style={
-            androidKeyboardFooterOffset > 0
-              ? { marginBottom: androidKeyboardFooterOffset }
-              : undefined
-          }
-        >
+        <View className="sticky bottom-0 items-center border-t border-border bg-card/95 px-4 py-4 backdrop-blur sm:px-6">
           <View
             className="w-full"
             style={{
@@ -526,7 +507,13 @@ export const CreateModal: React.FC<Props> = ({
                 }}
                 disabled={primaryDisabled && Platform.OS !== 'web'}
                 accessibilityRole="button"
-                accessibilityLabel={flow.isLastStep ? (isEditMode ? 'Save Rex changes' : 'Confirm and post') : 'Continue'}
+                accessibilityLabel={
+                  flow.isLastStep
+                    ? isEditMode
+                      ? 'Save Rex changes'
+                      : 'Confirm and post'
+                    : 'Continue'
+                }
                 accessibilityState={{ disabled: primaryDisabled }}
                 className={cn(
                   'flex h-12 w-full flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2',
@@ -543,7 +530,11 @@ export const CreateModal: React.FC<Props> = ({
                       pointerEvents="none"
                       className="text-base font-semibold text-primary-foreground"
                     >
-                      {flow.isLastStep ? (isEditMode ? 'Save Changes' : 'Confirm & Post') : 'Continue'}
+                      {flow.isLastStep
+                        ? isEditMode
+                          ? 'Save Changes'
+                          : 'Confirm & Post'
+                        : 'Continue'}
                     </Text>
                     {flow.isLastStep ? (
                       <Image
