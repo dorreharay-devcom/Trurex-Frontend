@@ -32,9 +32,10 @@ const MAP_LOCATION_PROMPT_DISMISSED_KEY = 'mapLocationPromptDismissed';
 
 type Props = {
   onRecommendationPress?: (rec: Recommendation) => void;
+  onRexSheetOpenChange?: (open: boolean) => void;
 };
 
-const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
+const MapScreen: React.FC<Props> = ({ onRecommendationPress, onRexSheetOpenChange }) => {
   const flow = useMapScreen({ onRecommendationPress });
   const { locateMe } = flow;
   const [locationPromptVisible, setLocationPromptVisible] = useState(false);
@@ -58,6 +59,11 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress }) => {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    onRexSheetOpenChange?.(Boolean(flow.selectedRec));
+    return () => onRexSheetOpenChange?.(false);
+  }, [flow.selectedRec, onRexSheetOpenChange]);
 
   const onLocationNotNow = useCallback(async () => {
     await AsyncStorage.setItem(MAP_LOCATION_PROMPT_DISMISSED_KEY, '1');

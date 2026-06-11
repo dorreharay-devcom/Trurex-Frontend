@@ -38,6 +38,7 @@ const MarkerMap: React.FC<Props> = ({
   markersRef.current = markers;
   const [mapLayoutReady, setMapLayoutReady] = useState(Platform.OS !== 'android');
   const [androidMapKey, setAndroidMapKey] = useState(0);
+  const [mapReady, setMapReady] = useState(false);
 
   const clearAndroidTileRetry = useCallback(() => {
     if (androidTileRetryRef.current == null) return;
@@ -66,6 +67,7 @@ const MarkerMap: React.FC<Props> = ({
   useEffect(() => clearAndroidTileRetry, [clearAndroidTileRetry]);
 
   const handleMapReady = useCallback(() => {
+    setMapReady(true);
     if (Platform.OS !== 'android') return;
     clearAndroidTileRetry();
     if (androidTileRetryCountRef.current > 0) return;
@@ -82,19 +84,32 @@ const MarkerMap: React.FC<Props> = ({
   }, [clearAndroidTileRetry]);
 
   useEffect(() => {
+    if (!mapReady) return;
     if (!recenterTo) return;
     if (recenterTo.fitMarkers) {
       const m = markersRef.current;
-      if (m.length > 0) mapRef.current?.animateToRegion(regionForMarkers(m));
+      if (m.length > 0) {
+        mapRef.current?.fitToCoordinates(
+          m.map((marker) => ({ latitude: marker.latitude, longitude: marker.longitude })),
+          {
+            edgePadding: { top: 80, right: 80, bottom: 120, left: 80 },
+            animated: true,
+          },
+        );
+      }
       return;
     }
-    mapRef.current?.animateToRegion({
-      latitude: recenterTo.latitude,
-      longitude: recenterTo.longitude,
-      latitudeDelta: 0.06,
-      longitudeDelta: 0.06,
-    });
-  }, [recenterTo]);
+    mapRef.current?.animateCamera(
+      {
+        center: {
+          latitude: recenterTo.latitude,
+          longitude: recenterTo.longitude,
+        },
+        zoom: 14,
+      },
+      { duration: 450 },
+    );
+  }, [mapReady, recenterTo]);
 
   const zoomByFactor = useCallback((factor: number) => {
     const r = regionRef.current;

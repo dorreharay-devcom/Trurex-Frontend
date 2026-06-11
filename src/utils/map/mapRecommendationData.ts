@@ -51,9 +51,12 @@ export function regionForMarkers(markers: MapMarkerItem[]): Region {
   const maxLng = Math.max(...lngs);
   const midLat = (minLat + maxLat) / 2;
   const midLng = (minLng + maxLng) / 2;
-  const pad = 0.02;
-  const latDelta = Math.max(maxLat - minLat + pad * 2, 0.08);
-  const lngDelta = Math.max(maxLng - minLng + pad * 2, 0.08);
+  const latSpan = maxLat - minLat;
+  const lngSpan = maxLng - minLng;
+  const latPad = Math.max(0.02, latSpan * 0.15);
+  const lngPad = Math.max(0.02, lngSpan * 0.15);
+  const latDelta = Math.max(latSpan + latPad * 2, 0.08);
+  const lngDelta = Math.max(lngSpan + lngPad * 2, 0.08);
   return {
     latitude: midLat,
     longitude: midLng,

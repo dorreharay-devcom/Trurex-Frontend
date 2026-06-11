@@ -5,9 +5,10 @@ export const nativeMarkerStyles = StyleSheet.create({
   markerHit: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    width: 44,
-    height: 44,
-    paddingTop: 4,
+    width: 56,
+    height: 56,
+    paddingTop: 6,
+    overflow: 'visible',
   },
   tooltipImage: {
     width: 300,
@@ -47,9 +48,9 @@ export const nativeMarkerStyles = StyleSheet.create({
     color: Theme.colors.secondaryText,
   },
   pin: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
@@ -60,7 +61,10 @@ export const nativeMarkerStyles = StyleSheet.create({
     elevation: 4,
   },
   glyph: {
-    fontSize: 14,
+    fontSize: 15,
+    lineHeight: 18,
     textAlign: 'center',
+    textAlignVertical: 'center',
+    includeFontPadding: false,
   },
 });

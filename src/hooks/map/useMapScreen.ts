@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Platform } from 'react-native';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import * as Location from 'expo-location';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import type { MapMarkerItem, MapRecenterTarget } from '~/types/map/mapMarker';
 import type { LatLngBounds } from '~/utils/map/mapRecommendationData';
@@ -18,6 +16,7 @@ import type { PinVisibility } from '~/types/map/mapPin';
 import { DEFAULT_PIN_VISIBILITY } from '~/types/map/mapPin';
 import { mapSearchTitleSuggestions } from '~/utils/map/mapSearchSuggestions';
 import { DEFAULT_SEARCH_DEBOUNCE_MS } from '~/hooks/useDebouncedValue';
+import { getCurrentLocationCoords } from '~/utils/location';
 
 type Params = {
   onRecommendationPress?: (rec: Recommendation) => void;
@@ -61,12 +60,10 @@ export function useMapScreen({ onRecommendationPress }: Params) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted' || cancelled) return;
-      const pos = await Location.getCurrentPositionAsync({});
-      if (!cancelled) {
-        setUserCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
-      }
+      try {
+        const coords = await getCurrentLocationCoords();
+        if (!cancelled) setUserCoords({ latitude: coords.lat, longitude: coords.lng });
+      } catch {}
     })();
     return () => {
       cancelled = true;
@@ -84,36 +81,17 @@ export function useMapScreen({ onRecommendationPress }: Params) {
       if (c) applyLocatedCoords(c.latitude, c.longitude);
     };
 
-    const tryExpo = async (): Promise<boolean> => {
+    const tryLocate = async (): Promise<boolean> => {
       try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') return false;
-        const pos = await Location.getCurrentPositionAsync({});
-        applyLocatedCoords(pos.coords.latitude, pos.coords.longitude);
+        const coords = await getCurrentLocationCoords();
+        applyLocatedCoords(coords.lat, coords.lng);
         return true;
       } catch {
         return false;
       }
     };
 
-    if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.geolocation) {
-      const ok = await new Promise<boolean>((resolve) => {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            applyLocatedCoords(pos.coords.latitude, pos.coords.longitude);
-            resolve(true);
-          },
-          () => resolve(false),
-          { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 },
-        );
-      });
-      if (ok) return;
-      if (await tryExpo()) return;
-      fallbackCached();
-      return;
-    }
-
-    if (await tryExpo()) return;
+    if (await tryLocate()) return;
     fallbackCached();
   }, [applyLocatedCoords]);
 
