@@ -69,7 +69,12 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress 
   useEffect(() => {
     if (!isMobile) return;
     if (open) {
-      Animated.spring(slideAnim, { toValue: 0, damping: 22, stiffness: 200, useNativeDriver: true }).start();
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        damping: 22,
+        stiffness: 200,
+        useNativeDriver: true,
+      }).start();
     } else {
       Animated.timing(slideAnim, { toValue: 600, duration: 220, useNativeDriver: true }).start();
     }
@@ -78,19 +83,23 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress 
   useEffect(() => {
     if (typeof document === 'undefined') return;
     document.body.style.overflow = open ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [open]);
 
   const followMutation = useMutation({
     mutationFn: followUser,
     onSuccess: (_data, actorId) => {
       setFollowedIds((prev) => new Set(prev).add(actorId));
-      queryClient.setQueryData<AppNotification[]>(['notifications'], (prev) =>
-        prev?.map((n) =>
-          FOLLOWABLE_TYPES.has(n.type) && n.actor_id === actorId
-            ? { ...n, show_followback: false }
-            : n,
-        ) ?? [],
+      queryClient.setQueryData<AppNotification[]>(
+        ['notifications'],
+        (prev) =>
+          prev?.map((n) =>
+            FOLLOWABLE_TYPES.has(n.type) && n.actor_id === actorId
+              ? { ...n, show_followback: false }
+              : n,
+          ) ?? [],
       );
     },
   });
@@ -150,11 +159,20 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress 
         return (
           <Pressable
             key={n.id}
-            onPress={() => { if (!n.is_read) markOneAsRead(n.id); }}
+            onPress={() => {
+              if (!n.is_read) markOneAsRead(n.id);
+            }}
             className={`flex-row items-start gap-3 border-b border-border/60 px-4 py-3 active:opacity-70 ${!n.is_read ? 'bg-primary/5' : ''}`}
           >
             <Pressable
-              onPress={n.actor_id && onUserPress ? () => { close(); onUserPress(n.actor_id!); } : undefined}
+              onPress={
+                n.actor_id && onUserPress
+                  ? () => {
+                      close();
+                      onUserPress(n.actor_id!);
+                    }
+                  : undefined
+              }
               className="shrink-0 active:opacity-70"
             >
               <View className="h-9 w-9 rounded-full overflow-hidden">
@@ -273,7 +291,11 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress 
       >
         <View className="flex-1" style={StyleSheet.absoluteFillObject}>
           <Pressable
-            style={[StyleSheet.absoluteFillObject, { backgroundColor: isMobile ? 'rgba(0,0,0,0.4)' : 'transparent' }]}
+            style={[
+              StyleSheet.absoluteFillObject,
+              { backgroundColor: isMobile ? 'rgba(0,0,0,0.4)' : 'transparent' },
+              Platform.OS === 'web' ? ({ cursor: 'default' } as unknown as ViewStyle) : null,
+            ]}
             onPress={close}
             accessibilityRole="button"
             accessibilityLabel="Close notifications"
