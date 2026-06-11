@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, Text, Image, Alert, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AuthApi } from '~/api/AuthApi';
@@ -6,10 +6,15 @@ import { Routes } from '~/constants/routes';
 import { Button } from '~/components/common/Button';
 import AuthLayout from '~/components/common/AuthLayout';
 import Input from '~/components/common/Input';
+import { InviteCodeInput, type InviteCodeInputRef } from '~/components/auth/InviteCodeInput';
 import { OAuthSocialButtons } from '~/components/auth/OAuthSocialButtons';
 import { useOAuthSignIn } from '~/hooks/auth/useOAuthSignIn';
 import { getRedirectUrl } from '~/utils';
 import { mapAuthError } from '~/utils/errors';
+import { isSignupInviteCodeValid, SIGNUP_INVITE_CODE_ENABLED } from '~/constants/authInvite';
+import type { OAuthProvider } from '~/auth/oauth';
+
+const INVITE_CODE_LENGTH = 6;
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -17,10 +22,13 @@ export default function SignupScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
+  const inviteCodeInputRef = useRef<InviteCodeInputRef>(null);
   const [errors, setErrors] = useState<{
     fullName?: string;
     email?: string;
     password?: string;
+    inviteCode?: string;
     general?: string;
   }>({});
   const [loading, setLoading] = useState(false);
@@ -31,8 +39,38 @@ export default function SignupScreen() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) next.email = 'Enter a valid email address';
     if (password.length < 6) next.password = 'Password must be at least 6 characters';
+    const inviteError = inviteCodeError();
+    if (inviteError) next.inviteCode = inviteError;
     setErrors(next);
     return Object.keys(next).length === 0;
+  };
+
+  const inviteCodeError = () => {
+    if (!SIGNUP_INVITE_CODE_ENABLED) return undefined;
+    if (inviteCode.length < INVITE_CODE_LENGTH) return 'Enter your 6-digit invite code';
+    if (!isSignupInviteCodeValid(inviteCode)) return 'Enter a valid invite code';
+    return undefined;
+  };
+
+  const validateInviteCodeOnly = () => {
+    const error = inviteCodeError();
+    if (error) {
+      setErrors((prev) => ({ ...prev, inviteCode: error }));
+      inviteCodeInputRef.current?.focus();
+      return false;
+    }
+    if (isSignupInviteCodeValid(inviteCode)) return true;
+    return false;
+  };
+
+  const handleOAuthSignup = (provider: OAuthProvider) => {
+    if (!validateInviteCodeOnly()) return;
+    signInWithOAuth(provider);
+  };
+
+  const handleInviteCodeChange = (value: string) => {
+    setInviteCode(value);
+    setErrors((e) => ({ ...e, inviteCode: undefined, general: undefined }));
   };
 
   const handleSignup = async () => {
@@ -67,8 +105,8 @@ export default function SignupScreen() {
 
       <OAuthSocialButtons
         disabled={oauthPending || loading}
-        onGooglePress={() => signInWithOAuth('google')}
-        onApplePress={() => signInWithOAuth('apple')}
+        onGooglePress={() => handleOAuthSignup('google')}
+        onApplePress={() => handleOAuthSignup('apple')}
       />
 
       <View className="flex-row items-center gap-3">
@@ -113,6 +151,15 @@ export default function SignupScreen() {
           secure
           error={errors.password}
         />
+
+        {SIGNUP_INVITE_CODE_ENABLED ? (
+          <InviteCodeInput
+            ref={inviteCodeInputRef}
+            value={inviteCode}
+            onChange={handleInviteCodeChange}
+            error={errors.inviteCode}
+          />
+        ) : null}
 
         <Button
           title="Create account"
