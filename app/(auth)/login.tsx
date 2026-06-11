@@ -9,10 +9,14 @@ import Input from '~/components/common/Input';
 import { OAuthSocialButtons } from '~/components/auth/OAuthSocialButtons';
 import { useOAuthSignIn } from '~/hooks/auth/useOAuthSignIn';
 import { mapAuthError } from '~/utils/errors';
+import { checkMfaRequirement } from '~/auth/mfa';
+import { useAuth } from '~/services/AuthContext';
+import { unknownErrorMessage } from '~/utils';
 
 export default function LoginScreen() {
   const router = useRouter();
   const isWeb = Platform.OS === 'web';
+  const { setMfaPending } = useAuth();
   const { signInWithOAuth, oauthPending } = useOAuthSignIn();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,11 +36,33 @@ export default function LoginScreen() {
     if (!validate()) return;
     setLoading(true);
     setErrors({});
+    let signedIn = false;
     try {
+      await setMfaPending(true);
       await AuthApi.signIn({ email, password });
+      signedIn = true;
+
+      const mfa = await checkMfaRequirement();
+      if (mfa.required) {
+        router.replace(Routes.Mfa);
+        return;
+      }
+
+      await setMfaPending(false);
       router.replace(Routes.Main);
     } catch (error: unknown) {
-      mapAuthError(error, setErrors);
+      await setMfaPending(false);
+      if (signedIn) {
+        await AuthApi.signOut().catch(() => {});
+        setErrors({
+          general: unknownErrorMessage(
+            error,
+            'Could not send your verification code. Please try again.',
+          ),
+        });
+      } else {
+        mapAuthError(error, setErrors);
+      }
     } finally {
       setLoading(false);
     }
@@ -94,10 +120,7 @@ export default function LoginScreen() {
               accessibilityRole="button"
               accessibilityLabel="Forgot password"
             >
-              <Text
-                pointerEvents="none"
-                className="text-xs font-medium text-muted-foreground"
-              >
+              <Text pointerEvents="none" className="text-xs font-medium text-muted-foreground">
                 Forgot password?
               </Text>
             </TouchableOpacity>

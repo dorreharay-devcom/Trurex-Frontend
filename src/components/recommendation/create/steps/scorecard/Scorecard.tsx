@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { ScrollView, View, Text } from 'react-native';
-import { REAL_ESTATE_CATEGORY_ID } from '~/constants/recommendation/rexCategories';
 import { useCategoryIcon } from '~/hooks/useCategoryIcon';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { cn } from '~/utils/general';
@@ -176,7 +175,6 @@ export const Scorecard: React.FC<Props> = ({
             <ScorecardValueForMoney
               value={scoreValueForMoney}
               onChange={onScoreValueForMoneyChange}
-              useRipOffLabels={selectedCategoryId === REAL_ESTATE_CATEGORY_ID}
             />
           </>
         )}

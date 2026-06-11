@@ -61,6 +61,7 @@ export default function HomeScreen() {
   const [avatarRefreshKey, setAvatarRefreshKey] = useState(0);
   const [viewingUserId, setViewingUserId] = useState<string | undefined>(undefined);
   const [profileBackStack, setProfileBackStack] = useState<ProfileBackTarget[]>([]);
+  const [mapRexSheetOpen, setMapRexSheetOpen] = useState(false);
   const { isAccountFrozen } = useUserConfig();
   const { user: authUser } = useAuth();
 
@@ -188,7 +189,12 @@ export default function HomeScreen() {
         {currentTab === 'circles' && (
           <CirclesView isActive={currentTab === 'circles'} onUserPress={openUserProfile} />
         )}
-        {currentTab === 'map' && <MapScreen onRecommendationPress={openPreview} />}
+        {currentTab === 'map' && (
+          <MapScreen
+            onRecommendationPress={openPreview}
+            onRexSheetOpenChange={setMapRexSheetOpen}
+          />
+        )}
         {currentTab === 'profile' && (
           <ProfileView
             userId={viewingUserId}
@@ -200,22 +206,24 @@ export default function HomeScreen() {
         )}
       </StickyTopChromeLayout>
 
-      <TouchableOpacity
-        onPress={openCreateRex}
-        accessibilityRole="button"
-        accessibilityLabel="Add Rex"
-        className="absolute bottom-6 w-14 h-14 rounded-full bg-primary items-center justify-center hover:opacity-90 active:opacity-75 cursor-pointer"
-        style={{
-          right: 24,
-          elevation: 4,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.2,
-          shadowRadius: 4,
-        }}
-      >
-        <PlusCircle size={28} color={Theme.colors.primaryForeground} />
-      </TouchableOpacity>
+      {!(currentTab === 'map' && mapRexSheetOpen) ? (
+        <TouchableOpacity
+          onPress={openCreateRex}
+          accessibilityRole="button"
+          accessibilityLabel="Add Rex"
+          className="absolute bottom-6 w-14 h-14 rounded-full bg-primary items-center justify-center hover:opacity-90 active:opacity-75 cursor-pointer"
+          style={{
+            right: 24,
+            elevation: 4,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+          }}
+        >
+          <PlusCircle size={28} color={Theme.colors.primaryForeground} />
+        </TouchableOpacity>
+      ) : null}
 
       <CreateModal
         visible={createRecommendationOpen}

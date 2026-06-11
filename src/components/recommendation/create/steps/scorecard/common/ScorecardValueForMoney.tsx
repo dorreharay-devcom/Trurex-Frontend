@@ -1,32 +1,14 @@
 import React from 'react';
 import { Platform, View, Text, Pressable } from 'react-native';
 import { cn } from '~/utils/general';
-
-const VALUE_LABELS_RIP_OFF = [
-  'Total Rip-Off',
-  'Poor Value',
-  'Fair',
-  'Good Value',
-  'Exceptional Value',
-] as const;
-
-const VALUE_LABELS_DEFAULT = [
-  'Total Steal',
-  'Budget-Friendly',
-  'Good Value',
-  'Worth Every Cent',
-  'Splurge',
-] as const;
+import { VALUE_FOR_MONEY_LABELS } from '~/utils/recommendation/recContentDisplay';
 
 type Props = {
   value: number | null;
   onChange: (v: number | null) => void;
-  useRipOffLabels: boolean;
 };
 
-export function ScorecardValueForMoney({ value, onChange, useRipOffLabels }: Props) {
-  const labels = useRipOffLabels ? VALUE_LABELS_RIP_OFF : VALUE_LABELS_DEFAULT;
-
+export function ScorecardValueForMoney({ value, onChange }: Props) {
   return (
     <View className="gap-3" style={Platform.OS === 'web' ? undefined : { marginBottom: 8 }}>
       <View className="flex-row items-center justify-between gap-2">
@@ -40,29 +22,23 @@ export function ScorecardValueForMoney({ value, onChange, useRipOffLabels }: Pro
         ) : null}
       </View>
       <View className="flex-row flex-wrap gap-2">
-        {labels.map((label, i) => {
+        {VALUE_FOR_MONEY_LABELS.map((label, i) => {
           const val = i + 1;
           const selected = value === val;
-          const dollars = '$'.repeat(val);
           return (
             <Pressable
               key={label}
               onPress={() => onChange(selected ? null : val)}
               accessibilityRole="button"
               accessibilityState={{ selected }}
-              accessibilityLabel={`Value for money: ${dollars} ${label}`}
+              accessibilityLabel={`Value for money: ${label}`}
               className={cn(
                 'rounded-full border px-3 py-2 active:opacity-90',
                 selected ? 'border-primary bg-primary' : 'border-border bg-muted/50',
               )}
             >
-              <Text
-                className={cn(
-                  'text-sm',
-                  selected ? 'text-primary-foreground' : 'text-black',
-                )}
-              >
-                {dollars} {label}
+              <Text className={cn('text-sm', selected ? 'text-primary-foreground' : 'text-black')}>
+                {label}
               </Text>
             </Pressable>
           );

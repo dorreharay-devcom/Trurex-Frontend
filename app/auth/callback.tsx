@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Linking from 'expo-linking';
@@ -6,10 +6,15 @@ import { Auth } from '~/services/AuthService';
 import { Routes } from '~/constants/routes';
 import { Theme } from '~/theme/Theme';
 import { completeOAuthSessionFromUrl } from '~/auth/oauth';
+import { checkMfaRequirement } from '~/auth/mfa';
 import { isWeb } from '~/utils';
+import { AuthApi } from '~/api/AuthApi';
+import { useAuth } from '~/services/AuthContext';
 
 export default function AuthCallback() {
   const router = useRouter();
+  const { setMfaPending } = useAuth();
+  const mfaCheckStartedRef = useRef(false);
 
   useEffect(() => {
     let active = true;
@@ -26,6 +31,28 @@ export default function AuthCallback() {
       }
     };
 
+    const goAfterMfaCheck = async () => {
+      if (mfaCheckStartedRef.current) return;
+      mfaCheckStartedRef.current = true;
+
+      try {
+        await setMfaPending(true);
+        const mfa = await checkMfaRequirement();
+        if (mfa.required) {
+          if (active) router.replace(Routes.Mfa);
+          return;
+        }
+
+        await setMfaPending(false);
+        goMain();
+      } catch (error) {
+        console.warn('[Auth] MFA initiation failed after OAuth sign-in', error);
+        await setMfaPending(false);
+        await AuthApi.signOut().catch(() => {});
+        goLogin();
+      }
+    };
+
     const bootstrap = async () => {
       if (!isWeb) {
         const initialUrl = await Linking.getInitialURL();
@@ -33,6 +60,8 @@ export default function AuthCallback() {
           try {
             await completeOAuthSessionFromUrl(initialUrl);
           } catch {
+            await setMfaPending(false);
+            goLogin();
             return;
           }
         }
@@ -40,7 +69,9 @@ export default function AuthCallback() {
 
       const { data } = await Auth.getSession();
       if (data.session) {
-        goMain();
+        goAfterMfaCheck();
+      } else {
+        goLogin();
       }
     };
 
@@ -50,7 +81,7 @@ export default function AuthCallback() {
       data: { subscription },
     } = Auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        goMain();
+        goAfterMfaCheck();
       } else if (event === 'SIGNED_OUT') {
         goLogin();
       }
@@ -60,7 +91,7 @@ export default function AuthCallback() {
       active = false;
       subscription.unsubscribe();
     };
-  }, [router]);
+  }, [router, setMfaPending]);
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

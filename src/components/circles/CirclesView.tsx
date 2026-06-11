@@ -38,6 +38,8 @@ import { ClearableSearchInput } from '~/components/common/ClearableSearchInput';
 
 type Props = { isActive: boolean; onUserPress?: (userId: string) => void };
 
+const SHOW_SHARE_PROFILE_CARD = false;
+
 const CirclesView = ({ isActive, onUserPress }: Props) => {
   const vm = useCirclesViewModel(isActive);
 
@@ -102,7 +104,7 @@ function CirclesListContent({
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <ShareProfileCard isActive={isActive} />
+        {SHOW_SHARE_PROFILE_CARD ? <ShareProfileCard isActive={isActive} /> : null}
         <Text className="mb-3 text-base font-semibold text-foreground">My Circles</Text>
 
         <View className="mb-3 flex-row items-center justify-between">

@@ -12,15 +12,15 @@ type Props = {
   onPress: (id: string) => void;
 };
 
-const ANDROID_MARKER_TRACKING_MS = 700;
+const NATIVE_MARKER_TRACKING_MS = 700;
 
 export const NativeMarker: React.FC<Props> = ({ marker: m, selected, onPress }) => {
-  const [tracksViewChanges, setTracksViewChanges] = useState(Platform.OS === 'android');
+  const [tracksViewChanges, setTracksViewChanges] = useState(Platform.OS !== 'web');
 
   useEffect(() => {
-    if (Platform.OS !== 'android') return;
+    if (Platform.OS === 'web') return;
     setTracksViewChanges(true);
-    const timeout = setTimeout(() => setTracksViewChanges(false), ANDROID_MARKER_TRACKING_MS);
+    const timeout = setTimeout(() => setTracksViewChanges(false), NATIVE_MARKER_TRACKING_MS);
     return () => clearTimeout(timeout);
   }, [m.glyph, m.pinColor, selected]);
 
@@ -29,7 +29,7 @@ export const NativeMarker: React.FC<Props> = ({ marker: m, selected, onPress }) 
       coordinate={{ latitude: m.latitude, longitude: m.longitude }}
       anchor={{ x: 0.5, y: 0.91 }}
       onPress={() => onPress(m.id)}
-      tracksViewChanges={Platform.OS === 'android' ? tracksViewChanges : false}
+      tracksViewChanges={tracksViewChanges}
       zIndex={selected ? 10 : 1}
     >
       <Pressable style={styles.markerHit} accessibilityLabel={m.title}>
