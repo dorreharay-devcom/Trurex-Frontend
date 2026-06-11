@@ -44,11 +44,11 @@ export function userAvatarHttpUrl(avatar: string | undefined | null): string | n
 }
 
 export const VALUE_FOR_MONEY_LABELS = [
-  'Total Steal',
-  'Budget-Friendly',
-  'Good Value',
-  'Worth It',
-  'Splurge',
+  'Bargain Find',
+  'Cheap&Cheerful',
+  'Fair&Solid',
+  'Expensive But Worth It',
+  'Felt Like A Rip-off',
 ] as const;
 
 export function valueForMoneyLabel(score: number): string | null {

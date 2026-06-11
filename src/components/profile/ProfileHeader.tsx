@@ -132,16 +132,6 @@ const ProfileHeader = ({
           )}
         </View>
 
-        {/* Stats */}
-        <View className="flex-row gap-6 mt-4 pb-4 border-b border-border">
-          <View className="items-center">
-            <Text className="text-lg font-display font-bold text-foreground">
-              {profile.rexCount}
-            </Text>
-            <Text className="text-xs text-muted-foreground">Rex</Text>
-          </View>
-        </View>
-
         {/* Action buttons */}
         {isOwnProfile ? (
           <View className="flex-row gap-2 mt-4 mb-2">

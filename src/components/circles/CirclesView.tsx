@@ -4,7 +4,6 @@ import { ChevronRight, Plus, Users, X } from 'lucide-react-native';
 import { CircleAssignmentSheet } from '~/components/circles/CircleAssignmentSheet';
 import { CircleDetailScreen } from '~/components/circles/CircleDetailScreen';
 import { PeopleYouMayKnowSection } from '~/components/circles/PeopleYouMayKnowSection';
-import { ShareProfileCard } from '~/components/circles/ShareProfileCard';
 import {
   CircleGlyphIcon,
   ConnectionLoadMoreButton,
@@ -102,7 +101,6 @@ function CirclesListContent({
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <ShareProfileCard isActive={isActive} />
         <Text className="mb-3 text-base font-semibold text-foreground">My Circles</Text>
 
         <View className="mb-3 flex-row items-center justify-between">

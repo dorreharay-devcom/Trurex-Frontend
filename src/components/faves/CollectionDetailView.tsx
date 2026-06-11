@@ -51,8 +51,7 @@ import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollec
 import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 import { buildCurrentWebPath, buildPublicWebPath } from '~/utils/shareUrls';
 import { shareMobileLink } from '~/utils/mobileShare';
-
-const VALUE_LABELS = ['Total Steal', 'Budget-Friendly', 'Good Value', 'Worth It', 'Splurge'];
+import { VALUE_FOR_MONEY_LABELS } from '~/utils/recommendation/recContentDisplay';
 
 function entryToRec(entry: CollectionRexEntry): Recommendation {
   return {
@@ -289,7 +288,9 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                       ) : (
                         <BookmarkPlus size={15} color={Theme.colors.foreground} />
                       )}
-                      <Text className={`text-sm ${isSaved ? 'text-destructive' : 'text-foreground'}`}>
+                      <Text
+                        className={`text-sm ${isSaved ? 'text-destructive' : 'text-foreground'}`}
+                      >
                         {isSaved ? 'Remove from saved' : 'Save to my collections'}
                       </Text>
                     </TouchableOpacity>
@@ -397,7 +398,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                           <View className="flex-row items-center gap-0.5">
                             <DollarSign size={10} color={Theme.colors.muted} />
                             <Text className="text-[11px] text-muted-foreground">
-                              {VALUE_LABELS[(item.score_value_for_money ?? 1) - 1]}
+                              {VALUE_FOR_MONEY_LABELS[(item.score_value_for_money ?? 1) - 1]}
                             </Text>
                           </View>
                         )}

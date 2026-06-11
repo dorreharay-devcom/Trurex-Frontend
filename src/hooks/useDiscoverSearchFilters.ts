@@ -3,14 +3,9 @@ import { DollarSign, Tag, Clock } from 'lucide-react-native';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { useSearchRexes, type RecencyDayToken } from '~/hooks/useDiscovery';
 import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/hooks/useDebouncedValue';
+import { VALUE_FOR_MONEY_LABELS } from '~/utils/recommendation/recContentDisplay';
 
-export const DISCOVER_VALUE_LABELS = [
-  'Total Steal',
-  'Budget-Friendly',
-  'Good Value',
-  'Worth It',
-  'Splurge',
-] as const;
+export const DISCOVER_VALUE_LABELS = VALUE_FOR_MONEY_LABELS;
 
 export const DISCOVER_TIME_FILTER_OPTIONS: { label: string; days: RecencyDayToken }[] = [
   { label: 'Today', days: 1 },
