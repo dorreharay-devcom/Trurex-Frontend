@@ -87,9 +87,9 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
   }, []);
 
   const handleCancelReply = useCallback(() => {
+    setText('');
     setReplyTo(null);
     if (Platform.OS === 'web') return;
-    setText('');
     inputRef.current?.blur();
     Keyboard.dismiss();
   }, []);
