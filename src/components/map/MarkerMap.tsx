@@ -36,6 +36,10 @@ const MarkerMap: React.FC<Props> = ({
   const regionRef = useRef<Region>(initialRegion);
   const markersRef = useRef(markers);
   markersRef.current = markers;
+  const iosSelectedMarker = useMemo(() => {
+    if (Platform.OS !== 'ios' || !selectedId) return null;
+    return markers.find((marker) => marker.id === selectedId) ?? null;
+  }, [markers, selectedId]);
   const [mapLayoutReady, setMapLayoutReady] = useState(Platform.OS !== 'android');
   const [androidMapKey, setAndroidMapKey] = useState(0);
   const [mapReady, setMapReady] = useState(false);
@@ -147,10 +151,18 @@ const MarkerMap: React.FC<Props> = ({
             <NativeMarker
               key={Platform.OS === 'android' ? `${androidMapKey}-${m.id}` : m.id}
               marker={m}
-              active={selectedId === m.id}
+              active={Platform.OS === 'ios' ? false : selectedId === m.id}
               onPress={onMarkerPress}
             />
           ))}
+          {iosSelectedMarker ? (
+            <NativeMarker
+              key={`ios-selected-${iosSelectedMarker.id}`}
+              marker={iosSelectedMarker}
+              active
+              onPress={onMarkerPress}
+            />
+          ) : null}
         </MapView>
       ) : null}
 
