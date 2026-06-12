@@ -9,6 +9,8 @@ export interface UserCollection {
   display_name: string;
   description: string | null;
   cover_image_path: string | null;
+  first_rex_photo_path?: string | null;
+  share_token?: string | null;
   visibility?: CollectionVisibility;
   created_at: string;
   updated_at: string;

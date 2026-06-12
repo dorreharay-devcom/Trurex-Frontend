@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, Image, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AuthApi } from '~/api/AuthApi';
 import { Routes } from '~/constants/routes';
@@ -84,7 +84,6 @@ export default function SignupScreen() {
         redirectTo: getRedirectUrl(),
         displayName: fullName,
       });
-      Alert.alert('Check your email', 'We sent you a confirmation link to verify your account.');
       router.replace(Routes.Login);
     } catch (error: unknown) {
       mapAuthError(error, setErrors);

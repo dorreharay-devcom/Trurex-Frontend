@@ -148,7 +148,6 @@ const MarkerMap: React.FC<Props> = ({
               key={Platform.OS === 'android' ? `${androidMapKey}-${m.id}` : m.id}
               marker={m}
               selected={selectedId === m.id}
-              selectionRenderKey={Platform.OS === 'ios' ? selectedId : undefined}
               onPress={onMarkerPress}
             />
           ))}
