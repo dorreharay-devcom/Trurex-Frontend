@@ -147,7 +147,7 @@ const MarkerMap: React.FC<Props> = ({
             <NativeMarker
               key={Platform.OS === 'android' ? `${androidMapKey}-${m.id}` : m.id}
               marker={m}
-              selected={selectedId === m.id}
+              active={selectedId === m.id}
               onPress={onMarkerPress}
             />
           ))}
