@@ -355,8 +355,8 @@ const AddToCollectionSheet: React.FC<AddToCollectionSheetProps> = ({
           `Added to ${collection.display_name}`,
         );
       }
-    } catch {
-      setError('Failed to create collection');
+    } catch (e: unknown) {
+      setError(unknownErrorMessage(e, 'Failed to create collection'));
       setCreating(false);
     }
   };
