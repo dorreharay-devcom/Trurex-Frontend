@@ -4,11 +4,10 @@ import { Theme } from '~/theme/Theme';
 export const nativeMarkerStyles = StyleSheet.create({
   markerHit: {
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    width: 56,
-    height: 56,
-    paddingTop: 6,
-    overflow: 'visible',
+    justifyContent: 'center',
+    width: 72,
+    height: 72,
+    padding: 12,
   },
   tooltipImage: {
     width: 300,
@@ -48,9 +47,9 @@ export const nativeMarkerStyles = StyleSheet.create({
     color: Theme.colors.secondaryText,
   },
   pin: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,

@@ -5,10 +5,10 @@ import { Routes } from '~/constants/routes';
 import { Theme } from '~/theme/Theme';
 
 export default function AuthLayout() {
-  const { session, loading, mfaPending } = useAuth();
+  const { session, loading, mfaPending, mfaChecking } = useAuth();
   const pathname = usePathname();
 
-  if (loading) {
+  if (loading || mfaChecking) {
     return (
       <View className="flex-1 justify-center items-center bg-background">
         <ActivityIndicator size="large" color={Theme.colors.primary} />

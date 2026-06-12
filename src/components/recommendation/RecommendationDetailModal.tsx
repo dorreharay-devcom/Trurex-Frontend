@@ -53,6 +53,7 @@ import {
   rexCoverStoragePathFromRecommendation,
   rexPhotoStoragePathsFromRecommendation,
 } from '~/utils/recommendation/recContentDisplay';
+import { singleLineEllipsisTextStyle } from '~/utils';
 import { deleteRexToastMessage } from '~/utils/recommendation/rexDetailToRecommendation';
 import { Skeleton } from '~/components/ui/skeleton';
 
@@ -248,10 +249,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   }, [recommendation, rexDetail?.place_location]);
 
   const placeWebsiteText = (rexDetail?.place_website_url ?? '').trim();
-  const placeWebsiteHref = useMemo(
-    () => normalizeWebsiteUrl(placeWebsiteText),
-    [placeWebsiteText],
-  );
+  const placeWebsiteHref = useMemo(() => normalizeWebsiteUrl(placeWebsiteText), [placeWebsiteText]);
   const openPlaceWebsite = useCallback(() => {
     if (!placeWebsiteHref) return;
     void Linking.openURL(placeWebsiteHref).catch(() => {
@@ -358,19 +356,13 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                         accessibilityLabel="Edit this recommendation"
                         accessibilityRole="button"
                         className="h-11 items-end justify-center rounded-full active:opacity-90"
-                        style={({ pressed }) => [
-                          pressed ? styles.headerActionPressed : null,
-                        ]}
+                        style={({ pressed }) => [pressed ? styles.headerActionPressed : null]}
                       >
                         <View
                           pointerEvents="none"
                           className="h-8 min-w-[76px] flex-row items-center justify-center gap-1 rounded-full border-2 border-primary bg-primary/20 px-2.5"
                         >
-                          <Pencil
-                            size={12}
-                            color={Theme.colors.foreground}
-                            strokeWidth={2.25}
-                          />
+                          <Pencil size={12} color={Theme.colors.foreground} strokeWidth={2.25} />
                           <Text
                             className="text-xs font-semibold text-foreground"
                             numberOfLines={1}
@@ -510,9 +502,15 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                     accessibilityRole="link"
                     accessibilityLabel={`Open ${placeWebsiteText}`}
                     className="mt-1 flex-row items-center gap-1.5 self-start active:opacity-80"
+                    style={{ maxWidth: '100%' }}
                   >
-                    <Link2 size={14} color={Theme.colors.secondaryText} />
-                    <Text className="text-sm font-medium text-foreground" numberOfLines={1}>
+                    <Link2 size={14} color="#2563eb" />
+                    <Text
+                      className="min-w-0 flex-1 text-sm font-medium text-blue-600"
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={singleLineEllipsisTextStyle}
+                    >
                       {placeWebsiteText}
                     </Text>
                   </Pressable>

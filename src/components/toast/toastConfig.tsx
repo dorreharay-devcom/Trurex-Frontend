@@ -13,7 +13,9 @@ export type AppToastRendererProps = ToastConfigParams<unknown> & Pick<BaseToastP
 
 export const toastRowStyle = {
   alignSelf: 'flex-end' as const,
+  height: 'auto' as const,
   marginRight: 16,
+  minHeight: 64,
   borderLeftColor: Theme.colors.primary,
 };
 
@@ -31,6 +33,19 @@ const dismissStyles = StyleSheet.create({
     width: 44,
     zIndex: 2,
     elevation: 2,
+  },
+});
+
+const toastTextStyles = StyleSheet.create({
+  contentContainer: {
+    paddingVertical: 10,
+  },
+  title: {
+    flexWrap: 'wrap',
+  },
+  message: {
+    flexWrap: 'wrap',
+    lineHeight: 16,
   },
 });
 
@@ -56,7 +71,12 @@ function renderToastRow(Row: ToastRowComponent, props: AppToastRendererProps) {
       renderTrailingIcon={
         Platform.OS === 'web' ? () => <ToastDismissButton hide={props.hide} /> : undefined
       }
+      contentContainerStyle={toastTextStyles.contentContainer}
       style={[toastRowStyle, props.style]}
+      text1NumberOfLines={3}
+      text1Style={toastTextStyles.title}
+      text2NumberOfLines={8}
+      text2Style={toastTextStyles.message}
     />
   );
 }

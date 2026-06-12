@@ -13,7 +13,7 @@ import { useAuth } from '~/services/AuthContext';
 
 export default function AuthCallback() {
   const router = useRouter();
-  const { setMfaPending } = useAuth();
+  const { setMfaPending, setMfaChecking } = useAuth();
   const mfaCheckStartedRef = useRef(false);
 
   useEffect(() => {
@@ -36,18 +36,22 @@ export default function AuthCallback() {
       mfaCheckStartedRef.current = true;
 
       try {
-        await setMfaPending(true);
+        setMfaChecking(true);
         const mfa = await checkMfaRequirement();
         if (mfa.required) {
+          await setMfaPending(true);
+          setMfaChecking(false);
           if (active) router.replace(Routes.Mfa);
           return;
         }
 
         await setMfaPending(false);
+        setMfaChecking(false);
         goMain();
       } catch (error) {
         console.warn('[Auth] MFA initiation failed after OAuth sign-in', error);
         await setMfaPending(false);
+        setMfaChecking(false);
         await AuthApi.signOut().catch(() => {});
         goLogin();
       }
@@ -61,6 +65,7 @@ export default function AuthCallback() {
             await completeOAuthSessionFromUrl(initialUrl);
           } catch {
             await setMfaPending(false);
+            setMfaChecking(false);
             goLogin();
             return;
           }
@@ -91,7 +96,7 @@ export default function AuthCallback() {
       active = false;
       subscription.unsubscribe();
     };
-  }, [router, setMfaPending]);
+  }, [router, setMfaChecking, setMfaPending]);
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
