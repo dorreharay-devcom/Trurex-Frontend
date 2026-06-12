@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Pressable, Platform } from 'react-native';
+import { View, Text, Platform } from 'react-native';
 import { Marker } from 'react-native-maps';
 import { Theme } from '~/theme/Theme';
 import type { MapMarkerItem } from '~/types/map/mapMarker';
@@ -8,59 +8,56 @@ import { nativeMarkerStyles as styles } from '~/components/map/common/nativeMark
 
 type Props = {
   marker: MapMarkerItem;
-  selected: boolean;
-  selectionRenderKey?: string | null;
+  active: boolean;
   onPress: (id: string) => void;
 };
 
 const NATIVE_MARKER_TRACKING_MS = 700;
 
 const markerAnchor = Platform.OS === 'android' ? { x: 0.5, y: 0.5 } : { x: 0.5, y: 0.91 };
-const shouldScaleSelectedMarker = Platform.OS !== 'ios';
 
 type MarkerContentProps = {
   marker: MapMarkerItem;
-  selected: boolean;
 };
 
-const MarkerContent = React.memo(function MarkerContent({
-  marker: m,
-  selected,
-}: MarkerContentProps) {
-  return (
-    <Pressable style={styles.markerHit} accessibilityLabel={m.title}>
-      <View
-        style={[
-          styles.pin,
-          {
-            backgroundColor: m.pinColor,
-            borderColor: Theme.colors.card,
-            transform: selected ? [{ scale: 1.08 }] : undefined,
-          },
-        ]}
-      >
-        <Text style={[styles.glyph, { color: MAP_PIN_GLYPH_COLOR[m.pinType] }]} numberOfLines={1}>
-          {m.glyph}
-        </Text>
+const MarkerContent = React.memo(
+  function MarkerContent({ marker: m }: MarkerContentProps) {
+    return (
+      <View style={styles.markerHit} accessibilityLabel={m.title}>
+        <View
+          style={[
+            styles.pin,
+            {
+              backgroundColor: m.pinColor,
+              borderColor: Theme.colors.card,
+            },
+          ]}
+        >
+          <Text style={[styles.glyph, { color: MAP_PIN_GLYPH_COLOR[m.pinType] }]} numberOfLines={1}>
+            {m.glyph}
+          </Text>
+        </View>
       </View>
-    </Pressable>
-  );
-});
+    );
+  },
+  (prev, next) => areMarkerVisualPropsEqual(prev.marker, next.marker),
+);
 
-const NativeMarkerComponent: React.FC<Props> = ({
-  marker: m,
-  selected,
-  selectionRenderKey,
-  onPress,
-}) => {
+const NativeMarkerComponent: React.FC<Props> = ({ marker: m, active, onPress }) => {
   const [tracksViewChanges, setTracksViewChanges] = useState(Platform.OS !== 'web');
 
   useEffect(() => {
     if (Platform.OS === 'web') return;
+    const timeout = setTimeout(() => setTracksViewChanges(false), NATIVE_MARKER_TRACKING_MS);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
     setTracksViewChanges(true);
     const timeout = setTimeout(() => setTracksViewChanges(false), NATIVE_MARKER_TRACKING_MS);
     return () => clearTimeout(timeout);
-  }, [m.glyph, m.pinColor, selectionRenderKey]);
+  }, [m.glyph, m.pinColor]);
 
   return (
     <Marker
@@ -68,19 +65,27 @@ const NativeMarkerComponent: React.FC<Props> = ({
       anchor={markerAnchor}
       onPress={() => onPress(m.id)}
       tracksViewChanges={tracksViewChanges}
-      zIndex={selected ? 10 : 1}
+      zIndex={active ? 10 : 1}
     >
-      <MarkerContent marker={m} selected={selected && shouldScaleSelectedMarker} />
+      <MarkerContent marker={m} />
     </Marker>
   );
 };
 
-function areNativeMarkerPropsEqual(prev: Props, next: Props): boolean {
+function areMarkerVisualPropsEqual(prev: MapMarkerItem, next: MapMarkerItem): boolean {
   return (
-    prev.marker === next.marker &&
-    prev.selected === next.selected &&
-    prev.selectionRenderKey === next.selectionRenderKey
+    prev.id === next.id &&
+    prev.latitude === next.latitude &&
+    prev.longitude === next.longitude &&
+    prev.title === next.title &&
+    prev.glyph === next.glyph &&
+    prev.pinColor === next.pinColor &&
+    prev.pinType === next.pinType
   );
+}
+
+function areNativeMarkerPropsEqual(prev: Props, next: Props): boolean {
+  return prev.active === next.active && areMarkerVisualPropsEqual(prev.marker, next.marker);
 }
 
 export const NativeMarker = React.memo(NativeMarkerComponent, areNativeMarkerPropsEqual);
