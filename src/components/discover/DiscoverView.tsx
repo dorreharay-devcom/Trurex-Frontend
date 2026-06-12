@@ -11,7 +11,6 @@ import {
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from 'react-native';
-import { Image } from 'expo-image';
 import { TrendingUp, Star, PlusCircle, ChevronDown, ChevronUp } from 'lucide-react-native';
 import {
   DiscoverCategoryPinButton,
@@ -31,7 +30,6 @@ import { useActiveCategories } from '~/hooks/useActiveCategories';
 import { usePinnedCategoryIds } from '~/hooks/usePinnedCategoryIds';
 import { categoryPillColor } from '~/utils/recommendation/recCategoryNav';
 import { CATEGORY_ICON_FALLBACK } from '~/utils/recommendation/categoryIconResolve';
-import { getCategoryImage } from '~/utils/recommendation/categoryImages';
 import { Theme } from '~/theme/Theme';
 import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
 import { useTrendingTags } from '~/hooks/useTags';
@@ -445,15 +443,7 @@ const DiscoverView = ({
                         isActive ? 'bg-primary/10 border-primary/40' : 'bg-white border-gray-200'
                       }`}
                     >
-                      {getCategoryImage(cat.code) ? (
-                        <Image
-                          source={getCategoryImage(cat.code)!}
-                          style={{ width: 32, height: 32 }}
-                          contentFit="contain"
-                        />
-                      ) : (
-                        <Text style={{ fontSize: 24 }}>{cat.emoji}</Text>
-                      )}
+                      <Text style={{ fontSize: 24 }}>{cat.emoji}</Text>
                       <Text
                         numberOfLines={2}
                         className={`text-[10px] font-bold tracking-tight text-center leading-tight px-1 ${

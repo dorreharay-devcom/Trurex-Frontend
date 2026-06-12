@@ -15,7 +15,7 @@ type Props = {
 
 const NATIVE_MARKER_TRACKING_MS = 700;
 
-export const NativeMarker: React.FC<Props> = ({
+const NativeMarkerComponent: React.FC<Props> = ({
   marker: m,
   selected,
   selectionRenderKey,
@@ -57,3 +57,13 @@ export const NativeMarker: React.FC<Props> = ({
     </Marker>
   );
 };
+
+function areNativeMarkerPropsEqual(prev: Props, next: Props): boolean {
+  return (
+    prev.marker === next.marker &&
+    prev.selected === next.selected &&
+    prev.selectionRenderKey === next.selectionRenderKey
+  );
+}
+
+export const NativeMarker = React.memo(NativeMarkerComponent, areNativeMarkerPropsEqual);
