@@ -15,15 +15,9 @@ import {
   Animated,
   Easing,
 } from 'react-native';
-import {
-  Plus,
-  Check,
-  Image as ImageIcon,
-  AlertCircle,
-  Trash2,
-  Bookmark,
-} from 'lucide-react-native';
+import { Plus, Check, AlertCircle, Trash2, Bookmark } from 'lucide-react-native';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useQueryClient } from '@tanstack/react-query';
 import { CollectionsApi, UserCollection } from '~/api/CollectionsApi';
 import { useAuth } from '~/services/AuthContext';
@@ -47,6 +41,7 @@ import { webDisabledCursorStyle } from '~/utils/general';
 const collectionFieldBg = { backgroundColor: Theme.colors.searchFieldBackground };
 const SHEET_CHROME_HEIGHT = 220;
 const TOAST_AFTER_SHEET_CLOSE_DELAY_MS = modalConfig.timing.sheetCloseMs + 180;
+const COLLECTION_FALLBACK_GRADIENT_COLORS = ['#F59B0A', '#B7C7CF'] as const;
 
 export interface RecSummary {
   id: string;
@@ -77,7 +72,8 @@ const CollectionRow: React.FC<{
   selected: boolean;
   onPress: () => void;
 }> = ({ col, selected, onPress }) => {
-  const { uri: coverUri } = useSignedStorageUrl(REX_IMAGES_BUCKET, col.cover_image_path ?? '');
+  const backgroundImagePath = col.cover_image_path ?? col.first_rex_photo_path ?? '';
+  const { uri: coverUri } = useSignedStorageUrl(REX_IMAGES_BUCKET, backgroundImagePath);
 
   return (
     <TouchableOpacity
@@ -86,12 +82,20 @@ const CollectionRow: React.FC<{
       style={selected ? { backgroundColor: Theme.colors.accent } : undefined}
       className="w-full flex-row items-center gap-3 rounded-xl p-3"
     >
-      <View className="w-10 h-10 rounded-lg bg-muted overflow-hidden items-center justify-center shrink-0">
+      <View className="w-10 h-10 rounded-lg overflow-hidden items-center justify-center shrink-0">
+        <LinearGradient
+          colors={COLLECTION_FALLBACK_GRADIENT_COLORS}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFillObject}
+        />
         {coverUri ? (
-          <Image source={{ uri: coverUri }} style={{ width: 40, height: 40 }} contentFit="cover" />
-        ) : (
-          <ImageIcon size={16} color={Theme.colors.muted} />
-        )}
+          <Image
+            source={{ uri: coverUri }}
+            style={StyleSheet.absoluteFillObject}
+            contentFit="cover"
+          />
+        ) : null}
       </View>
       <View className="flex-1 min-w-0">
         <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
