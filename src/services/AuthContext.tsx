@@ -19,6 +19,8 @@ interface AuthState {
   loading: boolean;
   mfaPending: boolean;
   setMfaPending: (pending: boolean) => Promise<void>;
+  mfaChecking: boolean;
+  setMfaChecking: (checking: boolean) => void;
   signOut: () => Promise<void>;
 }
 
@@ -28,6 +30,8 @@ const AuthContext = createContext<AuthState>({
   loading: true,
   mfaPending: false,
   setMfaPending: async () => {},
+  mfaChecking: false,
+  setMfaChecking: () => {},
   signOut: async () => {},
 });
 
@@ -38,6 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [mfaPending, setMfaPendingState] = useState(false);
+  const [mfaChecking, setMfaChecking] = useState(false);
 
   useEffect(() => {
     Promise.all([Auth.getSession(), StorageService.getItem(MFA_PENDING_STORAGE_KEY)])
@@ -77,6 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(session?.user ?? null);
       if (!session) {
         setMfaPendingState(false);
+        setMfaChecking(false);
         StorageService.removeItem(MFA_PENDING_STORAGE_KEY).catch(() => {});
       }
       setLoading(false);
@@ -95,6 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signOut = useCallback(async () => {
+    setMfaChecking(false);
     await setMfaPending(false);
     await AuthApi.signOut();
   }, [setMfaPending]);
@@ -102,7 +109,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => registerAccountSuspendedHandler(signOut), [signOut]);
 
   return (
-    <AuthContext.Provider value={{ session, user, loading, mfaPending, setMfaPending, signOut }}>
+    <AuthContext.Provider
+      value={{
+        session,
+        user,
+        loading,
+        mfaPending,
+        setMfaPending,
+        mfaChecking,
+        setMfaChecking,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

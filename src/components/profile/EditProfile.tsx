@@ -23,6 +23,7 @@ import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
 import { toastError } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { preparePickerImageUriForUpload } from '~/utils/photos/storageUpload';
+import { unknownErrorMessage } from '~/utils';
 
 interface EditProfileProps {
   onClose: () => void;
@@ -156,8 +157,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
       onClose();
     } catch (e) {
       if (didAccountFrozenMutationToast(e)) return;
-      const message = e instanceof Error ? e.message : 'Failed to save profile';
-      toastError(message);
+      toastError('Failed to save profile', unknownErrorMessage(e, 'Please try again.'));
     } finally {
       setSaving(false);
     }

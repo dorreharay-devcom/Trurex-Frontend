@@ -16,7 +16,7 @@ import { unknownErrorMessage } from '~/utils';
 export default function LoginScreen() {
   const router = useRouter();
   const isWeb = Platform.OS === 'web';
-  const { setMfaPending } = useAuth();
+  const { setMfaPending, setMfaChecking } = useAuth();
   const { signInWithOAuth, oauthPending } = useOAuthSignIn();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -38,20 +38,24 @@ export default function LoginScreen() {
     setErrors({});
     let signedIn = false;
     try {
-      await setMfaPending(true);
+      setMfaChecking(true);
       await AuthApi.signIn({ email, password });
       signedIn = true;
 
       const mfa = await checkMfaRequirement();
       if (mfa.required) {
+        await setMfaPending(true);
+        setMfaChecking(false);
         router.replace(Routes.Mfa);
         return;
       }
 
       await setMfaPending(false);
+      setMfaChecking(false);
       router.replace(Routes.Main);
     } catch (error: unknown) {
       await setMfaPending(false);
+      setMfaChecking(false);
       if (signedIn) {
         await AuthApi.signOut().catch(() => {});
         setErrors({

@@ -15,7 +15,7 @@ const providerLabel: Record<OAuthProvider, string> = {
 
 export function useOAuthSignIn() {
   const router = useRouter();
-  const { setMfaPending } = useAuth();
+  const { setMfaPending, setMfaChecking } = useAuth();
   const [oauthPending, setOauthPending] = useState(false);
 
   const signInWithOAuth = useCallback(
@@ -23,7 +23,7 @@ export function useOAuthSignIn() {
       setOauthPending(true);
       let signedIn = false;
       try {
-        await setMfaPending(true);
+        setMfaChecking(true);
         await signInWithOAuthProvider(provider);
         if (!isWeb) {
           const session = await AuthApi.getSession();
@@ -31,17 +31,22 @@ export function useOAuthSignIn() {
             signedIn = true;
             const mfa = await checkMfaRequirement();
             if (mfa.required) {
+              await setMfaPending(true);
+              setMfaChecking(false);
               router.replace(Routes.Mfa);
               return;
             }
             await setMfaPending(false);
+            setMfaChecking(false);
             router.replace(Routes.Main);
           } else {
             await setMfaPending(false);
+            setMfaChecking(false);
           }
         }
       } catch (error: unknown) {
         await setMfaPending(false);
+        setMfaChecking(false);
         if (signedIn) {
           await AuthApi.signOut().catch(() => {});
         }
@@ -54,7 +59,7 @@ export function useOAuthSignIn() {
         setOauthPending(false);
       }
     },
-    [router, setMfaPending],
+    [router, setMfaChecking, setMfaPending],
   );
 
   return { signInWithOAuth, oauthPending };

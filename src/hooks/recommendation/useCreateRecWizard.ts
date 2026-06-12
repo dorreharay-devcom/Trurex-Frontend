@@ -130,6 +130,15 @@ export function useCreateRecWizard() {
     [selectedCategoryId, categoryHasSubcategoryStep],
   );
 
+  const clearScorecardState = useCallback(() => {
+    setCategoryRatings({});
+    setQuestionAnswers({});
+    setSelectedTagSlugs([]);
+    setScoreQuickTip('');
+    setScoreValueForMoney(null);
+    setScoreReview('');
+  }, []);
+
   useEffect(() => {
     setStepId((prev) => resolveStepIdAfterStepsChange(prev, activeSteps));
   }, [activeSteps]);
@@ -141,7 +150,8 @@ export function useCreateRecWizard() {
     }
     setSelectedSubcategoryCode(null);
     setCategoryHasSubcategoryStep(false);
-  }, [selectedCategoryId]);
+    clearScorecardState();
+  }, [clearScorecardState, selectedCategoryId]);
 
   const stepIndex = activeSteps.indexOf(stepId);
   const safeStepIndex = stepIndex >= 0 ? stepIndex : 0;

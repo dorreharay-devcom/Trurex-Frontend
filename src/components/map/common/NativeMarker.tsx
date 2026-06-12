@@ -9,12 +9,18 @@ import { nativeMarkerStyles as styles } from '~/components/map/common/nativeMark
 type Props = {
   marker: MapMarkerItem;
   selected: boolean;
+  selectionRenderKey?: string | null;
   onPress: (id: string) => void;
 };
 
 const NATIVE_MARKER_TRACKING_MS = 700;
 
-export const NativeMarker: React.FC<Props> = ({ marker: m, selected, onPress }) => {
+export const NativeMarker: React.FC<Props> = ({
+  marker: m,
+  selected,
+  selectionRenderKey,
+  onPress,
+}) => {
   const [tracksViewChanges, setTracksViewChanges] = useState(Platform.OS !== 'web');
 
   useEffect(() => {
@@ -22,12 +28,12 @@ export const NativeMarker: React.FC<Props> = ({ marker: m, selected, onPress }) 
     setTracksViewChanges(true);
     const timeout = setTimeout(() => setTracksViewChanges(false), NATIVE_MARKER_TRACKING_MS);
     return () => clearTimeout(timeout);
-  }, [m.glyph, m.pinColor, selected]);
+  }, [m.glyph, m.pinColor, selected, selectionRenderKey]);
 
   return (
     <Marker
       coordinate={{ latitude: m.latitude, longitude: m.longitude }}
-      anchor={{ x: 0.5, y: 0.91 }}
+      anchor={Platform.OS === 'android' ? { x: 0.5, y: 0.5 } : { x: 0.5, y: 0.91 }}
       onPress={() => onPress(m.id)}
       tracksViewChanges={tracksViewChanges}
       zIndex={selected ? 10 : 1}
