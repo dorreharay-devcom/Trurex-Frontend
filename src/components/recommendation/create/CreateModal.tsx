@@ -55,6 +55,7 @@ import { CreateWizardStepper } from './CreateWizardStepper';
 import { CreateModalBody } from './CreateModalBody';
 
 const DYNO_IMAGE_SOURCE = require('../../../../assets/dyno.svg');
+const CREATE_REX_SUCCESS_TOAST_DELAY_MS = modalConfig.timing.sheetCloseMs + 180;
 
 type Props = {
   visible: boolean;
@@ -379,10 +380,6 @@ export const CreateModal: React.FC<Props> = ({
         await createRex(params);
       }
       postedSuccessfullyRef.current = true;
-      toastSuccess(
-        isEditMode ? 'Updated' : 'Posted',
-        isEditMode ? 'Your Rex was updated.' : 'Your recommendation is live.',
-      );
       queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
       queryClient.invalidateQueries({ queryKey: ['search-rexes'] });
       queryClient.invalidateQueries({ queryKey: ['my-rexes'] });
@@ -395,6 +392,12 @@ export const CreateModal: React.FC<Props> = ({
         queryClient.invalidateQueries({ queryKey: ['rexForEdit', editRexId] });
       }
       handleClose();
+      setTimeout(() => {
+        toastSuccess(
+          isEditMode ? 'Updated' : 'Posted',
+          isEditMode ? 'Your Rex was updated.' : 'Your recommendation is live.',
+        );
+      }, CREATE_REX_SUCCESS_TOAST_DELAY_MS);
     } catch (e) {
       if (didAccountFrozenMutationToast(e)) return;
       toastError(

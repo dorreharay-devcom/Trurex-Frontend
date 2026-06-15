@@ -1,0 +1,28 @@
+diff --git a/android/src/main/java/com/rnmaps/maps/MapMarker.java b/android/src/main/java/com/rnmaps/maps/MapMarker.java
+index b755f9ba5a35a5bf8ab77eb66ced7b6580fe2822..03a3ff8f482b6660636c73a5fb954fd3de3bc2bf 100644
+--- a/android/src/main/java/com/rnmaps/maps/MapMarker.java
++++ b/android/src/main/java/com/rnmaps/maps/MapMarker.java
+@@ -425,6 +425,23 @@ public class MapMarker extends MapFeature {
+     }
+   }
+ 
++  @Override
++  protected void onLayout(boolean changed, int l, int t, int r, int b) {
++    super.onLayout(changed, l, t, r, b);
++
++    int newWidth = r - l;
++    int newHeight = b - t;
++    if (newWidth > 0 && newHeight > 0 && (newWidth != this.width || newHeight != this.height)) {
++      this.width = newWidth;
++      this.height = newHeight;
++
++      clearDrawableCache();
++      if (marker != null) {
++        update(true);
++      }
++    }
++  }
++
+   @Override
+   public Object getFeature() {
+     return marker;

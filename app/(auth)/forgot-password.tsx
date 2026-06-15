@@ -53,10 +53,12 @@ export default function ForgotPasswordScreen() {
       {sent ? (
         <View className={isWeb ? 'items-center space-y-4' : 'items-center gap-4'}>
           <Text className="text-lg font-semibold text-foreground">Check your email</Text>
-          <Text className="text-sm text-muted-foreground text-center">
-            We sent a password reset link to{' '}
-            <Text className="font-medium text-foreground">{email}</Text>
-          </Text>
+          <View className="items-center">
+            <Text className="text-sm text-muted-foreground text-center">
+              We sent a password reset link to
+            </Text>
+            <Text className="text-sm font-medium text-foreground text-center">{email}</Text>
+          </View>
           <Button
             variant={ButtonVariant.Link}
             onPress={() => router.replace(Routes.Login)}
