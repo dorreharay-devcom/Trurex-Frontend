@@ -148,6 +148,7 @@ export function useCreateRecWizard() {
       setCategoryHasSubcategoryStep(false);
       return;
     }
+    editPrefillRef.current = null;
     setSelectedSubcategoryCode(null);
     setCategoryHasSubcategoryStep(false);
     clearScorecardState();
@@ -216,7 +217,10 @@ export function useCreateRecWizard() {
 
   const syncFormToConfig = useCallback(
     (dimensions: CategoryRatingDimension[], _questions: CategoryQuestion[]) => {
-      const edit = editPrefillRef.current;
+      const edit =
+        editPrefillRef.current?.category_code === selectedCategoryId
+          ? editPrefillRef.current
+          : null;
       setCategoryRatings(
         Object.fromEntries(
           dimensions.map((d) => [d.code, edit?.category_ratings?.[d.code]?.score ?? null]),
@@ -227,7 +231,7 @@ export function useCreateRecWizard() {
       setScoreValueForMoney(edit?.score_value_for_money ?? null);
       if (edit) editPrefillRef.current = null;
     },
-    [],
+    [selectedCategoryId],
   );
 
   const setCategoryRating = useCallback((code: string, value: number) => {

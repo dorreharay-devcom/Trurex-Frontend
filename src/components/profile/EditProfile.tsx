@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Keyboard,
   Platform,
   type TextStyle,
 } from 'react-native';
@@ -132,6 +133,9 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
 
   const handleSave = async () => {
     if (!user) return;
+    if (Platform.OS !== 'web') {
+      Keyboard.dismiss();
+    }
     setSaving(true);
     try {
       if (pendingAvatar) {

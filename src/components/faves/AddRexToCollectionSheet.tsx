@@ -46,6 +46,7 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
+    refetch,
   } = useSavedRexes({ uncollected: true });
   const { mutateAsync: addRex } = useAddRexToCollection();
 
@@ -60,6 +61,7 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({
     if (open) {
       setSelected(new Set());
       setVisible(true);
+      void refetch();
       Animated.parallel([
         Animated.timing(backdropOpacity, { toValue: 1, duration: 250, useNativeDriver: true }),
         Animated.spring(sheetTranslateY, {
@@ -75,7 +77,7 @@ const AddRexToCollectionSheet: React.FC<AddRexToCollectionSheetProps> = ({
         Animated.timing(sheetTranslateY, { toValue: 600, duration: 220, useNativeDriver: true }),
       ]).start(() => setVisible(false));
     }
-  }, [open]);
+  }, [backdropOpacity, open, refetch, sheetTranslateY]);
 
   const toggle = (id: string) => {
     setSelected((prev) => {

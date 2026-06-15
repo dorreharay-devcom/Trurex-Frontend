@@ -99,6 +99,9 @@
           "@react-native/normalize-colors": "*"
         }
       }
+    },
+    "patchedDependencies": {
+      "react-native-maps@1.20.1": "patches/react-native-maps@1.20.1.patch"
     }
   }
 }

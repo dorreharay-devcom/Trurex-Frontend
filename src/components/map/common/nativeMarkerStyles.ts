@@ -8,6 +8,13 @@ export const nativeMarkerStyles = StyleSheet.create({
     width: 72,
     height: 72,
     padding: 12,
+    overflow: 'visible',
+  },
+  androidMarkerHit: {
+    width: 52,
+    height: 52,
+    padding: 8,
+    overflow: 'hidden',
   },
   tooltipImage: {
     width: 300,
@@ -58,6 +65,14 @@ export const nativeMarkerStyles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 4,
+  },
+  androidPin: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
   glyph: {
     fontSize: 15,
