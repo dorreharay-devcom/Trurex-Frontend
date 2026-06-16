@@ -4,6 +4,7 @@ import { Auth } from './AuthService';
 import { AuthApi } from '~/api/AuthApi';
 import { StorageService } from './StorageService';
 import { registerAccountSuspendedHandler } from '~/utils/accountSuspension';
+import { clearMfaRequirementCache } from '~/auth/mfa';
 
 export enum AuthEvent {
   PasswordRecovery = 'PASSWORD_RECOVERY',
@@ -102,6 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = useCallback(async () => {
     setMfaChecking(false);
+    clearMfaRequirementCache();
     await AuthApi.signOut();
     await setMfaPending(false);
   }, [setMfaPending]);
