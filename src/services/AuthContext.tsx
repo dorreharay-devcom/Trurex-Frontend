@@ -102,8 +102,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = useCallback(async () => {
     setMfaChecking(false);
-    await setMfaPending(false);
     await AuthApi.signOut();
+    await setMfaPending(false);
   }, [setMfaPending]);
 
   useEffect(() => registerAccountSuspendedHandler(signOut), [signOut]);

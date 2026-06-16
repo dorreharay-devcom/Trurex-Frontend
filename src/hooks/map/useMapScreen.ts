@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import type { Region } from 'react-native-maps';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import type { MapMarkerItem, MapRecenterTarget } from '~/types/map/mapMarker';
 import type { LatLngBounds } from '~/utils/map/mapRecommendationData';
 import {
+  boundsToRegion,
   DEFAULT_MAP_BOUNDS,
   filterLocatedRecommendations,
   filterRecommendationsByPinLayers,
@@ -34,6 +36,7 @@ export function useMapScreen({ onRecommendationPress }: Params) {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [bounds, setBounds] = useState<LatLngBounds>(DEFAULT_MAP_BOUNDS);
   const [debouncedBounds, setDebouncedBounds] = useState<LatLngBounds>(DEFAULT_MAP_BOUNDS);
+  const [mapRegion, setMapRegion] = useState<Region>(() => boundsToRegion(DEFAULT_MAP_BOUNDS));
 
   const [layers, setLayers] = useState<PinVisibility>(DEFAULT_PIN_VISIBILITY);
   const [selectedRecId, setSelectedRecId] = useState<string | null>(null);
@@ -213,8 +216,9 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     }
   }, []);
 
-  const onBoundsChange = useCallback((next: LatLngBounds) => {
+  const onBoundsChange = useCallback((next: LatLngBounds, region?: Region) => {
     setBounds(next);
+    setMapRegion(region ?? boundsToRegion(next));
   }, []);
 
   const selectMarker = useCallback((id: string) => {
@@ -265,6 +269,7 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     userId,
     userCoords,
     recenterTo,
+    mapRegion,
     locateMe,
     focusOnRecommendation,
     locatedRecsForList: layerFiltered,

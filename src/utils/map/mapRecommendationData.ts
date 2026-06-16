@@ -23,6 +23,15 @@ export const DEFAULT_MAP_BOUNDS: LatLngBounds = {
   max_lng: 151.35,
 };
 
+export function boundsToRegion(bounds: LatLngBounds): Region {
+  return {
+    latitude: (bounds.min_lat + bounds.max_lat) / 2,
+    longitude: (bounds.min_lng + bounds.max_lng) / 2,
+    latitudeDelta: Math.max(bounds.max_lat - bounds.min_lat, 0.001),
+    longitudeDelta: Math.max(bounds.max_lng - bounds.min_lng, 0.001),
+  };
+}
+
 export function regionToBounds(region: Region): LatLngBounds {
   const halfLat = region.latitudeDelta / 2;
   const halfLng = region.longitudeDelta / 2;
