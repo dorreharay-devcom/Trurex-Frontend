@@ -147,151 +147,163 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress, onRexSheetOpenChang
   return (
     <View className="relative min-h-0 w-full flex-1 bg-background pt-4">
       <View className="relative min-h-0 w-full flex-1 px-4 pb-5" style={webContainerStyle}>
-        {!flow.listView ? (
-          <View className="relative min-h-0 w-full flex-1">
-            <View
-              style={[
-                StyleSheet.absoluteFillObject,
-                { zIndex: 0 },
-                Platform.OS === 'web' ? ({ isolation: 'isolate' } as const) : {},
-              ]}
-            >
-              <View className="h-full w-full flex-1">
-                <MarkerMap
-                  markers={flow.mapMarkers}
-                  selectedId={flow.selectedRecId}
-                  onMarkerPress={handleMarkerPress}
-                  onRegionChangeComplete={flow.onBoundsChange}
-                  recenterTo={flow.recenterTo}
-                />
-              </View>
+        <View className="relative min-h-0 w-full flex-1">
+          <View
+            pointerEvents={flow.listView ? 'none' : 'auto'}
+            style={[
+              StyleSheet.absoluteFillObject,
+              { zIndex: 0, opacity: flow.listView ? 0 : 1 },
+              Platform.OS === 'web' ? ({ isolation: 'isolate' } as const) : {},
+            ]}
+          >
+            <View className="h-full w-full flex-1">
+              <MarkerMap
+                markers={flow.mapMarkers}
+                selectedId={flow.selectedRecId}
+                onMarkerPress={handleMarkerPress}
+                onRegionChangeComplete={flow.onBoundsChange}
+                initialRegion={flow.mapRegion}
+                recenterTo={flow.recenterTo}
+              />
             </View>
+          </View>
 
-            <View
-              pointerEvents="box-none"
-              style={[
-                StyleSheet.absoluteFillObject,
-                Platform.select({
-                  web: { zIndex: 1100 },
-                  default: { zIndex: 1100, elevation: 0 },
-                }),
-              ]}
-            >
-              <MapLegend />
-              <MapLayerToggle visibility={flow.layers} onChange={flow.setLayers} />
-
-              <Pressable
-                onPress={() => void flow.locateMe()}
-                className="absolute z-[1100] h-10 w-10 items-center justify-center rounded-xl border border-border bg-card shadow-md"
+          {!flow.listView ? (
+            <>
+              <View
+                pointerEvents="box-none"
                 style={[
-                  {
-                    position: 'absolute',
-                    right: MAP_ACTION_INSET,
-                    bottom: MAP_RIGHT_CONTROLS_BOTTOM,
-                    zIndex: 1100,
-                    elevation: Platform.OS === 'android' ? 12 : 0,
-                  },
-                  Platform.OS === 'web' ? ({ cursor: 'pointer' } as const) : null,
+                  StyleSheet.absoluteFillObject,
+                  Platform.select({
+                    web: { zIndex: 1100 },
+                    default: { zIndex: 1100, elevation: 0 },
+                  }),
                 ]}
-                accessibilityRole="button"
-                accessibilityLabel="Center map on your location"
               >
-                <LocateFixed size={16} color={Theme.colors.foreground} />
-              </Pressable>
+                <MapLegend />
+                <MapLayerToggle visibility={flow.layers} onChange={flow.setLayers} />
 
-              {flow.isError ? (
-                <View
-                  className="absolute z-[1000]"
-                  style={{
-                    position: 'absolute',
-                    left: MAP_ACTION_INSET,
-                    right: MAP_ACTION_INSET,
-                    bottom: actionBannerBottom,
-                  }}
+                <Pressable
+                  onPress={() => void flow.locateMe()}
+                  className="absolute z-[1100] h-10 w-10 items-center justify-center rounded-xl border border-border bg-card shadow-md"
+                  style={[
+                    {
+                      position: 'absolute',
+                      right: MAP_ACTION_INSET,
+                      bottom: MAP_RIGHT_CONTROLS_BOTTOM,
+                      zIndex: 1100,
+                      elevation: Platform.OS === 'android' ? 12 : 0,
+                    },
+                    Platform.OS === 'web' ? ({ cursor: 'pointer' } as const) : null,
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Center map on your location"
                 >
-                  <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
-                    <Text className="text-sm font-medium text-foreground">
-                      Couldn&apos;t load map data
-                    </Text>
-                    <Pressable
-                      onPress={() => void flow.refetch()}
-                      className="mt-2 self-center rounded-xl bg-primary px-4 py-2"
-                    >
-                      <Text className="text-xs font-medium text-primary-foreground">Retry</Text>
-                    </Pressable>
-                  </View>
-                </View>
-              ) : null}
-            </View>
+                  <LocateFixed size={16} color={Theme.colors.foreground} />
+                </Pressable>
 
-            {flow.selectedRec && (
-              <MapPinDetailSheet
-                recommendation={flow.selectedRec}
-                pinType={pinType}
-                distanceLabel={distanceLabel}
-                onClose={flow.clearSelection}
-                onViewFullRex={() => {
-                  flow.openRec(flow.selectedRec!);
-                  flow.clearSelection();
-                }}
-                onSave={
-                  canSaveSelected
-                    ? () => {
-                        const r = flow.selectedRec!;
-                        setSaveTarget({
-                          id: r.id,
-                          place_name: r.title,
-                          category_code: r.category,
-                          location: r.location,
-                          isSaved: r.isSaved ?? false,
-                        });
-                      }
-                    : undefined
+                {flow.isError ? (
+                  <View
+                    className="absolute z-[1000]"
+                    style={{
+                      position: 'absolute',
+                      left: MAP_ACTION_INSET,
+                      right: MAP_ACTION_INSET,
+                      bottom: actionBannerBottom,
+                    }}
+                  >
+                    <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
+                      <Text className="text-sm font-medium text-foreground">
+                        Couldn&apos;t load map data
+                      </Text>
+                      <Pressable
+                        onPress={() => void flow.refetch()}
+                        className="mt-2 self-center rounded-xl bg-primary px-4 py-2"
+                      >
+                        <Text className="text-xs font-medium text-primary-foreground">Retry</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                ) : null}
+              </View>
+
+              {flow.selectedRec && (
+                <MapPinDetailSheet
+                  recommendation={flow.selectedRec}
+                  pinType={pinType}
+                  distanceLabel={distanceLabel}
+                  onClose={flow.clearSelection}
+                  onViewFullRex={() => {
+                    flow.openRec(flow.selectedRec!);
+                    flow.clearSelection();
+                  }}
+                  onSave={
+                    canSaveSelected
+                      ? () => {
+                          const r = flow.selectedRec!;
+                          setSaveTarget({
+                            id: r.id,
+                            place_name: r.title,
+                            category_code: r.category,
+                            location: r.location,
+                            isSaved: r.isSaved ?? false,
+                          });
+                        }
+                      : undefined
+                  }
+                />
+              )}
+
+              <AddToCollectionSheet
+                open={!!saveTarget}
+                rec={saveTarget}
+                onClose={() => setSaveTarget(null)}
+                onSaved={saveTarget ? () => flow.markRecSaved(saveTarget.id) : undefined}
+                onUnsaved={saveTarget ? () => flow.markRecUnsaved(saveTarget.id) : undefined}
+                onUnsaveFailed={saveTarget ? () => flow.markRecSaved(saveTarget.id) : undefined}
+                onSaveRexFailed={
+                  saveTarget ? () => flow.clearRecSavedOverride(saveTarget.id) : undefined
                 }
               />
-            )}
+            </>
+          ) : null}
 
-            <AddToCollectionSheet
-              open={!!saveTarget}
-              rec={saveTarget}
-              onClose={() => setSaveTarget(null)}
-              onSaved={saveTarget ? () => flow.markRecSaved(saveTarget.id) : undefined}
-              onUnsaved={saveTarget ? () => flow.markRecUnsaved(saveTarget.id) : undefined}
-              onUnsaveFailed={saveTarget ? () => flow.markRecSaved(saveTarget.id) : undefined}
-              onSaveRexFailed={
-                saveTarget ? () => flow.clearRecSavedOverride(saveTarget.id) : undefined
-              }
-            />
-          </View>
-        ) : (
-          <ScrollView
-            className="flex-1 w-full pt-32"
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={webContainerStyle}
-            contentContainerClassName="w-full pb-28"
-          >
-            {sortedList.length === 0 ? (
-              <View className="items-center py-12">
-                <MapPin size={32} color={Theme.colors.secondaryText} style={{ opacity: 0.4 }} />
-                <Text className="mt-2 text-sm font-medium text-muted-foreground">No Rex found</Text>
-                <Text className="mt-1 text-center text-xs text-muted-foreground">
-                  Adjust search or map filters
-                </Text>
-              </View>
-            ) : (
-              <View className="gap-2.5">
-                {sortedList.map((rec) => (
-                  <ListRow
-                    key={rec.id}
-                    rec={rec}
-                    highlighted={flow.selectedRecId === rec.id}
-                    onPress={() => flow.focusOnRecommendation(rec)}
-                  />
-                ))}
-              </View>
-            )}
-          </ScrollView>
-        )}
+          {flow.listView ? (
+            <ScrollView
+              className="flex-1 w-full bg-background pt-32"
+              style={[
+                StyleSheet.absoluteFillObject,
+                { zIndex: 100, elevation: Platform.OS === 'android' ? 2 : 0 },
+              ]}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={webContainerStyle}
+              contentContainerClassName="w-full pb-28"
+            >
+              {sortedList.length === 0 ? (
+                <View className="items-center py-12">
+                  <MapPin size={32} color={Theme.colors.secondaryText} style={{ opacity: 0.4 }} />
+                  <Text className="mt-2 text-sm font-medium text-muted-foreground">
+                    No Rex found
+                  </Text>
+                  <Text className="mt-1 text-center text-xs text-muted-foreground">
+                    Adjust search or map filters
+                  </Text>
+                </View>
+              ) : (
+                <View className="gap-2.5">
+                  {sortedList.map((rec) => (
+                    <ListRow
+                      key={rec.id}
+                      rec={rec}
+                      highlighted={flow.selectedRecId === rec.id}
+                      onPress={() => flow.focusOnRecommendation(rec)}
+                    />
+                  ))}
+                </View>
+              )}
+            </ScrollView>
+          ) : null}
+        </View>
 
         {showEmptyMapAreaBanner ? (
           <View pointerEvents="box-none" style={styles.mapSearchEmptyBannerShell}>

@@ -18,7 +18,8 @@ type Props = {
   markers: MapMarkerItem[];
   selectedId: string | null;
   onMarkerPress: (id: string) => void;
-  onRegionChangeComplete?: (bounds: LatLngBounds) => void;
+  initialRegion?: Region;
+  onRegionChangeComplete?: (bounds: LatLngBounds, region: Region) => void;
   recenterTo?: MapRecenterTarget | null;
 };
 
@@ -26,13 +27,15 @@ const MarkerMap: React.FC<Props> = ({
   markers,
   selectedId,
   onMarkerPress,
+  initialRegion: initialRegionProp,
   onRegionChangeComplete,
   recenterTo,
 }) => {
   const mapRef = useRef<MapView>(null);
   const androidTileRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const androidTileRetryCountRef = useRef(0);
-  const initialRegion = useMemo(() => regionForMarkers(markers), [markers]);
+  const markersInitialRegion = useMemo(() => regionForMarkers(markers), [markers]);
+  const initialRegion = initialRegionProp ?? markersInitialRegion;
   const regionRef = useRef<Region>(initialRegion);
   const markersRef = useRef(markers);
   markersRef.current = markers;
@@ -59,7 +62,7 @@ const MarkerMap: React.FC<Props> = ({
   const handleRegionComplete = useCallback(
     (region: Region) => {
       regionRef.current = region;
-      onRegionChangeComplete?.(regionToBounds(region));
+      onRegionChangeComplete?.(regionToBounds(region), region);
     },
     [onRegionChangeComplete],
   );

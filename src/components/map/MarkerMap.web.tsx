@@ -10,6 +10,7 @@ import {
 import { Minus, Plus } from 'lucide-react-native';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 import type { MapMarkerItem, MapRecenterTarget } from '~/types/map/mapMarker';
+import type { Region } from 'react-native-maps';
 import { MAP_ACTION_INSET, MAP_VIEW_MIN_HEIGHT, MAP_ZOOM_CONTROLS_BOTTOM } from '~/constants/map/mapUi';
 import { Theme } from '~/theme/Theme';
 import {
@@ -25,7 +26,8 @@ type Props = {
   markers: MapMarkerItem[];
   selectedId: string | null;
   onMarkerPress: (id: string) => void;
-  onRegionChangeComplete?: (bounds: LatLngBounds) => void;
+  initialRegion?: Region;
+  onRegionChangeComplete?: (bounds: LatLngBounds, region: Region) => void;
   recenterTo?: MapRecenterTarget | null;
 };
 
@@ -38,6 +40,7 @@ const MarkerMapWithLoader: React.FC<InnerProps> = ({
   markers,
   selectedId,
   onMarkerPress,
+  initialRegion,
   onRegionChangeComplete,
   recenterTo,
 }) => {
@@ -49,6 +52,7 @@ const MarkerMapWithLoader: React.FC<InnerProps> = ({
   });
   const { width: windowWidth } = useWindowDimensions();
   const [mapBox, setMapBox] = useState({ w: 0, h: 0 });
+  const initialRegionRef = useRef(initialRegion);
 
   const onMapLayout = useCallback((e: LayoutChangeEvent) => {
     const { width, height } = e.nativeEvent.layout;
@@ -67,6 +71,21 @@ const MarkerMapWithLoader: React.FC<InnerProps> = ({
     [pixelHeight],
   );
 
+  const initialCenter = useMemo(
+    () =>
+      initialRegionRef.current
+        ? { lat: initialRegionRef.current.latitude, lng: initialRegionRef.current.longitude }
+        : { lat: WEB_MAP_DEFAULT_CENTER.lat, lng: WEB_MAP_DEFAULT_CENTER.lng },
+    [],
+  );
+  const initialZoom = useMemo(() => {
+    if (!initialRegionRef.current) return 11;
+    return Math.min(
+      22,
+      Math.max(2, Math.round(Math.log2(360 / initialRegionRef.current.longitudeDelta))),
+    );
+  }, []);
+
   const mapOptions = useMemo((): google.maps.MapOptions => {
     return {
       disableDefaultUI: true,
@@ -79,10 +98,10 @@ const MarkerMapWithLoader: React.FC<InnerProps> = ({
       minZoom: 2,
       maxZoom: 22,
       gestureHandling: 'greedy',
-      center: { lat: WEB_MAP_DEFAULT_CENTER.lat, lng: WEB_MAP_DEFAULT_CENTER.lng },
-      zoom: 11,
+      center: initialCenter,
+      zoom: initialZoom,
     };
-  }, []);
+  }, [initialCenter, initialZoom]);
 
   const validMarkers = useMemo(
     () => markers.filter((m) => isValidMapCoordinate(m.latitude, m.longitude)),
@@ -94,17 +113,21 @@ const MarkerMapWithLoader: React.FC<InnerProps> = ({
   const validMarkersRef = useRef(validMarkers);
   validMarkersRef.current = validMarkers;
 
-  const fitBounds = useMemo(() => createFitBoundsHandler(validMarkers), [validMarkers]);
-
   const pushBoundsToParent = useCallback(
     (map: google.maps.Map) => {
       const b = map.getBounds();
       if (b && onRegionChangeComplete) {
-        onRegionChangeComplete({
+        const bounds = {
           min_lat: b.getSouthWest().lat(),
           max_lat: b.getNorthEast().lat(),
           min_lng: b.getSouthWest().lng(),
           max_lng: b.getNorthEast().lng(),
+        };
+        onRegionChangeComplete(bounds, {
+          latitude: (bounds.min_lat + bounds.max_lat) / 2,
+          longitude: (bounds.min_lng + bounds.max_lng) / 2,
+          latitudeDelta: Math.max(bounds.max_lat - bounds.min_lat, 0.001),
+          longitudeDelta: Math.max(bounds.max_lng - bounds.min_lng, 0.001),
         });
       }
     },
@@ -117,7 +140,6 @@ const MarkerMapWithLoader: React.FC<InnerProps> = ({
       setMapReady(true);
       const sync = () => {
         triggerGoogleMapResize(map);
-        fitBounds(map);
         pushBoundsToParent(map);
       };
       sync();
@@ -125,7 +147,7 @@ const MarkerMapWithLoader: React.FC<InnerProps> = ({
       window.setTimeout(sync, 50);
       window.setTimeout(sync, 300);
     },
-    [fitBounds, pushBoundsToParent],
+    [pushBoundsToParent],
   );
 
   const onIdle = useCallback(() => {
@@ -135,11 +157,17 @@ const MarkerMapWithLoader: React.FC<InnerProps> = ({
     if (!onRegionChangeComplete) return;
     const b = map.getBounds();
     if (!b) return;
-    onRegionChangeComplete({
+    const bounds = {
       min_lat: b.getSouthWest().lat(),
       max_lat: b.getNorthEast().lat(),
       min_lng: b.getSouthWest().lng(),
       max_lng: b.getNorthEast().lng(),
+    };
+    onRegionChangeComplete(bounds, {
+      latitude: (bounds.min_lat + bounds.max_lat) / 2,
+      longitude: (bounds.min_lng + bounds.max_lng) / 2,
+      latitudeDelta: Math.max(bounds.max_lat - bounds.min_lat, 0.001),
+      longitudeDelta: Math.max(bounds.max_lng - bounds.min_lng, 0.001),
     });
   }, [onRegionChangeComplete]);
 
