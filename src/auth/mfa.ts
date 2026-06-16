@@ -22,6 +22,16 @@ export type MfaVerifyParams = {
 };
 
 const MFA_CODE_PATTERN = /\bMFA0[1-4]\b/;
+const MFA_CHECK_CACHE_MS = 5000;
+
+let mfaCheckInFlight: Promise<MfaCheckResult> | null = null;
+let lastMfaCheck:
+  | {
+      deviceFingerprint: string;
+      checkedAt: number;
+      result: MfaCheckResult;
+    }
+  | null = null;
 
 export { getDeviceFingerprint };
 
@@ -50,12 +60,47 @@ export async function verifyMfaCode(params: MfaVerifyParams): Promise<MfaVerifyR
 
 export async function checkMfaRequirement(): Promise<MfaCheckResult> {
   const deviceFingerprint = await getDeviceFingerprint();
-  const result = await initiateMfa(deviceFingerprint);
+  const now = Date.now();
 
-  return {
-    required: result.required,
-    expiresAt: result.expires_at ?? null,
-  };
+  if (
+    lastMfaCheck &&
+    lastMfaCheck.deviceFingerprint === deviceFingerprint &&
+    now - lastMfaCheck.checkedAt < MFA_CHECK_CACHE_MS
+  ) {
+    return lastMfaCheck.result;
+  }
+
+  if (mfaCheckInFlight) {
+    return mfaCheckInFlight;
+  }
+
+  mfaCheckInFlight = (async () => {
+    const result = await initiateMfa(deviceFingerprint);
+
+    const checkResult = {
+      required: result.required,
+      expiresAt: result.expires_at ?? null,
+    };
+
+    lastMfaCheck = {
+      deviceFingerprint,
+      checkedAt: Date.now(),
+      result: checkResult,
+    };
+
+    return checkResult;
+  })();
+
+  try {
+    return await mfaCheckInFlight;
+  } finally {
+    mfaCheckInFlight = null;
+  }
+}
+
+export function clearMfaRequirementCache(): void {
+  mfaCheckInFlight = null;
+  lastMfaCheck = null;
 }
 
 export function getMfaErrorCode(error: unknown): string | null {
