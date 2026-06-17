@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Platform } from 'react-native';
 import { Marker } from 'react-native-maps';
-import { Check, Diamond, Star, Users } from 'lucide-react-native';
+import { Check, Diamond, Star, User, Users } from 'lucide-react-native';
 import { Theme } from '~/theme/Theme';
 import type { MapMarkerItem } from '~/types/map/mapMarker';
 import type { MapPinType } from '~/types/map/mapPin';
@@ -28,6 +28,8 @@ function AndroidMarkerGlyph({ pinType, color }: { pinType: MapPinType; color: st
       return <Check size={18} color={color} strokeWidth={3} />;
     case 'overlap':
       return <Diamond size={15} color={color} fill={color} strokeWidth={2.4} />;
+    case 'rex':
+      return <User size={17} color={color} strokeWidth={2.6} />;
     case 'network':
     default:
       return <Users size={18} color={color} strokeWidth={2.6} />;

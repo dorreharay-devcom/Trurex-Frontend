@@ -16,11 +16,12 @@ type Props = {
 };
 
 const layerRows: {
-  key: keyof Pick<PinVisibility, 'network' | 'saved' | 'beenHere'>;
+  key: keyof Pick<PinVisibility, 'network' | 'rex' | 'saved' | 'beenHere'>;
   label: string;
   color: string;
 }[] = [
-  { key: 'network', label: 'Network Recs', color: MAP_PIN_COLOR.network },
+  { key: 'rex', label: 'Rex', color: MAP_PIN_COLOR.rex },
+  { key: 'network', label: 'Trusted Recs', color: MAP_PIN_COLOR.network },
   { key: 'saved', label: 'Saved / Want to Go', color: MAP_PIN_COLOR.saved },
   { key: 'beenHere', label: 'Been Here', color: MAP_PIN_COLOR.beenHere },
 ];

@@ -9,12 +9,14 @@ import {
   DEFAULT_MAP_BOUNDS,
   filterLocatedRecommendations,
   filterRecommendationsByPinLayers,
+  apiPinTypeToMapPinType,
   mapPinRowToMapMarkerItem,
+  mapPinTypeForRecommendation,
   pinRowPassesLayerVisibility,
 } from '~/utils/map/mapRecommendationData';
 import { MapApi } from '~/api/MapApi';
 import { useAuth } from '~/services/AuthContext';
-import type { PinVisibility } from '~/types/map/mapPin';
+import type { PinVisibility, MapPinType } from '~/types/map/mapPin';
 import { DEFAULT_PIN_VISIBILITY } from '~/types/map/mapPin';
 import { mapSearchTitleSuggestions } from '~/utils/map/mapSearchSuggestions';
 import { DEFAULT_SEARCH_DEBOUNCE_MS } from '~/hooks/useDebouncedValue';
@@ -152,9 +154,20 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     [savedByRecId],
   );
 
+  const pinTypeByRecId = useMemo(() => {
+    const map = new Map<string, MapPinType>();
+    for (const row of pinRows) {
+      map.set(row.rex_id, apiPinTypeToMapPinType(row.pin_type, row));
+    }
+    return map;
+  }, [pinRows]);
+
   const layerFiltered = useMemo(
-    () => filterRecommendationsByPinLayers(locatedRecs, layers, userId).map(withSavedOverride),
-    [locatedRecs, layers, userId, withSavedOverride],
+    () =>
+      filterRecommendationsByPinLayers(locatedRecs, layers, userId, pinTypeByRecId).map(
+        withSavedOverride,
+      ),
+    [locatedRecs, layers, userId, pinTypeByRecId, withSavedOverride],
   );
 
   const markRecSaved = useCallback((recId: string) => {
@@ -200,6 +213,13 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     () => (selectedRecId ? (layerFiltered.find((r) => r.id === selectedRecId) ?? null) : null),
     [selectedRecId, layerFiltered],
   );
+
+  const selectedPinType = useMemo((): MapPinType | null => {
+    if (!selectedRecId) return null;
+    const rec = layerFiltered.find((r) => r.id === selectedRecId);
+    if (!rec) return null;
+    return mapPinTypeForRecommendation(rec, pinTypeByRecId, userId);
+  }, [selectedRecId, layerFiltered, pinTypeByRecId, userId]);
 
   const openRec = useCallback(
     (rec: Recommendation) => {
@@ -256,6 +276,7 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     locatedRexCount,
     selectedRecId,
     selectedRec,
+    selectedPinType,
     selectMarker,
     clearSelection,
     listView,

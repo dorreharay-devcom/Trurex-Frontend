@@ -25,7 +25,11 @@ function parseMapPinRow(row: Record<string, unknown>): MapPinRow | null {
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
   const pinRaw = row.pin_type;
   const pin_type =
-    pinRaw === 'trusted' || pinRaw === 'saved' || pinRaw === 'been_there' || pinRaw === 'overlap'
+    pinRaw === 'trusted' ||
+    pinRaw === 'default' ||
+    pinRaw === 'saved' ||
+    pinRaw === 'been_there' ||
+    pinRaw === 'overlap'
       ? pinRaw
       : null;
   return {

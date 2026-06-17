@@ -10,5 +10,5 @@ export type MapPinRow = {
   category_icon: string | null;
   category_color: string | null;
   is_saved: boolean;
-  pin_type: 'trusted' | 'saved' | 'been_there' | 'overlap' | null;
+  pin_type: 'trusted' | 'default' | 'saved' | 'been_there' | 'overlap' | null;
 };

@@ -12,6 +12,7 @@ import { mapAuthError } from '~/utils/errors';
 import { checkMfaRequirement } from '~/auth/mfa';
 import { useAuth } from '~/services/AuthContext';
 import { unknownErrorMessage } from '~/utils';
+import { toastError } from '~/utils/appToast';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -65,6 +66,7 @@ export default function LoginScreen() {
           ),
         });
       } else {
+        toastError(unknownErrorMessage(error, 'Sign in failed'));
         mapAuthError(error, setErrors);
       }
     } finally {
