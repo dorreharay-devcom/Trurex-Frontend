@@ -45,7 +45,10 @@ import {
   buildAddYourOwnRecSource,
   type AddYourOwnRecSource,
 } from '~/utils/recommendation/recCreateFlow';
-import { buildDetailRatingRows } from '~/utils/recommendation/recContentDisplay';
+import {
+  buildDetailRatingsFromRexDetail,
+  type DetailRatingRow,
+} from '~/utils/recommendation/recContentDisplay';
 import { cn } from '~/utils/general';
 import { RexImageCarousel } from './RexImageCarousel';
 import {
@@ -217,9 +220,34 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     refetchOnMount: 'always',
   });
 
-  const mockRatings = useMemo(
-    () => (recommendation ? buildDetailRatingRows(recommendation.rating ?? undefined) : []),
-    [recommendation],
+  const detailRatings = useMemo(() => {
+    if (!rexDetail) return { overall: null, dimensions: [] };
+    return buildDetailRatingsFromRexDetail(rexDetail);
+  }, [rexDetail]);
+
+  const hasDetailRatings =
+    detailRatings.overall != null || detailRatings.dimensions.length > 0;
+
+  const renderRatingRow = (r: DetailRatingRow, key: string) => (
+    <View key={key} className="flex-row items-center justify-between gap-2">
+      <Text className="min-w-0 flex-1 text-sm text-foreground">{r.label}</Text>
+      <View className="shrink-0 flex-row items-center gap-1.5">
+        <View className="flex-row gap-0.5">
+          {[1, 2, 3, 4, 5].map((n) => {
+            const filled = n <= Math.round(r.value);
+            return (
+              <Star
+                key={n}
+                size={14}
+                color={filled ? Theme.colors.ratingStar : Theme.colors.border}
+                fill={filled ? Theme.colors.ratingStar : 'transparent'}
+              />
+            );
+          })}
+        </View>
+        <Text className="w-6 text-right text-xs text-muted-foreground">{r.value.toFixed(1)}</Text>
+      </View>
+    </View>
   );
 
   const galleryPaths = useMemo(() => {
@@ -546,36 +574,24 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                 </View>
               ) : null}
 
-              <View className="gap-3">
-                <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Ratings
-                </Text>
-                <View className="gap-2">
-                  {mockRatings.map((r) => (
-                    <View key={r.label} className="flex-row items-center justify-between">
-                      <Text className="text-sm text-foreground">{r.label}</Text>
-                      <View className="flex-row items-center gap-1.5">
-                        <View className="flex-row gap-0.5">
-                          {[1, 2, 3, 4, 5].map((n) => {
-                            const filled = n <= Math.round(r.value);
-                            return (
-                              <Star
-                                key={n}
-                                size={14}
-                                color={filled ? Theme.colors.ratingStar : Theme.colors.border}
-                                fill={filled ? Theme.colors.ratingStar : 'transparent'}
-                              />
-                            );
-                          })}
-                        </View>
-                        <Text className="w-6 text-right text-xs text-muted-foreground">
-                          {r.value.toFixed(1)}
-                        </Text>
-                      </View>
-                    </View>
-                  ))}
+              {hasDetailRatings ? (
+                <View className="gap-3">
+                  <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Ratings
+                  </Text>
+                  <View className="gap-2">
+                    {detailRatings.overall
+                      ? renderRatingRow(detailRatings.overall, 'overall-quality')
+                      : null}
+                    {detailRatings.overall != null && detailRatings.dimensions.length > 0 ? (
+                      <View className="my-1 border-b border-border/80" />
+                    ) : null}
+                    {detailRatings.dimensions.map((r, index) =>
+                      renderRatingRow(r, `${r.label}-${index}`),
+                    )}
+                  </View>
                 </View>
-              </View>
+              ) : null}
 
               {(recommendation.tags ?? []).length > 0 ? (
                 <View className="gap-3">

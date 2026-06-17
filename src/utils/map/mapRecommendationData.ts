@@ -138,8 +138,28 @@ export function apiPinTypeToMapPinType(
   if (pinType === 'saved') return 'saved';
   if (pinType === 'been_there') return 'beenHere';
   if (pinType === 'trusted') return 'network';
+  if (pinType === 'default') return 'rex';
   if (row.is_saved) return 'saved';
-  return 'network';
+  return 'rex';
+}
+
+export function mapAuthorRecommendedLabel(user: {
+  name?: string | null;
+  handle?: string | null;
+}): string | null {
+  const name = user.name?.trim() ?? '';
+  if (name && name !== 'Member') return `${name} recommended it`;
+  const rawHandle = user.handle?.trim().replace(/^@/, '') ?? '';
+  if (rawHandle) return `@${rawHandle} recommended it`;
+  return null;
+}
+
+export function mapPinTypeForRecommendation(
+  rec: Recommendation,
+  pinTypeByRecId: ReadonlyMap<string, MapPinType>,
+  currentUserId: string | null | undefined,
+): MapPinType {
+  return pinTypeByRecId.get(rec.id) ?? deriveMapPinType(rec, currentUserId);
 }
 
 export function mapPinRowToMapMarkerItem(row: MapPinRow): MapMarkerItem {
@@ -180,15 +200,14 @@ export function deriveMapPinType(
   if (own && saved) return 'overlap';
   if (own) return 'beenHere';
   if (saved) return 'saved';
-  return 'network';
+  if (rec.authorRelationshipStatus === 'trusted') return 'network';
+  return 'rex';
 }
 
-function pinTypeVisible(
-  pinType: MapPinType,
-  layers: { network: boolean; saved: boolean; beenHere: boolean },
-): boolean {
+function pinTypeVisible(pinType: MapPinType, layers: PinVisibility): boolean {
   if (pinType === 'overlap') return layers.network && layers.saved;
   if (pinType === 'network') return layers.network;
+  if (pinType === 'rex') return layers.rex;
   if (pinType === 'saved') return layers.saved;
   return layers.beenHere;
 }
@@ -197,8 +216,11 @@ export function filterRecommendationsByPinLayers(
   recs: Recommendation[],
   layers: PinVisibility,
   userId: string | null,
+  pinTypeByRecId?: ReadonlyMap<string, MapPinType>,
 ): Recommendation[] {
-  return recs.filter((r) => pinTypeVisible(deriveMapPinType(r, userId), layers));
+  return recs.filter((r) =>
+    pinTypeVisible(mapPinTypeForRecommendation(r, pinTypeByRecId ?? new Map(), userId), layers),
+  );
 }
 
 export function recommendationToMapMarker(

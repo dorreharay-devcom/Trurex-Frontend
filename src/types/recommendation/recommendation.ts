@@ -54,6 +54,7 @@ export interface Recommendation {
   category: string;
   categoryIcon?: string | null;
   authorId?: string;
+  authorRelationshipStatus?: 'follows_you' | 'following' | 'trusted' | null;
   location?: string;
   placeWebsiteUrl?: string | null;
   isOnlinePlace?: boolean | null;

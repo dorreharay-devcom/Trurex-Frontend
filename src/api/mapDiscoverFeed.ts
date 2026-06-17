@@ -65,6 +65,13 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
   const image = imageField && /^https?:\/\//i.test(imageField) ? imageField : null;
 
   const authorId = firstNonEmptyString(o, 'user_id', 'author_id', 'author_user_id') ?? undefined;
+  const relationshipRaw = o.author_relationship_status;
+  const authorRelationshipStatus =
+    relationshipRaw === 'follows_you' ||
+    relationshipRaw === 'following' ||
+    relationshipRaw === 'trusted'
+      ? relationshipRaw
+      : null;
   const authorName = firstNonEmptyString(o, 'author_display_name', 'author_name', 'user_name') ?? 'Member';
   const authorHandle = normalizeHandle(firstNonEmptyString(o, 'author_handle', 'author_username', 'handle') ?? '');
   const avatarRaw = firstNonEmptyString(
@@ -100,6 +107,7 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
   return {
     id,
     authorId,
+    authorRelationshipStatus,
     title: firstNonEmptyString(o, 'place_name', 'title') ?? 'Place',
     description: bodyText,
     image,

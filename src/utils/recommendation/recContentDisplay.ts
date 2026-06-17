@@ -71,13 +71,42 @@ export function averageScoreFromCategoryRatings(raw: unknown): number | undefine
   return Math.round(avg * 10) / 10;
 }
 
-export type DetailRatingRow = { label: string; value: number };
+export type DetailRatingRow = {
+  label: string;
+  value: number;
+};
 
-export function buildDetailRatingRows(rating: number | undefined): DetailRatingRow[] {
-  const base = rating ?? 4.5;
-  return [
-    { label: 'Overall quality', value: base },
-    { label: 'Value for money', value: Math.max(1, base - 0.3) },
-    { label: 'Service', value: Math.min(5, base + 0.1) },
-  ];
+export type DetailRatingsDisplay = {
+  overall: DetailRatingRow | null;
+  dimensions: DetailRatingRow[];
+};
+
+type RexDetailRatingsSource = {
+  category_ratings: Record<
+    string,
+    { label?: string | null; display_label?: string | null; score?: number | null }
+  >;
+};
+
+export function buildDetailRatingsFromRexDetail(detail: RexDetailRatingsSource): DetailRatingsDisplay {
+  const dimensions = Object.entries(detail.category_ratings)
+    .map(([code, entry]) => {
+      const score = entry?.score;
+      if (typeof score !== 'number' || Number.isNaN(score) || score <= 0) return null;
+      const label =
+        (typeof entry.display_label === 'string' && entry.display_label.trim()) ||
+        (typeof entry.label === 'string' && entry.label.trim()) ||
+        code;
+      return { label, value: score };
+    })
+    .filter((row): row is DetailRatingRow => row != null)
+    .sort((a, b) => a.label.localeCompare(b.label));
+
+  const overallScore = averageScoreFromCategoryRatings(detail.category_ratings);
+
+  return {
+    overall:
+      overallScore != null ? { label: 'Overall quality', value: overallScore } : null,
+    dimensions,
+  };
 }

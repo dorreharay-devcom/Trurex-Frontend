@@ -21,7 +21,6 @@ import {
   MAP_RIGHT_CONTROLS_BOTTOM,
 } from '~/constants/map/mapUi';
 import {
-  deriveMapPinType,
   formatDistanceKm,
   haversineKm,
   isOwnRecommendation,
@@ -87,7 +86,7 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress, onRexSheetOpenChang
     return formatDistanceKm(km);
   }, [flow.selectedRec, flow.userCoords]);
 
-  const pinType = flow.selectedRec ? deriveMapPinType(flow.selectedRec, flow.userId) : 'network';
+  const pinType = flow.selectedPinType ?? 'rex';
 
   const canSaveSelected =
     flow.selectedRec != null && !isOwnRecommendation(flow.selectedRec, flow.userId);

@@ -6,6 +6,7 @@ import type { MapPinType } from '~/types/map/mapPin';
 import { Theme } from '~/theme/Theme';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { useShareRex } from '~/hooks/recommendation/useShareRex';
+import { mapAuthorRecommendedLabel } from '~/utils/map/mapRecommendationData';
 
 type Props = {
   recommendation: Recommendation;
@@ -18,6 +19,7 @@ type Props = {
 
 const pinTypeCopy: Record<MapPinType, string> = {
   network: 'Recommended by your network',
+  rex: 'Recommended on TruRex',
   saved: 'In your Saved items',
   beenHere: 'You recommended this',
   overlap: 'Multiple connections',
@@ -33,7 +35,11 @@ export const MapPinDetailSheet: React.FC<Props> = ({
 }) => {
   const { shareRecommendation } = useShareRex();
   const label = pinTypeCopy[pinType];
-  const showNetworkLine = (pinType === 'network' || pinType === 'overlap') && pin.user != null;
+  const authorRecommendedLabel =
+    (pinType === 'network' || pinType === 'rex') && pin.user
+      ? mapAuthorRecommendedLabel(pin.user)
+      : null;
+  const showAuthorLine = authorRecommendedLabel != null;
 
   const openDirections = () => {
     const q = pin.location ?? pin.title;
@@ -91,10 +97,10 @@ export const MapPinDetailSheet: React.FC<Props> = ({
         </View>
 
         <View className="mb-3 flex-row items-center gap-2">
-          {showNetworkLine && pin.user ? (
+          {showAuthorLine && pin.user ? (
             <>
               <SignedUserAvatar name={pin.user.name} avatar={pin.user.avatar} className="h-6 w-6" />
-              <Text className="text-xs text-muted-foreground">1 person in your network</Text>
+              <Text className="flex-1 text-xs text-muted-foreground">{authorRecommendedLabel}</Text>
             </>
           ) : (
             <Text className="text-xs text-muted-foreground">{label}</Text>

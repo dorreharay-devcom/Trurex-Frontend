@@ -6,6 +6,7 @@ import { MAP_PIN_COLOR, MAP_PIN_GLYPH, MAP_PIN_GLYPH_COLOR } from '~/types/map/m
 import { Theme } from '~/theme/Theme';
 
 const legendItems = [
+  { label: 'Rex', pinType: 'rex' as const },
   { label: 'Trusted Rex', pinType: 'network' as const },
   { label: 'Saved / Want to Go', pinType: 'saved' as const },
   { label: 'Been Here', pinType: 'beenHere' as const },
@@ -44,7 +45,7 @@ export const MapLegend: React.FC = () => {
             Platform.OS === 'ios'
               ? { width: 150 }
               : Platform.OS === 'android'
-                ? { width: 156 }
+                ? { width: 168 }
                 : undefined
           }
         >
