@@ -86,6 +86,7 @@ type UseSearchRexesArgs = {
   categoryId: string;
   searchCategoryFilter: string[];
   valueForMoneyFilters: number[];
+  qualityFilter: number | null;
   recencyFilterDays: RecencyDayToken[];
 } & Pick<SearchRexesParams, 'result_limit' | 'result_offset'>;
 
@@ -132,6 +133,7 @@ export const useSearchRexes = (args: UseSearchRexesArgs, options?: UseSearchRexe
       category_filter,
       [...args.searchCategoryFilter].sort().join(),
       [...args.valueForMoneyFilters].sort().join(),
+      args.qualityFilter ?? 'none',
       recencyKey,
       created_from,
       created_to,
@@ -144,6 +146,7 @@ export const useSearchRexes = (args: UseSearchRexesArgs, options?: UseSearchRexe
           search_term: trimmed || null,
           category_filter,
           value_for_money_filters: vfmRpc,
+          quality_filter: args.qualityFilter,
           created_from: created_from ?? null,
           created_to: created_to ?? null,
           result_limit: args.result_limit ?? 20,

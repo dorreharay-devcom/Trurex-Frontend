@@ -35,6 +35,7 @@ export type FeedListCardRow = {
   photo_path: string | null;
   placeholder_colors?: string[] | null;
   category_ratings: Record<string, CategoryRatingRead>;
+  overall_rating?: number | null;
 };
 
 export type RecommendationOpenOptions = {

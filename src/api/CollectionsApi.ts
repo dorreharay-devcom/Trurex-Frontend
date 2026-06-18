@@ -45,6 +45,7 @@ export interface CollectionRexEntry {
   is_online_place?: boolean | null;
   place_website_url?: string | null;
   score_value_for_money?: number | null;
+  overall_rating?: number | null;
   rating?: number | null;
   recommender_name?: string | null;
   recommender_handle?: string | null;

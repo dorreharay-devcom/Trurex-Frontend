@@ -56,21 +56,6 @@ export function valueForMoneyLabel(score: number): string | null {
   return VALUE_FOR_MONEY_LABELS[Math.round(score) - 1] ?? null;
 }
 
-type CategoryRatingEntry = { score?: unknown; label?: unknown };
-
-export function averageScoreFromCategoryRatings(raw: unknown): number | undefined {
-  if (raw == null || typeof raw !== 'object') return undefined;
-  const scores: number[] = [];
-  for (const v of Object.values(raw as Record<string, CategoryRatingEntry>)) {
-    if (v == null || typeof v !== 'object') continue;
-    const s = (v as CategoryRatingEntry).score;
-    if (typeof s === 'number' && !Number.isNaN(s)) scores.push(s);
-  }
-  if (scores.length === 0) return undefined;
-  const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-  return Math.round(avg * 10) / 10;
-}
-
 export type DetailRatingRow = {
   label: string;
   value: number;
@@ -82,6 +67,7 @@ export type DetailRatingsDisplay = {
 };
 
 type RexDetailRatingsSource = {
+  overall_rating?: number | null;
   category_ratings: Record<
     string,
     { label?: string | null; display_label?: string | null; score?: number | null }
@@ -102,11 +88,14 @@ export function buildDetailRatingsFromRexDetail(detail: RexDetailRatingsSource):
     .filter((row): row is DetailRatingRow => row != null)
     .sort((a, b) => a.label.localeCompare(b.label));
 
-  const overallScore = averageScoreFromCategoryRatings(detail.category_ratings);
+  const overallRaw = detail.overall_rating;
+  const overallScore =
+    typeof overallRaw === 'number' && !Number.isNaN(overallRaw) && overallRaw > 0
+      ? Math.round(overallRaw * 10) / 10
+      : null;
 
   return {
-    overall:
-      overallScore != null ? { label: 'Overall quality', value: overallScore } : null,
+    overall: overallScore != null ? { label: 'Overall quality', value: overallScore } : null,
     dimensions,
   };
 }

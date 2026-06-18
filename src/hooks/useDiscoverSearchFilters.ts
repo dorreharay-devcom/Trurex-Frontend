@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { DollarSign, Tag, Clock } from 'lucide-react-native';
+import { DollarSign, Tag, Clock, Star } from 'lucide-react-native';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { useSearchRexes, type RecencyDayToken } from '~/hooks/useDiscovery';
 import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/hooks/useDebouncedValue';
@@ -19,7 +19,7 @@ type CategoryLite = { code: string; label: string };
 type IconComp = typeof DollarSign;
 
 type FilterChip = {
-  id: 'budget' | 'category' | 'time';
+  id: 'budget' | 'quality' | 'category' | 'time';
   label: string;
   active: boolean;
   Icon: IconComp;
@@ -37,6 +37,7 @@ export function useDiscoverSearchFilters({
   allCats,
 }: UseDiscoverSearchFiltersArgs) {
   const [vfmFilter, setVfmFilter] = useState<number[]>([]);
+  const [qualityFilter, setQualityFilter] = useState<number | null>(null);
   const [searchCategoryFilter, setSearchCategoryFilter] = useState<string[]>([]);
   const [recencyFilterDays, setRecencyFilterDays] = useState<RecencyDayToken[]>([]);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
@@ -51,6 +52,7 @@ export function useDiscoverSearchFilters({
       categoryId: activeCategory,
       searchCategoryFilter,
       valueForMoneyFilters: vfmFilter,
+      qualityFilter,
       recencyFilterDays,
     },
     { enabled: hasDebouncedSearch },
@@ -66,12 +68,17 @@ export function useDiscoverSearchFilters({
   }, [searchData, searchCategoryFilter]);
 
   const hasActiveSearchFilters = useMemo(
-    () => vfmFilter.length > 0 || searchCategoryFilter.length > 0 || recencyFilterDays.length > 0,
-    [vfmFilter, searchCategoryFilter, recencyFilterDays],
+    () =>
+      vfmFilter.length > 0 ||
+      qualityFilter != null ||
+      searchCategoryFilter.length > 0 ||
+      recencyFilterDays.length > 0,
+    [vfmFilter, qualityFilter, searchCategoryFilter, recencyFilterDays],
   );
 
   const clearAllFilters = useCallback(() => {
     setVfmFilter([]);
+    setQualityFilter(null);
     setSearchCategoryFilter([]);
     setRecencyFilterDays([]);
     setActiveFilter(null);
@@ -82,6 +89,10 @@ export function useDiscoverSearchFilters({
       const next = prev.includes(val) ? prev.filter((x) => x !== val) : [...prev, val];
       return next.sort((a, b) => a - b);
     });
+  }, []);
+
+  const toggleQuality = useCallback((star: number) => {
+    setQualityFilter((prev) => (prev === star ? null : star));
   }, []);
 
   const toggleSearchCategory = useCallback((code: string) => {
@@ -121,6 +132,12 @@ export function useDiscoverSearchFilters({
         Icon: DollarSign,
       },
       {
+        id: 'quality',
+        label: qualityFilter != null ? `Quality (${qualityFilter}★)` : 'Quality',
+        active: qualityFilter != null,
+        Icon: Star,
+      },
+      {
         id: 'category',
         label: (() => {
           if (searchCategoryFilter.length === 0) return 'Category';
@@ -139,18 +156,20 @@ export function useDiscoverSearchFilters({
         Icon: Clock,
       },
     ];
-  }, [vfmFilter, searchCategoryFilter, recencyFilterDays, allCats]);
+  }, [vfmFilter, qualityFilter, searchCategoryFilter, recencyFilterDays, allCats]);
 
   return {
     hasSearch,
     searchRows,
     searchLoading,
     vfmFilter,
+    qualityFilter,
     searchCategoryFilter,
     recencyFilterDays,
     activeFilter,
     setActiveFilter,
     toggleVfm,
+    toggleQuality,
     toggleSearchCategory,
     toggleRecencyDay,
     clearAllFilters,
