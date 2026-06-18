@@ -9,7 +9,6 @@ import {
   firstPositiveFiniteNumber,
   optionalFiniteNumber,
 } from '~/utils/guards';
-import { averageScoreFromCategoryRatings } from '~/utils/recommendation/recContentDisplay';
 
 dayjs.extend(relativeTime);
 
@@ -94,11 +93,8 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
       (categoryCode ? categoryCode.replace(/_/g, ' ') : '')
     ).trim() || 'Uncategorized';
 
-  const explicitRating = firstPositiveFiniteNumber(o, 'rating', 'avg_rating');
-  const fromDimensions = averageScoreFromCategoryRatings(o.category_ratings);
   const rating =
-    explicitRating ??
-    (fromDimensions != null && fromDimensions > 0 ? fromDimensions : null);
+    firstPositiveFiniteNumber(o, 'overall_rating', 'overallRating', 'rating', 'avg_rating') ?? null;
 
   const bodyText =
     firstNonEmptyString(o, 'review', 'description') ??

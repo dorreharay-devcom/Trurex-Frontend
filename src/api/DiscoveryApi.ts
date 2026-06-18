@@ -13,6 +13,7 @@ export interface SearchRexesParams {
   search_term?: string | null;
   category_filter?: string | null;
   value_for_money_filters?: number[] | null;
+  quality_filter?: number | null;
   created_from?: string | null;
   created_to?: string | null;
   result_limit?: number;
@@ -47,6 +48,10 @@ export const DiscoveryApi = {
         value_for_money_filters: params.value_for_money_filters?.length
           ? params.value_for_money_filters
           : null,
+        quality_filter:
+          params.quality_filter != null && params.quality_filter >= 1 && params.quality_filter <= 5
+            ? params.quality_filter
+            : null,
         created_from: params.created_from ?? null,
         created_to: params.created_to ?? null,
         result_limit: params.result_limit ?? 20,

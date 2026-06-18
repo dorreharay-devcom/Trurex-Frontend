@@ -3,7 +3,6 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import type { RexDetailRow } from '~/types/recommendation/rexDetail';
 import { unknownErrorMessage } from '~/utils';
-import { averageScoreFromCategoryRatings } from '~/utils/recommendation/recContentDisplay';
 
 dayjs.extend(relativeTime);
 
@@ -18,7 +17,8 @@ export function rexDetailRowToRecommendation(row: RexDetailRow): Recommendation 
   const photoPaths = row.photo_paths?.filter((p) => p.trim().length > 0) ?? [];
   const photoPath = photoPaths[0] ?? null;
   const bodyText = row.review ?? row.description ?? row.must_know ?? row.quick_tip ?? null;
-  const rating = averageScoreFromCategoryRatings(row.category_ratings);
+  const rating =
+    row.overall_rating != null && row.overall_rating > 0 ? row.overall_rating : null;
 
   return {
     id: row.id,

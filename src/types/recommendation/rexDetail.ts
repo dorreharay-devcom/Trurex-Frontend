@@ -44,6 +44,7 @@ export type RexDetailRow = {
   tag_slugs: string[];
   photo_paths: string[];
   placeholder_colors?: string[] | null;
+  overall_rating: number | null;
 };
 
 export type RexForEditRow = {

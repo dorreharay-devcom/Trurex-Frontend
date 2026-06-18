@@ -6,6 +6,7 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
+  Pressable,
   ScrollView,
   useWindowDimensions,
   type NativeScrollEvent,
@@ -148,11 +149,13 @@ const DiscoverView = ({
     searchRows,
     searchLoading,
     vfmFilter,
+    qualityFilter,
     searchCategoryFilter,
     recencyFilterDays,
     activeFilter,
     setActiveFilter,
     toggleVfm,
+    toggleQuality,
     toggleSearchCategory,
     toggleRecencyDay,
     clearAllFilters,
@@ -270,6 +273,34 @@ const DiscoverView = ({
                       </TouchableOpacity>
                     );
                   })}
+                </View>
+              )}
+              {activeFilter === 'quality' && (
+                <View>
+                  <Text className="mb-3 text-xs text-muted-foreground">
+                    Filter by overall quality rating
+                  </Text>
+                  <View className="flex-row gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => {
+                      const selected = qualityFilter != null && star <= qualityFilter;
+                      return (
+                        <Pressable
+                          key={star}
+                          hitSlop={4}
+                          onPress={() => toggleQuality(star)}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Quality filter: ${star} star${star === 1 ? '' : 's'}`}
+                          className="p-0.5 active:opacity-90"
+                        >
+                          <Star
+                            size={20}
+                            color={selected ? Theme.colors.ratingStar : Theme.colors.border}
+                            fill={selected ? Theme.colors.ratingStar : 'transparent'}
+                          />
+                        </Pressable>
+                      );
+                    })}
+                  </View>
                 </View>
               )}
               {activeFilter === 'category' && (

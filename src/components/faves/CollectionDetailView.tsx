@@ -65,7 +65,7 @@ function entryToRec(entry: CollectionRexEntry): Recommendation {
     location: entry.location ?? undefined,
     placeWebsiteUrl: entry.place_website_url?.trim() || null,
     isOnlinePlace: entry.is_online_place ?? null,
-    rating: entry.rating ?? undefined,
+    rating: entry.overall_rating ?? entry.rating ?? undefined,
     scoreValueForMoney: entry.score_value_for_money ?? undefined,
     user:
       entry.recommender_name || entry.recommender_handle
