@@ -6,19 +6,23 @@ import { Routes } from '~/constants/routes';
 import { Button } from '~/components/common/Button';
 import AuthLayout from '~/components/common/AuthLayout';
 import Input from '~/components/common/Input';
+import { AuthInviteCodeField } from '~/components/auth/AuthInviteCodeField';
 import { OAuthSocialButtons } from '~/components/auth/OAuthSocialButtons';
 import { useOAuthSignIn } from '~/hooks/auth/useOAuthSignIn';
+import { useAuthInviteCode } from '~/hooks/auth/useAuthInviteCode';
 import { mapAuthError } from '~/utils/errors';
 import { checkMfaRequirement } from '~/auth/mfa';
 import { useAuth } from '~/services/AuthContext';
 import { unknownErrorMessage } from '~/utils';
 import { toastError } from '~/utils/appToast';
+import type { OAuthProvider } from '~/auth/oauth';
 
 export default function LoginScreen() {
   const router = useRouter();
   const isWeb = Platform.OS === 'web';
   const { setMfaPending, setMfaChecking } = useAuth();
   const { signInWithOAuth, oauthPending } = useOAuthSignIn();
+  const invite = useAuthInviteCode();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
@@ -29,8 +33,15 @@ export default function LoginScreen() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) next.email = 'Enter a valid email address';
     if (password.length < 6) next.password = 'Password must be at least 6 characters';
+    const inviteError = invite.getValidationError();
+    if (inviteError) invite.setError(inviteError);
     setErrors(next);
-    return Object.keys(next).length === 0;
+    return Object.keys(next).length === 0 && !inviteError;
+  };
+
+  const handleOAuthLogin = (provider: OAuthProvider) => {
+    if (!invite.validate()) return;
+    signInWithOAuth(provider);
   };
 
   const handleLogin = async () => {
@@ -90,8 +101,8 @@ export default function LoginScreen() {
 
       <OAuthSocialButtons
         disabled={oauthPending || loading}
-        onGooglePress={() => signInWithOAuth('google')}
-        onApplePress={() => signInWithOAuth('apple')}
+        onGooglePress={() => handleOAuthLogin('google')}
+        onApplePress={() => handleOAuthLogin('apple')}
       />
 
       <View className="flex-row items-center gap-3">
@@ -140,6 +151,8 @@ export default function LoginScreen() {
           secure
           error={errors.password}
         />
+
+        <AuthInviteCodeField invite={invite} />
 
         <Button
           title="Sign in"
