@@ -14,12 +14,16 @@ import {
 } from 'react-native';
 import { ArrowLeft, Camera, X } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
 import { useAuth } from '~/services/AuthContext';
+import { AuthApi } from '~/api/AuthApi';
 import { ProfileApi } from '~/api/ProfileApi';
+import { Routes } from '~/constants/routes';
 import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
 import { Button } from '~/components/common/Button';
 import Input from '~/components/common/Input';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
+import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
 import { toastError } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
@@ -58,10 +62,13 @@ const normalizeHandleForSave = (value: string) => {
 };
 
 const EditProfile = ({ onClose }: EditProfileProps) => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   const [displayName, setDisplayName] = useState('');
   const [handle, setHandle] = useState('');
@@ -164,6 +171,25 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
       toastError('Failed to save profile', unknownErrorMessage(e, 'Please try again.'));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleConfirmDeleteAccount = async () => {
+    setDeletingAccount(true);
+    try {
+      await AuthApi.deleteAccount();
+      try {
+        await signOut();
+      } catch {
+        await AuthApi.signOut().catch(() => {});
+      }
+      setDeleteConfirmVisible(false);
+      onClose();
+      router.replace(Routes.Signup);
+    } catch (e) {
+      toastError('Could not delete account', unknownErrorMessage(e, 'Please try again.'));
+    } finally {
+      setDeletingAccount(false);
     }
   };
 
@@ -385,7 +411,31 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
             ))}
           </View>
         </View>
+
+        <View className="pt-2 border-t border-border">
+          <TouchableOpacity
+            onPress={() => setDeleteConfirmVisible(true)}
+            activeOpacity={0.7}
+            disabled={saving || deletingAccount}
+            className="items-center rounded-xl border border-destructive/30 bg-destructive/5 py-3 disabled:opacity-50"
+          >
+            <Text className="text-sm font-semibold text-destructive">Delete account</Text>
+          </TouchableOpacity>
+          <Text className="mt-2 text-center text-[11px] text-muted-foreground">
+            Permanently removes your account and all associated data.
+          </Text>
+        </View>
       </ScrollView>
+
+      <DestructiveActionConfirmModal
+        visible={deleteConfirmVisible}
+        title="Delete your account?"
+        message="This will permanently delete your account, rexes, collections, and all other data. This action cannot be undone."
+        confirmLabel="Delete account"
+        pending={deletingAccount}
+        onCancel={() => !deletingAccount && setDeleteConfirmVisible(false)}
+        onConfirm={() => void handleConfirmDeleteAccount()}
+      />
     </View>
   );
 };

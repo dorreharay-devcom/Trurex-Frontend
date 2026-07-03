@@ -1,4 +1,4 @@
-import { Auth, unwrap } from '~/services/AuthService';
+import { Auth, Backend, unwrap } from '~/services/AuthService';
 import type { Session, User, OAuthResponse } from '@supabase/supabase-js';
 
 export interface SignUpParams {
@@ -91,6 +91,14 @@ export const AuthApi = {
     const { error } = await Auth.updateUser({ password });
     if (error) {
       console.error('Supabase Update Password Error:', error);
+      throw error;
+    }
+  },
+
+  deleteAccount: async (): Promise<void> => {
+    const { error } = await Backend.functions.invoke('delete-account');
+    if (error) {
+      console.error('Supabase Delete Account Error:', error);
       throw error;
     }
   },
