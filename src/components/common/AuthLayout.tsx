@@ -40,7 +40,9 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={
+        Platform.OS === 'ios' ? 'padding' : Platform.OS === 'android' ? 'height' : undefined
+      }
       style={{ flex: 1, backgroundColor: Theme.colors.background }}
     >
       <ScrollView
@@ -53,6 +55,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
         }}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'none'}
+        automaticallyAdjustKeyboardInsets
         showsVerticalScrollIndicator={false}
       >
         <View style={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
