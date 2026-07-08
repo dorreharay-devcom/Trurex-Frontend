@@ -4,6 +4,9 @@ const isProduction = appEnv === 'production';
 const appScheme = process.env.EXPO_PUBLIC_APP_SCHEME ?? (isProduction ? 'trurex' : 'trurex-dev');
 const nativeApplicationId = isProduction ? 'com.app.trurex' : 'com.app.trurex.dev';
 
+const PHOTO_LIBRARY_USAGE_DESCRIPTION =
+  'TruRex uses your photo library so you can choose images for your profile photo, recommendations, and collection covers. For example, when you create a recommendation, you can select a photo of the restaurant or place you are sharing.';
+
 module.exports = {
   expo: {
     name: isProduction ? 'truRex' : 'truRex Dev',
@@ -24,6 +27,7 @@ module.exports = {
       bundleIdentifier: nativeApplicationId,
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
+        NSPhotoLibraryUsageDescription: PHOTO_LIBRARY_USAGE_DESCRIPTION,
       },
     },
     android: {
@@ -50,6 +54,14 @@ module.exports = {
       'expo-web-browser',
       'expo-router',
       'expo-secure-store',
+      [
+        'expo-image-picker',
+        {
+          photosPermission: PHOTO_LIBRARY_USAGE_DESCRIPTION,
+          cameraPermission: false,
+          microphonePermission: false,
+        },
+      ],
       [
         'expo-location',
         {
