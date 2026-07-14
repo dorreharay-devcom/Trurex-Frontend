@@ -20,7 +20,7 @@ export default function AuthLayout() {
     return <Redirect href={Routes.Mfa} />;
   }
 
-  if (session && !mfaPending && pathname !== Routes.ResetPassword && pathname !== Routes.Mfa) {
+  if (session && !mfaPending && pathname !== Routes.ResetPassword && pathname !== Routes.Mfa && pathname !== Routes.Terms && pathname !== Routes.CommunityGuidelines) {
     return <Redirect href={Routes.Main} />;
   }
 

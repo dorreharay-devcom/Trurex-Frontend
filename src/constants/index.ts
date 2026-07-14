@@ -1,6 +1,8 @@
+import { LEGAL_CONTACT_EMAIL } from './legal';
+
 export const APP_CONFIG = {
   version: '1.0.4',
   bundleId: 'com.trurex.frontend',
   defaultLanguage: 'en',
-  supportEmail: 'support@trurex.com',
+  supportEmail: LEGAL_CONTACT_EMAIL,
 };
