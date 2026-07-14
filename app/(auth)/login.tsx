@@ -7,9 +7,11 @@ import { Button } from '~/components/common/Button';
 import AuthLayout from '~/components/common/AuthLayout';
 import Input from '~/components/common/Input';
 import { AuthInviteCodeField } from '~/components/auth/AuthInviteCodeField';
+import { AuthTermsAcceptanceField } from '~/components/auth/AuthTermsAcceptanceField';
 import { OAuthSocialButtons } from '~/components/auth/OAuthSocialButtons';
 import { useOAuthSignIn } from '~/hooks/auth/useOAuthSignIn';
 import { useAuthInviteCode } from '~/hooks/auth/useAuthInviteCode';
+import { useAuthTermsAcceptance } from '~/hooks/auth/useAuthTermsAcceptance';
 import { mapAuthError } from '~/utils/errors';
 import { checkMfaRequirement } from '~/auth/mfa';
 import { useAuth } from '~/services/AuthContext';
@@ -23,6 +25,7 @@ export default function LoginScreen() {
   const { setMfaPending, setMfaChecking } = useAuth();
   const { signInWithOAuth, oauthPending } = useOAuthSignIn();
   const invite = useAuthInviteCode();
+  const authTerms = useAuthTermsAcceptance();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
@@ -35,17 +38,25 @@ export default function LoginScreen() {
     if (password.length < 6) next.password = 'Password must be at least 6 characters';
     const inviteError = invite.getValidationError();
     if (inviteError) invite.setError(inviteError);
+    const termsError = authTerms.getValidationError();
+    if (termsError) authTerms.setError(termsError);
     setErrors(next);
-    return Object.keys(next).length === 0 && !inviteError;
+    return Object.keys(next).length === 0 && !inviteError && !termsError;
   };
 
   const handleOAuthLogin = (provider: OAuthProvider) => {
+    if (!authTerms.validate()) {
+      toastError('Accept the Terms and Guidelines below to continue');
+      return;
+    }
     if (!invite.validate()) return;
+    void authTerms.persistAcceptance();
     signInWithOAuth(provider);
   };
 
   const handleLogin = async () => {
     if (!validate()) return;
+    await authTerms.persistAcceptance();
     setLoading(true);
     setErrors({});
     let signedIn = false;
@@ -100,7 +111,7 @@ export default function LoginScreen() {
       </View>
 
       <OAuthSocialButtons
-        disabled={oauthPending || loading}
+        disabled={oauthPending || loading || !authTerms.hydrated}
         onGooglePress={() => handleOAuthLogin('google')}
         onApplePress={() => handleOAuthLogin('apple')}
       />
@@ -153,6 +164,8 @@ export default function LoginScreen() {
         />
 
         <AuthInviteCodeField invite={invite} />
+
+        <AuthTermsAcceptanceField terms={authTerms} />
 
         <Button
           title="Sign in"
