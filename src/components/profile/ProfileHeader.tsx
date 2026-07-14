@@ -25,6 +25,10 @@ interface ProfileHeaderProps {
   onGuestAction?: () => void;
   followLoading?: boolean;
   avatarRefreshKey?: number;
+  isBlocked?: boolean;
+  onBlockPress?: () => void;
+  onUnblockPress?: () => void;
+  blockLoading?: boolean;
 }
 
 const ProfileHeader = ({
@@ -40,6 +44,10 @@ const ProfileHeader = ({
   onGuestAction,
   followLoading = false,
   avatarRefreshKey,
+  isBlocked = false,
+  onBlockPress,
+  onUnblockPress,
+  blockLoading = false,
 }: ProfileHeaderProps) => {
   const handleShare = async () => {
     const slug = profileShareSlug(profile);
@@ -62,7 +70,6 @@ const ProfileHeader = ({
   return (
     <View className="overflow-hidden rounded-t-xl bg-card">
       <View className="px-4 pt-5">
-        {/* Avatar */}
         <View className="self-start">
           <TouchableOpacity
             onPress={isOwnProfile ? onAvatarPress : undefined}
@@ -93,7 +100,6 @@ const ProfileHeader = ({
           </TouchableOpacity>
         </View>
 
-        {/* Name & info */}
         <View className="mt-3">
           <View className="flex-row items-center gap-2 flex-wrap">
             <Text className="text-xl font-bold text-foreground">{profile.displayName}</Text>
@@ -132,7 +138,6 @@ const ProfileHeader = ({
           )}
         </View>
 
-        {/* Action buttons */}
         {isOwnProfile ? (
           <View className="flex-row gap-2 mt-4 mb-2">
             <TouchableOpacity
@@ -167,7 +172,7 @@ const ProfileHeader = ({
               return (
                 <TouchableOpacity
                   onPress={isGuest ? onGuestAction : isFollowing ? onUnfollow : onFollow}
-                  disabled={followLoading}
+                  disabled={followLoading || blockLoading}
                   activeOpacity={0.8}
                   className={`flex-1 py-2.5 rounded-lg items-center justify-center ${isFollowing && !isGuest ? 'border border-border bg-card' : 'bg-primary'}`}
                 >
@@ -192,6 +197,24 @@ const ProfileHeader = ({
               className="flex-row items-center gap-1.5 px-4 py-2.5 rounded-lg border border-border"
             >
               <Share2 size={15} color={Theme.colors.foreground} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={isGuest ? onGuestAction : isBlocked ? onUnblockPress : onBlockPress}
+              disabled={blockLoading}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel={isBlocked ? 'Unblock user' : 'Block user'}
+              className="min-w-[88px] items-center justify-center rounded-lg border border-border px-3 py-2.5"
+            >
+              {blockLoading ? (
+                <ActivityIndicator size="small" color={Theme.colors.destructive} />
+              ) : (
+                <Text
+                  className={`text-sm font-medium ${isBlocked ? 'text-foreground' : 'text-destructive'}`}
+                >
+                  {isBlocked ? 'Unblock' : 'Block'}
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
         )}

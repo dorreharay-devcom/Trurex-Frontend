@@ -2,7 +2,7 @@
 export const TRUREX_LEGAL_ORIGIN = 'https://www.trurex.com';
 
 /** Real contact published on trurex.com/privacy. */
-export const LEGAL_CONTACT_EMAIL = 'privacy@trurex.com';
+export const LEGAL_CONTACT_EMAIL = 'support@trurex.com';
 
 /** Bump when terms or community guidelines change to require re-acceptance. */
 export const LEGAL_TERMS_VERSION = '2026-07-13';

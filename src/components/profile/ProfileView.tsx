@@ -41,11 +41,13 @@ import {
 } from './skeleton';
 import { useMyCollections, useAddRexToCollection } from '~/hooks/useCollections';
 import { useFollowUser } from '~/hooks/useFollowUser';
+import { useBlockUser } from '~/hooks/useBlockUser';
 import { useSavedRexes } from '~/hooks/useGems';
 import { useMyRexes } from '~/hooks/useDiscovery';
 import { ChevronLeft, Star, UserX } from 'lucide-react-native';
 import CollectionDetailView from '~/components/faves/CollectionDetailView';
 import { OverlayModal } from '~/components/common/OverlayModal';
+import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
@@ -304,11 +306,26 @@ const ProfileView = ({
 
   const followTargetId = profile?.userId ?? propUserId ?? '';
   const { follow, unfollow } = useFollowUser(followTargetId, fetchProfile);
+  const [showBlockConfirm, setShowBlockConfirm] = useState(false);
+  const {
+    isBlocked,
+    block,
+    unblock,
+    isPending: blockPending,
+  } = useBlockUser({
+    viewerId: authUser?.id,
+    targetUserId: followTargetId,
+    onBlocked: () => {
+      setShowBlockConfirm(false);
+      onBack?.();
+    },
+  });
 
   useEffect(() => {
     setLoading(true);
     setNotFound(false);
     setProfile(null);
+    setShowBlockConfirm(false);
   }, [propUserId, propHandle]);
 
   const handleAvatarPress = useCallback(async () => {
@@ -551,6 +568,10 @@ const ProfileView = ({
               onUnfollow={() => unfollow.mutate()}
               onGuestAction={handleGuestAction}
               followLoading={follow.isPending || unfollow.isPending}
+              isBlocked={isBlocked}
+              onBlockPress={() => setShowBlockConfirm(true)}
+              onUnblockPress={() => unblock.mutate()}
+              blockLoading={blockPending}
             />
           )}
 
@@ -686,6 +707,19 @@ const ProfileView = ({
       </OverlayModal>
 
       {addToCollectionSheet}
+
+      <DestructiveActionConfirmModal
+        visible={showBlockConfirm}
+        title="Block this user?"
+        message="They won't be able to see your profile activity from your side, and their content will be hidden from your feed. You can unblock them later."
+        confirmLabel="Block"
+        pending={block.isPending}
+        icon={<UserX size={22} color={Theme.colors.destructive} />}
+        onCancel={() => {
+          if (!block.isPending) setShowBlockConfirm(false);
+        }}
+        onConfirm={() => block.mutate()}
+      />
     </>
   );
 };

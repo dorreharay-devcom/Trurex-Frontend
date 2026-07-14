@@ -1,5 +1,7 @@
 import { Backend, unwrap } from '~/services/AuthService';
-import type { ContentFlagRow, FlagReasonRow } from '~/types/moderation';
+import type { BlockedUserRow, ContentFlagRow, FlagReasonRow } from '~/types/moderation';
+import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
+import { coerceId, optStr, unknownAsArray } from '~/utils/guards';
 
 function normalizeFlagReasonRows(raw: unknown): FlagReasonRow[] {
   if (!Array.isArray(raw)) return [];
@@ -57,4 +59,38 @@ export async function flagComment(params: {
   const data = unwrap<unknown>(await Backend.rpc('flag_comment', payload));
   if (Array.isArray(data) && data[0]) return data[0] as ContentFlagRow;
   return data as ContentFlagRow;
+}
+
+export async function blockUser(targetUserId: string): Promise<void> {
+  throwRpcIfFailed(
+    await Backend.rpc('block_user', {
+      p_target_user_id: targetUserId,
+    }),
+  );
+}
+
+export async function unblockUser(targetUserId: string): Promise<void> {
+  throwRpcIfFailed(
+    await Backend.rpc('unblock_user', {
+      p_target_user_id: targetUserId,
+    }),
+  );
+}
+
+export async function fetchBlockedUsers(): Promise<BlockedUserRow[]> {
+  const { data, error } = await Backend.rpc('get_blocked_users');
+  throwRpcIfFailed({ data, error });
+  return unknownAsArray<Record<string, unknown>>(data)
+    .map(normalizeBlockedUserRow)
+    .filter((row) => row.user_id);
+}
+
+function normalizeBlockedUserRow(r: Record<string, unknown>): BlockedUserRow {
+  return {
+    user_id: coerceId(r.user_id),
+    display_name: optStr(r.display_name) ?? 'Member',
+    handle: optStr(r.handle),
+    avatar_url: optStr(r.avatar_url),
+    blocked_at: optStr(r.blocked_at) ?? '',
+  };
 }
