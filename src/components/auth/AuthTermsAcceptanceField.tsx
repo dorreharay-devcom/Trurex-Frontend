@@ -19,7 +19,7 @@ function LegalLink({
 }) {
   return (
     <Pressable onPress={onPress} accessibilityRole="link" hitSlop={4}>
-      <Text className="text-xs font-semibold text-primary underline">{label}</Text>
+      <Text className="text-xs font-semibold text-blue-600">{label}</Text>
     </Pressable>
   );
 }

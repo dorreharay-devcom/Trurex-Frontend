@@ -20,7 +20,7 @@ function SectionBody({ body }: { body: string }) {
   if (body === LEGAL_CONTACT_EMAIL || body.trim() === LEGAL_CONTACT_EMAIL) {
     return (
       <Text
-        className="text-sm leading-6 text-primary underline"
+        className="text-sm leading-6 font-medium text-blue-600"
         onPress={openSupportEmail}
         accessibilityRole="link"
         accessibilityLabel={`Email ${LEGAL_CONTACT_EMAIL}`}
@@ -42,7 +42,7 @@ function SectionBody({ body }: { body: string }) {
     <Text className="text-sm leading-6 text-foreground">
       {before}
       <Text
-        className="text-sm leading-6 text-primary underline"
+        className="text-sm leading-6 font-medium text-blue-600"
         onPress={openSupportEmail}
         accessibilityRole="link"
         accessibilityLabel={`Email ${LEGAL_CONTACT_EMAIL}`}
