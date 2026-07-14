@@ -1,7 +1,7 @@
 /** Official legal site — matches trurex.com. */
 export const TRUREX_LEGAL_ORIGIN = 'https://www.trurex.com';
 
-/** Real contact published on trurex.com/privacy. */
+/** Contact used in Terms / Community Guidelines (mailto). */
 export const LEGAL_CONTACT_EMAIL = 'support@trurex.com';
 
 /** Bump when terms or community guidelines change to require re-acceptance. */
