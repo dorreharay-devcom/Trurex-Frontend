@@ -24,11 +24,16 @@ import { Button } from '~/components/common/Button';
 import Input from '~/components/common/Input';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
+import {
+  BlockedUsersEntryRow,
+  BlockedUsersPanel,
+} from '~/components/profile/BlockedUsersPanel';
 import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
 import { toastError } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { preparePickerImageUriForUpload } from '~/utils/photos/storageUpload';
 import { unknownErrorMessage } from '~/utils';
+import { useBlockedUsers } from '~/hooks/useBlockUser';
 
 interface EditProfileProps {
   onClose: () => void;
@@ -69,6 +74,8 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
   const [uploading, setUploading] = useState(false);
   const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState(false);
+  const [showBlockedUsers, setShowBlockedUsers] = useState(false);
+  const { data: blockedUsers } = useBlockedUsers(user?.id);
 
   const [displayName, setDisplayName] = useState('');
   const [handle, setHandle] = useState('');
@@ -199,6 +206,10 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
         <ActivityIndicator color={Theme.colors.primary} />
       </View>
     );
+  }
+
+  if (showBlockedUsers) {
+    return <BlockedUsersPanel onBack={() => setShowBlockedUsers(false)} />;
   }
 
   return (
@@ -412,7 +423,13 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
           </View>
         </View>
 
-        <View className="pt-2 border-t border-border">
+        <View className="gap-3 pt-2 border-t border-border">
+          <BlockedUsersEntryRow
+            onPress={() => setShowBlockedUsers(true)}
+            disabled={saving || deletingAccount}
+            count={blockedUsers?.length}
+          />
+
           <TouchableOpacity
             onPress={() => setDeleteConfirmVisible(true)}
             activeOpacity={0.7}
@@ -421,7 +438,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
           >
             <Text className="text-sm font-semibold text-destructive">Delete account</Text>
           </TouchableOpacity>
-          <Text className="mt-2 text-center text-[11px] text-muted-foreground">
+          <Text className="text-center text-[11px] text-muted-foreground">
             Permanently removes your account and all associated data.
           </Text>
         </View>
