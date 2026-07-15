@@ -52,7 +52,7 @@ module.exports = {
     },
     plugins: [
       'expo-web-browser',
-      'expo-router',
+      ['expo-router', { sitemap: false }],
       'expo-secure-store',
       [
         'expo-image-picker',
