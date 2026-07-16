@@ -31,7 +31,7 @@ import {
 import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
 import { toastError } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
-import { preparePickerImageUriForUpload } from '~/utils/photos/storageUpload';
+import { pickLibraryImages } from '~/utils/photos/imagePickerLaunch';
 import { unknownErrorMessage } from '~/utils';
 import { useBlockedUsers } from '~/hooks/useBlockUser';
 
@@ -47,6 +47,8 @@ interface CurrentlyData {
 
 type PendingAvatar = {
   uri: string;
+  fileName?: string | null;
+  mimeType?: string | null;
   dispose?: () => void;
 };
 
@@ -115,27 +117,31 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
   }, [pendingAvatar]);
 
   const handleAvatarPick = async () => {
-    const { granted } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!granted) {
-      Alert.alert('Permission required', 'Please allow access to your photo library.');
-      return;
+    if (!user) return;
+
+    if (Platform.OS !== 'web') {
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!perm.granted) {
+        Alert.alert('Permission required', 'Please allow access to your photo library.');
+        return;
+      }
     }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-    if (result.canceled || !result.assets[0] || !user) return;
 
     setUploading(true);
     try {
-      const prepared = await preparePickerImageUriForUpload(
-        result.assets[0].uri,
-        result.assets[0].fileName,
-        result.assets[0].mimeType,
-      );
-      setPendingAvatar(prepared);
+      const assets = await pickLibraryImages(1);
+      const asset = assets[0];
+      if (!asset) return;
+
+      setPendingAvatar((prev) => {
+        prev?.dispose?.();
+        return {
+          uri: asset.uri,
+          fileName: asset.fileName,
+          mimeType: asset.mimeType,
+          dispose: asset.dispose,
+        };
+      });
       setAvatarRemoved(false);
     } catch (e) {
       const error = e as Error;
@@ -153,7 +159,13 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
     setSaving(true);
     try {
       if (pendingAvatar) {
-        const publicUrl = await ProfileApi.uploadAvatar(user.id, pendingAvatar.uri);
+        const publicUrl = await ProfileApi.uploadAvatar(
+          user.id,
+          pendingAvatar.uri,
+          pendingAvatar.fileName ?? `avatar-${Date.now()}.jpg`,
+          pendingAvatar.mimeType,
+        );
+        pendingAvatar.dispose?.();
         setCurrentAvatarUrl(publicUrl);
         setPendingAvatar(null);
         setAvatarRemoved(false);
@@ -281,7 +293,10 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
             {(pendingAvatar || currentAvatarUrl) && !uploading && (
               <TouchableOpacity
                 onPress={() => {
-                  setPendingAvatar(null);
+                  setPendingAvatar((prev) => {
+                    prev?.dispose?.();
+                    return null;
+                  });
                   setCurrentAvatarUrl(null);
                   setAvatarRemoved(true);
                 }}
