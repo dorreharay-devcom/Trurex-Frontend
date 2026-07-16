@@ -128,10 +128,11 @@ export async function uploadBlobToStorageBucket(
   storagePath: string,
   body: UploadBody,
   contentType?: string,
+  options?: { upsert?: boolean },
 ): Promise<void> {
   const { error } = await Backend.storage.from(bucket).upload(storagePath, body, {
     contentType: contentType || (body instanceof Blob ? body.type : undefined) || JPEG_CONTENT_TYPE,
-    upsert: false,
+    upsert: options?.upsert ?? false,
   });
   throwRpcIfFailed({ data: null, error });
 }

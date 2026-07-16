@@ -52,7 +52,7 @@ import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
 import { useQueryClient } from '@tanstack/react-query';
-import { preparePickerImageUriForUpload } from '~/utils/photos/storageUpload';
+import { pickLibraryImages } from '~/utils/photos/imagePickerLaunch';
 import { ConnectionLoadMoreButton } from '~/components/circles/common';
 
 const COLLECTION_REX_OPEN_DELAY_MS = 120;
@@ -329,39 +329,37 @@ const ProfileView = ({
   }, [propUserId, propHandle]);
 
   const handleAvatarPress = useCallback(async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission required', 'Allow photo access to change your avatar.');
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: 'images',
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-    if (result.canceled || !result.assets[0]) return;
     if (!authUser?.id) return;
+
+    if (Platform.OS !== 'web') {
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!perm.granted) {
+        Alert.alert('Permission required', 'Allow photo access to change your avatar.');
+        return;
+      }
+    }
+
+    const assets = await pickLibraryImages(1);
+    const asset = assets[0];
+    if (!asset) return;
+
     try {
       setAvatarUploading(true);
-      const prepared = await preparePickerImageUriForUpload(
-        result.assets[0].uri,
-        result.assets[0].fileName,
-        result.assets[0].mimeType,
+      await ProfileApi.uploadAvatar(
+        authUser.id,
+        asset.uri,
+        asset.fileName ?? `avatar-${Date.now()}.jpg`,
+        asset.mimeType,
       );
-      try {
-        await ProfileApi.uploadAvatar(authUser.id, prepared.uri);
-      } finally {
-        prepared.dispose?.();
-      }
       await fetchProfile();
       onAvatarUpdated?.();
     } catch {
       Alert.alert('Upload failed', 'Could not update avatar. Please try again.');
     } finally {
+      asset.dispose?.();
       setAvatarUploading(false);
     }
-  }, [authUser?.id, fetchProfile]);
+  }, [authUser?.id, fetchProfile, onAvatarUpdated]);
 
   useEffect(() => {
     fetchProfile();

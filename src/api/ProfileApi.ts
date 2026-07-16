@@ -6,6 +6,12 @@ import type {
   UserFollowResponse,
   Category,
 } from '~/types/profile';
+import {
+  preparePickerImageForUpload,
+  uploadBlobToStorageBucket,
+} from '~/utils/photos/storageUpload';
+
+const AVATAR_MAX_WIDTH = 800;
 
 interface UserRow {
   id: string;
@@ -131,19 +137,28 @@ export const ProfileApi = {
     );
   },
 
-  uploadAvatar: async (userId: string, uri: string): Promise<string> => {
-    const rawExt = uri.split('?')[0].split('.').pop()?.toLowerCase() ?? 'jpg';
-    const ext = ['jpg', 'jpeg', 'png', 'webp', 'heic'].includes(rawExt) ? rawExt : 'jpg';
-    const path = `${userId}/avatar.${ext}`;
-    const blob = await fetch(uri).then((r) => r.blob());
-    unwrap(
-      await Backend.storage.from(USER_AVATARS_BUCKET).upload(path, blob, {
-        upsert: true,
-        contentType: `image/${ext}`,
-      }),
+  uploadAvatar: async (
+    userId: string,
+    imageUri: string,
+    fileName?: string | null,
+    mimeType?: string | null,
+  ): Promise<string> => {
+    const name = fileName ?? `avatar-${Date.now()}.jpg`;
+    const prepared = await preparePickerImageForUpload(
+      imageUri,
+      name,
+      mimeType,
+      AVATAR_MAX_WIDTH,
+    );
+    const path = `${userId}/avatar.jpg`;
+    await uploadBlobToStorageBucket(
+      USER_AVATARS_BUCKET,
+      path,
+      prepared.body,
+      prepared.contentType,
+      { upsert: true },
     );
 
-    // After upload, update the user record via RPC
     await ProfileApi.updateAvatar(path);
 
     const { data } = Backend.storage.from(USER_AVATARS_BUCKET).getPublicUrl(path);
