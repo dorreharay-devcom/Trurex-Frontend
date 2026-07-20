@@ -15,6 +15,8 @@ const BASE64_VALUES = BASE64_CHARS.split('').reduce<Record<string, number>>((acc
   return acc;
 }, {});
 
+export const IMAGE_EMPTY_ERROR = 'IMAGE_EMPTY_ERROR';
+
 function base64ToArrayBuffer(base64: string): ArrayBuffer {
   const normalized = base64.replace(/^data:[^,]+,/, '').replace(/\s/g, '');
   const padding = normalized.endsWith('==') ? 2 : normalized.endsWith('=') ? 1 : 0;
@@ -53,6 +55,18 @@ function isHeicLikeFile(fileName?: string | null, mimeType?: string | null): boo
   );
 }
 
+function uploadBodyByteLength(body: UploadBody): number {
+  if (body instanceof ArrayBuffer) return body.byteLength;
+  if (typeof Blob !== 'undefined' && body instanceof Blob) return body.size;
+  return 0;
+}
+
+function assertNonEmptyUploadBody(body: UploadBody): void {
+  if (uploadBodyByteLength(body) === 0) {
+    throw new Error(IMAGE_EMPTY_ERROR);
+  }
+}
+
 export async function resizeForUpload(
   uri: string,
   maxWidth = 1200,
@@ -80,6 +94,7 @@ export async function preparePickerImageForUpload(
 
   try {
     if (image.converted && image.blob) {
+      assertNonEmptyUploadBody(image.blob);
       return {
         body: image.blob,
         fileName: jpegFileName(image.fileName ?? fileName),
@@ -91,14 +106,17 @@ export async function preparePickerImageForUpload(
 
     if (isNative) {
       if (!resized.base64) throw new Error('Could not read image data.');
+      const body = base64ToArrayBuffer(resized.base64);
+      assertNonEmptyUploadBody(body);
       return {
-        body: base64ToArrayBuffer(resized.base64),
+        body,
         fileName: jpegFileName(image.fileName ?? fileName),
         contentType: JPEG_CONTENT_TYPE,
       };
     }
 
     const blob = await fetchUriAsBlob(resized.uri);
+    assertNonEmptyUploadBody(blob);
 
     return {
       body: blob,
@@ -130,6 +148,7 @@ export async function uploadBlobToStorageBucket(
   contentType?: string,
   options?: { upsert?: boolean },
 ): Promise<void> {
+  assertNonEmptyUploadBody(body);
   const { error } = await Backend.storage.from(bucket).upload(storagePath, body, {
     contentType: contentType || (body instanceof Blob ? body.type : undefined) || JPEG_CONTENT_TYPE,
     upsert: options?.upsert ?? false,

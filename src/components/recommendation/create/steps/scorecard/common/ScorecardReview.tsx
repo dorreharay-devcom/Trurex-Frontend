@@ -20,19 +20,13 @@ export function ScorecardReview({
   value,
   onChangeText,
 }: Props) {
-  const reviewLen = value.length;
   return (
     <View>
-      <View className="mb-2 flex-row items-center justify-between gap-2">
-        <View className="min-w-0 flex-1 flex-row flex-wrap items-center gap-x-2 gap-y-1">
-          <Text className="text-xs font-medium uppercase tracking-wider text-black">{title}</Text>
-          {showOptionalHint ? (
-            <Text className="text-[10px] italic text-black opacity-80">optional</Text>
-          ) : null}
-        </View>
-        <Text className="shrink-0 text-[10px] text-black opacity-70">
-          {reviewLen}/{CREATE_REC_REVIEW_MAX}
-        </Text>
+      <View className="mb-2 flex-row flex-wrap items-center gap-x-2 gap-y-1">
+        <Text className="text-xs font-medium uppercase tracking-wider text-black">{title}</Text>
+        {showOptionalHint ? (
+          <Text className="text-[10px] italic text-black opacity-80">optional</Text>
+        ) : null}
       </View>
       <TextInput
         value={value}

@@ -16,6 +16,8 @@ export function buildLibraryImagePickerOptions(remainingSlots: number): ImagePic
     allowsMultipleSelection: n > 1,
     selectionLimit: n,
     quality: 0.85,
+    preferredAssetRepresentationMode:
+      ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Compatible,
   };
 }
 
