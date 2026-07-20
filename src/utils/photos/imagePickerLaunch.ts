@@ -1,6 +1,7 @@
 import type { ImagePickerOptions } from 'expo-image-picker';
 import * as ImagePicker from 'expo-image-picker';
 import { Platform } from 'react-native';
+import { IMAGE_EMPTY_ERROR } from '~/utils/photos/storageUpload';
 
 export type PickedLibraryImage = {
   uri: string;
@@ -31,7 +32,7 @@ function imageMimeFromFile(file: File): string | null {
 }
 
 function pickWebLibraryImages(remainingSlots: number): Promise<PickedLibraryImage[]> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept =
@@ -45,6 +46,12 @@ function pickWebLibraryImages(remainingSlots: number): Promise<PickedLibraryImag
 
     input.onchange = () => {
       const files = Array.from(input.files ?? []).slice(0, remainingSlots);
+      if (files.some((file) => file.size === 0)) {
+        cleanup();
+        reject(new Error(IMAGE_EMPTY_ERROR));
+        return;
+      }
+
       const images = files.map((file) => {
         const uri = URL.createObjectURL(file);
         return {

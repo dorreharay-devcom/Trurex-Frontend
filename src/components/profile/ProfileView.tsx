@@ -53,6 +53,8 @@ import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation
 import { modalConfig } from '~/constants/recommendation/modalConfig';
 import { useQueryClient } from '@tanstack/react-query';
 import { pickLibraryImages } from '~/utils/photos/imagePickerLaunch';
+import { photoUploadErrorMessage } from '~/utils/photos/storageUpload';
+import { toastError } from '~/utils/appToast';
 import { ConnectionLoadMoreButton } from '~/components/circles/common';
 
 const COLLECTION_REX_OPEN_DELAY_MS = 120;
@@ -339,25 +341,27 @@ const ProfileView = ({
       }
     }
 
-    const assets = await pickLibraryImages(1);
-    const asset = assets[0];
-    if (!asset) return;
-
     try {
-      setAvatarUploading(true);
-      await ProfileApi.uploadAvatar(
-        authUser.id,
-        asset.uri,
-        asset.fileName ?? `avatar-${Date.now()}.jpg`,
-        asset.mimeType,
-      );
-      await fetchProfile();
-      onAvatarUpdated?.();
-    } catch {
-      Alert.alert('Upload failed', 'Could not update avatar. Please try again.');
-    } finally {
-      asset.dispose?.();
-      setAvatarUploading(false);
+      const assets = await pickLibraryImages(1);
+      const asset = assets[0];
+      if (!asset) return;
+
+      try {
+        setAvatarUploading(true);
+        await ProfileApi.uploadAvatar(
+          authUser.id,
+          asset.uri,
+          asset.fileName ?? `avatar-${Date.now()}.jpg`,
+          asset.mimeType,
+        );
+        await fetchProfile();
+        onAvatarUpdated?.();
+      } finally {
+        asset.dispose?.();
+        setAvatarUploading(false);
+      }
+    } catch (e) {
+      toastError('Photo unavailable', photoUploadErrorMessage(e));
     }
   }, [authUser?.id, fetchProfile, onAvatarUpdated]);
 

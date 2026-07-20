@@ -32,6 +32,7 @@ import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
 import { toastError } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { pickLibraryImages } from '~/utils/photos/imagePickerLaunch';
+import { photoUploadErrorMessage } from '~/utils/photos/storageUpload';
 import { unknownErrorMessage } from '~/utils';
 import { useBlockedUsers } from '~/hooks/useBlockUser';
 
@@ -144,8 +145,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
       });
       setAvatarRemoved(false);
     } catch (e) {
-      const error = e as Error;
-      Alert.alert('Upload failed', error.message);
+      toastError('Photo unavailable', photoUploadErrorMessage(e));
     } finally {
       setUploading(false);
     }
@@ -187,7 +187,7 @@ const EditProfile = ({ onClose }: EditProfileProps) => {
       onClose();
     } catch (e) {
       if (didAccountFrozenMutationToast(e)) return;
-      toastError('Failed to save profile', unknownErrorMessage(e, 'Please try again.'));
+      toastError('Failed to save profile', photoUploadErrorMessage(e));
     } finally {
       setSaving(false);
     }
