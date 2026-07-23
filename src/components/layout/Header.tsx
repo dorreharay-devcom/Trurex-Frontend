@@ -24,6 +24,7 @@ import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 import { ClearableSearchInput } from '~/components/common/ClearableSearchInput';
+import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
 
 interface HeaderProps {
   searchQuery: string;
@@ -31,6 +32,7 @@ interface HeaderProps {
   onProfilePress: () => void;
   onAddPress: () => void;
   onUserPress?: (userId: string) => void;
+  onRexPress?: (rexId: string, options?: RecommendationOpenOptions) => void;
   isProfileActive?: boolean;
   avatarRefreshKey?: number;
   showSearch?: boolean;
@@ -42,6 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
   onProfilePress,
   onAddPress,
   onUserPress,
+  onRexPress,
   isProfileActive,
   avatarRefreshKey = 0,
   showSearch = true,
@@ -119,7 +122,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <PlusCircle size={22} color={Theme.colors.accentForeground} />
             </TouchableOpacity>
-            <NotificationBell onUserPress={onUserPress} />
+            <NotificationBell onUserPress={onUserPress} onRexPress={onRexPress} />
           </View>
 
           <View className="items-center justify-center" style={{ width: '14%' }}>
@@ -197,7 +200,7 @@ export const Header: React.FC<HeaderProps> = ({
               />
             </TouchableOpacity>
 
-            <NotificationBell onUserPress={onUserPress} />
+            <NotificationBell onUserPress={onUserPress} onRexPress={onRexPress} />
 
             <TouchableOpacity
               onPress={onProfilePress}

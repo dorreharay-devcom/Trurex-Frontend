@@ -9,4 +9,5 @@ export const Routes = {
   Mfa: '/mfa',
   Terms: '/terms',
   CommunityGuidelines: '/community-guidelines',
+  Privacy: '/privacy',
 } as const satisfies Record<string, Href>;

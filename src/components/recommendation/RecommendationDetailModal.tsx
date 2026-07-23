@@ -22,12 +22,14 @@ import {
   Trash2,
   Pencil,
   Link2,
+  Bookmark,
 } from 'lucide-react-native';
 import { RexCommentsSection } from '~/components/recommendation/comment';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { RexPhotoPlaceholder } from '~/components/common/RexPhotoPlaceholder';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { OverlayModal } from '~/components/common/OverlayModal';
+import AddToCollectionSheet, { type RecSummary } from '~/components/faves/AddToCollectionSheet';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
@@ -86,6 +88,7 @@ type Props = {
   onAddYourOwn?: (source: AddYourOwnRecSource) => void;
   onCommentCountChange?: (total: number) => void;
   scrollToComments?: boolean;
+  scrollToCommentId?: string;
   onAuthorPress?: (authorId: string) => void;
   onUserPress?: (userId: string) => void;
   onEditRex?: (rexId: string) => void;
@@ -98,6 +101,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   onAddYourOwn,
   onCommentCountChange,
   scrollToComments,
+  scrollToCommentId,
   onAuthorPress,
   onUserPress,
   onEditRex,
@@ -107,6 +111,8 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   const { user: authUser } = useAuth();
   const [reportTarget, setReportTarget] = useState<ContentReportTarget | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [saveOpen, setSaveOpen] = useState(false);
+  const [isSavedOverride, setIsSavedOverride] = useState<boolean | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const commentsSectionWrapRef = useRef<View>(null);
   const composerAnchorRef = useRef<View>(null);
@@ -146,11 +152,35 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     if (!visible) setDeleteConfirmOpen(false);
   }, [visible]);
 
-  const scrollComposerIntoView = useCallback(() => {
-    try {
-      const targetEl = composerAnchorRef.current ?? commentsSectionWrapRef.current;
-      if (!targetEl) return;
+  useEffect(() => {
+    setIsSavedOverride(null);
+    setSaveOpen(false);
+  }, [recommendationId]);
 
+  const isSaved = isSavedOverride ?? recommendation?.isSaved ?? false;
+
+  const saveRecSummary = useMemo((): RecSummary | null => {
+    if (!recommendation) return null;
+    return {
+      id: recommendation.id,
+      place_name: recommendation.title,
+      category_code: recommendation.categoryId,
+      location: recommendation.location,
+      isSaved,
+    };
+  }, [recommendation, isSaved]);
+
+  const openSave = useCallback(() => {
+    if (!recommendation) return;
+    if (!authUser) {
+      toastInfo('Sign in', 'Sign in to save this recommendation.');
+      return;
+    }
+    setSaveOpen(true);
+  }, [recommendation, authUser]);
+
+  const scrollTargetIntoView = useCallback((targetEl: View) => {
+    try {
       if (Platform.OS === 'web') {
         const el = targetEl as unknown as {
           scrollIntoView?: (o: { behavior?: string; block?: string; inline?: string }) => void;
@@ -172,6 +202,25 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     } catch {}
   }, []);
 
+  const scrollComposerIntoView = useCallback(() => {
+    const targetEl = composerAnchorRef.current ?? commentsSectionWrapRef.current;
+    if (!targetEl) return;
+    scrollTargetIntoView(targetEl);
+  }, [scrollTargetIntoView]);
+
+  const handleFocusCommentReady = useCallback(
+    (target: View) => {
+      const run = () => scrollTargetIntoView(target);
+      if (Platform.OS === 'web') {
+        setTimeout(run, 80);
+        return;
+      }
+      setTimeout(run, 60);
+      setTimeout(run, 280);
+    },
+    [scrollTargetIntoView],
+  );
+
   const handleComposerFocus = useCallback(() => {
     if (Platform.OS === 'web') {
       scrollComposerIntoView();
@@ -182,7 +231,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   }, [scrollComposerIntoView]);
 
   useEffect(() => {
-    if (!visible || !recommendationId || !scrollToComments) return;
+    if (!visible || !recommendationId || scrollToCommentId || !scrollToComments) return;
 
     let cancelled = false;
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -204,7 +253,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
       cancelled = true;
       if (timeoutId !== undefined) clearTimeout(timeoutId);
     };
-  }, [visible, scrollToComments, recommendationId, scrollComposerIntoView]);
+  }, [visible, scrollToComments, scrollToCommentId, recommendationId, scrollComposerIntoView]);
 
   const { data: rexDetail, isLoading: detailLoading } = useQuery({
     queryKey: ['rexDetail', recommendation?.id] as const,
@@ -508,12 +557,27 @@ export const RecommendationDetailModal: React.FC<Props> = ({
               ) : null}
 
               <View>
-                <View className="mb-1 flex-row items-center gap-2">
+                <View className="mb-1 flex-row items-center justify-between gap-2">
                   <View className="rounded-full border border-border/80 bg-border/40 px-2.5 py-1">
                     <Text className="text-xs font-medium capitalize text-foreground">
                       {recommendation.category}
                     </Text>
                   </View>
+                  <Pressable
+                    onPress={openSave}
+                    accessibilityRole="button"
+                    accessibilityLabel={isSaved ? 'Saved' : 'Save this recommendation'}
+                    className="flex-row items-center gap-1.5 rounded-full border border-border px-3 py-1.5 active:opacity-80"
+                  >
+                    <Bookmark
+                      size={14}
+                      color={isSaved ? Theme.colors.primary : Theme.colors.foreground}
+                      fill={isSaved ? Theme.colors.primary : 'transparent'}
+                    />
+                    <Text className="text-xs font-medium text-foreground">
+                      {isSaved ? 'Saved' : 'Save'}
+                    </Text>
+                  </Pressable>
                 </View>
                 <Text className="mt-2 font-display text-2xl font-bold text-foreground">
                   {recommendation.title}
@@ -630,7 +694,9 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                   rexId={recommendation.id}
                   onCommentTotalChange={onCommentCountChange}
                   composerAnchorRef={composerAnchorRef}
-                  autoFocusComposer={scrollToComments === true}
+                  autoFocusComposer={scrollToComments === true && !scrollToCommentId}
+                  focusCommentId={scrollToCommentId}
+                  onFocusCommentReady={handleFocusCommentReady}
                   onUserPress={onUserPress}
                   onReportComment={openCommentReport}
                   onComposerFocus={handleComposerFocus}
@@ -657,6 +723,15 @@ export const RecommendationDetailModal: React.FC<Props> = ({
             pending={deleteRexMutation.isPending}
             onCancel={() => setDeleteConfirmOpen(false)}
             onConfirm={handleConfirmDeleteRex}
+          />
+          <AddToCollectionSheet
+            open={saveOpen}
+            rec={saveRecSummary}
+            onClose={() => setSaveOpen(false)}
+            onSaved={() => setIsSavedOverride(true)}
+            onUnsaved={() => setIsSavedOverride(false)}
+            onUnsaveFailed={() => setIsSavedOverride(true)}
+            onSaveRexFailed={() => setIsSavedOverride(false)}
           />
         </View>
       </OverlayModal>

@@ -17,6 +17,8 @@ export type CommentRowProps = {
   onUserPress?: (userId: string) => void;
   onToggleLike: (commentId: string, currentlyLiked: boolean) => void;
   onReport?: (commentId: string) => void;
+  highlight?: boolean;
+  onRowRef?: (commentId: string, ref: View | null) => void;
 };
 
 export const CommentRow: React.FC<CommentRowProps> = ({
@@ -28,6 +30,8 @@ export const CommentRow: React.FC<CommentRowProps> = ({
   onUserPress,
   onToggleLike,
   onReport,
+  highlight,
+  onRowRef,
 }) => {
   const canDelete = canDeleteRexComment(comment, currentUserId);
   const name = comment.profile?.display_name?.trim() || 'Member';
@@ -38,7 +42,12 @@ export const CommentRow: React.FC<CommentRowProps> = ({
   const goToProfile = () => comment.author_id && onUserPress?.(comment.author_id);
 
   return (
-    <View className={`flex-row gap-2.5 ${isReply ? 'ml-10' : ''}`}>
+    <View
+      ref={(node) => onRowRef?.(comment.id, node)}
+      collapsable={false}
+      className={`flex-row gap-2.5 rounded-lg ${isReply ? 'ml-10' : ''} ${highlight ? 'bg-primary/10' : ''}`}
+      style={highlight ? { paddingHorizontal: 6, paddingVertical: 4, marginHorizontal: -6 } : undefined}
+    >
       <TouchableOpacity onPress={goToProfile} activeOpacity={0.7}>
         <SignedUserAvatar
           name={name}

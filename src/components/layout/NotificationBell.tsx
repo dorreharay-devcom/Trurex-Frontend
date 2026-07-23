@@ -21,6 +21,8 @@ import { formatCompactRelativeTime } from '~/utils/date';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import type { AppNotification } from '~/types/notification/appNotification';
+import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
+import { notificationRexDeepLink } from '~/utils/notification/notificationRexDeepLink';
 
 function formatNotificationTime(iso: string): string {
   const c = formatCompactRelativeTime(iso);
@@ -49,12 +51,14 @@ const typeConfig: Record<string, { verb: string }> = {
 };
 
 const FOLLOWABLE_TYPES = new Set(['follow', 'following', 'new_follower']);
+const PROFILE_TYPES = new Set(['follow', 'following', 'new_follower', 'trusted']);
 
 interface NotificationBellProps {
   onUserPress?: (userId: string) => void;
+  onRexPress?: (rexId: string, options?: RecommendationOpenOptions) => void;
 }
 
-export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress }) => {
+export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress, onRexPress }) => {
   const { notifications, unreadCount, loading, markAllAsRead, markOneAsRead } = useNotifications();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -161,6 +165,16 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress 
             key={n.id}
             onPress={() => {
               if (!n.is_read) markOneAsRead(n.id);
+              const deepLink = notificationRexDeepLink(n);
+              if (deepLink && onRexPress) {
+                close();
+                onRexPress(deepLink.rexId, deepLink.options);
+                return;
+              }
+              if (PROFILE_TYPES.has(n.type) && n.actor_id && onUserPress) {
+                close();
+                onUserPress(n.actor_id);
+              }
             }}
             className={`flex-row items-start gap-3 border-b border-border/60 px-4 py-3 active:opacity-70 ${!n.is_read ? 'bg-primary/5' : ''}`}
           >

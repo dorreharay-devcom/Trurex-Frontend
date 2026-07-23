@@ -12,6 +12,7 @@ import type {
   Recommendation,
   RecommendationOpenOptions,
 } from '~/types/recommendation/recommendation';
+import { recommendationStubFromId } from '~/utils/recommendation/recommendationStubFromId';
 
 export default function CollectionPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -23,6 +24,10 @@ export default function CollectionPage() {
   const openPreview = (rec: Recommendation, options?: RecommendationOpenOptions) => {
     setPreviewOptions(options ?? {});
     setPreviewRecommendation(rec);
+  };
+
+  const openRexById = (rexId: string, options?: RecommendationOpenOptions) => {
+    openPreview(recommendationStubFromId(rexId), options);
   };
 
   const closePreview = () => {
@@ -38,6 +43,8 @@ export default function CollectionPage() {
           onSearchChange={() => {}}
           onProfilePress={() => router.replace('/')}
           onAddPress={() => router.replace('/')}
+          onUserPress={(userId) => router.replace(`/user/${userId}`)}
+          onRexPress={openRexById}
           showSearch={false}
         />
         <TabBar currentTab="faves" onTabChange={(tab) => router.replace(`/?tab=${tab}`)} />
@@ -60,6 +67,7 @@ export default function CollectionPage() {
           onClose={closePreview}
           onCommentCountChange={() => {}}
           scrollToComments={previewOptions.scrollToComments === true}
+          scrollToCommentId={previewOptions.scrollToCommentId}
         />
       </SafeAreaView>
     </ProtectedRoute>

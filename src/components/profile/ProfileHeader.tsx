@@ -158,9 +158,10 @@ const ProfileHeader = ({
             <TouchableOpacity
               onPress={onSignOut}
               activeOpacity={0.7}
-              className="py-2.5 px-3 rounded-lg border border-border items-center justify-center"
+              className="items-center justify-center rounded-lg border border-destructive px-3 py-2.5"
+              accessibilityLabel="Log out"
             >
-              <LogOut size={16} color={Theme.colors.muted} />
+              <LogOut size={16} color={Theme.colors.destructive} />
             </TouchableOpacity>
           </View>
         ) : (

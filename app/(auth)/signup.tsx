@@ -14,7 +14,6 @@ import { useAuthInviteCode } from '~/hooks/auth/useAuthInviteCode';
 import { useAuthTermsAcceptance } from '~/hooks/auth/useAuthTermsAcceptance';
 import { getRedirectUrl } from '~/utils';
 import { mapAuthError } from '~/utils/errors';
-import { toastError } from '~/utils/appToast';
 import type { OAuthProvider } from '~/auth/oauth';
 
 export default function SignupScreen() {
@@ -41,17 +40,11 @@ export default function SignupScreen() {
     if (password.length < 6) next.password = 'Password must be at least 6 characters';
     const inviteError = invite.getValidationError();
     if (inviteError) invite.setError(inviteError);
-    const termsError = authTerms.getValidationError();
-    if (termsError) authTerms.setError(termsError);
     setErrors(next);
-    return Object.keys(next).length === 0 && !inviteError && !termsError;
+    return Object.keys(next).length === 0 && !inviteError;
   };
 
   const handleOAuthSignup = (provider: OAuthProvider) => {
-    if (!authTerms.validate()) {
-      toastError('Accept the Terms and Guidelines below to continue');
-      return;
-    }
     if (!invite.validate()) return;
     void authTerms.persistAcceptance();
     signInWithOAuth(provider);
@@ -88,7 +81,7 @@ export default function SignupScreen() {
       </View>
 
       <OAuthSocialButtons
-        disabled={oauthPending || loading || !authTerms.hydrated}
+        disabled={oauthPending || loading}
         onGooglePress={() => handleOAuthSignup('google')}
         onApplePress={() => handleOAuthSignup('apple')}
       />
@@ -138,7 +131,7 @@ export default function SignupScreen() {
 
         <AuthInviteCodeField invite={invite} />
 
-        <AuthTermsAcceptanceField terms={authTerms} />
+        <AuthTermsAcceptanceField />
 
         <Button
           title="Create account"

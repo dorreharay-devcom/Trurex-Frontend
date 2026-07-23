@@ -12,6 +12,9 @@ import {
   Pressable,
   StyleSheet,
   Platform,
+  ActivityIndicator,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Routes } from '~/constants/routes';
@@ -247,11 +250,15 @@ const ProfileView = ({
   const profileContentUserId =
     profile?.userId ?? (viewingByUserId ? propUserId : viewingByHandle ? undefined : authUser?.id);
 
-  const { data: myRexes = [], isLoading: rexesLoading } = useMyRexes(profileContentUserId);
+  const {
+    data: myRexes = [],
+    isLoading: rexesLoading,
+    isFetchingNextPage: isFetchingNextRexesPage,
+    fetchNextPage: fetchNextRexesPage,
+  } = useMyRexes(profileContentUserId);
   const {
     data: myCollections = [],
     isLoading: collectionsLoading,
-    hasNextPage: hasNextCollectionsPage,
     isFetchingNextPage: isFetchingNextCollectionsPage,
     fetchNextPage: fetchNextCollectionsPage,
   } = useMyCollections(profileContentUserId);
@@ -329,6 +336,17 @@ const ProfileView = ({
     setProfile(null);
     setShowBlockConfirm(false);
   }, [propUserId, propHandle]);
+
+  const loadMoreOnScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+      const nearBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 320;
+      if (!nearBottom) return;
+      if (activeTab === ProfileTab.Recs) fetchNextRexesPage();
+      else if (activeTab === ProfileTab.Collections) fetchNextCollectionsPage();
+    },
+    [activeTab, fetchNextRexesPage, fetchNextCollectionsPage],
+  );
 
   const handleAvatarPress = useCallback(async () => {
     if (!authUser?.id) return;
@@ -427,6 +445,10 @@ const ProfileView = ({
   }
 
   const rexTabCount = myRexes.length;
+  const collectionsTabCount = myCollections[0]?.total_count ?? myCollections.length;
+  const gridWidth = Math.min(windowWidth, 1280) - 66;
+  const numCols = gridWidth < 700 ? 2 : 4;
+  const cellWidth = Math.floor((gridWidth - 12 * (numCols - 1)) / numCols);
   const addToCollectionSheet = (
     <Modal
       visible={addSheetVisible}
@@ -543,6 +565,8 @@ const ProfileView = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={webContainerStyle}
         contentContainerClassName="p-4"
+        onScroll={loadMoreOnScroll}
+        scrollEventThrottle={16}
       >
         {onBack && (
           <TouchableOpacity
@@ -585,7 +609,7 @@ const ProfileView = ({
                 tab.id === ProfileTab.Recs
                   ? `Rex (${rexTabCount})`
                   : tab.id === ProfileTab.Collections
-                    ? `Collections (${myCollections.length})`
+                    ? `Collections (${collectionsTabCount})`
                     : tab.label;
               return (
                 <TouchableOpacity
@@ -617,55 +641,49 @@ const ProfileView = ({
                 <Text className="text-sm text-muted-foreground text-center py-8">No rexes yet</Text>
               ) : (
                 <View className="p-4">
-                  {(() => {
-                    const gw = Math.min(windowWidth, 1280) - 66;
-                    const numCols = gw < 700 ? 2 : 4;
-                    const cw = Math.floor((gw - 12 * (numCols - 1)) / numCols);
-                    return (
-                      <View className="flex-row flex-wrap" style={{ gap: 12 }}>
-                        {myRexes.map((rec, i) => (
-                          <AnimatedRexCard
-                            key={rec.id}
-                            rec={rec}
-                            index={i}
-                            width={cw}
-                            onPress={() => onRexPress?.(rec)}
-                          />
-                        ))}
-                      </View>
-                    );
-                  })()}
+                  <View className="flex-row flex-wrap" style={{ gap: 12 }}>
+                    {myRexes.map((rec, i) => (
+                      <AnimatedRexCard
+                        key={rec.id}
+                        rec={rec}
+                        index={i}
+                        width={cellWidth}
+                        onPress={() => onRexPress?.(rec)}
+                      />
+                    ))}
+                  </View>
+                  {isFetchingNextRexesPage && (
+                    <View className="py-4 items-center">
+                      <ActivityIndicator size="small" color={Theme.colors.primary} />
+                    </View>
+                  )}
                 </View>
               ))}
 
             {activeTab === ProfileTab.Collections &&
               (collectionsLoading ? (
-                <ProfileCollectionsSkeleton />
+                <ProfileCollectionsSkeleton windowWidth={windowWidth} />
               ) : myCollections.length === 0 ? (
                 <Text className="text-sm text-muted-foreground text-center py-8">
                   No collections yet
                 </Text>
               ) : (
-                <View className="px-4 py-4">
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerClassName="gap-3"
-                  >
+                <View className="p-4">
+                  <View className="flex-row flex-wrap" style={{ gap: 12 }}>
                     {myCollections.map((col) => (
                       <CollectionCard
                         key={col.id}
                         collection={col}
-                        width={140}
+                        width={cellWidth}
                         onPress={() => setOpenCollectionId(col.id)}
                       />
                     ))}
-                  </ScrollView>
-                  <ConnectionLoadMoreButton
-                    visible={hasNextCollectionsPage}
-                    loading={isFetchingNextCollectionsPage}
-                    onPress={fetchNextCollectionsPage}
-                  />
+                  </View>
+                  {isFetchingNextCollectionsPage && (
+                    <View className="py-4 items-center">
+                      <ActivityIndicator size="small" color={Theme.colors.primary} />
+                    </View>
+                  )}
                 </View>
               ))}
           </View>

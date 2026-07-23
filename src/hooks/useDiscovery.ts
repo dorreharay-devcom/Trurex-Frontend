@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { DiscoveryApi, DiscoverQueryParams, SearchRexesParams } from '~/api/DiscoveryApi';
 import { getRexCategoryApiCode } from '~/constants/recommendation/rexCategories';
 import { Backend, unwrap } from '~/services/AuthService';
@@ -10,6 +10,7 @@ export type RecencyDayToken = 1 | 7 | 30 | 9999;
 
 const VFM_ALL = [1, 2, 3, 4, 5] as const;
 const DISCOVER_FEED_PAGE_SIZE = 20;
+const MY_REXES_PAGE_SIZE = 20;
 
 function recencyDaysToCreatedBounds(days: RecencyDayToken[]): {
   created_from: string | null;
@@ -162,22 +163,40 @@ export const useSearchRexes = (args: UseSearchRexesArgs, options?: UseSearchRexe
 };
 
 export const useMyRexes = (userId?: string) => {
-  return useQuery<Recommendation[]>({
-    queryKey: ['my-rexes', userId],
-    queryFn: async () => {
+  const pageSize = MY_REXES_PAGE_SIZE;
+  const query = useInfiniteQuery({
+    queryKey: ['my-rexes', userId, pageSize],
+    queryFn: async ({ pageParam }) => {
       const raw = unwrap(
         await Backend.rpc('user_rexes', {
           input_user_id: userId,
-          result_limit: 50,
-          result_offset: 0,
+          result_limit: pageSize,
+          result_offset: Number(pageParam ?? 0),
         }),
       );
-      if (!Array.isArray(raw)) return [];
+      if (!Array.isArray(raw)) return [] as Recommendation[];
       return raw.flatMap((row) => {
         const rec = mapDiscoverFeedRowSafe(row);
         return rec ? [rec] : [];
       });
     },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length === pageSize ? allPages.length * pageSize : undefined,
     enabled: !!userId,
   });
+
+  const rows = useMemo(() => query.data?.pages.flat() ?? [], [query.data?.pages]);
+  const fetchNextPage = useCallback(() => {
+    if (!query.hasNextPage || query.isFetchingNextPage) return;
+    void query.fetchNextPage();
+  }, [query]);
+
+  return {
+    ...query,
+    data: rows,
+    hasNextPage: Boolean(query.hasNextPage),
+    isFetchingNextPage: query.isFetchingNextPage,
+    fetchNextPage,
+  };
 };

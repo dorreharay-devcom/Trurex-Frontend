@@ -16,6 +16,8 @@ export type RexCommentsSectionProps = {
   onCommentTotalChange?: (total: number) => void;
   composerAnchorRef?: React.RefObject<View | null>;
   autoFocusComposer?: boolean;
+  focusCommentId?: string;
+  onFocusCommentReady?: (target: View) => void;
   onUserPress?: (userId: string) => void;
   onReportComment?: (commentId: string) => void;
   onComposerFocus?: () => void;
@@ -26,6 +28,8 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
   onCommentTotalChange,
   composerAnchorRef,
   autoFocusComposer,
+  focusCommentId,
+  onFocusCommentReady,
   onUserPress,
   onReportComment,
   onComposerFocus,
@@ -37,6 +41,9 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
   const [posting, setPosting] = useState(false);
   const postingRef = useRef(false);
   const inputRef = useRef<TextInput | null>(null);
+  const commentRefs = useRef(new Map<string, View>());
+  const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
+  const focusNotifiedRef = useRef<string | null>(null);
 
   const total = useMemo(() => totalRexCommentCount(comments), [comments]);
 
@@ -45,11 +52,57 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
   }, [total, onCommentTotalChange]);
 
   useEffect(() => {
-    if (!autoFocusComposer || !user) return;
+    if (!autoFocusComposer || !user || focusCommentId) return;
     const delay = Platform.OS === 'web' ? 780 : 600;
     const t = setTimeout(() => inputRef.current?.focus(), delay);
     return () => clearTimeout(t);
-  }, [autoFocusComposer, user, rexId]);
+  }, [autoFocusComposer, user, rexId, focusCommentId]);
+
+  useEffect(() => {
+    focusNotifiedRef.current = null;
+    setHighlightedCommentId(null);
+  }, [rexId, focusCommentId]);
+
+  useEffect(() => {
+    if (!focusCommentId || loading || !onFocusCommentReady) return;
+    if (focusNotifiedRef.current === focusCommentId) return;
+
+    let cancelled = false;
+    let clearHighlight: ReturnType<typeof setTimeout> | undefined;
+
+    const tryFocus = () => {
+      if (cancelled || focusNotifiedRef.current === focusCommentId) return false;
+      const target = commentRefs.current.get(focusCommentId);
+      if (!target) return false;
+      focusNotifiedRef.current = focusCommentId;
+      setHighlightedCommentId(focusCommentId);
+      onFocusCommentReady(target);
+      clearHighlight = setTimeout(() => setHighlightedCommentId(null), 2500);
+      return true;
+    };
+
+    if (tryFocus()) {
+      return () => {
+        cancelled = true;
+        if (clearHighlight) clearTimeout(clearHighlight);
+      };
+    }
+
+    const retry = setTimeout(() => {
+      tryFocus();
+    }, 120);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(retry);
+      if (clearHighlight) clearTimeout(clearHighlight);
+    };
+  }, [focusCommentId, loading, comments, onFocusCommentReady]);
+
+  const registerCommentRef = useCallback((commentId: string, ref: View | null) => {
+    if (ref) commentRefs.current.set(commentId, ref);
+    else commentRefs.current.delete(commentId);
+  }, []);
 
   const handlePost = useCallback(async () => {
     const body = text.trim();
@@ -136,6 +189,8 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
               onUserPress={onUserPress}
               onToggleLike={handleToggleLike}
               onReport={onReportComment}
+              highlightCommentId={highlightedCommentId}
+              onRowRef={registerCommentRef}
             />
           ))}
         </View>
