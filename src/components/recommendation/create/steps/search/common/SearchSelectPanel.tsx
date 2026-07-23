@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, Pressable, ActivityIndicator, TextInput, Platform } from 'react-native';
-import { Check, Plus } from 'lucide-react-native';
+import { Check, Plus, MapPin } from 'lucide-react-native';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { CreateStepTitle } from '../../../CreateStepTitle';
 import {
@@ -29,6 +29,11 @@ type Props = {
   onOnlineNameChange: (v: string) => void;
   onlineWebsiteUrl: string;
   onOnlineWebsiteUrlChange: (v: string) => void;
+  onlineLocationText: string;
+  onOnlineLocationTextChange: (v: string) => void;
+  onlineGeotag: { lat: number; lng: number } | null;
+  onTagLocationPress: () => void;
+  tagLocationLoading: boolean;
   selectedSearchPlace: CreateRecSearchPlace | null;
   onSelectPlace: (place: CreateRecSearchPlace) => void;
   results: CreateRecSearchPlace[];
@@ -48,6 +53,11 @@ export function SearchSelectPanel({
   onOnlineNameChange,
   onlineWebsiteUrl,
   onOnlineWebsiteUrlChange,
+  onlineLocationText,
+  onOnlineLocationTextChange,
+  onlineGeotag,
+  onTagLocationPress,
+  tagLocationLoading,
   selectedSearchPlace,
   onSelectPlace,
   results,
@@ -228,6 +238,54 @@ export function SearchSelectPanel({
               numberOfLines={1}
               scrollEnabled={false}
             />
+            <TextInput
+              value={onlineLocationText}
+              onChangeText={onOnlineLocationTextChange}
+              placeholder="Address or location"
+              placeholderTextColor={Theme.colors.secondaryText}
+              editable={Platform.OS === 'android' || !tagLocationLoading}
+              className={cn(
+                'w-full rounded-xl border border-border bg-muted/50 px-4 text-base text-foreground',
+                Platform.OS === 'web' ? 'py-3.5' : 'py-0',
+                INPUT_FOCUS_RING_CLASS,
+              )}
+              style={[
+                webNoOutline,
+                textFieldCaretStyle,
+                textFieldSingleLineStyle,
+                textFieldSingleLineLargeHeightStyle,
+                textFieldNativeSingleLineNoWrapStyle,
+              ]}
+              autoCorrect
+              autoCapitalize="sentences"
+              underlineColorAndroid="transparent"
+              selectionColor={Theme.colors.foreground}
+              multiline={false}
+              numberOfLines={1}
+              scrollEnabled={false}
+            />
+            {tagLocationLoading ? (
+              <View className="w-full flex-row items-center gap-2 rounded-lg py-2">
+                <ActivityIndicator size="small" color={Theme.colors.primary} />
+                <Text className="text-sm text-muted-foreground">Getting your location…</Text>
+              </View>
+            ) : (
+              <Pressable
+                onPress={onTagLocationPress}
+                className="w-full flex-row items-center gap-1.5 rounded-lg py-2 active:opacity-90"
+                accessibilityRole="button"
+                accessibilityLabel={
+                  onlineGeotag ? 'Update geotagged location' : 'Tag current location'
+                }
+              >
+                <MapPin size={18} color={Theme.colors.secondaryText} />
+                <Text className="text-sm text-muted-foreground">
+                  {onlineGeotag
+                    ? `Geotagged (${onlineGeotag.lat.toFixed(4)}, ${onlineGeotag.lng.toFixed(4)})`
+                    : 'Tag current location'}
+                </Text>
+              </Pressable>
+            )}
           </View>
         ) : null}
       </View>

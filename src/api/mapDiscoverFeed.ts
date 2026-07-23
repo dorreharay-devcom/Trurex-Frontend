@@ -115,6 +115,7 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
     category: categoryLabel,
     categoryIcon,
     location: firstNonEmptyString(o, 'place_location') ?? undefined,
+    locationText: firstNonEmptyString(o, 'location_text', 'locationText') ?? null,
     placeWebsiteUrl: firstNonEmptyString(o, 'place_website_url', 'placeWebsiteUrl') ?? null,
     isOnlinePlace: firstBoolean(o, 'is_online_place', 'isOnlinePlace'),
     latitude: optionalFiniteNumber(o, 'latitude'),

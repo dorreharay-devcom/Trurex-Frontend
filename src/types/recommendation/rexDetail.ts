@@ -17,6 +17,8 @@ export type RexDetailRow = {
   place_name: string;
   is_online_place?: boolean | null;
   place_website_url?: string | null;
+  /** Free-text location for non-physical/online places. */
+  location_text?: string | null;
   place_location?: string | null;
   description: string | null;
   reason: string | null;
@@ -55,6 +57,7 @@ export type RexForEditRow = {
   place_name: string;
   is_online_place: boolean;
   place_website_url: string | null;
+  location_text: string | null;
   description: string | null;
   reason: string | null;
   review: string | null;

@@ -79,6 +79,7 @@ export const CreateModal: React.FC<Props> = ({
     applyEditPrefill,
     setManualGeotag,
     setManualAddress,
+    applyOnlineGeotag,
     syncFormToConfig,
     syncCategoryCreateShape,
   } = flow;
@@ -95,16 +96,20 @@ export const CreateModal: React.FC<Props> = ({
     if (!visible) appliedEditIdRef.current = null;
   }, [visible, editRexId]);
 
-  const applyManualGeotag = useCallback(
+  const applyGeotag = useCallback(
     (result: ManualPlaceGeotagResult) => {
+      if (flow.searchMode === 'online') {
+        applyOnlineGeotag(result);
+        return;
+      }
       setManualAddress(result.addressLabel);
       setManualGeotag({ lat: result.lat, lng: result.lng });
     },
-    [setManualGeotag, setManualAddress],
+    [flow.searchMode, setManualAddress, setManualGeotag, applyOnlineGeotag],
   );
 
   const { isGeotagging, geotag: handleTagLocation } = useManualPlaceGeotag({
-    onSuccess: applyManualGeotag,
+    onSuccess: applyGeotag,
   });
 
   const { sheetTranslateY, stepOpacity, handleClose } = useCreateRecommendationModalPresentation({
@@ -362,6 +367,8 @@ export const CreateModal: React.FC<Props> = ({
         p_is_online_place: flow.searchMode === 'online',
         p_place_website_url:
           flow.searchMode === 'online' ? flow.onlineWebsiteUrl.trim() || null : null,
+        p_location_text:
+          flow.searchMode === 'online' ? flow.onlineLocationText.trim() || null : null,
         p_category_ratings: buildCategoryRatingsPayload(flow.categoryRatings),
         p_question_answers: p_question_answers,
         p_score_value_for_money:

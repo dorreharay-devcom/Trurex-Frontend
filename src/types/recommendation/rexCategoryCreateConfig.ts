@@ -63,6 +63,8 @@ export type CreateRexRpcParams = {
   p_linked_place_id?: string | null;
   p_is_online_place?: boolean | null;
   p_place_website_url?: string | null;
+  /** Free-text location for online / non-physical places. */
+  p_location_text?: string | null;
   p_must_know?: string | null;
   p_category_ratings: Record<string, number>;
   p_question_answers: Record<string, string>;

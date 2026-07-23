@@ -33,6 +33,7 @@ export function rexDetailRowToRecommendation(row: RexDetailRow): Recommendation 
     categoryIcon: row.category_icon,
     authorId: row.author_id,
     location: row.place_location?.trim() || undefined,
+    locationText: row.location_text?.trim() || null,
     placeWebsiteUrl: row.place_website_url?.trim() || null,
     isOnlinePlace: row.is_online_place ?? null,
     rating: rating ?? null,

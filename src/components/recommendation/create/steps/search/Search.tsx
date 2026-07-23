@@ -18,6 +18,9 @@ type Props = {
   onOnlineNameChange: (v: string) => void;
   onlineWebsiteUrl: string;
   onOnlineWebsiteUrlChange: (v: string) => void;
+  onlineLocationText: string;
+  onOnlineLocationTextChange: (v: string) => void;
+  onlineGeotag: { lat: number; lng: number } | null;
   onOnlinePlaceChange: (selected: boolean) => void;
   onSelectManualAddress: (place: CreateRecSearchPlace) => void;
   onOpenManual: () => void;
@@ -41,6 +44,9 @@ export const Search: React.FC<Props> = ({
   onOnlineNameChange,
   onlineWebsiteUrl,
   onOnlineWebsiteUrlChange,
+  onlineLocationText,
+  onOnlineLocationTextChange,
+  onlineGeotag,
   onOnlinePlaceChange,
   onSelectManualAddress,
   onOpenManual,
@@ -100,6 +106,11 @@ export const Search: React.FC<Props> = ({
       onOnlineNameChange={onOnlineNameChange}
       onlineWebsiteUrl={onlineWebsiteUrl}
       onOnlineWebsiteUrlChange={onOnlineWebsiteUrlChange}
+      onlineLocationText={onlineLocationText}
+      onOnlineLocationTextChange={onOnlineLocationTextChange}
+      onlineGeotag={onlineGeotag}
+      onTagLocationPress={onTagLocationPress}
+      tagLocationLoading={tagLocationLoading}
       selectedSearchPlace={selectedSearchPlace}
       onSelectPlace={onSelectPlace}
       results={placeSearch.results}

@@ -325,6 +325,8 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     return fromDetail || fromRec;
   }, [recommendation, rexDetail?.place_location]);
 
+  const onlineLocationText = (rexDetail?.location_text ?? recommendation?.locationText ?? '').trim();
+
   const placeWebsiteText = (rexDetail?.place_website_url ?? '').trim();
   const placeWebsiteHref = useMemo(() => normalizeWebsiteUrl(placeWebsiteText), [placeWebsiteText]);
   const openPlaceWebsite = useCallback(() => {
@@ -606,6 +608,9 @@ export const RecommendationDetailModal: React.FC<Props> = ({
                       {placeWebsiteText}
                     </Text>
                   </Pressable>
+                ) : null}
+                {onlineLocationText ? (
+                  <Text className="mt-1 text-sm text-muted-foreground">{onlineLocationText}</Text>
                 ) : null}
               </View>
 

@@ -59,6 +59,8 @@ export interface Recommendation {
   authorId?: string;
   authorRelationshipStatus?: 'follows_you' | 'following' | 'trusted' | null;
   location?: string;
+  /** Free-text location for online / non-physical places (not a places-row address). */
+  locationText?: string | null;
   placeWebsiteUrl?: string | null;
   isOnlinePlace?: boolean | null;
   latitude?: number;
