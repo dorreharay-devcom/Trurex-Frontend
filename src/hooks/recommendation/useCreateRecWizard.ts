@@ -107,6 +107,8 @@ export function useCreateRecWizard() {
   const [manualGeotag, setManualGeotag] = useState<{ lat: number; lng: number } | null>(null);
   const [onlineName, setOnlineName] = useState('');
   const [onlineWebsiteUrl, setOnlineWebsiteUrl] = useState('');
+  const [onlineLocationText, setOnlineLocationTextState] = useState('');
+  const [onlineGeotag, setOnlineGeotag] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [selectedSubcategoryCode, setSelectedSubcategoryCode] = useState<string | null>(null);
   const [photoStoragePaths, setPhotoStoragePaths] = useState<string[]>([]);
@@ -264,6 +266,16 @@ export function useCreateRecWizard() {
     setManualGeotag(null);
   }, []);
 
+  const setOnlineLocationTextValue = useCallback((value: string) => {
+    setOnlineLocationTextState(value);
+    setOnlineGeotag(null);
+  }, []);
+
+  const applyOnlineGeotag = useCallback((result: { lat: number; lng: number; addressLabel: string }) => {
+    setOnlineLocationTextState(result.addressLabel);
+    setOnlineGeotag({ lat: result.lat, lng: result.lng });
+  }, []);
+
   const selectManualAddress = useCallback((place: CreateRecSearchPlace) => {
     setManualAddress(place.fullText ?? place.subtitle ?? place.title);
     setManualGeotag(
@@ -350,6 +362,8 @@ export function useCreateRecWizard() {
     setManualGeotag(null);
     setOnlineName('');
     setOnlineWebsiteUrl('');
+    setOnlineLocationTextState('');
+    setOnlineGeotag(null);
     setSelectedCategoryId(null);
     setSelectedSubcategoryCode(null);
     setPhotoStoragePaths([]);
@@ -406,6 +420,8 @@ export function useCreateRecWizard() {
         setSearchMode('online');
         setOnlineName(row.place_name ?? '');
         setOnlineWebsiteUrl(row.place_website_url ?? '');
+        setOnlineLocationTextState(row.location_text ?? '');
+        setOnlineGeotag(null);
       } else {
         setSearchMode('select');
         setSearchQuery(row.place_name ?? '');
@@ -490,6 +506,8 @@ export function useCreateRecWizard() {
     if (!selected) {
       setOnlineName('');
       setOnlineWebsiteUrl('');
+      setOnlineLocationTextState('');
+      setOnlineGeotag(null);
     }
   }, []);
 
@@ -500,6 +518,8 @@ export function useCreateRecWizard() {
     setManualGeotag(null);
     setOnlineName('');
     setOnlineWebsiteUrl('');
+    setOnlineLocationTextState('');
+    setOnlineGeotag(null);
   }, []);
 
   return {
@@ -523,6 +543,10 @@ export function useCreateRecWizard() {
     setOnlineName,
     onlineWebsiteUrl,
     setOnlineWebsiteUrl,
+    onlineLocationText,
+    setOnlineLocationText: setOnlineLocationTextValue,
+    onlineGeotag,
+    applyOnlineGeotag,
     setOnlinePlaceSelected,
     selectManualAddress,
     setSearchMode,
