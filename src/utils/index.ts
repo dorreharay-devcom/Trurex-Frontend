@@ -43,7 +43,7 @@ export const formatCurrency = (amount: number, currency: string = 'USD') => {
 
 const APP_SCHEME = process.env.EXPO_PUBLIC_APP_SCHEME ?? 'trurex';
 const AUTH_CALLBACK_PATH = 'auth/callback';
-const RESET_PASSWORD_REDIRECT_URL = 'https://trurex.netlify.app/reset-password';
+const RESET_PASSWORD_REDIRECT_URL = 'https://app.trurex.com/reset-password';
 
 export const getRedirectUrl = () =>
   isWeb

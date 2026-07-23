@@ -18,6 +18,7 @@ import type {
   Recommendation,
   RecommendationOpenOptions,
 } from '~/types/recommendation/recommendation';
+import { recommendationStubFromId } from '~/utils/recommendation/recommendationStubFromId';
 import { useUserConfig } from '~/hooks/useUserConfig';
 import { useAuth } from '~/services/AuthContext';
 
@@ -105,6 +106,13 @@ export default function HomeScreen() {
     setPreviewRecommendation(rec);
   }, []);
 
+  const openRexById = useCallback(
+    (rexId: string, options?: RecommendationOpenOptions) => {
+      openPreview(recommendationStubFromId(rexId), options);
+    },
+    [openPreview],
+  );
+
   const closePreview = useCallback(() => {
     setPreviewRecommendation(null);
     setPreviewOptions({});
@@ -166,6 +174,7 @@ export default function HomeScreen() {
               onProfilePress={() => handleTabChange('profile')}
               onAddPress={openCreateRex}
               onUserPress={openUserProfile}
+              onRexPress={openRexById}
               avatarRefreshKey={avatarRefreshKey}
               showSearch={currentTab === 'discover'}
             />
@@ -239,6 +248,7 @@ export default function HomeScreen() {
         onAddYourOwn={openCreateFromDetail}
         onCommentCountChange={handleCommentCountChange}
         scrollToComments={previewOptions.scrollToComments === true}
+        scrollToCommentId={previewOptions.scrollToCommentId}
         onAuthorPress={openUserProfile}
         onUserPress={openUserProfile}
         onEditRex={openEditFromDetail}

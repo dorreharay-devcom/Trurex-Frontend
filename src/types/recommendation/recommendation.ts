@@ -40,6 +40,8 @@ export type FeedListCardRow = {
 
 export type RecommendationOpenOptions = {
   scrollToComments?: boolean;
+  /** When set, open comments and scroll to this comment (takes precedence over scrollToComments). */
+  scrollToCommentId?: string;
 };
 
 export interface Recommendation {

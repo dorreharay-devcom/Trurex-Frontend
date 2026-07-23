@@ -75,3 +75,33 @@ export const COMMUNITY_GUIDELINES: LegalDocumentContent = {
     },
   ],
 };
+
+export const PRIVACY_POLICY: LegalDocumentContent = {
+  title: 'Privacy Policy',
+  lastUpdated: 'July 13, 2026',
+  preamble: [
+    'This Privacy Policy explains how TruRex collects, uses, and protects your information when you use the app.',
+  ],
+  sections: [
+    {
+      title: 'Information we collect',
+      body: 'We collect account details you provide (such as name, email, and profile information), content you create (such as recommendations and photos), and basic device and usage data needed to operate and improve the service.',
+    },
+    {
+      title: 'How we use information',
+      body: 'We use your information to provide and personalize TruRex, enable social features, moderate content, send service-related communications, and keep the platform secure.',
+    },
+    {
+      title: 'Sharing',
+      body: 'Profile and recommendation content you choose to share is visible to other users according to your settings. We do not sell your personal information. We may share data with service providers who help us run TruRex, or when required by law.',
+    },
+    {
+      title: 'Data retention and deletion',
+      body: 'We keep your information while your account is active. You can delete your account in Edit Profile, which removes associated personal data subject to legal retention requirements.',
+    },
+    {
+      title: 'Contact',
+      body: LEGAL_CONTACT_EMAIL,
+    },
+  ],
+};

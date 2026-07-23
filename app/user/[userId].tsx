@@ -11,6 +11,7 @@ import type {
   Recommendation,
   RecommendationOpenOptions,
 } from '~/types/recommendation/recommendation';
+import { recommendationStubFromId } from '~/utils/recommendation/recommendationStubFromId';
 import { isHexUuidString } from '~/utils/guards';
 
 export default function UserProfilePage() {
@@ -35,6 +36,13 @@ export default function UserProfilePage() {
     setPreviewRecommendation(rec);
   }, []);
 
+  const openRexById = useCallback(
+    (rexId: string, options?: RecommendationOpenOptions) => {
+      openPreview(recommendationStubFromId(rexId), options);
+    },
+    [openPreview],
+  );
+
   const closePreview = useCallback(() => {
     setPreviewRecommendation(null);
     setPreviewOptions({});
@@ -49,6 +57,8 @@ export default function UserProfilePage() {
             onSearchChange={() => {}}
             onProfilePress={() => handleTabChange('profile')}
             onAddPress={() => {}}
+            onUserPress={(id) => router.replace(`/user/${id}`)}
+            onRexPress={openRexById}
             avatarRefreshKey={avatarRefreshKey}
             showSearch={false}
           />
@@ -69,6 +79,7 @@ export default function UserProfilePage() {
           recommendation={previewRecommendation}
           onClose={closePreview}
           scrollToComments={previewOptions.scrollToComments === true}
+          scrollToCommentId={previewOptions.scrollToCommentId}
         />
       </SafeAreaProvider>
     </ProtectedRoute>

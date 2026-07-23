@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": { "description": "", "title": "standard public schema", "version": "14.5" },
-  "host": "kcjumjxwjgjhkdaglvdh.supabase.co:443",
+  "host": "auth.trurex.com:443",
   "basePath": "/",
   "schemes": ["https"],
   "consumes": [

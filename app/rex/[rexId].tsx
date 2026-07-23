@@ -21,8 +21,16 @@ export default function RexDeepLinkPage() {
 }
 
 function RexDeepLinkContent() {
-  const raw = useLocalSearchParams<{ rexId: string | string[] }>();
+  const raw = useLocalSearchParams<{
+    rexId: string | string[];
+    commentId?: string | string[];
+    comments?: string | string[];
+  }>();
   const rexId = Array.isArray(raw.rexId) ? raw.rexId[0] : raw.rexId;
+  const commentIdRaw = Array.isArray(raw.commentId) ? raw.commentId[0] : raw.commentId;
+  const commentsRaw = Array.isArray(raw.comments) ? raw.comments[0] : raw.comments;
+  const scrollToCommentId = commentIdRaw?.trim() || undefined;
+  const scrollToComments = !scrollToCommentId && (commentsRaw === '1' || commentsRaw === 'true');
   const router = useRouter();
   const [avatarRefreshKey] = useState(0);
 
@@ -51,6 +59,17 @@ function RexDeepLinkContent() {
     [router],
   );
 
+  const onRexPress = useCallback(
+    (id: string, options?: { scrollToCommentId?: string; scrollToComments?: boolean }) => {
+      const params = new URLSearchParams();
+      if (options?.scrollToCommentId) params.set('commentId', options.scrollToCommentId);
+      else if (options?.scrollToComments) params.set('comments', '1');
+      const qs = params.toString();
+      router.push(`/rex/${id}${qs ? `?${qs}` : ''}`);
+    },
+    [router],
+  );
+
   const trimmedId = rexId?.trim() ?? '';
 
   const { data, isPending, isError } = useQuery({
@@ -71,6 +90,8 @@ function RexDeepLinkContent() {
         onSearchChange={() => {}}
         onProfilePress={() => handleTabChange('profile')}
         onAddPress={() => {}}
+        onUserPress={onUserPress}
+        onRexPress={onRexPress}
         avatarRefreshKey={avatarRefreshKey}
         showSearch={false}
       />
@@ -132,6 +153,8 @@ function RexDeepLinkContent() {
         onClose={closeToDiscover}
         onAuthorPress={onAuthorPress}
         onUserPress={onUserPress}
+        scrollToComments={scrollToComments}
+        scrollToCommentId={scrollToCommentId}
       />
     </SafeAreaProvider>
   );

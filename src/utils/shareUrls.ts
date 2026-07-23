@@ -1,4 +1,4 @@
-export const TRUREX_WEB_ORIGIN = 'https://trurex.netlify.app';
+export const TRUREX_WEB_ORIGIN = 'https://app.trurex.com';
 
 export function buildPublicWebPath(path: string): string {
   const normalized = path.startsWith('/') ? path : `/${path}`;
