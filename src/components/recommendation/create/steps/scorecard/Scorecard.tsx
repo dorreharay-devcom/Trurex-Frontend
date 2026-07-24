@@ -77,11 +77,15 @@ export const Scorecard: React.FC<Props> = ({
     [categoryRatingDimensions, subcategoryRatingDimensions],
   );
 
-  const totalSlots = starDimensions.length;
+  const totalSlots = useMemo(
+    () => starDimensions.filter((d) => !d.show_toggle).length,
+    [starDimensions],
+  );
 
   const filledCount = useMemo(
     () =>
       starDimensions.filter((d) => {
+        if (d.show_toggle) return false;
         const v = categoryRatings[d.code];
         return v != null && v > 0;
       }).length,
@@ -117,6 +121,7 @@ export const Scorecard: React.FC<Props> = ({
           <>
             {categoryRatingDimensions.length > 0 ? (
               <ScorecardStarsTable
+                key={`cat-${categoryRatingDimensions.map((d) => d.code).join('|')}`}
                 dimensions={categoryRatingDimensions}
                 scores={categoryRatings}
                 onStarChange={onCategoryRatingChange}
@@ -125,6 +130,7 @@ export const Scorecard: React.FC<Props> = ({
 
             {subcategoryRatingDimensions.length > 0 ? (
               <ScorecardStarsTable
+                key={`sub-${subcategoryRatingDimensions.map((d) => d.code).join('|')}`}
                 sectionTitle={subcategoryStarTitle ?? 'More detail'}
                 dimensions={subcategoryRatingDimensions}
                 scores={categoryRatings}

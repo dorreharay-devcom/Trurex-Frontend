@@ -13,6 +13,7 @@ export type CategoryRatingDimension = {
   description: string | null;
   scale_left?: string | null;
   scale_right?: string | null;
+  show_toggle: boolean;
   sort_order: number;
 };
 
