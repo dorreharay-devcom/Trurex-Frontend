@@ -25,7 +25,7 @@ export function ScorecardTagOptions({ tagOptions, selectedSlugs, onToggle }: Pro
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => new Set());
 
   useEffect(() => {
-    setOpenGroups(new Set(groups.map((g) => groupKey(g.groupTitle))));
+    setOpenGroups(new Set());
   }, [groups]);
 
   const toggleGroup = useCallback((key: string) => {

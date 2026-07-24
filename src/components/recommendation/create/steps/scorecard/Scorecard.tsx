@@ -138,6 +138,20 @@ export const Scorecard: React.FC<Props> = ({
               </Text>
             ) : null}
 
+            <ScorecardValueForMoney
+              value={scoreValueForMoney}
+              onChange={onScoreValueForMoneyChange}
+            />
+
+            {showQuickTip ? (
+              <ScorecardQuickTip
+                value={quickTip}
+                onChangeText={onQuickTipChange}
+                categoryCode={selectedCategoryId}
+                categoryDisplayName={categoryDisplayName}
+              />
+            ) : null}
+
             {categoryQuestions.length > 0 ? (
               <ScorecardQuestions
                 sectionTitle="Questions"
@@ -156,20 +170,6 @@ export const Scorecard: React.FC<Props> = ({
                 onSelectOption={onQuestionAnswer}
               />
             ) : null}
-
-            {showQuickTip ? (
-              <ScorecardQuickTip
-                value={quickTip}
-                onChangeText={onQuickTipChange}
-                categoryCode={selectedCategoryId}
-                categoryDisplayName={categoryDisplayName}
-              />
-            ) : null}
-
-            <ScorecardValueForMoney
-              value={scoreValueForMoney}
-              onChange={onScoreValueForMoneyChange}
-            />
           </>
         )}
 
