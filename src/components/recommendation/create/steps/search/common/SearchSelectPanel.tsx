@@ -214,7 +214,7 @@ export function SearchSelectPanel({
             <TextInput
               value={onlineWebsiteUrl}
               onChangeText={onOnlineWebsiteUrlChange}
-              placeholder="Link to site…"
+              placeholder="Link to site (optional)"
               placeholderTextColor={Theme.colors.secondaryText}
               className={cn(
                 'w-full rounded-xl border border-border bg-muted/50 px-4 text-base text-foreground',
@@ -241,7 +241,7 @@ export function SearchSelectPanel({
             <TextInput
               value={onlineLocationText}
               onChangeText={onOnlineLocationTextChange}
-              placeholder="Address or location"
+              placeholder="Address or location (optional)"
               placeholderTextColor={Theme.colors.secondaryText}
               editable={Platform.OS === 'android' || !tagLocationLoading}
               className={cn(

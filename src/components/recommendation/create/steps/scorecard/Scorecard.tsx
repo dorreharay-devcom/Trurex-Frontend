@@ -157,12 +157,6 @@ export const Scorecard: React.FC<Props> = ({
               />
             ) : null}
 
-            <ScorecardTagOptions
-              tagOptions={tagOptions}
-              selectedSlugs={selectedTagSlugs}
-              onToggle={onToggleTag}
-            />
-
             {showQuickTip ? (
               <ScorecardQuickTip
                 value={quickTip}
@@ -188,6 +182,14 @@ export const Scorecard: React.FC<Props> = ({
           value={reviewText}
           onChangeText={onReviewChange}
         />
+
+        {configReady && !configLoadError ? (
+          <ScorecardTagOptions
+            tagOptions={tagOptions}
+            selectedSlugs={selectedTagSlugs}
+            onToggle={onToggleTag}
+          />
+        ) : null}
       </View>
     </ScrollView>
   );
