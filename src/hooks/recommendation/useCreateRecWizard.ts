@@ -6,6 +6,7 @@ import {
 } from '~/constants/recommendation/createScorecard';
 import {
   buildSelectedSearchPlaceFromAddYourOwn,
+  keepKnownCircleIds,
   type AddYourOwnRecSource,
 } from '~/utils/recommendation/recCreateFlow';
 import {
@@ -382,16 +383,18 @@ export function useCreateRecWizard() {
   const ensureDefaultCircleSelectionFromApiOrder = useCallback((rows: CreateRecCircle[]) => {
     if (!rows.length) return;
     const outerId = rows[rows.length - 1]!.id;
+    const knownIds = new Set(rows.map((r) => r.id));
     setPublicCircleId(outerId);
     setSelectedCircleIds((prev) => {
-      if (prev.has('public')) {
-        const next = new Set(prev);
+      const kept = keepKnownCircleIds(prev, knownIds);
+      if (kept.has('public')) {
+        const next = new Set(kept);
         next.delete('public');
         next.add(outerId);
         return next;
       }
-      if (prev.size === 0) return new Set([outerId]);
-      return prev;
+      if (kept.size === 0) return new Set([outerId]);
+      return kept;
     });
   }, []);
 

@@ -26,7 +26,7 @@ type Props = {
   tagLabels: string[];
   tip: string;
   review: string;
-  circleTitles: string[];
+  sharingLabel: string;
 };
 
 export function ConfirmPreviewCard({
@@ -40,11 +40,10 @@ export function ConfirmPreviewCard({
   tagLabels,
   tip,
   review,
-  circleTitles,
+  sharingLabel,
 }: Props) {
   const categoryEmoji = useCategoryIcon(selectedCategoryId);
   const categoryLabel = categoryDisplayName?.trim() || 'Category';
-  const sharingLine = circleTitles.length > 0 ? circleTitles.join(', ') : 'No one yet';
 
   return (
     <View className="overflow-hidden rounded-2xl border border-border bg-card shadow-card">
@@ -131,7 +130,7 @@ export function ConfirmPreviewCard({
           </Text>
         ) : null}
         <Text className="text-xs leading-5 text-muted-foreground">
-          Sharing to: <Text className="font-medium text-foreground">{sharingLine}</Text>
+          Sharing to: <Text className="font-medium text-foreground">{sharingLabel}</Text>
         </Text>
       </View>
     </View>

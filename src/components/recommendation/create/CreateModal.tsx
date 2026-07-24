@@ -44,6 +44,8 @@ import {
   getLinkedPlaceId,
   getPlaceNameForRex,
   hasNonPublicMockCircleSelection,
+  canPostCreateRexShare,
+  createRexErrorMessage,
   resolveCreateRexCircleIds,
   resolveCreateRexVisibility,
 } from '~/utils/recommendation/recCreateFlow';
@@ -328,6 +330,10 @@ export const CreateModal: React.FC<Props> = ({
       );
       return;
     }
+    if (!canPostCreateRexShare(flow.privateRex, flow.selectedCircleIds, flow.publicCircleId)) {
+      toastInfo('Circles', 'Select a sharing circle before posting.');
+      return;
+    }
     setSubmitting(true);
     try {
       const p_visibility = resolveCreateRexVisibility(
@@ -409,7 +415,7 @@ export const CreateModal: React.FC<Props> = ({
       if (didAccountFrozenMutationToast(e)) return;
       toastError(
         isEditMode ? 'Could not update' : 'Could not post',
-        unknownErrorMessage(e, 'Something went wrong.'),
+        createRexErrorMessage(unknownErrorMessage(e, 'Something went wrong.')),
       );
     } finally {
       setSubmitting(false);

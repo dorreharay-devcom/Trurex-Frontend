@@ -10,7 +10,7 @@ import {
   authorForConfirmPreview,
   averageCategoryRatings,
   getConfirmPreviewPlace,
-  getConfirmCircleTitles,
+  getConfirmSharingLabel,
   getConfirmTagLabels,
 } from '~/utils/recommendation/recCreateFlow';
 import type { CreateRecSearchPlace, SearchEntryMode } from '~/types/recommendation/create';
@@ -105,9 +105,8 @@ export const Confirm: React.FC<Props> = ({
     () => getConfirmTagLabels(selectedTagSlugs, tagOptions),
     [selectedTagSlugs, tagOptions],
   );
-  const circleTitles = useMemo(
-    () =>
-      privateRex ? ['Only you'] : getConfirmCircleTitles(selectedCircleIds, circleTitleLookup),
+  const sharingLabel = useMemo(
+    () => getConfirmSharingLabel(privateRex, selectedCircleIds, circleTitleLookup),
     [privateRex, selectedCircleIds, circleTitleLookup],
   );
 
@@ -147,7 +146,7 @@ export const Confirm: React.FC<Props> = ({
           tagLabels={tagLabels}
           tip={tip}
           review={review}
-          circleTitles={circleTitles}
+          sharingLabel={sharingLabel}
         />
       </View>
     </ScrollView>

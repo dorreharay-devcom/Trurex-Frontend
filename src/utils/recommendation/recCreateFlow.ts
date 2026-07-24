@@ -168,6 +168,41 @@ export function resolveCreateRexVisibility(
   return 'circles';
 }
 
+export function keepKnownCircleIds(
+  selectedCircleIds: Set<string>,
+  knownCircleIds: ReadonlySet<string>,
+): Set<string> {
+  return new Set(
+    [...selectedCircleIds].filter((id) => id === 'public' || knownCircleIds.has(id)),
+  );
+}
+
+export function canPostCreateRexShare(
+  privateSelected: boolean,
+  selectedCircleIds: Set<string>,
+  publicCircleId?: string | null,
+): boolean {
+  if (privateSelected) return true;
+  const visibility = resolveCreateRexVisibility(
+    selectedCircleIds,
+    privateSelected,
+    publicCircleId,
+  );
+  if (visibility === 'public') return true;
+  const circleIds = resolveCreateRexCircleIds(selectedCircleIds, publicCircleId);
+  return Array.isArray(circleIds) && circleIds.length > 0;
+}
+
+export function createRexErrorMessage(
+  rawMessage: string,
+  fallback = 'Something went wrong.',
+): string {
+  if (/invalid circle id/i.test(rawMessage)) {
+    return 'Select a valid sharing circle before posting.';
+  }
+  return rawMessage.trim() || fallback;
+}
+
 export function getPlaceNameForRex(
   searchMode: SearchEntryMode,
   selectedSearchPlace: CreateRecSearchPlace | null,
@@ -410,8 +445,21 @@ export function getConfirmCircleTitles(
   lookup: readonly { id: string; title: string }[],
 ): string[] {
   const map = new Map(lookup.map((c) => [c.id, c.title]));
-  return [...selectedCircleIds].map((id) => map.get(id)).filter((t): t is string => Boolean(t));
+  return [...selectedCircleIds]
+    .map((id) => map.get(id))
+    .filter((t): t is string => Boolean(t?.trim()));
 }
+
+export function getConfirmSharingLabel(
+  privateRex: boolean,
+  selectedCircleIds: Set<string>,
+  lookup: readonly { id: string; title: string }[],
+): string {
+  if (privateRex) return 'Only you';
+  const titles = getConfirmCircleTitles(selectedCircleIds, lookup);
+  if (titles.length > 0) return titles.join(', ');
+  if (selectedCircleIds.size > 0) return 'Unavailable circle';
+  return 'No one yet';}
 
 export function filterCreateRecSearchPlaces(
   query: string,
