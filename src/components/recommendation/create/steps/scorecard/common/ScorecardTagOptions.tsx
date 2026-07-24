@@ -20,6 +20,10 @@ function groupLabel(groupTitle: string): string {
   return groupTitle.trim() ? groupTitle : 'Other';
 }
 
+function isOnlyOnTrurexGroup(groupTitle: string): boolean {
+  return groupTitle.trim().toLowerCase() === 'only on trurex';
+}
+
 export function ScorecardTagOptions({ tagOptions, selectedSlugs, onToggle }: Props) {
   const groups = useMemo(() => groupTagOptionsByTagGroup(tagOptions), [tagOptions]);
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => new Set());
@@ -48,12 +52,19 @@ export function ScorecardTagOptions({ tagOptions, selectedSlugs, onToggle }: Pro
         const key = groupKey(g.groupTitle);
         const open = openGroups.has(key);
         const selectedInGroup = g.tags.filter((t) => selectedSlugs.includes(t.slug)).length;
+        const emphasize = isOnlyOnTrurexGroup(g.groupTitle);
 
         return (
-          <View key={key} className="overflow-hidden rounded-xl border border-border">
+          <View
+            key={key}
+            className={cn(
+              'overflow-hidden rounded-xl border',
+              emphasize ? 'border-border bg-primary/20' : 'border-border bg-card',
+            )}
+          >
             <Pressable
               onPress={() => toggleGroup(key)}
-              className="flex-row items-center justify-between gap-2 bg-card px-3 py-3 active:opacity-90"
+              className="flex-row items-center justify-between gap-2 px-3 py-3 active:opacity-90"
               accessibilityRole="button"
               accessibilityState={{ expanded: open }}
               accessibilityLabel={`${groupLabel(g.groupTitle)}${selectedInGroup > 0 ? `, ${selectedInGroup} selected` : ''}`}
@@ -78,7 +89,9 @@ export function ScorecardTagOptions({ tagOptions, selectedSlugs, onToggle }: Pro
                       onPress={() => onToggle(t.slug)}
                       className={cn(
                         'rounded-full border px-3 py-1.5 active:opacity-90',
-                        on ? 'border-primary bg-primary' : 'border-border bg-muted/50',
+                        on && 'border-primary bg-primary',
+                        !on && emphasize && 'border-border bg-primary/20',
+                        !on && !emphasize && 'border-border bg-muted/50',
                       )}
                       accessibilityRole="button"
                       accessibilityState={{ selected: on }}
