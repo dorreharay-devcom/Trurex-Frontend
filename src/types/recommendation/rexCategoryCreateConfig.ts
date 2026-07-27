@@ -1,7 +1,11 @@
+export type CategoryQuestionType = 'select' | 'text';
+
 export type CategoryQuestion = {
   code: string;
   display_label: string;
   description: string | null;
+  type: CategoryQuestionType;
+  max_length: number | null;
   is_required: boolean;
   sort_order: number;
   options: { code: string; label: string; sort_order: number }[];

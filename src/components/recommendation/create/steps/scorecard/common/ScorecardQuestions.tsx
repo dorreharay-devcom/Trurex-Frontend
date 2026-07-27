@@ -1,7 +1,16 @@
 import React from 'react';
-import { Platform, View, Text, Pressable } from 'react-native';
+import { Platform, View, Text, Pressable, TextInput } from 'react-native';
 import type { CategoryQuestion } from '~/types/recommendation/rexCategoryCreateConfig';
+import { CREATE_REC_MUST_KNOW_MAX } from '~/constants/recommendation/createScorecard';
+import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
+import {
+  Theme,
+  textFieldCaretStyle,
+  textFieldSingleLineDefaultHeightStyle,
+  textFieldSingleLineStyle,
+} from '~/theme/Theme';
 import { cn } from '~/utils/general';
+import { webNoOutline } from '../../search/common/webInputOutline';
 
 const OFF_MARKET_HELPER = 'Did they provide access to off-market opportunities?';
 
@@ -15,13 +24,17 @@ function questionHelperText(q: CategoryQuestion): string | null {
   return null;
 }
 
+function textMaxLength(q: CategoryQuestion): number {
+  if (typeof q.max_length === 'number' && q.max_length > 0) return q.max_length;
+  return CREATE_REC_MUST_KNOW_MAX;
+}
+
 type Props = {
   sectionTitle?: string | null;
-  /** Subcategory-style block: VFM-like headings and helper text */
   questionStyle?: 'standard' | 'emphasized';
   questions: CategoryQuestion[];
   answers: Record<string, string>;
-  onSelectOption: (questionCode: string, optionCode: string) => void;
+  onAnswerChange: (questionCode: string, value: string, mode: 'select' | 'text') => void;
 };
 
 export function ScorecardQuestions({
@@ -29,7 +42,7 @@ export function ScorecardQuestions({
   questionStyle = 'standard',
   questions,
   answers,
-  onSelectOption,
+  onAnswerChange,
 }: Props) {
   if (questions.length === 0) return null;
 
@@ -48,19 +61,32 @@ export function ScorecardQuestions({
       {questions.map((q) => {
         const helper = questionHelperText(q);
         const emphasized = questionStyle === 'emphasized';
+        const isText = q.type === 'text';
+        const maxLength = textMaxLength(q);
+        const textValue = answers[q.code] ?? '';
 
         return (
           <View key={q.code} className="space-y-2">
             <View>
-              <Text
-                className={cn(
-                  emphasized
-                    ? 'text-xs font-medium uppercase tracking-wider text-black'
-                    : 'text-sm font-medium text-foreground',
-                )}
-              >
-                {q.display_label}
-              </Text>
+              <View className="flex-row flex-wrap items-center gap-x-2 gap-y-1">
+                <Text
+                  className={cn(
+                    emphasized
+                      ? 'text-xs font-medium uppercase tracking-wider text-black'
+                      : 'text-sm font-medium text-foreground',
+                  )}
+                >
+                  {q.display_label}
+                </Text>
+                <Text
+                  className={cn(
+                    'text-[10px] italic',
+                    q.is_required ? 'text-destructive' : 'text-black opacity-80',
+                  )}
+                >
+                  {q.is_required ? 'required' : 'optional'}
+                </Text>
+              </View>
               {helper ? (
                 <Text
                   className={cn(
@@ -74,37 +100,62 @@ export function ScorecardQuestions({
                   {helper}
                 </Text>
               ) : null}
-              {q.is_required ? (
-                <Text className="mt-0.5 text-[10px] text-destructive">Required</Text>
-              ) : null}
             </View>
-            <View
-              className="flex-row flex-wrap gap-2"
-              style={isNative ? { marginTop: 8 } : undefined}
-            >
-              {q.options.map((opt) => {
-                const selected = answers[q.code] === opt.code;
-                return (
-                  <Pressable
-                    key={opt.code}
-                    onPress={() => onSelectOption(q.code, opt.code)}
-                    className={cn(
-                      'rounded-full border px-3 active:opacity-90',
-                      emphasized ? 'py-2' : 'py-1.5',
-                      selected ? 'border-primary bg-primary' : 'border-border bg-muted/50',
-                    )}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected }}
-                  >
-                    <Text
-                      className={cn('text-sm', selected ? 'text-primary-foreground' : 'text-black')}
+
+            {isText ? (
+              <View style={isNative ? { marginTop: 8 } : undefined}>
+                <TextInput
+                  value={textValue}
+                  onChangeText={(next) => onAnswerChange(q.code, next, 'text')}
+                  placeholder="Type your answer..."
+                  placeholderTextColor={Theme.colors.secondaryText}
+                  maxLength={maxLength}
+                  className={`w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
+                  style={[
+                    webNoOutline,
+                    textFieldCaretStyle,
+                    textFieldSingleLineStyle,
+                    textFieldSingleLineDefaultHeightStyle,
+                  ]}
+                  underlineColorAndroid="transparent"
+                  selectionColor={Theme.colors.foreground}
+                />
+                <Text className="mt-2 text-right text-[10px] text-black opacity-70">
+                  {textValue.length}/{maxLength}
+                </Text>
+              </View>
+            ) : (
+              <View
+                className="flex-row flex-wrap gap-2"
+                style={isNative ? { marginTop: 8 } : undefined}
+              >
+                {q.options.map((opt) => {
+                  const selected = answers[q.code] === opt.code;
+                  return (
+                    <Pressable
+                      key={opt.code}
+                      onPress={() => onAnswerChange(q.code, opt.code, 'select')}
+                      className={cn(
+                        'rounded-full border px-3 active:opacity-90',
+                        emphasized ? 'py-2' : 'py-1.5',
+                        selected ? 'border-primary bg-primary' : 'border-border bg-muted/50',
+                      )}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected }}
                     >
-                      {opt.label}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
+                      <Text
+                        className={cn(
+                          'text-sm',
+                          selected ? 'text-primary-foreground' : 'text-black',
+                        )}
+                      >
+                        {opt.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            )}
           </View>
         );
       })}

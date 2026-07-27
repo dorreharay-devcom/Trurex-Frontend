@@ -49,6 +49,8 @@ type CanProceedDeps = {
   privateRex: boolean;
   selectedSubcategoryCode: string | null;
   photoStoragePaths: string[];
+  questionAnswers: Record<string, string>;
+  requiredQuestionCodes: string[];
 };
 
 function canProceedForStep(stepId: CreateRecStepId, d: CanProceedDeps): boolean {
@@ -70,7 +72,7 @@ function canProceedForStep(stepId: CreateRecStepId, d: CanProceedDeps): boolean 
     case 'type':
       return d.selectedSubcategoryCode !== null;
     case 'scorecard':
-      return true;
+      return d.requiredQuestionCodes.every((code) => Boolean(d.questionAnswers[code]?.trim()));
     case 'photos':
       return true;
     case 'circles':
@@ -115,6 +117,7 @@ export function useCreateRecWizard() {
   const [photoStoragePaths, setPhotoStoragePaths] = useState<string[]>([]);
   const [categoryRatings, setCategoryRatings] = useState<Record<string, number | null>>({});
   const [questionAnswers, setQuestionAnswers] = useState<Record<string, string>>({});
+  const [requiredQuestionCodes, setRequiredQuestionCodes] = useState<string[]>([]);
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>([]);
   const [scoreQuickTip, setScoreQuickTip] = useState('');
   const [scoreValueForMoney, setScoreValueForMoney] = useState<number | null>(null);
@@ -136,6 +139,7 @@ export function useCreateRecWizard() {
   const clearScorecardState = useCallback(() => {
     setCategoryRatings({});
     setQuestionAnswers({});
+    setRequiredQuestionCodes([]);
     setSelectedTagSlugs([]);
     setScoreQuickTip('');
     setScoreValueForMoney(null);
@@ -201,6 +205,8 @@ export function useCreateRecWizard() {
         privateRex,
         selectedSubcategoryCode,
         photoStoragePaths,
+        questionAnswers,
+        requiredQuestionCodes,
       }),
     [
       stepId,
@@ -215,11 +221,13 @@ export function useCreateRecWizard() {
       privateRex,
       selectedSubcategoryCode,
       photoStoragePaths,
+      questionAnswers,
+      requiredQuestionCodes,
     ],
   );
 
   const syncFormToConfig = useCallback(
-    (dimensions: CategoryRatingDimension[], _questions: CategoryQuestion[]) => {
+    (dimensions: CategoryRatingDimension[], questions: CategoryQuestion[]) => {
       const edit =
         editPrefillRef.current?.category_code === selectedCategoryId
           ? editPrefillRef.current
@@ -230,6 +238,7 @@ export function useCreateRecWizard() {
         ),
       );
       setQuestionAnswers(edit?.question_answers ?? {});
+      setRequiredQuestionCodes(questions.filter((q) => q.is_required).map((q) => q.code));
       setSelectedTagSlugs(edit?.tag_slugs ?? []);
       setScoreValueForMoney(edit?.score_value_for_money ?? null);
       if (edit) editPrefillRef.current = null;
@@ -241,15 +250,25 @@ export function useCreateRecWizard() {
     setCategoryRatings((prev) => ({ ...prev, [code]: value === 0 ? null : value }));
   }, []);
 
-  const setQuestionAnswer = useCallback((code: string, optionCode: string) => {
-    setQuestionAnswers((prev) => {
-      if (prev[code] === optionCode) {
-        const { [code]: _removed, ...rest } = prev;
-        return rest;
-      }
-      return { ...prev, [code]: optionCode };
-    });
-  }, []);
+  const setQuestionAnswer = useCallback(
+    (code: string, value: string, mode: 'select' | 'text' = 'select') => {
+      setQuestionAnswers((prev) => {
+        if (mode === 'text' && value.length === 0) {
+          const { [code]: _removed, ...rest } = prev;
+          return rest;
+        }
+        if (mode === 'text') {
+          return { ...prev, [code]: value };
+        }
+        if (prev[code] === value) {
+          const { [code]: _removed, ...rest } = prev;
+          return rest;
+        }
+        return { ...prev, [code]: value };
+      });
+    },
+    [],
+  );
 
   const toggleTagSlug = useCallback((slug: string) => {
     setSelectedTagSlugs((prev) =>
@@ -370,6 +389,7 @@ export function useCreateRecWizard() {
     setPhotoStoragePaths([]);
     setCategoryRatings({});
     setQuestionAnswers({});
+    setRequiredQuestionCodes([]);
     setSelectedTagSlugs([]);
     setScoreQuickTip('');
     setScoreValueForMoney(null);
