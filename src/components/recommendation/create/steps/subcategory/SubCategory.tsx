@@ -34,11 +34,16 @@ export function SubCategory({ subCategories, selected, onSelect }: Props) {
           {subCategories.map((sc) => {
             const isSelected = selected === sc.code;
             const icon = resolveSubcategoryIcon(sc.code, sc.label, sc.icon).trim();
-            const ratingLabel = `${sc.ratingCount} specific rating${sc.ratingCount !== 1 ? 's' : ''}`;
-            const q =
-              sc.questionCount > 0
-                ? ` + ${sc.questionCount} question${sc.questionCount !== 1 ? 's' : ''}`
-                : '';
+            const parts: string[] = [];
+            if (sc.ratingCount > 0) {
+              parts.push(
+                `${sc.ratingCount} specific rating${sc.ratingCount !== 1 ? 's' : ''}`,
+              );
+            }
+            if (sc.questionCount > 0) {
+              parts.push(`${sc.questionCount} question${sc.questionCount !== 1 ? 's' : ''}`);
+            }
+            const metaLabel = parts.join(' + ');
             return (
               <Pressable
                 key={sc.code}
@@ -67,10 +72,9 @@ export function SubCategory({ subCategories, selected, onSelect }: Props) {
                   >
                     {sc.label}
                   </Text>
-                  <Text className="mt-0.5 text-xs text-muted-foreground">
-                    {ratingLabel}
-                    {q}
-                  </Text>
+                  {metaLabel ? (
+                    <Text className="mt-0.5 text-xs text-muted-foreground">{metaLabel}</Text>
+                  ) : null}
                 </View>
                 <View
                   className={cn(
