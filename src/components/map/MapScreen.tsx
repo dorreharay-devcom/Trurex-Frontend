@@ -329,10 +329,10 @@ const MapScreen: React.FC<Props> = ({ onRecommendationPress, onRexSheetOpenChang
               field={
                 <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
                   <Text className="text-sm font-medium text-foreground">
-                    No Rex match that name
+                    Looks like this business is waiting for its first Rex.
                   </Text>
                   <Text className="mt-1 text-xs text-muted-foreground">
-                    Try another title or clear the search.
+                    Been here? Any insider tips? Help your network discover it. Add your Rex now.
                   </Text>
                 </View>
               }

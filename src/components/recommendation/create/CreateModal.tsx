@@ -59,6 +59,12 @@ import { CreateModalBody } from './CreateModalBody';
 const DYNO_IMAGE_SOURCE = require('../../../../assets/dyno.svg');
 const CREATE_REX_SUCCESS_TOAST_DELAY_MS = modalConfig.timing.sheetCloseMs + 180;
 
+function nativePrimaryFooterBackground(disabled: boolean, pressed: boolean): string {
+  if (disabled) return Theme.colors.accent;
+  if (pressed) return Theme.brand.colorDark;
+  return Theme.colors.primary;
+}
+
 type Props = {
   visible: boolean;
   onClose: () => void;
@@ -532,11 +538,22 @@ export const CreateModal: React.FC<Props> = ({
                 }
                 accessibilityState={{ disabled: primaryDisabled }}
                 className={cn(
-                  'flex h-12 w-full flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2',
-                  primaryDisabled
-                    ? 'cursor-not-allowed bg-primary/40 opacity-50'
-                    : 'cursor-pointer bg-primary active:bg-primary/90',
+                  'flex h-12 w-full flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-2',
+                  isWeb &&
+                    'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2',
+                  isWeb &&
+                    primaryDisabled &&
+                    'cursor-not-allowed bg-primary/40 opacity-50',
+                  isWeb && !primaryDisabled && 'cursor-pointer bg-primary active:bg-primary/90',
+                  !isWeb && 'overflow-hidden',
                 )}
+                style={
+                  isWeb
+                    ? undefined
+                    : ({ pressed }) => ({
+                        backgroundColor: nativePrimaryFooterBackground(primaryDisabled, pressed),
+                      })
+                }
               >
                 {submitting ? (
                   <ActivityIndicator color={Theme.colors.primaryForeground} />
@@ -544,7 +561,10 @@ export const CreateModal: React.FC<Props> = ({
                   <>
                     <Text
                       pointerEvents="none"
-                      className="text-base font-semibold text-primary-foreground"
+                      className={cn(
+                        'text-base font-semibold text-primary-foreground',
+                        !isWeb && primaryDisabled && 'text-accent-foreground',
+                      )}
                     >
                       {flow.isLastStep
                         ? isEditMode
@@ -562,7 +582,14 @@ export const CreateModal: React.FC<Props> = ({
                     ) : null}
                     {!flow.isLastStep && (
                       <View pointerEvents="none">
-                        <ChevronRight size={16} color={Theme.colors.primaryForeground} />
+                        <ChevronRight
+                          size={16}
+                          color={
+                            !isWeb && primaryDisabled
+                              ? Theme.colors.accentForeground
+                              : Theme.colors.primaryForeground
+                          }
+                        />
                       </View>
                     )}
                   </>

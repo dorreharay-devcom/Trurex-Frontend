@@ -3,6 +3,7 @@ import type { CategorySubcategoryConfig } from '~/types/recommendation/rexCatego
 export type RexSubcategoryOption = {
   code: string;
   label: string;
+  icon: string | null;
   ratingCount: number;
   questionCount: number;
 };
@@ -42,7 +43,7 @@ function iconKeyFromLabel(displayName: string): keyof typeof SUB_CAT_ICONS | nul
   return null;
 }
 
-export function resolveSubcategoryIcon(code: string, displayName?: string): string {
+function resolveLocalSubcategoryIcon(code: string, displayName?: string): string {
   const cleaned = code.trim().replace(/[\u200B-\u200D\uFEFF]/g, '');
   const direct = SUB_CAT_ICONS[cleaned as keyof typeof SUB_CAT_ICONS];
   if (direct) return direct;
@@ -62,12 +63,23 @@ export function resolveSubcategoryIcon(code: string, displayName?: string): stri
   return '';
 }
 
+export function resolveSubcategoryIcon(
+  code: string,
+  displayName?: string,
+  iconFromApi?: string | null,
+): string {
+  const fromApi = iconFromApi?.trim();
+  if (fromApi) return fromApi;
+  return resolveLocalSubcategoryIcon(code, displayName);
+}
+
 export function mapSubcategoriesFromConfig(
   subcategories: CategorySubcategoryConfig[],
 ): RexSubcategoryOption[] {
   return subcategories.map((s) => ({
     code: s.code,
     label: s.display_name,
+    icon: s.icon ?? null,
     ratingCount: s.rating_dimensions.length,
     questionCount: s.questions.length,
   }));
