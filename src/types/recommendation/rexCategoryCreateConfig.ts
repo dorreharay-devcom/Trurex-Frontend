@@ -27,6 +27,7 @@ export type CategoryTagOption = {
 export type CategorySubcategoryConfig = {
   code: string;
   display_name: string;
+  icon: string | null;
   sort_order: number;
   questions: CategoryQuestion[];
   rating_dimensions: CategoryRatingDimension[];

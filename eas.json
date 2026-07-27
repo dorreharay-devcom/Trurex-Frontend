@@ -10,7 +10,8 @@
       "env": {
         "APP_ENV": "development",
         "APP_TARGET": "native",
-        "EXPO_PUBLIC_APP_SCHEME": "trurex-dev"
+        "EXPO_PUBLIC_APP_SCHEME": "trurex-dev",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://auth-dev.trurex.com"
       }
     },
     "preview": {
@@ -19,7 +20,8 @@
       "env": {
         "APP_ENV": "development",
         "APP_TARGET": "native",
-        "EXPO_PUBLIC_APP_SCHEME": "trurex-dev"
+        "EXPO_PUBLIC_APP_SCHEME": "trurex-dev",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://auth-dev.trurex.com"
       }
     },
     "production": {
@@ -28,7 +30,8 @@
       "env": {
         "APP_ENV": "production",
         "APP_TARGET": "native",
-        "EXPO_PUBLIC_APP_SCHEME": "trurex"
+        "EXPO_PUBLIC_APP_SCHEME": "trurex",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://auth.trurex.com"
       }
     }
   },

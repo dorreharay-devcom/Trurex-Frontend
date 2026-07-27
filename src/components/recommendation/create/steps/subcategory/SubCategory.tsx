@@ -33,7 +33,7 @@ export function SubCategory({ subCategories, selected, onSelect }: Props) {
         <View className="gap-2.5">
           {subCategories.map((sc) => {
             const isSelected = selected === sc.code;
-            const icon = resolveSubcategoryIcon(sc.code, sc.label).trim();
+            const icon = resolveSubcategoryIcon(sc.code, sc.label, sc.icon).trim();
             const ratingLabel = `${sc.ratingCount} specific rating${sc.ratingCount !== 1 ? 's' : ''}`;
             const q =
               sc.questionCount > 0

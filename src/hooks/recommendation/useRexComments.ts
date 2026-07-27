@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Backend } from '~/services/AuthService';
 import {
   addRexComment,
@@ -7,14 +8,27 @@ import {
   likeRexComment,
   unlikeRexComment,
 } from '~/api/rexCommentsApi';
-import { updateCommentInTree } from '~/utils/recommendation/rexCommentTree';
+import {
+  totalRexCommentCount,
+  updateCommentInTree,
+} from '~/utils/recommendation/rexCommentTree';
+import { patchFeedCommentCount } from '~/utils/recommendation/patchFeedCommentCount';
 import type { RexComment } from '~/types/recommendation/rexComment';
 import { unknownErrorMessage } from '~/utils';
 
 export function useRexComments(rexId: string | undefined) {
+  const queryClient = useQueryClient();
   const [comments, setComments] = useState<RexComment[]>([]);
   const [loading, setLoading] = useState(true);
   const commentLikeInFlight = useRef(new Set<string>());
+
+  const syncFeedCommentCount = useCallback(
+    (nextComments: RexComment[]) => {
+      if (!rexId) return;
+      patchFeedCommentCount(queryClient, rexId, totalRexCommentCount(nextComments));
+    },
+    [queryClient, rexId],
+  );
 
   const fetchComments = useCallback(async () => {
     if (!rexId) {
@@ -24,14 +38,16 @@ export function useRexComments(rexId: string | undefined) {
     }
     setLoading(true);
     try {
-      setComments(await getRexComments(rexId));
+      const next = await getRexComments(rexId);
+      setComments(next);
+      syncFeedCommentCount(next);
     } catch (e) {
       console.warn('[useRexComments]', e);
       setComments([]);
     } finally {
       setLoading(false);
     }
-  }, [rexId]);
+  }, [rexId, syncFeedCommentCount]);
 
   useEffect(() => {
     void fetchComments();
