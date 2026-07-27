@@ -58,13 +58,13 @@ export function ScorecardStarsTable({
                     accessibilityLabel={`Include ${dim.display_label}`}
                     hitSlop={4}
                     className={cn(
-                      'h-7 w-12 justify-center rounded-full px-0.5 active:opacity-90',
+                      'h-5 w-9 justify-center rounded-full px-0.5 active:opacity-90',
                       ratingVisible ? 'bg-primary' : 'bg-border',
                     )}
                   >
                     <View
                       className={cn(
-                        'h-6 w-6 rounded-full bg-white shadow-sm',
+                        'h-4 w-4 rounded-full bg-white shadow-sm',
                         ratingVisible ? 'self-end' : 'self-start',
                       )}
                     />
