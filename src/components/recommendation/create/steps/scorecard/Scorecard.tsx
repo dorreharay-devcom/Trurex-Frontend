@@ -31,7 +31,7 @@ type Props = {
   categoryQuestions: CategoryQuestion[];
   subcategoryQuestions: CategoryQuestion[];
   questionAnswers: Record<string, string>;
-  onQuestionAnswer: (questionCode: string, optionCode: string) => void;
+  onQuestionAnswer: (questionCode: string, value: string, mode?: 'select' | 'text') => void;
   tagOptions: CategoryTagOption[];
   selectedTagSlugs: string[];
   onToggleTag: (slug: string) => void;
@@ -163,7 +163,7 @@ export const Scorecard: React.FC<Props> = ({
                 sectionTitle="Questions"
                 questions={categoryQuestions}
                 answers={questionAnswers}
-                onSelectOption={onQuestionAnswer}
+                onAnswerChange={onQuestionAnswer}
               />
             ) : null}
 
@@ -173,7 +173,7 @@ export const Scorecard: React.FC<Props> = ({
                 questionStyle="emphasized"
                 questions={subcategoryQuestions}
                 answers={questionAnswers}
-                onSelectOption={onQuestionAnswer}
+                onAnswerChange={onQuestionAnswer}
               />
             ) : null}
           </>

@@ -258,7 +258,9 @@ export const CreateModal: React.FC<Props> = ({
   const useExperienceReviewCopy = categoryDefinesSubcategories;
 
   const ratingDimCodesKey = mergedRatingDimensions.map((d) => d.code).join('|');
-  const questionCodesKey = mergedQuestions.map((q) => q.code).join('|');
+  const questionSyncKey = mergedQuestions
+    .map((q) => `${q.code}:${q.is_required ? 1 : 0}:${q.type ?? 'select'}`)
+    .join('|');
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
@@ -270,7 +272,7 @@ export const CreateModal: React.FC<Props> = ({
     activeCreateConfig?.code,
     subcategoryCodeForMerge,
     ratingDimCodesKey,
-    questionCodesKey,
+    questionSyncKey,
     syncFormToConfig,
   ]);
   /* eslint-enable react-hooks/exhaustive-deps */
@@ -320,7 +322,7 @@ export const CreateModal: React.FC<Props> = ({
     for (const q of mergedQuestions) {
       if (q.is_required) {
         const v = flow.questionAnswers[q.code];
-        if (v == null || v === '') {
+        if (v == null || v.trim() === '') {
           toastInfo('Almost there', `Please answer: ${q.display_label}`);
           return;
         }
@@ -354,8 +356,10 @@ export const CreateModal: React.FC<Props> = ({
       const p_question_answers: Record<string, string> = {};
       for (const q of mergedQuestions) {
         const v = flow.questionAnswers[q.code];
-        if (v != null && v !== '') p_question_answers[q.code] = v;
-        else if (q.is_required) {
+        const trimmed = v?.trim() ?? '';
+        if (trimmed) {
+          p_question_answers[q.code] = q.type === 'text' ? trimmed : v!;
+        } else if (q.is_required) {
           throw new Error(`Please answer: ${q.display_label}`);
         }
       }
@@ -441,10 +445,20 @@ export const CreateModal: React.FC<Props> = ({
 
   const { layout } = modalConfig;
 
+  const scorecardRequiredSatisfied = useMemo(
+    () =>
+      mergedQuestions.every((q) => {
+        if (!q.is_required) return true;
+        return Boolean(flow.questionAnswers[q.code]?.trim());
+      }),
+    [mergedQuestions, flow.questionAnswers],
+  );
+
   const primaryDisabled =
     submitting ||
     editLoading ||
     isGeotagging ||
+    (flow.stepId === 'scorecard' && !scorecardRequiredSatisfied) ||
     (!flow.isLastStep && !flow.canProceed) ||
     (flow.isLastStep && submitting);
 
