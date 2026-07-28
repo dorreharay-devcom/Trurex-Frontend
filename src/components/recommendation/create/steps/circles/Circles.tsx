@@ -213,7 +213,7 @@ export const Circles: React.FC<Props> = ({
                 privateSelected ? 'text-foreground' : 'text-muted-foreground',
               )}
             >
-              Make this rex private
+              Make this Rex private
             </Text>
           </Pressable>
 

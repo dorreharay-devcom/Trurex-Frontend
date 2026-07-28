@@ -1,5 +1,13 @@
 import React, { useCallback } from 'react';
-import { View, Text, ScrollView, Pressable, Linking, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  Pressable,
+  Linking,
+  Platform,
+  useWindowDimensions,
+} from 'react-native';
 import { useNavigation, useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import AuthLayout from '~/components/common/AuthLayout';
@@ -57,6 +65,8 @@ function SectionBody({ body }: { body: string }) {
 export function LegalDocumentScreen({ document }: Props) {
   const router = useRouter();
   const navigation = useNavigation();
+  const { height: windowHeight } = useWindowDimensions();
+  const documentMaxHeight = Math.round(windowHeight * 0.7);
 
   const handleBack = useCallback(() => {
     if (navigation.canGoBack()) {
@@ -96,9 +106,11 @@ export function LegalDocumentScreen({ document }: Props) {
         </View>
 
         <ScrollView
-          className="max-h-[70vh] rounded-xl border border-border bg-card"
+          className="rounded-xl border border-border bg-card"
+          style={{ maxHeight: documentMaxHeight }}
           contentContainerClassName="gap-5 p-4"
           showsVerticalScrollIndicator={false}
+          nestedScrollEnabled={Platform.OS === 'android'}
         >
           {document.preamble.map((paragraph) => (
             <Text key={paragraph} className="text-sm leading-6 text-foreground">

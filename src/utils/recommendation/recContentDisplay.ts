@@ -46,7 +46,7 @@ export function userAvatarHttpUrl(avatar: string | undefined | null): string | n
 export const VALUE_FOR_MONEY_LABELS = [
   'Bargain Find',
   'Cheap&Cheerful',
-  'Fair&Solid',
+  'Good Value',
   'Expensive But Worth It',
   'Felt Like A Rip-off',
 ] as const;

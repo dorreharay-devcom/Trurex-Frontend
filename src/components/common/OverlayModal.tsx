@@ -31,6 +31,7 @@ const webOverlayRoot: ViewStyle | undefined =
 export const OverlayModal: React.FC<OverlayModalProps> = ({
   visible,
   onRequestClose,
+  onDismiss,
   contentTranslateY,
   backdropBackground,
   children,
@@ -45,6 +46,7 @@ export const OverlayModal: React.FC<OverlayModalProps> = ({
       presentationStyle={Platform.OS === 'ios' ? 'overFullScreen' : undefined}
       statusBarTranslucent={Platform.OS === 'android'}
       onRequestClose={onRequestClose}
+      onDismiss={onDismiss}
     >
       <View style={[styles.overlayRoot, webOverlayRoot]}>
         <Pressable
