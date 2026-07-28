@@ -57,6 +57,7 @@ export default function HomeScreen() {
   const [createRecommendationOpen, setCreateRecommendationOpen] = useState(false);
   const [addYourOwnPrefill, setAddYourOwnPrefill] = useState<AddYourOwnRecSource | null>(null);
   const [editRexId, setEditRexId] = useState<string | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [previewRecommendation, setPreviewRecommendation] = useState<Recommendation | null>(null);
   const [previewOptions, setPreviewOptions] = useState<RecommendationOpenOptions>({});
   const [avatarRefreshKey, setAvatarRefreshKey] = useState(0);
@@ -85,25 +86,29 @@ export default function HomeScreen() {
     setCreateRecommendationOpen(true);
   }, []);
 
+  const clearPreviewData = useCallback(() => {
+    setPreviewRecommendation(null);
+    setPreviewOptions({});
+  }, []);
+
   const openCreateFromDetail = useCallback((source: AddYourOwnRecSource) => {
     setAddYourOwnPrefill(source);
     setEditRexId(null);
     setCreateRecommendationOpen(true);
-    setPreviewRecommendation(null);
-    setPreviewOptions({});
+    setPreviewOpen(false);
   }, []);
 
   const openEditFromDetail = useCallback((rexId: string) => {
     setEditRexId(rexId);
     setAddYourOwnPrefill(null);
     setCreateRecommendationOpen(true);
-    setPreviewRecommendation(null);
-    setPreviewOptions({});
+    setPreviewOpen(false);
   }, []);
 
   const openPreview = useCallback((rec: Recommendation, options?: RecommendationOpenOptions) => {
     setPreviewOptions(options ?? {});
     setPreviewRecommendation(rec);
+    setPreviewOpen(true);
   }, []);
 
   const openRexById = useCallback(
@@ -114,14 +119,12 @@ export default function HomeScreen() {
   );
 
   const closePreview = useCallback(() => {
-    setPreviewRecommendation(null);
-    setPreviewOptions({});
+    setPreviewOpen(false);
   }, []);
 
   const openUserProfile = useCallback(
     (userId: string) => {
-      setPreviewRecommendation(null);
-      setPreviewOptions({});
+      setPreviewOpen(false);
       const currentProfileUserId =
         currentTab === 'profile' ? (viewingUserId ?? authUser?.id) : null;
       if (currentProfileUserId === userId) {
@@ -242,9 +245,10 @@ export default function HomeScreen() {
       />
 
       <RecommendationDetailModal
-        visible={previewRecommendation != null}
+        visible={previewOpen}
         recommendation={previewRecommendation}
         onClose={closePreview}
+        onDismiss={clearPreviewData}
         onAddYourOwn={openCreateFromDetail}
         onCommentCountChange={handleCommentCountChange}
         scrollToComments={previewOptions.scrollToComments === true}

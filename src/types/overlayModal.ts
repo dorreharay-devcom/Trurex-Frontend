@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 export type OverlayModalProps = {
   visible: boolean;
   onRequestClose: () => void;
+  onDismiss?: () => void;
   contentTranslateY: Animated.Value;
   backdropBackground: string;
   children: ReactNode;

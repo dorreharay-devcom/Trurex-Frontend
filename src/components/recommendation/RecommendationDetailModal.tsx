@@ -85,6 +85,7 @@ type Props = {
   visible: boolean;
   recommendation: Recommendation | null;
   onClose: () => void;
+  onDismiss?: () => void;
   onAddYourOwn?: (source: AddYourOwnRecSource) => void;
   onCommentCountChange?: (total: number) => void;
   scrollToComments?: boolean;
@@ -98,6 +99,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   visible,
   recommendation,
   onClose,
+  onDismiss,
   onAddYourOwn,
   onCommentCountChange,
   scrollToComments,
@@ -151,6 +153,11 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   useEffect(() => {
     if (!visible) setDeleteConfirmOpen(false);
   }, [visible]);
+
+  useEffect(() => {
+    if (visible || Platform.OS === 'ios' || !recommendation) return;
+    onDismiss?.();
+  }, [visible, recommendation, onDismiss]);
 
   useEffect(() => {
     setIsSavedOverride(null);
@@ -398,8 +405,9 @@ export const RecommendationDetailModal: React.FC<Props> = ({
   return (
     <>
       <OverlayModal
-        visible={visible && !!recommendation}
+        visible={visible}
         onRequestClose={handleClose}
+        onDismiss={onDismiss}
         contentTranslateY={sheetTranslateY}
         backdropBackground={layout.backdropBackground}
       >
