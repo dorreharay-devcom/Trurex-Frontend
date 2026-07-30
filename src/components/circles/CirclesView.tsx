@@ -30,7 +30,7 @@ import {
   textFieldMultilineStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 import { connectionScopeTabStyle } from '~/utils/circleTabUtils';
 import { cn } from '~/utils/general';
 import { webContainerStyle } from '~/utils';

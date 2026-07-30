@@ -9,7 +9,7 @@ import {
   followUserFromPeopleSuggestion,
 } from '~/api/peopleSuggestionsApi';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import type { PeopleSuggestionRow } from '~/types/peopleSuggestions';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { unknownErrorMessage } from '~/utils';

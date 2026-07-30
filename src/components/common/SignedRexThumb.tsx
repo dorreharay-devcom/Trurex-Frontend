@@ -2,7 +2,7 @@ import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 
 type Props = {
   bucket: string;

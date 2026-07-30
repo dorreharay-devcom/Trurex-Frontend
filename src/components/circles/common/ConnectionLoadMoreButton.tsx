@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, Text } from 'react-native';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 
 type Props = {
   visible: boolean;

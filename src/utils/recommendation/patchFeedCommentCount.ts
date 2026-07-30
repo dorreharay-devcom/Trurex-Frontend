@@ -40,9 +40,8 @@ export function patchFeedCommentCount(
   const infiniteKeys = ['discover-recommendations', 'my-rexes', 'my-saved-rexes'] as const;
 
   for (const key of infiniteKeys) {
-    queryClient.setQueriesData<InfiniteData<Recommendation[]>>(
-      { queryKey: [key] },
-      (data) => patchInfiniteRecommendations(data, rexId, commentCount),
+    queryClient.setQueriesData<InfiniteData<Recommendation[]>>({ queryKey: [key] }, (data) =>
+      patchInfiniteRecommendations(data, rexId, commentCount),
     );
   }
 

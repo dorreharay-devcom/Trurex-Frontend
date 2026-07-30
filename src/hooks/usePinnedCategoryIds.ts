@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { fetchUserConfig } from '~/api/usersApi';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import { pinCategory, unpinCategory } from '~/api/pinnedCategoriesApi';
 
 const queryKey = (userId: string) => ['user_config', 'pinned_category_ids', userId] as const;

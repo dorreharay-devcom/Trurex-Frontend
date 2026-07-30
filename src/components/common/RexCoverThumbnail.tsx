@@ -11,15 +11,16 @@ import {
 } from '~/utils/recommendation/recContentDisplay';
 
 type Props = {
-  rec: Pick<
-    Recommendation,
-    'title' | 'photoPath' | 'image' | 'categoryIcon' | 'placeholderColors'
-  >;
+  rec: Pick<Recommendation, 'title' | 'photoPath' | 'image' | 'categoryIcon' | 'placeholderColors'>;
   className?: string;
   imageClassName?: string;
 };
 
-export function RexCoverThumbnail({ rec, className = 'h-12 w-12 rounded-lg', imageClassName }: Props) {
+export function RexCoverThumbnail({
+  rec,
+  className = 'h-12 w-12 rounded-lg',
+  imageClassName,
+}: Props) {
   const coverPath = rexCoverStoragePathFromRecommendation(rec);
   const coverHttp = rexCoverRemoteHttpUrl(rec);
 

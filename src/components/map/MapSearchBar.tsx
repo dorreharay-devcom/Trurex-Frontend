@@ -8,7 +8,7 @@ import {
   textFieldCaretStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 import { MAP_SEARCH_SUGGEST_MIN_QUERY_LENGTH } from '~/utils/map/mapSearchSuggestions';
 import { MapSearchRow } from '~/components/map/MapSearchRow';
 

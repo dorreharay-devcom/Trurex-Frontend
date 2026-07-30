@@ -13,7 +13,7 @@ import {
   textFieldCaretStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 import { CreateStepTitle } from '../../CreateStepTitle';
 import { cn } from '~/utils/general';
 import { CirclesRingPicker } from './common/CirclesRingPicker';

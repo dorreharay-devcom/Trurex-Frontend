@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TextInput } from 'react-native';
 import { CREATE_REC_REVIEW_MAX } from '~/constants/recommendation/createScorecard';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
-import { Theme, textFieldCaretStyle, textFieldMultilineStyle } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldMultilineStyle } from '~/shared/theme/Theme';
 import { webNoOutline } from '../../search/common/webInputOutline';
 
 type Props = {

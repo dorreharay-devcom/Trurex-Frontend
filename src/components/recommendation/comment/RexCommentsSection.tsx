@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View, Text, TextInput, ActivityIndicator, Platform, Keyboard } from 'react-native';
 import { MessageCircle } from 'lucide-react-native';
 import { useRexComments } from '~/hooks/recommendation/useRexComments';
-import { useAuth } from '~/services/AuthContext';
-import { Theme } from '~/theme/Theme';
+import { useAuth } from '~/features/auth/providers';
+import { Theme } from '~/shared/theme/Theme';
 import { toastError } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { unknownErrorMessage } from '~/utils';

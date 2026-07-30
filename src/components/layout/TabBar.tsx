@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { Sparkles, Gem, Orbit, MapPinned, UserCircle2 } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { isWeb } from '~/utils';
 
 export type Tab = 'discover' | 'faves' | 'circles' | 'map' | 'profile';
@@ -42,7 +42,9 @@ export const TabBar: React.FC<TabBarProps> = ({ currentTab, onTabChange }) => {
                 className={`flex-row items-center gap-2 px-5 py-3 border-b-2 ${active ? 'border-primary' : 'border-transparent'}`}
               >
                 <Icon size={16} color={active ? Theme.colors.foreground : Theme.colors.muted} />
-                <Text className={`text-sm ${active ? 'font-medium text-foreground' : 'text-muted'}`}>
+                <Text
+                  className={`text-sm ${active ? 'font-medium text-foreground' : 'text-muted'}`}
+                >
                   {label}
                 </Text>
               </TouchableOpacity>
@@ -69,7 +71,9 @@ export const TabBar: React.FC<TabBarProps> = ({ currentTab, onTabChange }) => {
               <Icon size={20} color={color} />
               <Text
                 className="text-[10px] font-semibold"
-                style={{ color: active ? Theme.colors.accentForeground : Theme.colors.secondaryText }}
+                style={{
+                  color: active ? Theme.colors.accentForeground : Theme.colors.secondaryText,
+                }}
               >
                 {label}
               </Text>

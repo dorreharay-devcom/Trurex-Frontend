@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchUserConfig } from '~/api/usersApi';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import {
   isAccountSuspendedStatus,
   terminateSessionForSuspendedAccount,

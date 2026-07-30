@@ -30,7 +30,7 @@ import {
   Link2,
 } from 'lucide-react-native';
 import { webContainerStyle } from '~/utils';
-import { Theme, textFieldCaretStyle, textFieldMultilineStyle } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldMultilineStyle } from '~/shared/theme/Theme';
 import {
   useCollectionDetail,
   useRemoveRexFromCollection,

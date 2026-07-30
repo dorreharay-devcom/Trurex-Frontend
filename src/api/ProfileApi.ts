@@ -1,4 +1,4 @@
-import { Backend, unwrap } from '~/services/AuthService';
+import { Backend, unwrap } from '~/shared/api/client';
 import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
 import type {
   ProfileData,
@@ -72,11 +72,7 @@ function toProfileData(data: UserRow | UserProfileResponse | any, email?: string
   return {
     userId,
     displayName: displayName || 'Anonymous',
-    handle: handle
-      ? handle.startsWith('@')
-        ? handle
-        : `@${handle}`
-      : '',
+    handle: handle ? (handle.startsWith('@') ? handle : `@${handle}`) : '',
     bio,
     location,
     avatarUrl,
@@ -144,12 +140,7 @@ export const ProfileApi = {
     mimeType?: string | null,
   ): Promise<string> => {
     const name = fileName ?? `avatar-${Date.now()}.jpg`;
-    const prepared = await preparePickerImageForUpload(
-      imageUri,
-      name,
-      mimeType,
-      AVATAR_MAX_WIDTH,
-    );
+    const prepared = await preparePickerImageForUpload(imageUri, name, mimeType, AVATAR_MAX_WIDTH);
     const path = `${userId}/avatar.jpg`;
     await uploadBlobToStorageBucket(
       USER_AVATARS_BUCKET,

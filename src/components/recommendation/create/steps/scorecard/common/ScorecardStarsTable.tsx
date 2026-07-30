@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Star } from 'lucide-react-native';
 import type { CategoryRatingDimension } from '~/types/recommendation/rexCategoryCreateConfig';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 
 type Props = {
@@ -38,14 +38,10 @@ export function ScorecardStarsTable({
           const scaleRight = dim.scale_right?.trim();
           const hasScaleLabels = Boolean(scaleLeft || scaleRight);
           const isConditional = Boolean(dim.show_toggle);
-          const ratingVisible =
-            !isConditional || (toggleOverride[dim.code] ?? value > 0);
+          const ratingVisible = !isConditional || (toggleOverride[dim.code] ?? value > 0);
 
           return (
-            <View
-              key={dim.code}
-              className={cn('py-3', !isLast && 'border-b border-border/50')}
-            >
+            <View key={dim.code} className={cn('py-3', !isLast && 'border-b border-border/50')}>
               {isConditional ? (
                 <View className="mb-2 flex-row items-center justify-between gap-3">
                   <Text className="min-w-0 flex-1 text-sm text-foreground">

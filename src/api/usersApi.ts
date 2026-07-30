@@ -1,4 +1,4 @@
-import { Backend } from '~/services/AuthService';
+import { Backend } from '~/shared/api/client';
 import type { NetworkUserRow, PublicUserRow, UserConfigRow, UserProfileRow } from '~/types/network';
 import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
 import {

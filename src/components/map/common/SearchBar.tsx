@@ -6,7 +6,7 @@ import {
   textFieldCaretStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 
 type Props = {
   value: string;

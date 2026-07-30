@@ -1,8 +1,8 @@
 import { Redirect, Stack } from 'expo-router';
 import { View, ActivityIndicator } from 'react-native';
-import { useAuth } from '~/services/AuthContext';
-import { Routes } from '~/constants/routes';
-import { Theme } from '~/theme/Theme';
+import { useAuth } from '~/features/auth/providers';
+import { Routes } from '~/shared/config/routes';
+import { Theme } from '~/shared/theme/Theme';
 
 export default function MainLayout() {
   const { session, loading, mfaPending, mfaChecking } = useAuth();

@@ -71,8 +71,11 @@ export function mapDiscoverFeedRow(row: unknown): Recommendation {
     relationshipRaw === 'trusted'
       ? relationshipRaw
       : null;
-  const authorName = firstNonEmptyString(o, 'author_display_name', 'author_name', 'user_name') ?? 'Member';
-  const authorHandle = normalizeHandle(firstNonEmptyString(o, 'author_handle', 'author_username', 'handle') ?? '');
+  const authorName =
+    firstNonEmptyString(o, 'author_display_name', 'author_name', 'user_name') ?? 'Member';
+  const authorHandle = normalizeHandle(
+    firstNonEmptyString(o, 'author_handle', 'author_username', 'handle') ?? '',
+  );
   const avatarRaw = firstNonEmptyString(
     o,
     'author_profile_picture_url',

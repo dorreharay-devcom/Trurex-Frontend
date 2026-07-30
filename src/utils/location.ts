@@ -182,10 +182,7 @@ export async function reverseGeocodeLatLng(lat: number, lng: number): Promise<st
     url.searchParams.set('latlng', `${lat},${lng}`);
     url.searchParams.set('key', key);
     const res = await withTimeout(fetch(url.toString()), REVERSE_GEOCODE_TIMEOUT_MS);
-    const data = (await withTimeout(
-      res.json(),
-      REVERSE_GEOCODE_TIMEOUT_MS,
-    )) as {
+    const data = (await withTimeout(res.json(), REVERSE_GEOCODE_TIMEOUT_MS)) as {
       status: string;
       results?: { formatted_address?: string }[];
     };

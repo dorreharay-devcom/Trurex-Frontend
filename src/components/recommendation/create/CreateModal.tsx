@@ -14,7 +14,7 @@ import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout'
 import { getRexCategoryApiCode } from '~/constants/recommendation/rexCategories';
 import { OverlayModal } from '~/components/common/OverlayModal';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import {
   useCreateRecWizard,
   useCreateRecommendationModalPresentation,

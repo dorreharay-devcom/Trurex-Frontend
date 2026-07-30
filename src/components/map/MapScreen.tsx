@@ -13,7 +13,7 @@ import { MapPinDetailSheet } from '~/components/map/MapPinDetailSheet';
 import { MapLocationPromptBanner } from '~/components/map/MapLocationPromptBanner';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import { ListRow } from '~/components/map/common/ListRow';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { MapPin, List, LocateFixed } from 'lucide-react-native';
 import {
   MAP_ACTION_INSET,

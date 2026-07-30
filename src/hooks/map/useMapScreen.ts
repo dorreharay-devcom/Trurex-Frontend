@@ -15,7 +15,7 @@ import {
   pinRowPassesLayerVisibility,
 } from '~/utils/map/mapRecommendationData';
 import { MapApi } from '~/api/MapApi';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import type { PinVisibility, MapPinType } from '~/types/map/mapPin';
 import { DEFAULT_PIN_VISIBILITY } from '~/types/map/mapPin';
 import { mapSearchTitleSuggestions } from '~/utils/map/mapSearchSuggestions';

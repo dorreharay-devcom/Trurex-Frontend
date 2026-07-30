@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PlusCircle, UserCircle2 } from 'lucide-react-native';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import { ProfileApi } from '~/api/ProfileApi';
 import {
   Theme,
@@ -17,7 +17,7 @@ import {
   textFieldHeaderSearchStyle,
   textFieldSingleLineCompactHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 import { isWeb } from '~/utils';
 import { NotificationBell } from '~/components/layout/NotificationBell';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';

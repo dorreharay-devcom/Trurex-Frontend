@@ -3,7 +3,7 @@ import { View, Text, Pressable } from 'react-native';
 import { ChevronDown, ChevronUp } from 'lucide-react-native';
 import type { CategoryTagOption } from '~/types/recommendation/rexCategoryCreateConfig';
 import { groupTagOptionsByTagGroup } from '~/utils/recommendation/recCreateFlow';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 
 type Props = {

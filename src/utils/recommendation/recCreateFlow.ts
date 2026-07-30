@@ -1,4 +1,3 @@
-import { CREATE_REC_SEARCH_PLACES } from '~/constants/recommendation/mockSearchPlaces';
 import type { User } from '@supabase/supabase-js';
 import type {
   CategoryCreateConfig,
@@ -172,9 +171,7 @@ export function keepKnownCircleIds(
   selectedCircleIds: Set<string>,
   knownCircleIds: ReadonlySet<string>,
 ): Set<string> {
-  return new Set(
-    [...selectedCircleIds].filter((id) => id === 'public' || knownCircleIds.has(id)),
-  );
+  return new Set([...selectedCircleIds].filter((id) => id === 'public' || knownCircleIds.has(id)));
 }
 
 export function canPostCreateRexShare(
@@ -183,11 +180,7 @@ export function canPostCreateRexShare(
   publicCircleId?: string | null,
 ): boolean {
   if (privateSelected) return true;
-  const visibility = resolveCreateRexVisibility(
-    selectedCircleIds,
-    privateSelected,
-    publicCircleId,
-  );
+  const visibility = resolveCreateRexVisibility(selectedCircleIds, privateSelected, publicCircleId);
   if (visibility === 'public') return true;
   const circleIds = resolveCreateRexCircleIds(selectedCircleIds, publicCircleId);
   return Array.isArray(circleIds) && circleIds.length > 0;
@@ -459,28 +452,5 @@ export function getConfirmSharingLabel(
   const titles = getConfirmCircleTitles(selectedCircleIds, lookup);
   if (titles.length > 0) return titles.join(', ');
   if (selectedCircleIds.size > 0) return 'Unavailable circle';
-  return 'No one yet';}
-
-export function filterCreateRecSearchPlaces(
-  query: string,
-  places: readonly CreateRecSearchPlace[] = CREATE_REC_SEARCH_PLACES,
-): CreateRecSearchPlace[] {
-  const q = query.trim().toLowerCase();
-  if (!q) {
-    return [...places];
-  }
-  return places.filter((p) => {
-    return (
-      p.title.toLowerCase().includes(q) ||
-      p.subtitle.toLowerCase().includes(q) ||
-      p.categoryLabel.toLowerCase().includes(q)
-    );
-  });
-}
-
-export function getSearchStepSelectState(query: string) {
-  const results = filterCreateRecSearchPlaces(query);
-  const hasActiveQuery = query.trim().length > 0;
-  const showNoResults = hasActiveQuery && results.length === 0;
-  return { results, showNoResults };
+  return 'No one yet';
 }

@@ -7,7 +7,7 @@ import {
   textFieldCaretStyle,
   textFieldSingleLineCompactHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 

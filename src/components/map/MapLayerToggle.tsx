@@ -8,7 +8,7 @@ import {
 } from '~/constants/map/mapUi';
 import type { PinVisibility } from '~/types/map/mapPin';
 import { MAP_PIN_COLOR } from '~/types/map/mapPin';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 
 type Props = {
   visibility: PinVisibility;

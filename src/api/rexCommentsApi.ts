@@ -1,4 +1,4 @@
-import { Backend, unwrap } from '~/services/AuthService';
+import { Backend, unwrap } from '~/shared/api/client';
 import { resolveTopLevelReplyParentId } from '~/utils/recommendation/rexCommentTree';
 import type {
   RexComment,
@@ -54,10 +54,7 @@ export async function addRexComment(
     throw new Error('Comment cannot be empty');
   }
 
-  const parentCommentId = resolveTopLevelReplyParentId(
-    existingComments,
-    params.parentCommentId,
-  );
+  const parentCommentId = resolveTopLevelReplyParentId(existingComments, params.parentCommentId);
 
   return unwrap(
     await Backend.rpc('add_rex_comment', {

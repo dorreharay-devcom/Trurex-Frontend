@@ -1,4 +1,4 @@
-import { Brand } from '~/theme/Theme';
+import { Brand } from '~/shared/theme/Theme';
 
 /** Default/public Rex pins — soft light blue, distinct from trusted grey-blue. */
 export const MAP_PIN_REX_COLOR = '#7EC8E8';

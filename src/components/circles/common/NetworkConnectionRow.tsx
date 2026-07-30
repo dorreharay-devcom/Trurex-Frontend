@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { ChevronRight, PlusCircle } from 'lucide-react-native';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import type { NetworkUserRow } from '~/types/network';
 
 type Props = {

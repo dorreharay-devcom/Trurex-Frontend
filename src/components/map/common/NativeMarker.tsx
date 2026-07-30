@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Platform } from 'react-native';
 import { Marker } from 'react-native-maps';
 import { Check, Diamond, Star, User, Users } from 'lucide-react-native';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import type { MapMarkerItem } from '~/types/map/mapMarker';
 import type { MapPinType } from '~/types/map/mapPin';
 import { MAP_PIN_GLYPH_COLOR } from '~/types/map/mapPin';

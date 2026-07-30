@@ -2,14 +2,13 @@ import { useEffect, useRef } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Linking from 'expo-linking';
-import { Auth } from '~/services/AuthService';
-import { Routes } from '~/constants/routes';
-import { Theme } from '~/theme/Theme';
-import { completeOAuthSessionFromUrl } from '~/auth/oauth';
-import { checkMfaRequirement } from '~/auth/mfa';
+import { Auth } from '~/shared/api/client';
+import { Routes } from '~/shared/config/routes';
+import { Theme } from '~/shared/theme/Theme';
+import { completeOAuthSessionFromUrl, navigateAfterAuthenticatedSession } from '~/features/auth';
 import { isWeb } from '~/utils';
-import { AuthApi } from '~/api/AuthApi';
-import { useAuth } from '~/services/AuthContext';
+import { AuthApi } from '~/shared/api/auth';
+import { useAuth } from '~/features/auth/providers';
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -37,17 +36,14 @@ export default function AuthCallback() {
 
       try {
         setMfaChecking(true);
-        const mfa = await checkMfaRequirement();
-        if (mfa.required) {
-          await setMfaPending(true);
-          setMfaChecking(false);
-          if (active) router.replace(Routes.Mfa);
-          return;
-        }
-
-        await setMfaPending(false);
-        setMfaChecking(false);
-        goMain();
+        await navigateAfterAuthenticatedSession({
+          setMfaPending,
+          setMfaChecking,
+          onRequireMfa: () => {
+            if (active) router.replace(Routes.Mfa);
+          },
+          onReady: goMain,
+        });
       } catch (error) {
         console.warn('[Auth] MFA initiation failed after OAuth sign-in', error);
         await setMfaPending(false);

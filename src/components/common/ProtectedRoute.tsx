@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { Redirect } from 'expo-router';
-import { useAuth } from '~/services/AuthContext';
-import { Routes } from '~/constants/routes';
-import { Theme } from '~/theme/Theme';
+import { useAuth } from '~/features/auth/providers';
+import { Routes } from '~/shared/config/routes';
+import { Theme } from '~/shared/theme/Theme';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { session, loading } = useAuth();

@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, Text, ScrollView, Pressable, ActivityIndicator, TextInput, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  Pressable,
+  ActivityIndicator,
+  TextInput,
+  Platform,
+} from 'react-native';
 import { Check, Plus, MapPin } from 'lucide-react-native';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { CreateStepTitle } from '../../../CreateStepTitle';
@@ -9,7 +17,7 @@ import {
   textFieldNativeSingleLineNoWrapStyle,
   textFieldSingleLineLargeHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 import { useActiveCategories } from '~/hooks/useActiveCategories';
 import type { CreateRecSearchPlace } from '~/types/recommendation/create';
 import { cn, webDisabledCursorStyle } from '~/utils/general';

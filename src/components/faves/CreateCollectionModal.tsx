@@ -17,7 +17,7 @@ import {
 import { X, Upload, Lock, Link2, Globe, Check } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import { useCreateCollection } from '~/hooks/useCollections';
 import { toastSuccess, toastError } from '~/utils/appToast';
 import {
@@ -32,7 +32,7 @@ import {
   textFieldMultilineStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 import { cn, webDisabledCursorStyle } from '~/utils/general';
 import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';

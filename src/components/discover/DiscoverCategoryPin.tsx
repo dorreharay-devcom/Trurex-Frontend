@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable } from 'react-native';
 import { Pin } from 'lucide-react-native';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 
 const PIN_STROKE = 2.25;
 

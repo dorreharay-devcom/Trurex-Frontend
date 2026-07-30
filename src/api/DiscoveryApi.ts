@@ -1,4 +1,4 @@
-import { Backend, unwrap } from '~/services/AuthService';
+import { Backend, unwrap } from '~/shared/api/client';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { mapDiscoverFeedRowSafe } from '~/api/mapDiscoverFeed';
 

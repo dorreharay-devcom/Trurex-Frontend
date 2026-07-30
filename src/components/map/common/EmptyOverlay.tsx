@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { Search } from 'lucide-react-native';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 
 export const EmptyOverlay: React.FC = () => (
   <View

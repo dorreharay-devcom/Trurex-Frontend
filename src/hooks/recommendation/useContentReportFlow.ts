@@ -7,7 +7,7 @@ import {
   type ContentReportTarget,
 } from '~/constants/recommendation/contentReport';
 import { toastError, toastSuccess } from '~/utils/appToast';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { unknownErrorMessage } from '~/utils';
 
@@ -73,8 +73,11 @@ export function useContentReportFlow({ open, target }: Params) {
     }
     setIsSubmitting(true);
     try {
-      const detailPayload =
-        otherSelected ? details.trim() : details.trim() !== '' ? details.trim() : null;
+      const detailPayload = otherSelected
+        ? details.trim()
+        : details.trim() !== ''
+          ? details.trim()
+          : null;
       if (target.kind === 'recommendation') {
         await ModerationApi.flagRex({
           rexId: target.rexId,

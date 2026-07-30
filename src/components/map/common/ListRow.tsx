@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, Platform, type PressableProps } from 'react-native';
 import { MapPin } from 'lucide-react-native';
 import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { cn } from '~/utils/general';
 

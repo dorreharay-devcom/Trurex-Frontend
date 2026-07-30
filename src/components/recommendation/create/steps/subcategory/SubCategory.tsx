@@ -1,7 +1,6 @@
 import React from 'react';
 import { Platform, View, Text, Pressable, ScrollView } from 'react-native';
-import type { RexSubcategoryOption } from '~/data/rexSubcategoryCatalog';
-import { resolveSubcategoryIcon } from '~/data/rexSubcategoryCatalog';
+import type { RexSubcategoryOption } from '~/utils/recommendation/rexSubcategories';
 import { CreateStepTitle } from '../../CreateStepTitle';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { cn } from '~/utils/general';
@@ -33,12 +32,10 @@ export function SubCategory({ subCategories, selected, onSelect }: Props) {
         <View className="gap-2.5">
           {subCategories.map((sc) => {
             const isSelected = selected === sc.code;
-            const icon = resolveSubcategoryIcon(sc.code, sc.label, sc.icon).trim();
+            const icon = sc.icon?.trim() ?? '';
             const parts: string[] = [];
             if (sc.ratingCount > 0) {
-              parts.push(
-                `${sc.ratingCount} specific rating${sc.ratingCount !== 1 ? 's' : ''}`,
-              );
+              parts.push(`${sc.ratingCount} specific rating${sc.ratingCount !== 1 ? 's' : ''}`);
             }
             if (sc.questionCount > 0) {
               parts.push(`${sc.questionCount} question${sc.questionCount !== 1 ? 's' : ''}`);

@@ -5,7 +5,7 @@ import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { canDeleteRexComment } from '~/api/rexCommentsApi';
 import type { RexComment } from '~/types/recommendation/rexComment';
 import { formatCompactRelativeTime } from '~/utils/date';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { DeleteAction, LikeAction, ReplyAction } from './CommentActions';
 
 export type CommentRowProps = {
@@ -46,7 +46,9 @@ export const CommentRow: React.FC<CommentRowProps> = ({
       ref={(node) => onRowRef?.(comment.id, node)}
       collapsable={false}
       className={`flex-row gap-2.5 rounded-lg ${isReply ? 'ml-10' : ''} ${highlight ? 'bg-primary/10' : ''}`}
-      style={highlight ? { paddingHorizontal: 6, paddingVertical: 4, marginHorizontal: -6 } : undefined}
+      style={
+        highlight ? { paddingHorizontal: 6, paddingVertical: 4, marginHorizontal: -6 } : undefined
+      }
     >
       <TouchableOpacity onPress={goToProfile} activeOpacity={0.7}>
         <SignedUserAvatar

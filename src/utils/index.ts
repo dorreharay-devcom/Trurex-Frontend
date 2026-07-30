@@ -11,6 +11,7 @@ export function unknownErrorMessage(error: unknown, fallback: string): string {
 }
 
 export const isWeb = Platform.OS === 'web';
+export const isAndroid = Platform.OS === 'android';
 
 const flexRowSingleLineText: TextStyle = {
   flex: 1,

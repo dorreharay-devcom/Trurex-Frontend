@@ -31,7 +31,7 @@ import { useActiveCategories } from '~/hooks/useActiveCategories';
 import { usePinnedCategoryIds } from '~/hooks/usePinnedCategoryIds';
 import { categoryPillColor } from '~/utils/recommendation/recCategoryNav';
 import { CATEGORY_ICON_FALLBACK } from '~/utils/recommendation/categoryIconResolve';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
 import { useTrendingTags } from '~/hooks/useTags';
 import { toastSuccess } from '~/utils/appToast';

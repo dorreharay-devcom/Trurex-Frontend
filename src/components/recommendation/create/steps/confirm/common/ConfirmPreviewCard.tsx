@@ -6,7 +6,7 @@ import type {
   ConfirmAuthorPreview,
   ConfirmPreviewPlace,
 } from '~/utils/recommendation/recCreateFlow';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 
 const TAGS_PREVIEW_MAX = 5;
@@ -88,11 +88,7 @@ export function ConfirmPreviewCard({
 
       {ratingDisplay != null ? (
         <View className="flex-row items-center gap-1.5 px-4 pb-2">
-          <Star
-            size={14}
-            color={Theme.colors.ratingStar}
-            fill={Theme.colors.ratingStar}
-          />
+          <Star size={14} color={Theme.colors.ratingStar} fill={Theme.colors.ratingStar} />
           <Text className="text-sm font-semibold text-foreground">{ratingDisplay}</Text>
         </View>
       ) : null}

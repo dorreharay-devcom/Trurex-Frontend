@@ -16,12 +16,12 @@ import { RexPhotoPlaceholder } from '~/components/common/RexPhotoPlaceholder';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { likeRex, unlikeRex } from '~/api/rexLikesApi';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import type {
   Recommendation,
   RecommendationOpenOptions,
 } from '~/types/recommendation/recommendation';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import { useShareRex } from '~/hooks/recommendation/useShareRex';
 import { toastError } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';

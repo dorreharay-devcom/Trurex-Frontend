@@ -10,7 +10,7 @@ import {
 } from '~/utils/map/mapRecommendationData';
 import { NativeMarker } from '~/components/map/common/NativeMarker';
 import { MAP_ACTION_INSET, MAP_ZOOM_CONTROLS_BOTTOM } from '~/constants/map/mapUi';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 
 const ANDROID_TILE_LOAD_TIMEOUT_MS = 2500;
 

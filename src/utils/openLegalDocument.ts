@@ -1,5 +1,5 @@
 import type { Href } from 'expo-router';
-import { Routes } from '~/constants/routes';
+import { Routes } from '~/shared/config/routes';
 
 export type LegalDocumentKind = 'terms' | 'communityGuidelines' | 'privacy';
 

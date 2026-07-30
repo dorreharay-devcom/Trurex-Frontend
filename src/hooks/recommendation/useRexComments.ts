@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Backend } from '~/services/AuthService';
+import { Backend } from '~/shared/api/client';
 import {
   addRexComment,
   deleteRexComment,
@@ -8,10 +8,7 @@ import {
   likeRexComment,
   unlikeRexComment,
 } from '~/api/rexCommentsApi';
-import {
-  totalRexCommentCount,
-  updateCommentInTree,
-} from '~/utils/recommendation/rexCommentTree';
+import { totalRexCommentCount, updateCommentInTree } from '~/utils/recommendation/rexCommentTree';
 import { patchFeedCommentCount } from '~/utils/recommendation/patchFeedCommentCount';
 import type { RexComment } from '~/types/recommendation/rexComment';
 import { unknownErrorMessage } from '~/utils';

@@ -12,7 +12,7 @@ import { StickyTopChromeLayout } from '~/components/layout/StickyTopChromeLayout
 import { TabBar, Tab } from '~/components/layout/TabBar';
 import { CreateModal } from '~/components/recommendation/create/CreateModal';
 import { RecommendationDetailModal } from '~/components/recommendation/RecommendationDetailModal';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import type { AddYourOwnRecSource } from '~/utils/recommendation/recCreateFlow';
 import type {
   Recommendation,
@@ -20,7 +20,7 @@ import type {
 } from '~/types/recommendation/recommendation';
 import { recommendationStubFromId } from '~/utils/recommendation/recommendationStubFromId';
 import { useUserConfig } from '~/hooks/useUserConfig';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 
 type ProfileBackTarget = {
   tab: Tab;

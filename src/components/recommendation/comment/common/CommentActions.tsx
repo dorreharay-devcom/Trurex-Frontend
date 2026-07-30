@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform, Pressable, Text } from 'react-native';
 import { Heart, Reply, Trash2 } from 'lucide-react-native';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 
 type PressProps = {
   onPress: () => void;

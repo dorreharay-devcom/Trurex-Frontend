@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { MAP_FILTER_CATEGORIES } from '~/constants/map/mapUi';
 
 type Props = {

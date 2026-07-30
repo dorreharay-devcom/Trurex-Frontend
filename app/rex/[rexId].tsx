@@ -9,8 +9,8 @@ import { RecommendationDetailModal } from '~/components/recommendation/Recommend
 import ProtectedRoute from '~/components/common/ProtectedRoute';
 import { fetchRexDetail } from '~/api/rexDetailApi';
 import { rexDetailRowToRecommendation } from '~/utils/recommendation/rexDetailToRecommendation';
-import { Routes } from '~/constants/routes';
-import { Theme } from '~/theme/Theme';
+import { Routes } from '~/shared/config/routes';
+import { Theme } from '~/shared/theme/Theme';
 
 export default function RexDeepLinkPage() {
   return (
@@ -78,10 +78,7 @@ function RexDeepLinkContent() {
     enabled: trimmedId.length > 0,
   });
 
-  const recommendation = useMemo(
-    () => (data ? rexDetailRowToRecommendation(data) : null),
-    [data],
-  );
+  const recommendation = useMemo(() => (data ? rexDetailRowToRecommendation(data) : null), [data]);
 
   const shellBody = (body: React.ReactNode) => (
     <View className="flex-1 bg-background">

@@ -17,15 +17,15 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Routes } from '~/constants/routes';
+import { Routes } from '~/shared/config/routes';
 import * as ImagePicker from 'expo-image-picker';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
 import { RexPhotoPlaceholder } from '~/components/common/RexPhotoPlaceholder';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import { ProfileApi } from '~/api/ProfileApi';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import type { ProfileData } from '~/types/profile';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { webContainerStyle } from '~/utils';

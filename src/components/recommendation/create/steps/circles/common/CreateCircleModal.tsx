@@ -16,7 +16,7 @@ import {
   textFieldMultilineStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/utils/circleTabUtils';
 import { cn, webDisabledCursorStyle } from '~/utils/general';
 import { isWeb } from '~/utils';

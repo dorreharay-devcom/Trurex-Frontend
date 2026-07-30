@@ -1,8 +1,7 @@
 import '../global.css';
-import '~/i18n/config';
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AuthProvider } from '~/services/AuthContext';
+import { AuthProvider } from '~/features/auth/providers';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { AppToast } from '~/components/toast/AppToast';

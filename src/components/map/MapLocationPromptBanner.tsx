@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, Platform } from 'react-native';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { MAP_ACTION_INSET, MAP_LOCATION_PROMPT_TOP } from '~/constants/map/mapUi';
 
 type Props = {

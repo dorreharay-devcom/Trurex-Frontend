@@ -37,7 +37,7 @@ import {
   textFieldMultilineStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 import {
   DELETE_CIRCLE_CONFIRM_MESSAGE,
@@ -166,7 +166,9 @@ export function CircleDetailScreen({ vm, onUserPress }: Props) {
                 key={m.user_id}
                 member={m}
                 onUserPress={onUserPress}
-                onRemove={canRemoveMembers ? () => vm.removeFromSelectedCircle(m.user_id) : undefined}
+                onRemove={
+                  canRemoveMembers ? () => vm.removeFromSelectedCircle(m.user_id) : undefined
+                }
                 removing={vm.removingMemberId === m.user_id}
               />
             ))}

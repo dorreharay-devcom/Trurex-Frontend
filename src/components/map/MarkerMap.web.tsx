@@ -11,8 +11,12 @@ import { Minus, Plus } from 'lucide-react-native';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 import type { MapMarkerItem, MapRecenterTarget } from '~/types/map/mapMarker';
 import type { Region } from 'react-native-maps';
-import { MAP_ACTION_INSET, MAP_VIEW_MIN_HEIGHT, MAP_ZOOM_CONTROLS_BOTTOM } from '~/constants/map/mapUi';
-import { Theme } from '~/theme/Theme';
+import {
+  MAP_ACTION_INSET,
+  MAP_VIEW_MIN_HEIGHT,
+  MAP_ZOOM_CONTROLS_BOTTOM,
+} from '~/constants/map/mapUi';
+import { Theme } from '~/shared/theme/Theme';
 import {
   createWebMapPinIconUrl,
   WEB_MAP_DEFAULT_CENTER,

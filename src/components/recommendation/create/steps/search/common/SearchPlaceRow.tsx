@@ -6,7 +6,7 @@ import {
   CATEGORY_ICON_FALLBACK,
   resolveCategoryIconFromRows,
 } from '~/utils/recommendation/categoryIconResolve';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import type { CreateRecSearchPlace } from '~/types/recommendation/create';
 import { cn } from '~/utils/general';
 import { isStrictUuid } from '~/utils/guards';

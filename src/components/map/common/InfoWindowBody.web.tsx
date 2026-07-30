@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { WEB_INFO_CARD_MAX_W, WEB_INFO_IMAGE_H } from '~/constants/map/mapUi';
 import type { MapMarkerItem } from '~/types/map/mapMarker';
 import { MarkerPreviewImage } from '~/components/map/common/MarkerPreviewImage';

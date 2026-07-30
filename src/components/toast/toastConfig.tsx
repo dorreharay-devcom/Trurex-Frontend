@@ -7,7 +7,7 @@ import {
   type ToastConfigParams,
 } from 'react-native-toast-message';
 import { X } from 'lucide-react-native';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 
 export type AppToastRendererProps = ToastConfigParams<unknown> & Pick<BaseToastProps, 'style'>;
 

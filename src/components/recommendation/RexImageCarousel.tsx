@@ -6,7 +6,7 @@ import { Skeleton } from '~/components/ui/skeleton';
 import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { useInfiniteHorizontalCarousel } from '~/hooks/useInfiniteHorizontalCarousel';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 
 const ASPECT = 16 / 9;

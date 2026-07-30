@@ -16,7 +16,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNotifications } from '~/hooks/useNotifications';
 import { followUser } from '~/api/usersApi';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { formatCompactRelativeTime } from '~/utils/date';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
@@ -289,8 +289,9 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onUserPress,
                     } as ViewStyle)
                   : null,
               ]}
-              accessibilityElementsHidden
-              importantForAccessibility="no"
+              {...(Platform.OS === 'web'
+                ? { 'aria-hidden': true }
+                : { accessibilityElementsHidden: true, importantForAccessibility: 'no' as const })}
             />
           ) : null}
         </View>

@@ -1,6 +1,6 @@
 import type { CircleApiRow } from '~/api/circlesApi';
 import type { NetworkUserRow } from '~/types/network';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { isWeb } from '~/utils';
 
 export const CIRCLE_COLOR_PRESETS = [

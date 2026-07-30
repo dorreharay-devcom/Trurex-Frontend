@@ -18,7 +18,7 @@ import {
   textFieldNativeSingleLineNoWrapStyle,
   textFieldSingleLineLargeHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 import { webNoOutline } from './webInputOutline';
 import type { CreateRecSearchPlace } from '~/types/recommendation/create';

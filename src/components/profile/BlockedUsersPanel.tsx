@@ -9,18 +9,15 @@ import {
 } from 'react-native';
 import { ArrowLeft, ChevronRight } from 'lucide-react-native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import { unblockUser } from '~/api/moderationApi';
 import type { BlockedUserRow } from '~/types/moderation';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { unknownErrorMessage } from '~/utils';
-import {
-  blockedUsersQueryKey,
-  useBlockedUsers,
-} from '~/hooks/useBlockUser';
+import { blockedUsersQueryKey, useBlockedUsers } from '~/hooks/useBlockUser';
 
 type Props = {
   onBack: () => void;
@@ -35,8 +32,13 @@ export function BlockedUsersPanel({ onBack }: Props) {
   const { user } = useAuth();
   const viewerId = user?.id;
   const queryClient = useQueryClient();
-  const { data: blockedUsers = [], isLoading, isError, refetch, isFetching } =
-    useBlockedUsers(viewerId);
+  const {
+    data: blockedUsers = [],
+    isLoading,
+    isError,
+    refetch,
+    isFetching,
+  } = useBlockedUsers(viewerId);
   const [pendingUserId, setPendingUserId] = useState<string | null>(null);
 
   const unblock = useMutation({

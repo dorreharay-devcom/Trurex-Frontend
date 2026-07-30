@@ -3,7 +3,7 @@ import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { ChevronRight, UserMinus } from 'lucide-react-native';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import type { CircleMemberProfile } from '~/api/circlesApi';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 
 type Props = {
   member: CircleMemberProfile;

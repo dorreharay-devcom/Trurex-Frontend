@@ -17,8 +17,7 @@ export const MAP_RIGHT_CONTROLS_BOTTOM = MAP_ACTION_INSET + 76;
 export const MAP_LAYER_ABOVE_LOCATE = 52;
 
 /** Zoom +/- stack sits above the layers button (h-10). */
-export const MAP_ZOOM_CONTROLS_BOTTOM =
-  MAP_RIGHT_CONTROLS_BOTTOM + MAP_LAYER_ABOVE_LOCATE + 40 + 8;
+export const MAP_ZOOM_CONTROLS_BOTTOM = MAP_RIGHT_CONTROLS_BOTTOM + MAP_LAYER_ABOVE_LOCATE + 40 + 8;
 
 export const WEB_INFO_CARD_MAX_W = 320;
 export const WEB_INFO_IMAGE_H = 118;

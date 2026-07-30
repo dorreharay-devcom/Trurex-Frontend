@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, Platform } from 'react-native';
 import type { CategoryPickerTile } from '~/constants/recommendation/rexCategories';
 import type { CategoryGridConfig } from '~/types/recommendation/categoryGrid';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 
 export type CategoryTileProps = {

@@ -3,7 +3,7 @@ import { View, Text, Pressable, Linking, Platform, ScrollView } from 'react-nati
 import { X, ExternalLink, Bookmark, Navigation, Share2 } from 'lucide-react-native';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import type { MapPinType } from '~/types/map/mapPin';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { useShareRex } from '~/hooks/recommendation/useShareRex';
 import { mapAuthorRecommendedLabel } from '~/utils/map/mapRecommendationData';

@@ -1,7 +1,6 @@
-import React from 'react';
-import { LegalDocumentScreen } from '~/components/auth/LegalDocumentScreen';
-import { PRIVACY_POLICY } from '~/constants/legalDocuments';
+import LegalDocumentScreen from '~/features/auth/ui/legal/LegalDocumentScreen';
+import { PRIVACY_POLICY } from '~/features/auth/config/legalDocuments';
 
-export default function PrivacyScreen() {
+export default function PrivacyRoute() {
   return <LegalDocumentScreen document={PRIVACY_POLICY} />;
 }

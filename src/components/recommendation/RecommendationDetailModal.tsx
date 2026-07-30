@@ -36,12 +36,12 @@ import { modalConfig } from '~/constants/recommendation/modalConfig';
 import { deleteRex, fetchRexDetail } from '~/api/rexDetailApi';
 import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 import { ReportContentDialog } from '~/components/recommendation/report/ReportContentDialog';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import type { ContentReportTarget } from '~/constants/recommendation/contentReport';
 import { toastError, toastInfo, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import {
   buildAddYourOwnRecSource,
@@ -281,8 +281,7 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     return buildDetailRatingsFromRexDetail(rexDetail);
   }, [rexDetail]);
 
-  const hasDetailRatings =
-    detailRatings.overall != null || detailRatings.dimensions.length > 0;
+  const hasDetailRatings = detailRatings.overall != null || detailRatings.dimensions.length > 0;
 
   const renderRatingRow = (r: DetailRatingRow, key: string) => (
     <View key={key} className="flex-row items-center justify-between gap-2">
@@ -332,7 +331,11 @@ export const RecommendationDetailModal: React.FC<Props> = ({
     return fromDetail || fromRec;
   }, [recommendation, rexDetail?.place_location]);
 
-  const onlineLocationText = (rexDetail?.location_text ?? recommendation?.locationText ?? '').trim();
+  const onlineLocationText = (
+    rexDetail?.location_text ??
+    recommendation?.locationText ??
+    ''
+  ).trim();
 
   const placeWebsiteText = (rexDetail?.place_website_url ?? '').trim();
   const placeWebsiteHref = useMemo(() => normalizeWebsiteUrl(placeWebsiteText), [placeWebsiteText]);

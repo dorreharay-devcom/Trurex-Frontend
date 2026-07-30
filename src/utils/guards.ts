@@ -10,8 +10,7 @@ export const isPlainObject = (value: unknown): value is Record<string, unknown> 
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 };
 
-export const optStr = (value: unknown): string | null =>
-  typeof value === 'string' ? value : null;
+export const optStr = (value: unknown): string | null => (typeof value === 'string' ? value : null);
 
 export const optStrUndef = (value: unknown): string | undefined =>
   typeof value === 'string' ? value : undefined;
@@ -38,15 +37,13 @@ export function unknownAsArray<T>(data: unknown): T[] {
   return [data as T];
 }
 
-const HEX_UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const HEX_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function isHexUuidString(value: string): boolean {
   return HEX_UUID_RE.test(value);
 }
 
-const STRICT_UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const STRICT_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export function isStrictUuid(value: string): boolean {
   return STRICT_UUID_RE.test(value);

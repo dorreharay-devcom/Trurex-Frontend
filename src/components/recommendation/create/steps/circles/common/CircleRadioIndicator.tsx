@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 
 type Props = { selected: boolean };
 

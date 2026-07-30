@@ -74,7 +74,9 @@ type RexDetailRatingsSource = {
   >;
 };
 
-export function buildDetailRatingsFromRexDetail(detail: RexDetailRatingsSource): DetailRatingsDisplay {
+export function buildDetailRatingsFromRexDetail(
+  detail: RexDetailRatingsSource,
+): DetailRatingsDisplay {
   const dimensions = Object.entries(detail.category_ratings)
     .map(([code, entry]) => {
       const score = entry?.score;

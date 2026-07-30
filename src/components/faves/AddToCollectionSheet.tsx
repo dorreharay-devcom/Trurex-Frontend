@@ -20,7 +20,7 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useQueryClient } from '@tanstack/react-query';
 import { CollectionsApi, UserCollection } from '~/api/CollectionsApi';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import { toastError, toastSuccess, toastSuccessAfterDismiss } from '~/utils/appToast';
 import { isWeb, webContainerStyle } from '~/utils';
 import { cn } from '~/utils/general';
@@ -34,7 +34,7 @@ import {
   textFieldCaretStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 import { modalConfig } from '~/constants/recommendation/modalConfig';
 import { webDisabledCursorStyle } from '~/utils/general';
 

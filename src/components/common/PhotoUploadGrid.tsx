@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { Plus, X, CircleAlert } from 'lucide-react-native';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import { useRexPhotoUploadGrid } from '~/hooks/useRexPhotoUploadGrid';
 import { SignedRexThumb } from './SignedRexThumb';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 
 export const REX_IMAGES_DEFAULT_BUCKET = REX_IMAGES_BUCKET;

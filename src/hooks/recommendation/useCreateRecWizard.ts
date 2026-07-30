@@ -291,10 +291,13 @@ export function useCreateRecWizard() {
     setOnlineGeotag(null);
   }, []);
 
-  const applyOnlineGeotag = useCallback((result: { lat: number; lng: number; addressLabel: string }) => {
-    setOnlineLocationTextState(result.addressLabel);
-    setOnlineGeotag({ lat: result.lat, lng: result.lng });
-  }, []);
+  const applyOnlineGeotag = useCallback(
+    (result: { lat: number; lng: number; addressLabel: string }) => {
+      setOnlineLocationTextState(result.addressLabel);
+      setOnlineGeotag({ lat: result.lat, lng: result.lng });
+    },
+    [],
+  );
 
   const selectManualAddress = useCallback((place: CreateRecSearchPlace) => {
     setManualAddress(place.fullText ?? place.subtitle ?? place.title);

@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 import { useEffect, useState } from 'react';
-import { Backend } from '~/services/AuthService';
+import { Backend } from '~/shared/api/client';
 import { isNonEmptyString, isPlainObject } from '~/utils/guards';
 import { terminateIfUnauthorizedRequestError } from '~/utils/mutationRestrictionError';
 

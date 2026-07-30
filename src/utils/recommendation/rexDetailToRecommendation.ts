@@ -17,8 +17,7 @@ export function rexDetailRowToRecommendation(row: RexDetailRow): Recommendation 
   const photoPaths = row.photo_paths?.filter((p) => p.trim().length > 0) ?? [];
   const photoPath = photoPaths[0] ?? null;
   const bodyText = row.review ?? row.description ?? row.must_know ?? row.quick_tip ?? null;
-  const rating =
-    row.overall_rating != null && row.overall_rating > 0 ? row.overall_rating : null;
+  const rating = row.overall_rating != null && row.overall_rating > 0 ? row.overall_rating : null;
 
   return {
     id: row.id,
@@ -44,7 +43,8 @@ export function rexDetailRowToRecommendation(row: RexDetailRow): Recommendation 
       handle: normalizeHandle(row.author_username),
       avatar: row.author_profile_picture_url?.trim() ?? '',
     },
-    timeAgo: row.created_at && dayjs(row.created_at).isValid() ? dayjs(row.created_at).fromNow() : '',
+    timeAgo:
+      row.created_at && dayjs(row.created_at).isValid() ? dayjs(row.created_at).fromNow() : '',
     likes: row.like_count ?? 0,
     comments: row.comment_count ?? 0,
     saves: 0,

@@ -15,19 +15,16 @@ import {
 import { ArrowLeft, Camera, X } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { useAuth } from '~/services/AuthContext';
-import { AuthApi } from '~/api/AuthApi';
+import { useAuth } from '~/features/auth/providers';
+import { AuthApi } from '~/shared/api/auth';
 import { ProfileApi } from '~/api/ProfileApi';
-import { Routes } from '~/constants/routes';
-import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/theme/Theme';
-import { Button } from '~/components/common/Button';
-import Input from '~/components/common/Input';
+import { Routes } from '~/shared/config/routes';
+import { Theme, textFieldCaretStyle, textFieldSingleLineStyle } from '~/shared/theme/Theme';
+import { Button } from '~/shared/ui/Button';
+import Input from '~/shared/ui/Input';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
-import {
-  BlockedUsersEntryRow,
-  BlockedUsersPanel,
-} from '~/components/profile/BlockedUsersPanel';
+import { BlockedUsersEntryRow, BlockedUsersPanel } from '~/components/profile/BlockedUsersPanel';
 import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
 import { toastError } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';

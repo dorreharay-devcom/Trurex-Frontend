@@ -3,7 +3,7 @@ import { View, Text, Pressable, Platform } from 'react-native';
 import { ChevronDown, ChevronUp } from 'lucide-react-native';
 import { MAP_ACTION_INSET } from '~/constants/map/mapUi';
 import { MAP_PIN_COLOR, MAP_PIN_GLYPH, MAP_PIN_GLYPH_COLOR } from '~/types/map/mapPin';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 
 const legendItems = [
   { label: 'Rex', pinType: 'rex' as const },

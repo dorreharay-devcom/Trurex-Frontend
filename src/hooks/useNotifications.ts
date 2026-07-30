@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Backend, unwrap } from '~/services/AuthService';
+import { Backend, unwrap } from '~/shared/api/client';
 import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
 import type { AppNotification } from '~/types/notification/appNotification';
 

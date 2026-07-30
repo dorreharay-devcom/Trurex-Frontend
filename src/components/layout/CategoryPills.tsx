@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView, TouchableOpacity, Text } from 'react-native';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { categoryPillActiveSurface } from '~/utils/recommendation/recCategoryNav';
 
 export interface Category {

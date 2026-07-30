@@ -1,6 +1,6 @@
 import * as ImageManipulator from 'expo-image-manipulator';
 import { Platform } from 'react-native';
-import { Backend } from '~/services/AuthService';
+import { Backend } from '~/shared/api/client';
 import { generateRexImageStoragePath } from './photoUtils';
 import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
 import { convertHeicIfNeeded } from './heicConversion';
@@ -17,13 +17,14 @@ const BASE64_VALUES = BASE64_CHARS.split('').reduce<Record<string, number>>((acc
 
 export const IMAGE_EMPTY_ERROR = 'IMAGE_EMPTY_ERROR';
 
-export const IMAGE_EMPTY_USER_MESSAGE =
-  'This photo could not be used. Please try a different one.';
+export const IMAGE_EMPTY_USER_MESSAGE = 'This photo could not be used. Please try a different one.';
 
-export const PHOTO_UPLOAD_ERROR_MESSAGE =
-  'Something went wrong with this photo. Please try again.';
+export const PHOTO_UPLOAD_ERROR_MESSAGE = 'Something went wrong with this photo. Please try again.';
 
-export function photoUploadErrorMessage(error: unknown, fallback = PHOTO_UPLOAD_ERROR_MESSAGE): string {
+export function photoUploadErrorMessage(
+  error: unknown,
+  fallback = PHOTO_UPLOAD_ERROR_MESSAGE,
+): string {
   if (error instanceof Error && error.message === IMAGE_EMPTY_ERROR) {
     return IMAGE_EMPTY_USER_MESSAGE;
   }

@@ -8,7 +8,7 @@ import {
   type StyleProp,
 } from 'react-native';
 import { Search, X } from 'lucide-react-native';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 
 type ClearableSearchInputProps = Omit<TextInputProps, 'value' | 'onChangeText' | 'style'> & {

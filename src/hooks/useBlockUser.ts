@@ -1,18 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  blockUser,
-  fetchBlockedUsers,
-  unblockUser,
-} from '~/api/moderationApi';
+import { blockUser, fetchBlockedUsers, unblockUser } from '~/api/moderationApi';
 import type { BlockedUserRow } from '~/types/moderation';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { isPlainObject } from '~/utils/guards';
 import { unknownErrorMessage } from '~/utils';
 
-export const blockedUsersQueryKey = (viewerId: string) =>
-  ['blocked-users', viewerId] as const;
+export const blockedUsersQueryKey = (viewerId: string) => ['blocked-users', viewerId] as const;
 
 function blockErrorMessage(error: unknown): string {
   if (isPlainObject(error)) {

@@ -21,7 +21,7 @@ import { toastError, toastSuccess } from '~/utils/appToast';
 import { unknownErrorMessage, webContainerStyle } from '~/utils';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 import { ConnectionLoadMoreButton } from '~/components/circles/common';
 

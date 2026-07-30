@@ -10,7 +10,7 @@ import {
 } from '~/api/circlesApi';
 import { filterOneWayFollowing } from '~/api/usersApi';
 import { useConnectionUsers } from '~/hooks/circles/useScopedConnectionUserSearch';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import {
   mapApiCirclesToTabRows,
   parseCircleAccentHex,

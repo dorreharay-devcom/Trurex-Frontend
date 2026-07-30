@@ -1,4 +1,4 @@
-import { Backend, unwrap } from '~/services/AuthService';
+import { Backend, unwrap } from '~/shared/api/client';
 import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
 import type { RexDetailRow } from '~/types/recommendation/rexDetail';
 

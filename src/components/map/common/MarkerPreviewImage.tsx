@@ -3,7 +3,7 @@ import { View, ActivityIndicator, Image } from 'react-native';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
 import { WEB_INFO_IMAGE_H } from '~/constants/map/mapUi';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { nativeMarkerStyles as styles } from '~/components/map/common/nativeMarkerStyles';
 import { isHttpUrl } from '~/utils/recommendation/recContentDisplay';
 

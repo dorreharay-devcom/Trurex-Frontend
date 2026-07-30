@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 
 export const nativeMarkerStyles = StyleSheet.create({
   markerHit: {

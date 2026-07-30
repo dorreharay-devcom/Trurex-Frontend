@@ -20,8 +20,6 @@ function buildMobileShareContent({ title, message, url }: MobileShareLinkParams)
 export async function shareMobileLink(params: MobileShareLinkParams): Promise<void> {
   await Share.share(
     buildMobileShareContent(params),
-    Platform.OS === 'ios'
-      ? { subject: params.title }
-      : { dialogTitle: params.title },
+    Platform.OS === 'ios' ? { subject: params.title } : { dialogTitle: params.title },
   );
 }

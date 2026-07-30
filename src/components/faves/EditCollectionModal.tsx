@@ -33,11 +33,11 @@ import {
   textFieldMultilineStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 
 const collectionFieldBg = { backgroundColor: Theme.colors.searchFieldBackground };
 

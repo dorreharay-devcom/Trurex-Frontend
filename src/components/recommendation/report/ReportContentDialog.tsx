@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ShieldAlert, X } from 'lucide-react-native';
-import { Theme, textFieldCaretStyle, textFieldMultilineStyle } from '~/theme/Theme';
+import { Theme, textFieldCaretStyle, textFieldMultilineStyle } from '~/shared/theme/Theme';
 import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
 import {
   type ContentReportTarget,
@@ -22,7 +22,7 @@ import {
   MAX_CONTENT_REPORT_DETAILS,
 } from '~/constants/recommendation/contentReport';
 import { useContentReportFlow } from '~/hooks/recommendation/useContentReportFlow';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import { cn } from '~/utils/general';
 import { toastInfo } from '~/utils/appToast';
 import { CREATE_REC_MODAL_MAX_W } from '~/constants/recommendation/createLayout';

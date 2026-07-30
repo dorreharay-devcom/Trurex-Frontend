@@ -7,7 +7,7 @@ import {
   textFieldCaretStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 import { webNoOutline } from '../../search/common/webInputOutline';
 
 type Props = {
@@ -65,7 +65,10 @@ function normalizeForMatch(value: string | null | undefined): string {
     .replace(/^_+|_+$/g, '');
 }
 
-function copyForCategory(categoryCode: string | null, categoryDisplayName?: string | null): QuickTipCopy {
+function copyForCategory(
+  categoryCode: string | null,
+  categoryDisplayName?: string | null,
+): QuickTipCopy {
   const candidates = [
     normalizeForMatch(categoryCode),
     normalizeForMatch(categoryDisplayName),

@@ -6,7 +6,7 @@ import {
   textFieldNativeSingleLineNoWrapStyle,
   textFieldSingleLineLargeHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 import { cn, webDisabledCursorStyle } from '~/utils/general';
 import { webNoOutline } from './webInputOutline';

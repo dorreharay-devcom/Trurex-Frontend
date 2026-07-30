@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 import { Globe, Heart, Lock, Users } from 'lucide-react-native';
 import type { CreateRecCircle } from '~/constants/recommendation/createCircles';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 import { rgbaFromHexColor } from '~/utils/color';
 import {

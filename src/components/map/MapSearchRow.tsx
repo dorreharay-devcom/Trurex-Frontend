@@ -1,10 +1,15 @@
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
+import { isWeb } from '~/utils';
 
 type Props = {
   field: ReactNode;
   trailingSlot?: ReactNode | 'preserve-width';
 };
+
+const spacerA11yProps = isWeb
+  ? ({ 'aria-hidden': true } as const)
+  : ({ accessibilityElementsHidden: true } as const);
 
 export function MapSearchRow({ field, trailingSlot }: Props) {
   const showTrailing = trailingSlot !== undefined;
@@ -15,7 +20,7 @@ export function MapSearchRow({ field, trailingSlot }: Props) {
       {showTrailing ? (
         <View className="shrink-0 items-end gap-2">
           {trailingSlot === 'preserve-width' ? (
-            <View className="h-10 w-10 shrink-0" pointerEvents="none" accessibilityElementsHidden />
+            <View className="h-10 w-10 shrink-0" pointerEvents="none" {...spacerA11yProps} />
           ) : (
             trailingSlot
           )}

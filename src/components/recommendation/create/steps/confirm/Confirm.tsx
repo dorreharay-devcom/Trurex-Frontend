@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getUserProfile } from '~/api/usersApi';
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { CreateStepTitle } from '../../CreateStepTitle';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import {
   authorForConfirmPreview,
   averageCategoryRatings,

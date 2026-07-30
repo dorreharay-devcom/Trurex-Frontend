@@ -14,14 +14,14 @@ import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMyCollections, useMySavedCollections } from '~/hooks/useCollections';
 import { useSavedRexes } from '~/hooks/useGems';
-import { useAuth } from '~/services/AuthContext';
+import { useAuth } from '~/features/auth/providers';
 import { webContainerStyle, singleLineEllipsisTextStyle } from '~/utils';
 import {
   Theme,
   textFieldCaretStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
-} from '~/theme/Theme';
+} from '~/shared/theme/Theme';
 import type {
   Recommendation,
   RecommendationOpenOptions,

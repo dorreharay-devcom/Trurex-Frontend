@@ -4,8 +4,8 @@ import { Check, Copy, Share2 } from 'lucide-react-native';
 import { useQuery } from '@tanstack/react-query';
 import * as Clipboard from 'expo-clipboard';
 import { ProfileApi } from '~/api/ProfileApi';
-import { useAuth } from '~/services/AuthContext';
-import { Theme } from '~/theme/Theme';
+import { useAuth } from '~/features/auth/providers';
+import { Theme } from '~/shared/theme/Theme';
 import { toastSuccess } from '~/utils/appToast';
 import { buildProfileShareUrl, profileShareSlug } from '~/utils/profileShareUrl';
 

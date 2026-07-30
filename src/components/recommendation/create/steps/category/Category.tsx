@@ -10,7 +10,7 @@ import {
 import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
 import { categoryRowToPickerTile } from '~/constants/recommendation/rexCategories';
 import { useActiveCategories } from '~/hooks/useActiveCategories';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { getCategoryGridConfig } from '~/utils/recommendation/recCategoryNav';
 import { cn } from '~/utils/general';
 import { CategoryListHeader, CategoryTile } from './common';
@@ -93,8 +93,7 @@ export const Category: React.FC<Props> = ({
           }
           renderItem={({ item, index }) => {
             const remainder = tiles.length % grid.numColumns;
-            const isOnlyTileOnIncompleteLastRow =
-              remainder === 1 && index === tiles.length - 1;
+            const isOnlyTileOnIncompleteLastRow = remainder === 1 && index === tiles.length - 1;
 
             const tile = (
               <CategoryTile
@@ -116,9 +115,7 @@ export const Category: React.FC<Props> = ({
 
             if (isOnlyTileOnIncompleteLastRow) {
               return (
-                <View className="min-w-0 flex-1 flex-row items-stretch justify-center">
-                  {tile}
-                </View>
+                <View className="min-w-0 flex-1 flex-row items-stretch justify-center">{tile}</View>
               );
             }
 

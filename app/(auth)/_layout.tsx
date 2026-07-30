@@ -1,8 +1,8 @@
 import { Redirect, Stack, usePathname } from 'expo-router';
 import { View, ActivityIndicator } from 'react-native';
-import { useAuth } from '~/services/AuthContext';
-import { Routes } from '~/constants/routes';
-import { Theme } from '~/theme/Theme';
+import { useAuth } from '~/features/auth/providers';
+import { Routes } from '~/shared/config/routes';
+import { Theme } from '~/shared/theme/Theme';
 
 export default function AuthLayout() {
   const { session, loading, mfaPending, mfaChecking } = useAuth();
@@ -20,7 +20,14 @@ export default function AuthLayout() {
     return <Redirect href={Routes.Mfa} />;
   }
 
-  if (session && !mfaPending && pathname !== Routes.ResetPassword && pathname !== Routes.Mfa && pathname !== Routes.Terms && pathname !== Routes.CommunityGuidelines) {
+  if (
+    session &&
+    !mfaPending &&
+    pathname !== Routes.ResetPassword &&
+    pathname !== Routes.Mfa &&
+    pathname !== Routes.Terms &&
+    pathname !== Routes.CommunityGuidelines
+  ) {
     return <Redirect href={Routes.Main} />;
   }
 

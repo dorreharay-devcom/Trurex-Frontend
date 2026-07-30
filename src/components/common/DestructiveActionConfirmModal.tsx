@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Trash2 } from 'lucide-react-native';
 import { isWeb, webContainerStyle } from '~/utils';
-import { Theme } from '~/theme/Theme';
+import { Theme } from '~/shared/theme/Theme';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 
 export type DestructiveActionConfirmModalProps = {

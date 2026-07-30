@@ -2,7 +2,7 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { DiscoveryApi, DiscoverQueryParams, SearchRexesParams } from '~/api/DiscoveryApi';
 import { getRexCategoryApiCode } from '~/constants/recommendation/rexCategories';
-import { Backend, unwrap } from '~/services/AuthService';
+import { Backend, unwrap } from '~/shared/api/client';
 import { mapDiscoverFeedRowSafe } from '~/api/mapDiscoverFeed';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 
