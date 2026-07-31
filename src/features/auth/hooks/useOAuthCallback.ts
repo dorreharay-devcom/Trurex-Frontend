@@ -1,16 +1,16 @@
 import { useEffect, useRef } from 'react';
-import { View, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Linking from 'expo-linking';
-import { Auth } from '~/shared/api/client';
-import { Routes } from '~/shared/config/routes';
-import { Theme } from '~/shared/theme/Theme';
-import { completeOAuthSessionFromUrl, navigateAfterAuthenticatedSession } from '~/features/auth';
-import { isWeb } from '~/utils';
-import { AuthApi } from '~/shared/api/auth';
+import { completeOAuthSessionFromUrl } from '~/features/auth/lib/oauth';
+import { navigateAfterAuthenticatedSession } from '~/features/auth/lib/mfa';
 import { useAuth } from '~/features/auth/providers';
+import { AuthEvent } from '~/features/auth/types';
+import { Auth } from '~/shared/api/client';
+import { AuthApi } from '~/shared/api/auth';
+import { Routes } from '~/shared/config/routes';
+import { isWeb } from '~/utils';
 
-export default function AuthCallback() {
+export function useOAuthCallback() {
   const router = useRouter();
   const { setMfaPending, setMfaChecking } = useAuth();
   const mfaCheckStartedRef = useRef(false);
@@ -19,15 +19,11 @@ export default function AuthCallback() {
     let active = true;
 
     const goMain = () => {
-      if (active) {
-        router.replace(Routes.Main);
-      }
+      if (active) router.replace(Routes.Main);
     };
 
     const goLogin = () => {
-      if (active) {
-        router.replace(Routes.Login);
-      }
+      if (active) router.replace(Routes.Login);
     };
 
     const goAfterMfaCheck = async () => {
@@ -53,20 +49,24 @@ export default function AuthCallback() {
       }
     };
 
-    const bootstrap = async () => {
-      if (!isWeb) {
-        const initialUrl = await Linking.getInitialURL();
-        if (initialUrl) {
-          try {
-            await completeOAuthSessionFromUrl(initialUrl);
-          } catch {
-            await setMfaPending(false);
-            setMfaChecking(false);
-            goLogin();
-            return;
-          }
-        }
+    const completeNativeOAuthRedirect = async (): Promise<boolean> => {
+      if (isWeb) return true;
+      const initialUrl = await Linking.getInitialURL();
+      if (!initialUrl) return true;
+      try {
+        await completeOAuthSessionFromUrl(initialUrl);
+        return true;
+      } catch {
+        await setMfaPending(false);
+        setMfaChecking(false);
+        goLogin();
+        return false;
       }
+    };
+
+    const bootstrap = async () => {
+      const redirectCompleted = await completeNativeOAuthRedirect();
+      if (!redirectCompleted) return;
 
       const { data } = await Auth.getSession();
       if (data.session) {
@@ -81,11 +81,11 @@ export default function AuthCallback() {
     const {
       data: { subscription },
     } = Auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
+      if (event === AuthEvent.SignedIn && session) {
         goAfterMfaCheck();
-      } else if (event === 'SIGNED_OUT') {
-        goLogin();
+        return;
       }
+      if (event === AuthEvent.SignedOut) goLogin();
     });
 
     return () => {
@@ -93,10 +93,4 @@ export default function AuthCallback() {
       subscription.unsubscribe();
     };
   }, [router, setMfaChecking, setMfaPending]);
-
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <ActivityIndicator size="large" color={Theme.colors.primary} />
-    </View>
-  );
 }

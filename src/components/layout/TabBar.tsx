@@ -5,18 +5,30 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Theme } from '~/shared/theme/Theme';
 import { isWeb } from '~/utils';
 
-export type Tab = 'discover' | 'faves' | 'circles' | 'map' | 'profile';
+export const TAB = {
+  discover: 'discover',
+  faves: 'faves',
+  circles: 'circles',
+  map: 'map',
+  profile: 'profile',
+} as const;
+
+export type Tab = (typeof TAB)[keyof typeof TAB];
+
+export function isTab(value: unknown): value is Tab {
+  return typeof value === 'string' && value in TAB;
+}
 
 export const NAV_ITEMS: {
   id: Tab;
   label: string;
   icon: React.ComponentType<{ size: number; color: string }>;
 }[] = [
-  { id: 'discover', label: 'Discover', icon: Sparkles },
-  { id: 'faves', label: 'Gems', icon: Gem },
-  { id: 'circles', label: 'Circles', icon: Orbit },
-  { id: 'map', label: 'Map', icon: MapPinned },
-  { id: 'profile', label: 'Profile', icon: UserCircle2 },
+  { id: TAB.discover, label: 'Discover', icon: Sparkles },
+  { id: TAB.faves, label: 'Gems', icon: Gem },
+  { id: TAB.circles, label: 'Circles', icon: Orbit },
+  { id: TAB.map, label: 'Map', icon: MapPinned },
+  { id: TAB.profile, label: 'Profile', icon: UserCircle2 },
 ];
 
 interface TabBarProps {

@@ -2,7 +2,7 @@
 module.exports = {
   // Required for NativeWind on web: avoids "Cannot manually set color scheme" when dark mode is `media`.
   darkMode: 'class',
-  content: ['./app/**/*.{js,jsx,ts,tsx}', './src/**/*.{js,jsx,ts,tsx}'],
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
   presets: [require('nativewind/preset')],
   theme: {
     fontFamily: {

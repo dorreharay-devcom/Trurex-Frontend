@@ -1,4 +1,4 @@
-import '../global.css';
+import '../../global.css';
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '~/features/auth/providers';
@@ -17,8 +17,6 @@ export default function RootLayout() {
     'HankenGrotesk-Bold': require('@assets/fonts/HankenGrotesk-Bold.ttf'),
     'HankenGrotesk-ExtraBold': require('@assets/fonts/HankenGrotesk-ExtraBold.ttf'),
   });
-
-  console.log('loaded', loaded);
 
   if (!loaded) return null;
 

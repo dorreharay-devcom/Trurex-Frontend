@@ -5,7 +5,7 @@ import type { Recommendation } from '~/shared/types/recommendation';
 import type { MapPinType } from '~/types/map/mapPin';
 import { Theme } from '~/shared/theme/Theme';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
-import { useShareRex } from '~/hooks/useShareRex';
+import { useShareRex } from '~/shared/hooks/useShareRex';
 import { mapAuthorRecommendedLabel } from '~/utils/map/mapRecommendationData';
 
 type Props = {

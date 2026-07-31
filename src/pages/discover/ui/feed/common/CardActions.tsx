@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Heart, MessageCircle, Share2, Bookmark } from 'lucide-react-native';
 import { useLikeRex } from '~/pages/discover/hooks/useLikeRex';
-import { useShareRex } from '~/hooks/useShareRex';
+import { useShareRex } from '~/shared/hooks/useShareRex';
 import { Theme } from '~/shared/theme/Theme';
 import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
 
