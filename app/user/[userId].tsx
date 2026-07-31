@@ -5,13 +5,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import ProfileView from '~/components/profile/ProfileView';
 import { Header } from '~/components/layout/Header';
 import { TabBar, Tab } from '~/components/layout/TabBar';
-import { RecommendationDetailModal } from '~/components/recommendation/RecommendationDetailModal';
+import RecommendationDetailModal from '~/features/rex-detail/ui/RecommendationDetailModal';
 import ProtectedRoute from '~/components/common/ProtectedRoute';
-import type {
-  Recommendation,
-  RecommendationOpenOptions,
-} from '~/types/recommendation/recommendation';
-import { recommendationStubFromId } from '~/utils/recommendation/recommendationStubFromId';
+import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
+import { recommendationStubFromId } from '~/features/rex-detail/lib/rexDetailToRecommendation';
 import { isHexUuidString } from '~/utils/guards';
 
 export default function UserProfilePage() {

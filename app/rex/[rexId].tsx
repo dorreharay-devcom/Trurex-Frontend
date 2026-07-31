@@ -5,10 +5,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { Header } from '~/components/layout/Header';
 import { TabBar, type Tab } from '~/components/layout/TabBar';
-import { RecommendationDetailModal } from '~/components/recommendation/RecommendationDetailModal';
+import RecommendationDetailModal from '~/features/rex-detail/ui/RecommendationDetailModal';
 import ProtectedRoute from '~/components/common/ProtectedRoute';
-import { fetchRexDetail } from '~/api/rexDetailApi';
-import { rexDetailRowToRecommendation } from '~/utils/recommendation/rexDetailToRecommendation';
+import { fetchRexDetail } from '~/features/rex-detail/api/rexDetailApi';
+import { rexDetailRowToRecommendation } from '~/features/rex-detail/lib/rexDetailToRecommendation';
 import { Routes } from '~/shared/config/routes';
 import { Theme } from '~/shared/theme/Theme';
 

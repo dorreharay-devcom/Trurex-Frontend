@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 import { View, FlatList, useWindowDimensions, Text, ActivityIndicator } from 'react-native';
-import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
-import { categoryRowToPickerTile } from '~/constants/recommendation/rexCategories';
+import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
+import { categoryRowToPickerTile } from '~/features/rex-create/lib/categories';
 import { useActiveCategories } from '~/hooks/useActiveCategories';
 import { useResolvedColumnWidth } from '~/features/rex-create/hooks/useResolvedColumnWidth';
 import { Theme } from '~/shared/theme/Theme';
-import { getCategoryGridConfig } from '~/utils/recommendation/recCategoryNav';
+import { getCategoryGridConfig } from '~/features/rex-create/lib/categories';
 import { cn } from '~/utils/general';
 import { CategoryListHeader, CategoryTile } from './common';
 

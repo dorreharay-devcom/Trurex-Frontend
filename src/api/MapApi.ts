@@ -1,6 +1,6 @@
 import { Backend, unwrap } from '~/shared/api/client';
 import { mapDiscoverFeedRowSafe } from '~/api/mapDiscoverFeed';
-import type { Recommendation } from '~/types/recommendation/recommendation';
+import type { Recommendation } from '~/shared/types/recommendation';
 import type { MapPinRow } from '~/types/map/mapPinRow';
 import { filterRecommendationsByRexTitle } from '~/utils/map/mapRecommendationData';
 

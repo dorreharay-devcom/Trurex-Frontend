@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { PhotoUploadGrid } from '~/components/common/PhotoUploadGrid';
 import CreateStepTitle from '../../CreateStepTitle';
-import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
+import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
 
 type Props = {
   photoPaths: string[];

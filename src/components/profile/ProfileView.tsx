@@ -27,12 +27,12 @@ import { useAuth } from '~/features/auth/providers';
 import { ProfileApi } from '~/api/ProfileApi';
 import { Theme } from '~/shared/theme/Theme';
 import type { ProfileData } from '~/types/profile';
-import type { Recommendation } from '~/types/recommendation/recommendation';
+import type { Recommendation } from '~/shared/types/recommendation';
 import { webContainerStyle } from '~/utils';
 import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
-} from '~/utils/recommendation/recContentDisplay';
+} from '~/shared/lib/rexImages';
 import ProfileHeader from './ProfileHeader';
 import CurrentlySection from './CurrentlySection';
 import EditProfile from './EditProfile';
@@ -53,7 +53,7 @@ import { OverlayModal } from '~/components/common/OverlayModal';
 import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
-import { modalConfig } from '~/constants/recommendation/modalConfig';
+import { modalConfig } from '~/hooks/useOverlaySheetPresentation';
 import { useQueryClient } from '@tanstack/react-query';
 import { pickLibraryImages } from '~/utils/photos/imagePickerLaunch';
 import { photoUploadErrorMessage } from '~/utils/photos/storageUpload';

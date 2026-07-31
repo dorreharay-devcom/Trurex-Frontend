@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import type { CreateRecCircle } from '~/constants/recommendation/createCircles';
+import type { CreateRecCircle } from '~/types/circles';
 import { cn } from '~/utils/general';
 import CircleGlyph from './CircleGlyph';
 import CircleRadioIndicator from './CircleRadioIndicator';

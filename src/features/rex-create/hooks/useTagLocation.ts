@@ -4,7 +4,7 @@ import {
   type ManualPlaceGeotagResult,
 } from '~/hooks/location/useManualPlaceGeotag';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
-import { SEARCH_MODE } from '~/types/recommendation/create';
+import { SEARCH_MODE } from '~/features/rex-create/types/create';
 
 export function useTagLocation(flow: CreateRecFlow) {
   const { searchMode, applyOnlineGeotag, setManualAddress, setManualGeotag } = flow.place;

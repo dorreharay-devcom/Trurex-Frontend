@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import type { Region } from 'react-native-maps';
-import type { Recommendation } from '~/types/recommendation/recommendation';
+import type { Recommendation } from '~/shared/types/recommendation';
 import type { MapMarkerItem, MapRecenterTarget } from '~/types/map/mapMarker';
 import type { LatLngBounds } from '~/utils/map/mapRecommendationData';
 import {

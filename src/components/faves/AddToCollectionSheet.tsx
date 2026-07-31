@@ -35,7 +35,7 @@ import {
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
-import { modalConfig } from '~/constants/recommendation/modalConfig';
+import { modalConfig } from '~/hooks/useOverlaySheetPresentation';
 import { webDisabledCursorStyle } from '~/utils/general';
 
 const collectionFieldBg = { backgroundColor: Theme.colors.searchFieldBackground };

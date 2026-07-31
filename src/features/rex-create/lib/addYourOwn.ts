@@ -1,6 +1,6 @@
-import type { CreateRecSearchPlace } from '~/types/recommendation/create';
-import type { Recommendation } from '~/types/recommendation/recommendation';
-import type { RexDetailRow } from '~/types/recommendation/rexDetail';
+import type { CreateRecSearchPlace } from '~/features/rex-create/types/create';
+import type { Recommendation } from '~/shared/types/recommendation';
+import type { RexDetailRow } from '~/features/rex-detail/types/rexDetail';
 
 export type AddYourOwnRecSource = {
   placeName: string;

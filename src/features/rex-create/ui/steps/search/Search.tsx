@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import { SEARCH_MODE } from '~/types/recommendation/create';
+import { SEARCH_MODE } from '~/features/rex-create/types/create';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
-import { useRexPlaceSearch } from '~/hooks/recommendation';
+import { useRexPlaceSearch } from '~/features/rex-create/hooks/useRexPlaceSearch';
 import { SearchManualPanel, SearchSelectPanel } from './common';
 
 type Props = {

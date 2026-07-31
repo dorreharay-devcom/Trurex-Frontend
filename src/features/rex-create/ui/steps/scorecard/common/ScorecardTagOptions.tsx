@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { ChevronDown, ChevronUp } from 'lucide-react-native';
-import type { CategoryTagOption } from '~/types/recommendation/rexCategoryCreateConfig';
+import type { CategoryTagOption } from '~/features/rex-create/types/categoryCreateConfig';
 import { groupTagOptionsByTagGroup } from '~/features/rex-create/lib/configMerge';
 import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';

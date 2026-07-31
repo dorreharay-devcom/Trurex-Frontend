@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native';
-import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
+import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
 import CreateStepTitle from '../../../CreateStepTitle';
 import { Theme } from '~/shared/theme/Theme';
 import { isAndroid } from '~/utils';
 import { cn } from '~/utils/general';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
-import type { CreateRecSearchPlace } from '~/types/recommendation/create';
+import type { CreateRecSearchPlace } from '~/features/rex-create/types/create';
 import { useActiveCategories } from '~/hooks/useActiveCategories';
 import SearchPlaceRow from './SearchPlaceRow';
 import SearchTextField from './SearchTextField';

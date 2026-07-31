@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { getRexCategoryApiCode } from '~/constants/recommendation/rexCategories';
-import { modalConfig } from '~/constants/recommendation/modalConfig';
+import { getRexCategoryApiCode } from '~/features/rex-create/lib/categories';
+import { modalConfig } from '~/hooks/useOverlaySheetPresentation';
 import { createRex, updateRex } from '~/features/rex-create/api/rexCreateApi';
 import {
   buildCreateRexParams,
@@ -10,7 +10,7 @@ import {
   invalidateRexQueries,
 } from '~/features/rex-create/lib/submit';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
-import { STEP_ID } from '~/types/recommendation/create';
+import { STEP_ID } from '~/features/rex-create/types/create';
 import type { CreateConfigState } from '~/features/rex-create/hooks/useCategoryCreateConfig';
 import { toastError, toastInfo, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';

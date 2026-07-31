@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { keepKnownCircleIds, PUBLIC_CIRCLE_KEY } from '~/features/rex-create/lib/sharing';
-import type { CreateRecCircle } from '~/constants/recommendation/createCircles';
-import type { RexForEditRow } from '~/types/recommendation/rexDetail';
+import type { CreateRecCircle } from '~/types/circles';
+import type { RexForEditRow } from '~/features/rex-detail/types/rexDetail';
 
 export function useShareCircles() {
   const [selectedCircleIds, setSelectedCircleIds] = useState<Set<string>>(() => new Set());

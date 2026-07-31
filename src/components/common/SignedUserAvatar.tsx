@@ -2,14 +2,25 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { SignedStorageImage } from '~/components/common/SignedStorageImage';
 import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
-import { userAvatarHttpUrl, userAvatarStoragePath } from '~/utils/recommendation/recContentDisplay';
-import { cn } from '~/utils/general';
+import { cn, isHttpUrl } from '~/utils/general';
 
 type Props = {
   name: string;
   avatar?: string | null;
   className?: string;
 };
+
+function userAvatarStoragePath(avatar: string | undefined | null): string | null {
+  const a = avatar?.trim() ?? '';
+  if (!a || isHttpUrl(a)) return null;
+  return a;
+}
+
+function userAvatarHttpUrl(avatar: string | undefined | null): string | null {
+  const a = avatar?.trim() ?? '';
+  if (a && isHttpUrl(a)) return a;
+  return null;
+}
 
 export function SignedUserAvatar({ name, avatar, className }: Props) {
   const path = userAvatarStoragePath(avatar);

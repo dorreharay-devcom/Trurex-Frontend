@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { STEP_ID, type CreateRecStepId } from '~/types/recommendation/create';
+import { STEP_ID, type CreateRecStepId } from '~/features/rex-create/types/create';
 import { resolveStepIdAfterStepsChange } from '~/features/rex-create/lib/steps';
 
 export function useStepNavigation(activeSteps: CreateRecStepId[]) {

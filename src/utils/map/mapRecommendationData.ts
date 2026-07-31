@@ -1,13 +1,13 @@
 import type { Region } from 'react-native-maps';
 import type { MapPinRow } from '~/types/map/mapPinRow';
-import type { Recommendation } from '~/types/recommendation/recommendation';
+import type { Recommendation } from '~/shared/types/recommendation';
 import type { MapMarkerItem } from '~/types/map/mapMarker';
 import type { MapPinType, PinVisibility } from '~/types/map/mapPin';
 import { MAP_PIN_COLOR, MAP_PIN_GLYPH } from '~/types/map/mapPin';
 import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
-} from '~/utils/recommendation/recContentDisplay';
+} from '~/shared/lib/rexImages';
 
 export type LatLngBounds = {
   min_lat: number;

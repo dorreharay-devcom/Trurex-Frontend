@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Star } from 'lucide-react-native';
-import type { CategoryRatingDimension } from '~/types/recommendation/rexCategoryCreateConfig';
+import type { CategoryRatingDimension } from '~/features/rex-create/types/categoryCreateConfig';
 import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 

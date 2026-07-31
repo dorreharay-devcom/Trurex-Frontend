@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { Recommendation } from '~/types/recommendation/recommendation';
+import type { Recommendation } from '~/shared/types/recommendation';
 import { useSearchRexes } from '~/pages/discover/hooks/useSearchRexes';
 import type { SearchFiltersState } from '~/pages/discover/hooks/useSearchFilters';
 import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/hooks/useDebouncedValue';

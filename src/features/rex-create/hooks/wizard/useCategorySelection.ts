@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
-import { getActiveCreateRecSteps } from '~/types/recommendation/create';
-import type { CategoryCreateConfig } from '~/types/recommendation/rexCategoryCreateConfig';
+import { getActiveCreateRecSteps } from '~/features/rex-create/lib/steps';
+import type { CategoryCreateConfig } from '~/features/rex-create/types/categoryCreateConfig';
 
 export function useCategorySelection() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, ScrollView, Text, Pressable, Platform, StyleSheet, Keyboard } from 'react-native';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { Recommendation } from '~/types/recommendation/recommendation';
+import type { Recommendation } from '~/shared/types/recommendation';
 import MarkerMap from '~/components/map/MarkerMap';
 import { useMapScreen } from '~/hooks/map/useMapScreen';
 import { MapSearchBar } from '~/components/map/MapSearchBar';

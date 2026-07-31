@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { isWeb } from '~/utils';
 import { cn } from '~/utils/general';
-import { VALUE_FOR_MONEY_LABELS } from '~/utils/recommendation/recContentDisplay';
+import { VALUE_FOR_MONEY_LABELS } from '~/shared/lib/valueForMoney';
 
 type Props = {
   value: number | null;

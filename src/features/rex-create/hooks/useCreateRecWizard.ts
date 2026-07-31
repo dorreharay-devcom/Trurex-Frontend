@@ -6,9 +6,9 @@ import { usePlaceSearch } from '~/features/rex-create/hooks/wizard/usePlaceSearc
 import { useScorecard } from '~/features/rex-create/hooks/wizard/useScorecard';
 import { useShareCircles } from '~/features/rex-create/hooks/wizard/useShareCircles';
 import { useStepNavigation } from '~/features/rex-create/hooks/wizard/useStepNavigation';
-import { STEP_ID } from '~/types/recommendation/create';
-import type { CategoryRatingDimension } from '~/types/recommendation/rexCategoryCreateConfig';
-import type { RexForEditRow } from '~/types/recommendation/rexDetail';
+import { STEP_ID } from '~/features/rex-create/types/create';
+import type { CategoryRatingDimension } from '~/features/rex-create/types/categoryCreateConfig';
+import type { RexForEditRow } from '~/features/rex-detail/types/rexDetail';
 
 export type CreateRecFlow = ReturnType<typeof useCreateRecWizard>;
 

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, Pressable, useWindowDimensions } from 'react-native';
-import type { CreateRecCircle } from '~/constants/recommendation/createCircles';
+import type { CreateRecCircle } from '~/types/circles';
 import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 import { rgbaFromHexColor } from '~/utils/color';
@@ -11,7 +11,7 @@ import {
   ringDiameterFns,
   ringPaintOrderBackToFront,
   selectionAnnuliLargestFirst,
-} from '~/utils/recommendation/createCirclesRing';
+} from '~/features/rex-create/lib/circles';
 import CircleGlyph from './CircleGlyph';
 
 const CHIP_ICON = 12;

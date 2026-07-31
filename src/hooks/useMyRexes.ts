@@ -2,7 +2,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { Backend, unwrap } from '~/shared/api/client';
 import { mapDiscoverFeedRowSafe } from '~/api/mapDiscoverFeed';
-import type { Recommendation } from '~/types/recommendation/recommendation';
+import type { Recommendation } from '~/shared/types/recommendation';
 
 const MY_REXES_PAGE_SIZE = 20;
 

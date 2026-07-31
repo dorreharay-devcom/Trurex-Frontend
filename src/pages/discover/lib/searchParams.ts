@@ -1,4 +1,4 @@
-import { getRexCategoryApiCode } from '~/constants/recommendation/rexCategories';
+import { getRexCategoryApiCode } from '~/features/rex-create/lib/categories';
 import { ALL_CATEGORIES } from '~/pages/discover/types';
 
 export const ALL_TIME_DAYS = 9999;

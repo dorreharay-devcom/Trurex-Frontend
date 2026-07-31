@@ -15,7 +15,7 @@ import {
   mapApiCirclesToTabRows,
   parseCircleAccentHex,
   sortCirclesForRingStack,
-} from '~/utils/recommendation/recCircles';
+} from '~/shared/lib/recCircles';
 import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/utils/circleTabUtils';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';

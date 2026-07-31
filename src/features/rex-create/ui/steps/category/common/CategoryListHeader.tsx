@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import type { CategoryPickerTile } from '~/constants/recommendation/rexCategories';
+import type { CategoryPickerTile } from '~/features/rex-create/lib/categories';
 import CreateStepTitle from '../../../CreateStepTitle';
 
 export type CategoryListHeaderProps = {

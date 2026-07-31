@@ -8,8 +8,8 @@ import {
   resolveCreateRexCircleIds,
   resolveCreateRexVisibility,
 } from '~/features/rex-create/lib/sharing';
-import { SEARCH_MODE } from '~/types/recommendation/create';
-import type { CategoryQuestion } from '~/types/recommendation/rexCategoryCreateConfig';
+import { SEARCH_MODE } from '~/features/rex-create/types/create';
+import type { CategoryQuestion } from '~/features/rex-create/types/categoryCreateConfig';
 
 export function createRexErrorMessage(
   rawMessage: string,

@@ -19,6 +19,7 @@ import { Plus, X } from 'lucide-react-native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { CircleApiRow } from '~/api/circlesApi';
 import { addCircleMember, createCircle } from '~/api/circlesApi';
+import { CIRCLE_SYSTEM_KIND } from '~/constants/circles';
 import { CircleGlyphIcon } from '~/components/circles/common/CircleGlyphIcon';
 import {
   Theme,
@@ -38,7 +39,7 @@ import {
   parseCircleAccentHex,
   isUserCreatedCircle,
   sortCirclesForRingStack,
-} from '~/utils/recommendation/recCircles';
+} from '~/shared/lib/recCircles';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/utils/circleTabUtils';
 import { cn } from '~/utils/general';
@@ -173,7 +174,9 @@ export function CircleAssignmentSheet({
 
   const assignableCircles = useMemo(() => {
     const sorted = sortCirclesForRingStack(circles);
-    return sorted.filter((c) => c.system_kind === 'inner_circle' || isUserCreatedCircle(c));
+    return sorted.filter(
+      (c) => c.system_kind === CIRCLE_SYSTEM_KIND.innerCircle || isUserCreatedCircle(c),
+    );
   }, [circles]);
 
   const assignMutation = useMutation({

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
+import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
 import { Skeleton } from '~/components/ui/skeleton';
 
 const StepSkeleton = () => {

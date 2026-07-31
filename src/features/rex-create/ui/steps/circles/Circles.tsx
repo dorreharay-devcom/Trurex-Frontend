@@ -1,26 +1,23 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, Pressable } from 'react-native';
-import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
+import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
+import type { CreateRecCircle } from '~/types/circles';
 import {
-  type CreateRecCircle,
   canRenameCreateRecCircle,
+  effectiveCirclesAfterLoadError,
   findRenameableCircleById,
-} from '~/constants/recommendation/createCircles';
+  partitionPublicAndPrivateRings,
+} from '~/features/rex-create/lib/circles';
 import { useCircleEditor } from '~/features/rex-create/hooks/useCircleEditor';
 import { Theme } from '~/shared/theme/Theme';
 import CreateStepTitle from '../../CreateStepTitle';
 import { cn } from '~/utils/general';
-import {
-  effectiveCirclesAfterLoadError,
-  partitionPublicAndPrivateRings,
-} from '~/utils/recommendation/createCirclesRing';
 import CircleActionChips from './common/CircleActionChips';
 import CircleRenameRow from './common/CircleRenameRow';
 import CirclesRingPicker from './common/CirclesRingPicker';
 import CirclesSelectionSummary from './common/CirclesSelectionSummary';
 import CreateCircleModal from './common/CreateCircleModal';
 import PrivateRexToggle from './common/PrivateRexToggle';
-import SensitiveNudge from './common/SensitiveNudge';
 
 type Props = {
   circles: CreateRecCircle[];
@@ -31,7 +28,6 @@ type Props = {
   onToggle: (id: string) => void;
   privateSelected: boolean;
   onPrivateSelectedChange: (selected: boolean) => void;
-  showSensitiveNudge?: boolean;
 };
 
 const Circles: React.FC<Props> = ({
@@ -43,7 +39,6 @@ const Circles: React.FC<Props> = ({
   onToggle,
   privateSelected,
   onPrivateSelectedChange,
-  showSensitiveNudge = false,
 }) => {
   const visible = useMemo(
     () => effectiveCirclesAfterLoadError(loadError, circles),
@@ -85,8 +80,6 @@ const Circles: React.FC<Props> = ({
               Tap a ring to share with that circle. Smallest = most private.
             </Text>
           </View>
-
-          {showSensitiveNudge ? <SensitiveNudge /> : null}
 
           <PrivateRexToggle selected={privateSelected} onChange={onPrivateSelectedChange} />
 

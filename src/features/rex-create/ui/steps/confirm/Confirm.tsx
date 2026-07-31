@@ -3,7 +3,7 @@ import { View, Text, ScrollView } from 'react-native';
 import { Image } from 'expo-image';
 import { useQuery } from '@tanstack/react-query';
 import { getUserProfile } from '~/api/usersApi';
-import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
+import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
 import CreateStepTitle from '../../CreateStepTitle';
 import { useAuth } from '~/features/auth/providers';
 import {
@@ -13,8 +13,8 @@ import {
   getConfirmSharingLabel,
   getConfirmTagLabels,
 } from '~/features/rex-create/lib/confirmPreview';
-import type { CreateRecSearchPlace, SearchEntryMode } from '~/types/recommendation/create';
-import type { CategoryTagOption } from '~/types/recommendation/rexCategoryCreateConfig';
+import type { CreateRecSearchPlace, SearchEntryMode } from '~/features/rex-create/types/create';
+import type { CategoryTagOption } from '~/features/rex-create/types/categoryCreateConfig';
 import { ConfirmPreviewCard } from './common';
 
 const DYNO_IMAGE_SOURCE = require('@assets/dyno.svg');

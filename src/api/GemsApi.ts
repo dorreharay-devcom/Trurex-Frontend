@@ -1,5 +1,5 @@
 import { Backend, unwrap } from '~/shared/api/client';
-import type { Recommendation } from '~/types/recommendation/recommendation';
+import type { Recommendation } from '~/shared/types/recommendation';
 import { mapDiscoverFeedRowSafe } from '~/api/mapDiscoverFeed';
 
 export interface SavedRexesParams {

@@ -1,5 +1,5 @@
 import type { AppNotification } from '~/types/notification/appNotification';
-import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
+import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 
 const REX_NOTIFICATION_TYPES = new Set(['comment', 'comment_reply', 'reply', 'reaction']);
 

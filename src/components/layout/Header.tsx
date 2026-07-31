@@ -24,7 +24,7 @@ import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
 import { ClearableSearchInput } from '~/components/common/ClearableSearchInput';
-import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
+import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 
 interface HeaderProps {
   searchQuery: string;

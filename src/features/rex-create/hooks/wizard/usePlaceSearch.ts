@@ -3,7 +3,7 @@ import {
   buildSelectedSearchPlaceFromAddYourOwn,
   type AddYourOwnRecSource,
 } from '~/features/rex-create/lib/addYourOwn';
-import { persistPlace } from '~/features/rex-create/lib/persistPlace';
+import { persistPlace } from '~/features/rex-create/lib/place';
 import { buildSelectedSearchPlaceFromEditRow } from '~/features/rex-create/lib/place';
 import {
   SEARCH_MODE,
@@ -12,8 +12,8 @@ import {
   type ManualPlaceDraft,
   type OnlinePlaceDraft,
   type SearchEntryMode,
-} from '~/types/recommendation/create';
-import type { RexForEditRow } from '~/types/recommendation/rexDetail';
+} from '~/features/rex-create/types/create';
+import type { RexForEditRow } from '~/features/rex-detail/types/rexDetail';
 
 const EMPTY_MANUAL: ManualPlaceDraft = { name: '', address: '', geotag: null };
 const EMPTY_ONLINE: OnlinePlaceDraft = { name: '', websiteUrl: '', locationText: '', geotag: null };

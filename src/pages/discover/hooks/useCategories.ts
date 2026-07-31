@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import { useActiveCategories } from '~/hooks/useActiveCategories';
 import { usePinnedCategoryIds } from '~/pages/discover/hooks/usePinnedCategoryIds';
-import { categoryPillColor } from '~/utils/recommendation/recCategoryNav';
-import { CATEGORY_ICON_FALLBACK } from '~/utils/recommendation/categoryIconResolve';
+import { categoryPillColor } from '~/shared/lib/categoryPills';
+import { CATEGORY_ICON_FALLBACK } from '~/shared/api/categories';
 import type { Category } from '~/pages/discover/types';
 
 export function useCategories() {
@@ -39,3 +39,5 @@ export function useCategories() {
     categoriesPending,
   };
 }
+
+export type CategoriesState = ReturnType<typeof useCategories>;

@@ -4,11 +4,11 @@ import type {
   CategoryRatingDimension,
   CategorySubcategoryConfig,
   CategoryTagOption,
-} from '~/types/recommendation/rexCategoryCreateConfig';
+} from '~/features/rex-create/types/categoryCreateConfig';
 import {
   mapSubcategoriesFromConfig,
   type RexSubcategoryOption,
-} from '~/utils/recommendation/rexSubcategories';
+} from '~/features/rex-create/lib/categories';
 
 export function resolveSubcategoryForMerge(
   config: CategoryCreateConfig,

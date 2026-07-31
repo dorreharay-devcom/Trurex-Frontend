@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getRexCategoryApiCode } from '~/constants/recommendation/rexCategories';
+import { getRexCategoryApiCode } from '~/features/rex-create/lib/categories';
 import {
   fetchAllCategoryCreateConfigs,
   fetchCategoryCreateConfig,

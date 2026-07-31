@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { View, TextInput, Pressable, Text, ScrollView, Platform, StyleSheet } from 'react-native';
 import { Search, X } from 'lucide-react-native';
-import type { Recommendation } from '~/types/recommendation/recommendation';
+import type { Recommendation } from '~/shared/types/recommendation';
 import { MAP_ACTION_INSET } from '~/constants/map/mapUi';
 import {
   Theme,

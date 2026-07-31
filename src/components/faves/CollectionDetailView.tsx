@@ -42,16 +42,13 @@ import {
 import EditCollectionModal from '~/components/faves/EditCollectionModal';
 import { toastError, toastSuccessAfterDismiss } from '~/utils/appToast';
 import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
-import type {
-  Recommendation,
-  RecommendationOpenOptions,
-} from '~/types/recommendation/recommendation';
+import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
 import type { CollectionRexEntry } from '~/api/CollectionsApi';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';
 import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
 import { buildCurrentWebPath, buildPublicWebPath } from '~/utils/shareUrls';
 import { shareMobileLink } from '~/utils/mobileShare';
-import { VALUE_FOR_MONEY_LABELS } from '~/utils/recommendation/recContentDisplay';
+import { valueForMoneyLabel } from '~/shared/lib/valueForMoney';
 
 function entryToRec(entry: CollectionRexEntry): Recommendation {
   return {
@@ -398,7 +395,7 @@ const CollectionDetailView: React.FC<CollectionDetailViewProps> = ({
                           <View className="flex-row items-center gap-0.5">
                             <DollarSign size={10} color={Theme.colors.muted} />
                             <Text className="text-[11px] text-muted-foreground">
-                              {VALUE_FOR_MONEY_LABELS[(item.score_value_for_money ?? 1) - 1]}
+                              {valueForMoneyLabel(item.score_value_for_money)}
                             </Text>
                           </View>
                         )}

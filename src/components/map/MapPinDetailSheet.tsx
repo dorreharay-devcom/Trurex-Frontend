@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, Pressable, Linking, Platform, ScrollView } from 'react-native';
 import { X, ExternalLink, Bookmark, Navigation, Share2 } from 'lucide-react-native';
-import type { Recommendation } from '~/types/recommendation/recommendation';
+import type { Recommendation } from '~/shared/types/recommendation';
 import type { MapPinType } from '~/types/map/mapPin';
 import { Theme } from '~/shared/theme/Theme';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
-import { useShareRex } from '~/hooks/recommendation/useShareRex';
+import { useShareRex } from '~/hooks/useShareRex';
 import { mapAuthorRecommendedLabel } from '~/utils/map/mapRecommendationData';
 
 type Props = {

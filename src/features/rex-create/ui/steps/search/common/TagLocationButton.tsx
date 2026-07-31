@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { MapPin } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
-import type { Geotag } from '~/types/recommendation/create';
+import type { Geotag } from '~/features/rex-create/types/create';
 
 type Props = {
   loading: boolean;

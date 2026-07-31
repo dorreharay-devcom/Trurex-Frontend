@@ -1,4 +1,4 @@
-import type { CreateRexRpcParams } from '~/types/recommendation/rexCategoryCreateConfig';
+import type { CreateRexRpcParams } from '~/features/rex-create/types/categoryCreateConfig';
 import { isStrictUuid } from '~/utils/guards';
 
 export const PUBLIC_CIRCLE_KEY = 'public';

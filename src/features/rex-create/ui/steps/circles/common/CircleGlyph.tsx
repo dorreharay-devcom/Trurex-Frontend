@@ -1,9 +1,6 @@
 import React from 'react';
 import { Globe, Heart, Lock, Users } from 'lucide-react-native';
-import type {
-  CreateRecCircle,
-  CreateRecCircleIconKind,
-} from '~/constants/recommendation/createCircles';
+import type { CreateRecCircle, CreateRecCircleIconKind } from '~/types/circles';
 
 const GLYPH_ICONS: Record<CreateRecCircleIconKind, typeof Lock> = {
   lock: Lock,

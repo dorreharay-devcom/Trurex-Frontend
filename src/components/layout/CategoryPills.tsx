@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, TouchableOpacity, Text } from 'react-native';
 import { Theme } from '~/shared/theme/Theme';
-import { categoryPillActiveSurface } from '~/utils/recommendation/recCategoryNav';
+import { categoryPillActiveSurface } from '~/shared/lib/categoryPills';
 
 export interface Category {
   id: string;

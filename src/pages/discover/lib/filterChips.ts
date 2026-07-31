@@ -1,4 +1,5 @@
-import { VALUE_LABELS, TIME_FILTER_OPTIONS } from '~/pages/discover/lib/filterOptions';
+import { TIME_FILTER_OPTIONS } from '~/pages/discover/lib/filterOptions';
+import { VALUE_FOR_MONEY_LABELS } from '~/shared/lib/valueForMoney';
 import type { RecencyDayToken } from '~/pages/discover/lib/searchParams';
 import type { Category } from '~/pages/discover/types';
 
@@ -14,7 +15,7 @@ export type FilterChip = {
 
 function budgetChipLabel(vfmFilter: number[]): string {
   if (vfmFilter.length === 0) return 'Budget';
-  if (vfmFilter.length === 1) return VALUE_LABELS[vfmFilter[0]! - 1] ?? 'Budget';
+  if (vfmFilter.length === 1) return VALUE_FOR_MONEY_LABELS[vfmFilter[0]! - 1] ?? 'Budget';
   return `Budget (${vfmFilter.length})`;
 }
 

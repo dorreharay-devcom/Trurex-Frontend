@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { MapPin } from 'lucide-react-native';
-import type { DbCategoryRow } from '~/types/recommendation/rexCategoryCreateConfig';
 import {
   CATEGORY_ICON_FALLBACK,
   resolveCategoryIconFromRows,
-} from '~/utils/recommendation/categoryIconResolve';
+  type DbCategoryRow,
+} from '~/shared/api/categories';
 import { Theme } from '~/shared/theme/Theme';
-import type { CreateRecSearchPlace } from '~/types/recommendation/create';
+import type { CreateRecSearchPlace } from '~/features/rex-create/types/create';
 import { cn } from '~/utils/general';
 import { isStrictUuid } from '~/utils/guards';
 

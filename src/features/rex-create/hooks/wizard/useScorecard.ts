@@ -3,8 +3,8 @@ import {
   CREATE_REC_MUST_KNOW_MAX,
   CREATE_REC_REVIEW_MAX,
 } from '~/features/rex-create/config/scorecard';
-import type { CategoryRatingDimension } from '~/types/recommendation/rexCategoryCreateConfig';
-import type { RexForEditRow } from '~/types/recommendation/rexDetail';
+import type { CategoryRatingDimension } from '~/features/rex-create/types/categoryCreateConfig';
+import type { RexForEditRow } from '~/features/rex-detail/types/rexDetail';
 
 function withoutKey(map: Record<string, string>, key: string): Record<string, string> {
   const { [key]: _omitted, ...rest } = map;

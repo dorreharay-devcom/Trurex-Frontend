@@ -4,15 +4,12 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CollectionDetailView from '~/components/faves/CollectionDetailView';
 import AddRexToCollectionSheet from '~/components/faves/AddRexToCollectionSheet';
-import { RecommendationDetailModal } from '~/components/recommendation/RecommendationDetailModal';
+import RecommendationDetailModal from '~/features/rex-detail/ui/RecommendationDetailModal';
 import { Header } from '~/components/layout/Header';
 import { TabBar } from '~/components/layout/TabBar';
 import ProtectedRoute from '~/components/common/ProtectedRoute';
-import type {
-  Recommendation,
-  RecommendationOpenOptions,
-} from '~/types/recommendation/recommendation';
-import { recommendationStubFromId } from '~/utils/recommendation/recommendationStubFromId';
+import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
+import { recommendationStubFromId } from '~/features/rex-detail/lib/rexDetailToRecommendation';
 
 export default function CollectionPage() {
   const { id } = useLocalSearchParams<{ id: string }>();

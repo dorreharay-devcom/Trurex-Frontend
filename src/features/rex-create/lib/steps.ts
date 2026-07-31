@@ -5,8 +5,16 @@ import {
   type CreateRecStepId,
   type CreateRecSearchPlace,
   type SearchEntryMode,
-} from '~/types/recommendation/create';
+} from '~/features/rex-create/types/create';
 import { isStrictUuid } from '~/utils/guards';
+
+export function getActiveCreateRecSteps(
+  selectedCategoryId: string | null,
+  includeSubcategoryStep: boolean,
+): CreateRecStepId[] {
+  const includeType = selectedCategoryId != null && includeSubcategoryStep;
+  return CREATE_REC_STEP_ORDER.filter((id) => id !== STEP_ID.type || includeType);
+}
 
 export function suggestedCategoryFromSearch(
   searchMode: SearchEntryMode,

@@ -1,4 +1,4 @@
-import type { Recommendation } from '~/types/recommendation/recommendation';
+import type { Recommendation } from '~/shared/types/recommendation';
 
 export const MAP_SEARCH_SUGGEST_MIN_QUERY_LENGTH = 2;
 export const MAP_SEARCH_SUGGEST_LIMIT = 5;

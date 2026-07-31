@@ -4,8 +4,7 @@ import { Image } from 'expo-image';
 import type { ImageStyle } from 'expo-image';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { Skeleton } from '~/components/ui/skeleton';
-import { cn } from '~/utils/general';
-import { isHttpUrl } from '~/utils/recommendation/recContentDisplay';
+import { cn, isHttpUrl } from '~/utils/general';
 import {
   isRexPlaceholderPhotoPath,
   REX_PLACEHOLDER_IMAGE_SOURCE,

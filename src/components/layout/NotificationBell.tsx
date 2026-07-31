@@ -21,7 +21,7 @@ import { formatCompactRelativeTime } from '~/utils/date';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import type { AppNotification } from '~/types/notification/appNotification';
-import type { RecommendationOpenOptions } from '~/types/recommendation/recommendation';
+import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 import { notificationRexDeepLink } from '~/utils/notification/notificationRexDeepLink';
 
 function formatNotificationTime(iso: string): string {

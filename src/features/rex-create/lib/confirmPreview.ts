@@ -1,10 +1,10 @@
 import type { User } from '@supabase/supabase-js';
-import type { CategoryTagOption } from '~/types/recommendation/rexCategoryCreateConfig';
+import type { CategoryTagOption } from '~/features/rex-create/types/categoryCreateConfig';
 import {
   SEARCH_MODE,
   type CreateRecSearchPlace,
   type SearchEntryMode,
-} from '~/types/recommendation/create';
+} from '~/features/rex-create/types/create';
 import type { UserProfileRow } from '~/types/network';
 
 export type ConfirmAuthorPreview = {

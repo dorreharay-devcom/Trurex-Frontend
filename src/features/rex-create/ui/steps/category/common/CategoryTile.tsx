@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import type { CategoryPickerTile } from '~/constants/recommendation/rexCategories';
-import type { CategoryGridConfig } from '~/types/recommendation/categoryGrid';
+import type { CategoryPickerTile } from '~/features/rex-create/lib/categories';
+import type { CategoryGridConfig } from '~/features/rex-create/lib/categories';
 import { Theme } from '~/shared/theme/Theme';
 import { isWeb } from '~/utils';
 import { cn } from '~/utils/general';

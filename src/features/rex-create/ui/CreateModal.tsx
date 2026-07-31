@@ -1,7 +1,7 @@
 import React, { useLayoutEffect } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { OverlayModal } from '~/components/common/OverlayModal';
-import { modalConfig } from '~/constants/recommendation/modalConfig';
+import { modalConfig } from '~/hooks/useOverlaySheetPresentation';
 import { useCreateRecWizard } from '~/features/rex-create/hooks/useCreateRecWizard';
 import { useModalPresentation } from '~/features/rex-create/hooks/useModalPresentation';
 import { useCategoryCreateConfig } from '~/features/rex-create/hooks/useCategoryCreateConfig';

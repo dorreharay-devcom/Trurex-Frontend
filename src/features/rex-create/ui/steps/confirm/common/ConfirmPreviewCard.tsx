@@ -144,7 +144,7 @@ function ConfirmPreviewCard({
         <View className="min-w-0 flex-1">
           <Text className="text-sm font-semibold text-foreground">{author.name}</Text>
           <Text className="mt-0.5 text-xs text-muted-foreground">
-            {author.handle ? `${author.handle} · ` : ''}just now
+            {author.handle ? `${author.handle}\u00A0·\u00A0` : ''}just now
           </Text>
         </View>
         <CategoryBadge

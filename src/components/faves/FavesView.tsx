@@ -22,10 +22,7 @@ import {
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
-import type {
-  Recommendation,
-  RecommendationOpenOptions,
-} from '~/types/recommendation/recommendation';
+import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
 import CollectionDetailView from '~/components/faves/CollectionDetailView';
 import CreateCollectionModal from '~/components/faves/CreateCollectionModal';
 import AddToCollectionSheet, { RecSummary } from '~/components/faves/AddToCollectionSheet';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Animated as RNAnimated } from 'react-native';
-import { STEP_ID } from '~/types/recommendation/create';
+import { STEP_ID } from '~/features/rex-create/types/create';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
 import type { CreateConfigState } from '~/features/rex-create/hooks/useCategoryCreateConfig';
 import { useDisplayCircles } from '~/features/rex-create/hooks/useDisplayCircles';

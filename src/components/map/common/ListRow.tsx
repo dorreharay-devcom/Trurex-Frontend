@@ -3,7 +3,7 @@ import { View, Text, Pressable, Platform, type PressableProps } from 'react-nati
 import { MapPin } from 'lucide-react-native';
 import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
 import { Theme } from '~/shared/theme/Theme';
-import type { Recommendation } from '~/types/recommendation/recommendation';
+import type { Recommendation } from '~/shared/types/recommendation';
 import { cn } from '~/utils/general';
 
 type HoverProps = Pick<PressableProps, 'onHoverIn' | 'onHoverOut'>;

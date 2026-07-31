@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
-import type { CategoryGridConfig } from '~/types/recommendation/categoryGrid';
+import type { CategoryGridConfig } from '~/features/rex-create/lib/categories';
 
 export function useResolvedColumnWidth(grid: CategoryGridConfig) {
   const [rowWidth, setRowWidth] = useState<number | null>(null);

@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { createCircle, updateCircle } from '~/api/circlesApi';
-import type { CreateRecCircle } from '~/constants/recommendation/createCircles';
+import type { CreateRecCircle } from '~/types/circles';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/utils/circleTabUtils';
 import { isNonEmptyString } from '~/utils/guards';

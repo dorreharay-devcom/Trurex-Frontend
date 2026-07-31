@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchRexForEdit } from '~/features/rex-create/api/rexCreateApi';
-import type { RexForEditRow } from '~/types/recommendation/rexDetail';
+import type { RexForEditRow } from '~/features/rex-detail/types/rexDetail';
 import { toastError } from '~/utils/appToast';
 
 type UseEditPrefillArgs = {

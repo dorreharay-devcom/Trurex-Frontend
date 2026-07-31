@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import type { CreateRecCircle } from '~/constants/recommendation/createCircles';
-import { circleFooterSubtitle } from '~/utils/recommendation/createCirclesRing';
+import type { CreateRecCircle } from '~/types/circles';
+import { circleFooterSubtitle } from '~/features/rex-create/lib/circles';
 
 type Props = {
   privateSelected: boolean;

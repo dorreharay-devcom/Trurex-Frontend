@@ -11,14 +11,11 @@ import { Header } from '~/components/layout/Header';
 import { StickyTopChromeLayout } from '~/components/layout/StickyTopChromeLayout';
 import { TabBar, Tab } from '~/components/layout/TabBar';
 import { CreateModal } from '~/features/rex-create';
-import { RecommendationDetailModal } from '~/components/recommendation/RecommendationDetailModal';
+import RecommendationDetailModal from '~/features/rex-detail/ui/RecommendationDetailModal';
 import { Theme } from '~/shared/theme/Theme';
 import type { AddYourOwnRecSource } from '~/features/rex-create';
-import type {
-  Recommendation,
-  RecommendationOpenOptions,
-} from '~/types/recommendation/recommendation';
-import { recommendationStubFromId } from '~/utils/recommendation/recommendationStubFromId';
+import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
+import { recommendationStubFromId } from '~/features/rex-detail/lib/rexDetailToRecommendation';
 import { useUserConfig } from '~/hooks/useUserConfig';
 import { useAuth } from '~/features/auth/providers';
 

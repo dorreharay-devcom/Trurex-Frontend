@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { ArrowLeft, X } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
-import type { CreateRecStepId } from '~/types/recommendation/create';
+import type { CreateRecStepId } from '~/features/rex-create/types/create';
 import CreateWizardStepper from './CreateWizardStepper';
 
 type Props = {

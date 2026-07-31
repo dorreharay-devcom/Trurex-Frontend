@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { ScrollView, View, Text } from 'react-native';
 import { useCategoryIcon } from '~/hooks/useCategoryIcon';
-import { CREATE_REC_STEP_INNER } from '~/constants/recommendation/createLayout';
+import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
 import type { CreateConfigState } from '~/features/rex-create/hooks/useCategoryCreateConfig';
 import { cn } from '~/utils/general';
