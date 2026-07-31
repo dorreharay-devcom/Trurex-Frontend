@@ -5,17 +5,17 @@ import { Theme } from '~/shared/theme/Theme';
 
 const PIN_STROKE = 2.25;
 
-type DiscoverCategoryPinButtonProps = {
+type CategoryPinButtonProps = {
   isPinned: boolean;
   onPress: () => void;
   disabled?: boolean;
 };
 
-export const DiscoverCategoryPinButton = React.memo(function DiscoverCategoryPinButton({
+const CategoryPinButton = React.memo(function CategoryPinButton({
   isPinned,
   onPress,
   disabled = false,
-}: DiscoverCategoryPinButtonProps) {
+}: CategoryPinButtonProps) {
   return (
     <Pressable
       hitSlop={8}
@@ -36,8 +36,4 @@ export const DiscoverCategoryPinButton = React.memo(function DiscoverCategoryPin
   );
 });
 
-export const DiscoverCategoryPinHintIcon = React.memo(function DiscoverCategoryPinHintIcon() {
-  return (
-    <Pin size={10} color={Theme.colors.secondary} fill="transparent" strokeWidth={PIN_STROKE} />
-  );
-});
+export default CategoryPinButton;

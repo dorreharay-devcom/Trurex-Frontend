@@ -1,30 +1,12 @@
 import { Backend, unwrap } from '~/shared/api/client';
 import type { Recommendation } from '~/types/recommendation/recommendation';
 import { mapDiscoverFeedRowSafe } from '~/api/mapDiscoverFeed';
-
-export interface DiscoverQueryParams {
-  category_filter?: string | null;
-  tag_filters?: string[] | null;
-  result_limit?: number;
-  result_offset?: number;
-}
-
-export interface SearchRexesParams {
-  search_term?: string | null;
-  category_filter?: string | null;
-  value_for_money_filters?: number[] | null;
-  quality_filter?: number | null;
-  created_from?: string | null;
-  created_to?: string | null;
-  result_limit?: number;
-  result_offset?: number;
-}
+import type { DiscoverQueryParams, SearchRexesParams } from './types';
 
 export const DiscoveryApi = {
   getDiscoverRecommendations: async (
     params: DiscoverQueryParams = {},
   ): Promise<Recommendation[]> => {
-    const tags = params.tag_filters?.filter((t) => t.trim().length > 0);
     const raw = unwrap(
       await Backend.rpc('recommendation_feed', {
         category_filter: params.category_filter ?? null,

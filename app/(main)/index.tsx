@@ -4,7 +4,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { PlusCircle } from 'lucide-react-native';
 import ProfileView from '~/components/profile/ProfileView';
 import FavesView from '~/components/faves/FavesView';
-import DiscoverView from '~/components/discover/DiscoverView';
+import DiscoverPage from '~/pages/discover';
 import MapScreen from '~/components/map/MapScreen';
 import CirclesView from '~/components/circles/CirclesView';
 import { Header } from '~/components/layout/Header';
@@ -193,7 +193,7 @@ export default function HomeScreen() {
         }
       >
         {currentTab === 'discover' && (
-          <DiscoverView searchQuery={searchQuery} onRecommendationPress={openPreview} />
+          <DiscoverPage searchQuery={searchQuery} onRecommendationPress={openPreview} />
         )}
         {currentTab === 'faves' && (
           <FavesView commentCountByRexId={{}} onRecommendationPress={openPreview} />

@@ -46,7 +46,7 @@ import { useMyCollections, useAddRexToCollection } from '~/hooks/useCollections'
 import { useFollowUser } from '~/hooks/useFollowUser';
 import { useBlockUser } from '~/hooks/useBlockUser';
 import { useSavedRexes } from '~/hooks/useGems';
-import { useMyRexes } from '~/hooks/useDiscovery';
+import { useMyRexes } from '~/hooks/useMyRexes';
 import { ChevronLeft, Star, UserX } from 'lucide-react-native';
 import CollectionDetailView from '~/components/faves/CollectionDetailView';
 import { OverlayModal } from '~/components/common/OverlayModal';

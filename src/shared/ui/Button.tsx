@@ -73,11 +73,17 @@ export const Button = ({
 }: ButtonProps) => {
   const isDisabled = disabled || loading;
 
+  function handlePress() {
+    if (isDisabled) return;
+    onPress();
+  }
+
   return (
     <TouchableOpacity
       activeOpacity={0.7}
-      onPress={onPress}
-      disabled={isDisabled}
+      onPress={handlePress}
+      disabled={!isWeb && isDisabled}
+      accessibilityState={{ disabled: isDisabled }}
       style={isDisabled && isWeb ? webDisabledCursorStyle : undefined}
       className={cn(
         'flex-row items-center justify-center',
@@ -91,7 +97,7 @@ export const Button = ({
       ) : (
         <>
           {icon ? <View className={title ? 'mr-2' : undefined}>{icon}</View> : null}
-          <View className="flex-row items-center">
+          <View className="flex-row items-center" pointerEvents="none">
             {label ? (
               <Text className={cn('mr-1.5 font-medium text-gray-500', labelClassName)}>
                 {label}
