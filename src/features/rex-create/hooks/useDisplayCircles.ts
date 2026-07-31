@@ -1,13 +1,13 @@
 import { useEffect, useMemo } from 'react';
-import { useMyCircles } from '~/hooks/useMyCircles';
-import { mapApiCirclesToDisplayRows, sortCirclesForRingStack } from '~/shared/lib/recCircles';
-import type { CreateRecCircle } from '~/types/circles';
+import { useMyCircles } from '~/shared/hooks/useMyCircles';
+import { mapApiCirclesToDisplayRows, sortCirclesForRingStack } from '~/shared/lib/circles';
+import type { CircleDisplayRow } from '~/shared/types/circles';
 
 export type DisplayCirclesState = ReturnType<typeof useDisplayCircles>;
 
 type UseDisplayCirclesArgs = {
   visible: boolean;
-  onLoaded: (circles: CreateRecCircle[]) => void;
+  onLoaded: (circles: CircleDisplayRow[]) => void;
 };
 
 export function useDisplayCircles({ visible, onLoaded }: UseDisplayCirclesArgs) {

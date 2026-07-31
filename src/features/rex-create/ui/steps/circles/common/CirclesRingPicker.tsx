@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, Pressable, useWindowDimensions } from 'react-native';
-import type { CreateRecCircle } from '~/types/circles';
+import type { CircleDisplayRow } from '~/shared/types/circles';
 import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 import { rgbaFromHexColor } from '~/utils/color';
@@ -17,8 +17,8 @@ import CircleGlyph from './CircleGlyph';
 const CHIP_ICON = 12;
 
 type Props = {
-  publicCircle: CreateRecCircle;
-  ringsInnerToBroader: CreateRecCircle[];
+  publicCircle: CircleDisplayRow;
+  ringsInnerToBroader: CircleDisplayRow[];
   selectedIds: Set<string>;
   onToggle: (id: string) => void;
   highlightId: string;

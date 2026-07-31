@@ -9,8 +9,6 @@ import {
 } from '~/shared/theme/Theme';
 import { webNoOutline } from '~/utils';
 
-const fieldBg = { backgroundColor: Theme.colors.searchFieldBackground };
-
 type Props = {
   name: string;
   onChangeName: (value: string) => void;
@@ -27,9 +25,8 @@ function CircleRenameRow({ name, onChangeName, onSave, onCancel, busy }: Props) 
         onChangeText={onChangeName}
         placeholder="Circle name"
         placeholderTextColor={Theme.colors.secondaryText}
-        className="min-w-0 flex-1 rounded-lg border border-border px-3 py-2 text-sm text-foreground"
+        className="min-w-0 flex-1 rounded-lg border border-border bg-search-field px-3 py-2 text-sm text-foreground"
         style={[
-          fieldBg,
           webNoOutline,
           textFieldCaretStyle,
           textFieldSingleLineStyle,
@@ -53,8 +50,7 @@ function CircleRenameRow({ name, onChangeName, onSave, onCancel, busy }: Props) 
         accessibilityRole="button"
         accessibilityLabel="Cancel editing"
         disabled={busy}
-        className="rounded-lg border border-border p-2 active:opacity-90 disabled:opacity-50"
-        style={fieldBg}
+        className="rounded-lg border border-border bg-search-field p-2 active:opacity-90 disabled:opacity-50"
       >
         <X size={18} color={Theme.colors.destructive} />
       </Pressable>

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Globe, Heart, Lock, Users } from 'lucide-react-native';
-import type { CreateRecCircle, CreateRecCircleIconKind } from '~/types/circles';
+import type { CircleDisplayRow, CircleIconKind } from '~/shared/types/circles';
 
-const GLYPH_ICONS: Record<CreateRecCircleIconKind, typeof Lock> = {
+const GLYPH_ICONS: Record<CircleIconKind, typeof Lock> = {
   lock: Lock,
   heart: Heart,
   users: Users,
@@ -10,7 +10,7 @@ const GLYPH_ICONS: Record<CreateRecCircleIconKind, typeof Lock> = {
 };
 
 type Props = {
-  circle: CreateRecCircle;
+  circle: CircleDisplayRow;
   size: number;
 };
 

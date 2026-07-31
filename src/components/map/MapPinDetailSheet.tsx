@@ -4,7 +4,7 @@ import { X, ExternalLink, Bookmark, Navigation, Share2 } from 'lucide-react-nati
 import type { Recommendation } from '~/shared/types/recommendation';
 import type { MapPinType } from '~/types/map/mapPin';
 import { Theme } from '~/shared/theme/Theme';
-import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
+import { SignedUserAvatar } from '~/shared/ui/SignedUserAvatar';
 import { useShareRex } from '~/shared/hooks/useShareRex';
 import { mapAuthorRecommendedLabel } from '~/utils/map/mapRecommendationData';
 

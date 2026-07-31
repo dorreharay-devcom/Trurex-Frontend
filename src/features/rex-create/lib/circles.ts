@@ -1,17 +1,17 @@
-import type { CreateRecCircle } from '~/types/circles';
+import type { CircleDisplayRow } from '~/shared/types/circles';
 import { isNonEmptyString } from '~/utils/guards';
 
-export function canRenameCreateRecCircle(c: CreateRecCircle): boolean {
+export function canRenameCircleDisplayRow(c: CircleDisplayRow): boolean {
   return c.systemKind == null || c.systemKind === '';
 }
 
 export function findRenameableCircleById(
-  rows: CreateRecCircle[],
+  rows: CircleDisplayRow[],
   id: string | null,
-): CreateRecCircle | undefined {
+): CircleDisplayRow | undefined {
   if (id == null || !isNonEmptyString(id)) return undefined;
   const row = rows.find((c) => c.id === id);
-  if (row == null || !canRenameCreateRecCircle(row)) return undefined;
+  if (row == null || !canRenameCircleDisplayRow(row)) return undefined;
   return row;
 }
 
@@ -50,14 +50,14 @@ export type SelectionAnnulus = {
 
 export function effectiveCirclesAfterLoadError(
   loadError: boolean,
-  circles: CreateRecCircle[],
-): CreateRecCircle[] {
+  circles: CircleDisplayRow[],
+): CircleDisplayRow[] {
   return loadError ? [] : circles;
 }
 
-export function partitionPublicAndPrivateRings(rows: CreateRecCircle[]): {
-  publicCircle: CreateRecCircle | undefined;
-  ringsInnerToBroader: CreateRecCircle[];
+export function partitionPublicAndPrivateRings(rows: CircleDisplayRow[]): {
+  publicCircle: CircleDisplayRow | undefined;
+  ringsInnerToBroader: CircleDisplayRow[];
 } {
   if (rows.length === 0) return { publicCircle: undefined, ringsInnerToBroader: [] };
   const publicCircle = rows[rows.length - 1]!;
@@ -66,15 +66,15 @@ export function partitionPublicAndPrivateRings(rows: CreateRecCircle[]): {
 }
 
 export function ringPaintOrderBackToFront(
-  publicCircle: CreateRecCircle,
-  ringsInnerToBroader: CreateRecCircle[],
-): CreateRecCircle[] {
+  publicCircle: CircleDisplayRow,
+  ringsInnerToBroader: CircleDisplayRow[],
+): CircleDisplayRow[] {
   return [publicCircle, ...ringsInnerToBroader.slice().reverse()];
 }
 
 export function selectionAnnuliLargestFirst(
-  ringsInnerToBroader: CreateRecCircle[],
-  publicCircle: CreateRecCircle,
+  ringsInnerToBroader: CircleDisplayRow[],
+  publicCircle: CircleDisplayRow,
   selectedIds: Set<string>,
   outerDiameter: (d: number) => number,
   innerHoleDiameter: (d: number) => number,
@@ -108,8 +108,8 @@ export function selectionAnnuliLargestFirst(
 
 export function distanceFromInnerForRingId(
   id: string,
-  publicCircle: CreateRecCircle,
-  ringsInnerToBroader: CreateRecCircle[],
+  publicCircle: CircleDisplayRow,
+  ringsInnerToBroader: CircleDisplayRow[],
   ringCount: number,
 ): number {
   if (id === publicCircle.id) return ringCount - 1;
@@ -117,7 +117,7 @@ export function distanceFromInnerForRingId(
   return idx >= 0 ? idx : 0;
 }
 
-export function circleFooterSubtitle(c: CreateRecCircle): string {
+export function circleFooterSubtitle(c: CircleDisplayRow): string {
   if (c.systemKind === 'broader_network') return 'Visible to anyone on TruRex';
   const n = c.memberCount;
   return `${n} ${n === 1 ? 'member' : 'members'}`;

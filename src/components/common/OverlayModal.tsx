@@ -4,7 +4,6 @@ import {
   Modal,
   View,
   KeyboardAvoidingView,
-  Platform,
   Pressable,
   StyleSheet,
   type ViewStyle,
@@ -12,7 +11,11 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { OverlayModalProps } from '~/types/overlayModal';
+import { KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT } from '~/shared/config/keyboard';
+import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/modalProps';
 import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
+import { isAndroid, isWeb } from '~/utils';
+import { cn } from '~/utils/general';
 
 export type { OverlayModalProps } from '~/types/overlayModal';
 
@@ -23,10 +26,11 @@ const styles = StyleSheet.create({
   },
 });
 
-const webOverlayRoot: ViewStyle | undefined =
-  Platform.OS === 'web'
-    ? ({ width: '100%', height: '100%', minHeight: '100%' } as ViewStyle)
-    : undefined;
+const webOverlayRoot: ViewStyle | undefined = isWeb
+  ? ({ width: '100%', height: '100%', minHeight: '100%' } as ViewStyle)
+  : undefined;
+
+const androidElevation: ViewStyle | undefined = isAndroid ? { elevation: 12 } : undefined;
 
 export const OverlayModal: React.FC<OverlayModalProps> = ({
   visible,
@@ -43,8 +47,7 @@ export const OverlayModal: React.FC<OverlayModalProps> = ({
       visible={visible}
       transparent
       animationType="none"
-      presentationStyle={Platform.OS === 'ios' ? 'overFullScreen' : undefined}
-      statusBarTranslucent={Platform.OS === 'android'}
+      {...OVERLAY_MODAL_PLATFORM_PROPS}
       onRequestClose={onRequestClose}
       onDismiss={onDismiss}
     >
@@ -57,15 +60,13 @@ export const OverlayModal: React.FC<OverlayModalProps> = ({
         >
           <View
             pointerEvents="none"
-            className={Platform.OS === 'web' ? 'backdrop-blur-sm' : ''}
+            className={cn(isWeb && 'backdrop-blur-sm')}
             style={[StyleSheet.absoluteFill, { backgroundColor: backdropBackground }]}
           />
         </Pressable>
 
         <KeyboardAvoidingView
-          behavior={
-            Platform.OS === 'ios' ? 'padding' : Platform.OS === 'android' ? 'height' : undefined
-          }
+          behavior={KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT}
           pointerEvents="box-none"
           style={[StyleSheet.absoluteFillObject, { zIndex: 61 }]}
         >
@@ -78,11 +79,7 @@ export const OverlayModal: React.FC<OverlayModalProps> = ({
           >
             <View
               className="absolute inset-0 sm:inset-4 sm:top-8 flex flex-col overflow-hidden bg-card sm:rounded-2xl sm:shadow-elevated"
-              style={{
-                paddingTop: insets.top,
-                paddingBottom: insets.bottom,
-                ...(Platform.OS === 'android' ? { elevation: 12 } : null),
-              }}
+              style={[{ paddingTop: insets.top, paddingBottom: insets.bottom }, androidElevation]}
             >
               {children}
             </View>

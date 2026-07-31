@@ -11,7 +11,6 @@ import {
   Modal,
   Pressable,
   StyleSheet,
-  Platform,
   ActivityIndicator,
   NativeSyntheticEvent,
   NativeScrollEvent,
@@ -28,7 +27,9 @@ import { ProfileApi } from '~/api/ProfileApi';
 import { Theme } from '~/shared/theme/Theme';
 import type { ProfileData } from '~/types/profile';
 import type { Recommendation } from '~/shared/types/recommendation';
-import { webContainerStyle } from '~/utils';
+import { isWeb, webContainerStyle } from '~/utils';
+import { KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT } from '~/shared/config/keyboard';
+import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/modalProps';
 import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
@@ -198,7 +199,7 @@ const ProfileView = ({
     onClose: () => setOpenCollectionId(null),
   });
   const closeCollection = useCallback(() => {
-    if (Platform.OS === 'web') {
+    if (isWeb) {
       handleCollectionClose();
       return;
     }
@@ -207,7 +208,7 @@ const ProfileView = ({
 
   const handleCollectionRexPress = useCallback(
     (rec: Recommendation) => {
-      if (Platform.OS !== 'web') {
+      if (!isWeb) {
         setOpenCollectionId(null);
         onRexPress?.(rec);
         return;
@@ -352,7 +353,7 @@ const ProfileView = ({
   const handleAvatarPress = useCallback(async () => {
     if (!authUser?.id) return;
 
-    if (Platform.OS !== 'web') {
+    if (!isWeb) {
       const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!perm.granted) {
         Alert.alert('Permission required', 'Allow photo access to change your avatar.');
@@ -418,12 +419,7 @@ const ProfileView = ({
 
   if (isEditing) {
     return (
-      <KeyboardAvoidingView
-        behavior={
-          Platform.OS === 'ios' ? 'padding' : Platform.OS === 'android' ? 'height' : undefined
-        }
-        className="min-h-0 flex-1"
-      >
+      <KeyboardAvoidingView behavior={KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT} className="min-h-0 flex-1">
         <ScrollView
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -455,8 +451,7 @@ const ProfileView = ({
       visible={addSheetVisible}
       transparent
       animationType="none"
-      presentationStyle={Platform.OS === 'ios' ? 'overFullScreen' : undefined}
-      statusBarTranslucent={Platform.OS === 'android'}
+      {...OVERLAY_MODAL_PLATFORM_PROPS}
       onRequestClose={() => setAddToCollectionId(null)}
     >
       <Animated.View
@@ -545,7 +540,7 @@ const ProfileView = ({
     </Modal>
   );
 
-  if (openCollectionId && Platform.OS !== 'web') {
+  if (openCollectionId && !isWeb) {
     return (
       <>
         <CollectionDetailView

@@ -17,3 +17,11 @@ export const REX_QUERY_KEYS = {
   /** owner: map (pin markers) */
   mapRexPins: ['mapRexPins'],
 } as const;
+
+/**
+ * React Query keys for circle data shared across features.
+ */
+export const CIRCLE_QUERY_KEYS = {
+  /** owner: features/circles; also invalidated by rex-create after circle edits */
+  myCircles: ['myCircles'],
+} as const;

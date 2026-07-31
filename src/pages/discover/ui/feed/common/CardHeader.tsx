@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { X } from 'lucide-react-native';
-import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
+import { SignedUserAvatar } from '~/shared/ui/SignedUserAvatar';
 import type { Recommendation } from '~/shared/types/recommendation';
 
 type Props = {

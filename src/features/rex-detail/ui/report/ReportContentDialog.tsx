@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Modal, ScrollView, useWindowDimensions, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { isIos, isWeb } from '~/utils';
+import { isWeb } from '~/utils';
 import type { ContentReportTarget } from '~/features/rex-detail/types/contentReport';
 import { useContentReportFlow } from '~/features/rex-detail/hooks/report/useContentReportFlow';
 import { useAuth } from '~/features/auth/providers';
@@ -11,6 +11,7 @@ import ReportDialogShell from './common/ReportDialogShell';
 import ReportDialogHeader from './common/ReportDialogHeader';
 import ReportFormBody from './common/ReportFormBody';
 import ReportFooter from './common/ReportFooter';
+import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/modalProps';
 
 const FORM_FOOTER_EST = 100;
 const HEADER_EST = 56;
@@ -95,9 +96,8 @@ const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, target, inli
       visible={open}
       animationType="fade"
       transparent
-      presentationStyle={isIos ? 'overFullScreen' : undefined}
+      {...OVERLAY_MODAL_PLATFORM_PROPS}
       onRequestClose={onRequestClose}
-      statusBarTranslucent
     >
       {content}
       <ModalToastLayer />

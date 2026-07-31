@@ -11,7 +11,9 @@ import {
 } from 'react-native';
 import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
 import { useSheetSlideAnimation } from '~/features/collections/hooks/common/useSheetSlideAnimation';
-import { isAndroid, isIos, isWeb } from '~/utils';
+import { isWeb } from '~/utils';
+import { KEYBOARD_BEHAVIOR_NATIVE_PADDING } from '~/shared/config/keyboard';
+import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/modalProps';
 
 type Props = {
   open: boolean;
@@ -28,8 +30,7 @@ function BottomSheet({ open, onClose, sheetStyle, children }: Props) {
       visible={visible}
       transparent
       animationType="none"
-      presentationStyle={isIos ? 'overFullScreen' : undefined}
-      statusBarTranslucent={isAndroid}
+      {...OVERLAY_MODAL_PLATFORM_PROPS}
       onRequestClose={onClose}
     >
       <Animated.View
@@ -41,7 +42,7 @@ function BottomSheet({ open, onClose, sheetStyle, children }: Props) {
 
       <View style={styles.outer} pointerEvents="box-none">
         <KeyboardAvoidingView
-          behavior={isWeb ? undefined : 'padding'}
+          behavior={KEYBOARD_BEHAVIOR_NATIVE_PADDING}
           pointerEvents="box-none"
           style={styles.full}
         >

@@ -4,6 +4,7 @@ import { GemsApi } from '~/features/collections/api/gemsApi';
 import { COLLECTIONS_QUERY_KEYS } from '~/features/collections/config/queryKeys';
 import type { SavedRexesParams } from '~/features/collections/types/savedRexes';
 import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/hooks/useDebouncedValue';
+import { nextPageOffset } from '~/shared/lib/pagination';
 
 const SAVED_REXES_PAGE_LIMIT = 20;
 
@@ -28,8 +29,7 @@ export const useSavedRexes = (params: SavedRexesParams = {}) => {
         search_term: searchTerm,
       }),
     initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.length === pageSize ? allPages.length * pageSize : undefined,
+    getNextPageParam: (lastPage, allPages) => nextPageOffset(lastPage, allPages, pageSize),
   });
 
   const rows = useMemo(() => query.data?.pages.flat() ?? [], [query.data?.pages]);

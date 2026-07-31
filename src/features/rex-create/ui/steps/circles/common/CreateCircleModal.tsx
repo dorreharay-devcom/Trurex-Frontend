@@ -16,8 +16,9 @@ import {
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
-import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/utils/circleTabUtils';
-import { isIos, isWeb, webDisabledCursor, webNoOutline } from '~/utils';
+import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/shared/config/circles';
+import { KEYBOARD_BEHAVIOR_IOS_PADDING } from '~/shared/config/keyboard';
+import { isWeb, webDisabledCursor, webNoOutline } from '~/utils';
 import { cn } from '~/utils/general';
 import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
 
@@ -53,7 +54,7 @@ function CreateCircleModal({
       <View className="flex-1 justify-center bg-black/50 px-4">
         <Pressable className="absolute inset-0" onPress={onClose} accessibilityLabel="Dismiss" />
         <KeyboardAvoidingView
-          behavior={isIos ? 'padding' : undefined}
+          behavior={KEYBOARD_BEHAVIOR_IOS_PADDING}
           className="w-full max-w-md self-center"
         >
           <View className="rounded-xl border border-border bg-card p-4">

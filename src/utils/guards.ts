@@ -127,3 +127,8 @@ export function firstBoolean(record: Record<string, unknown>, ...keys: string[])
   }
   return false;
 }
+
+export function omitUndefined<T extends Record<string, unknown>>(record: T): Partial<T> {
+  const entries = Object.entries(record).filter(([, value]) => value !== undefined);
+  return Object.fromEntries(entries) as Partial<T>;
+}

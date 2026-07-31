@@ -12,7 +12,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '~/features/auth/providers';
 import { unblockUser } from '~/api/moderationApi';
 import type { BlockedUserRow } from '~/types/moderation';
-import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
+import { SignedUserAvatar } from '~/shared/ui/SignedUserAvatar';
 import { Theme } from '~/shared/theme/Theme';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';

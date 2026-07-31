@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import type { CreateRecCircle } from '~/types/circles';
+import type { CircleDisplayRow } from '~/shared/types/circles';
 import { circleFooterSubtitle } from '~/features/rex-create/lib/circles';
 
 type Props = {
   privateSelected: boolean;
   selectedCount: number;
-  displayCircle: CreateRecCircle | undefined;
+  displayCircle: CircleDisplayRow | undefined;
 };
 
 function CirclesSelectionSummary({ privateSelected, selectedCount, displayCircle }: Props) {

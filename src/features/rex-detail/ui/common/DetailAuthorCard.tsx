@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
-import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
+import { SignedUserAvatar } from '~/shared/ui/SignedUserAvatar';
 import { Theme } from '~/shared/theme/Theme';
 
 type Props = {

@@ -1,26 +1,15 @@
 import React from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  View,
-  useWindowDimensions,
-} from 'react-native';
+import { KeyboardAvoidingView, ScrollView, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT } from '~/shared/config/keyboard';
 import { Theme } from '~/shared/theme/Theme';
-import { isWeb } from '~/utils';
+import { isIos, isWeb } from '~/utils';
 
 const FORM_MAX_WIDTH = 384;
 const HORIZONTAL_PADDING = 32;
 const TOP_PADDING = 48;
 const WEB_BOTTOM_PADDING = 48;
 const NATIVE_BOTTOM_PADDING = 64;
-
-const keyboardBehavior = Platform.select({
-  ios: 'padding' as const,
-  android: 'height' as const,
-  default: undefined,
-});
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   const { height } = useWindowDimensions();
@@ -47,7 +36,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <KeyboardAvoidingView
-      behavior={keyboardBehavior}
+      behavior={KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT}
       style={{ flex: 1, backgroundColor: Theme.colors.background }}
     >
       <ScrollView
@@ -59,7 +48,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
           paddingBottom: insets.bottom + NATIVE_BOTTOM_PADDING,
         }}
         keyboardShouldPersistTaps="handled"
-        keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'none'}
+        keyboardDismissMode={isIos ? 'interactive' : 'none'}
         automaticallyAdjustKeyboardInsets
         showsVerticalScrollIndicator={false}
       >

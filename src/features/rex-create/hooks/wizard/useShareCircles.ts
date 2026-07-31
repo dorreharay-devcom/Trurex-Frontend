@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { keepKnownCircleIds, PUBLIC_CIRCLE_KEY } from '~/features/rex-create/lib/sharing';
 import { REX_VISIBILITY } from '~/shared/config/rexVisibility';
-import type { CreateRecCircle } from '~/types/circles';
+import type { CircleDisplayRow } from '~/shared/types/circles';
 import type { RexForEditRow } from '~/features/rex-detail/types/rexDetail';
 
 export function useShareCircles() {
@@ -31,7 +31,7 @@ export function useShareCircles() {
     if (selected) setSelectedCircleIds(new Set());
   }, []);
 
-  const ensureDefaultCircleSelectionFromApiOrder = useCallback((rows: CreateRecCircle[]) => {
+  const ensureDefaultCircleSelectionFromApiOrder = useCallback((rows: CircleDisplayRow[]) => {
     if (!rows.length) return;
     const outerId = rows[rows.length - 1]!.id;
     const knownIds = new Set(rows.map((r) => r.id));

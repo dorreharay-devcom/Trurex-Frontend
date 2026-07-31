@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import type { CreateRecCircle } from '~/types/circles';
+import type { CircleDisplayRow } from '~/shared/types/circles';
 import { cn } from '~/utils/general';
 import CircleGlyph from './CircleGlyph';
 import CircleRadioIndicator from './CircleRadioIndicator';
@@ -8,7 +8,7 @@ import CircleRadioIndicator from './CircleRadioIndicator';
 const GLYPH_SIZE = 24;
 
 type Props = {
-  circle: CreateRecCircle;
+  circle: CircleDisplayRow;
   selected: boolean;
   onToggle: () => void;
 };

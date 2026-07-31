@@ -11,7 +11,8 @@ import CollectionSummaryHeader from '~/features/collections/ui/collection-detail
 import { entryToRecommendation } from '~/features/collections/lib/mappers';
 import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
 import { Theme } from '~/shared/theme/Theme';
-import { isAndroid, isIos, webContainerStyle } from '~/utils';
+import { KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT } from '~/shared/config/keyboard';
+import { webContainerStyle } from '~/utils';
 
 function EmptyCollection() {
   return (
@@ -25,12 +26,6 @@ function EmptyCollection() {
       </Text>
     </View>
   );
-}
-
-function keyboardBehavior() {
-  if (isIos) return 'padding';
-  if (isAndroid) return 'height';
-  return undefined;
 }
 
 export type CollectionDetailViewProps = {
@@ -61,7 +56,7 @@ function CollectionDetailView({
 
   return (
     <>
-      <KeyboardAvoidingView behavior={keyboardBehavior()} className="min-h-0 flex-1">
+      <KeyboardAvoidingView behavior={KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT} className="min-h-0 flex-1">
         <CollectionHeaderBar
           isMyCollection={detail.is_my_collection}
           actions={actions}

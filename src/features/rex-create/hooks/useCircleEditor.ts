@@ -1,14 +1,18 @@
 import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { createCircle, updateCircle } from '~/api/circlesApi';
-import type { CreateRecCircle } from '~/types/circles';
+import { createCircle, updateCircle } from '~/shared/api/circlesApi';
+import type { CircleDisplayRow } from '~/shared/types/circles';
 import { toastError, toastSuccess } from '~/utils/appToast';
-import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/utils/circleTabUtils';
+import {
+  CIRCLE_COLOR_PRESETS,
+  CIRCLE_PRESET_DEFAULT,
+  type CirclePresetColor,
+} from '~/shared/config/circles';
+import { CIRCLE_QUERY_KEYS } from '~/shared/config/queryKeys';
 import { isNonEmptyString } from '~/utils/guards';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { unknownErrorMessage } from '~/utils';
 
-const PRESET_DEFAULT: CirclePresetColor = CIRCLE_COLOR_PRESETS[0];
 
 type UseCircleEditorArgs = {
   onCreated: (circleId: string) => void;
@@ -20,17 +24,17 @@ export function useCircleEditor({ onCreated }: UseCircleEditorArgs) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [color, setColor] = useState<CirclePresetColor>(PRESET_DEFAULT);
+  const [color, setColor] = useState<CirclePresetColor>(CIRCLE_PRESET_DEFAULT);
   const [busy, setBusy] = useState(false);
 
   const invalidateCircles = useCallback(() => {
-    void queryClient.invalidateQueries({ queryKey: ['myCircles'] });
+    void queryClient.invalidateQueries({ queryKey: CIRCLE_QUERY_KEYS.myCircles });
   }, [queryClient]);
 
   const resetForm = useCallback(() => {
     setName('');
     setDescription('');
-    setColor(PRESET_DEFAULT);
+    setColor(CIRCLE_PRESET_DEFAULT);
   }, []);
 
   const openCreateModal = useCallback(() => {
@@ -66,7 +70,7 @@ export function useCircleEditor({ onCreated }: UseCircleEditorArgs) {
     }
   }, [name, description, color, closeCreateModal, invalidateCircles, onCreated]);
 
-  const startRename = useCallback((circle: CreateRecCircle) => {
+  const startRename = useCallback((circle: CircleDisplayRow) => {
     setEditingId(circle.id);
     setName(circle.title);
   }, []);

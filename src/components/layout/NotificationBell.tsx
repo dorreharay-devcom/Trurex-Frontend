@@ -18,7 +18,7 @@ import { useNotifications } from '~/hooks/useNotifications';
 import { followUser } from '~/api/usersApi';
 import { Theme } from '~/shared/theme/Theme';
 import { formatCompactRelativeTime } from '~/utils/date';
-import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
+import { SignedUserAvatar } from '~/shared/ui/SignedUserAvatar';
 import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
 import type { AppNotification } from '~/types/notification/appNotification';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';

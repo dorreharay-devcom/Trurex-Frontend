@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, Pressable } from 'react-native';
 import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
-import type { CreateRecCircle } from '~/types/circles';
+import type { CircleDisplayRow } from '~/shared/types/circles';
 import {
-  canRenameCreateRecCircle,
+  canRenameCircleDisplayRow,
   effectiveCirclesAfterLoadError,
   findRenameableCircleById,
   partitionPublicAndPrivateRings,
@@ -20,7 +20,7 @@ import CreateCircleModal from './common/CreateCircleModal';
 import PrivateRexToggle from './common/PrivateRexToggle';
 
 type Props = {
-  circles: CreateRecCircle[];
+  circles: CircleDisplayRow[];
   showFetchSpinner: boolean;
   loadError: boolean;
   onRetry: () => void;
@@ -61,7 +61,7 @@ const Circles: React.FC<Props> = ({
   const renameTarget = findRenameableCircleById(visible, editor.editingId);
   const showRenameChip =
     displayCircle != null &&
-    canRenameCreateRecCircle(displayCircle) &&
+    canRenameCircleDisplayRow(displayCircle) &&
     editor.editingId == null &&
     !privateSelected;
 

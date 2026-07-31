@@ -4,6 +4,7 @@ import { Backend, unwrap } from '~/shared/api/client';
 import { mapDiscoverFeedRowSafe } from '~/api/mapDiscoverFeed';
 import type { Recommendation } from '~/shared/types/recommendation';
 import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
+import { nextPageOffset } from '~/shared/lib/pagination';
 
 const MY_REXES_PAGE_SIZE = 20;
 
@@ -26,8 +27,7 @@ export const useMyRexes = (userId?: string) => {
       });
     },
     initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.length === pageSize ? allPages.length * pageSize : undefined,
+    getNextPageParam: (lastPage, allPages) => nextPageOffset(lastPage, allPages, pageSize),
     enabled: !!userId,
   });
 

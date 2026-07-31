@@ -17,8 +17,10 @@ import { X } from 'lucide-react-native';
 import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
 import { useModalSpringAnimation } from '~/features/collections/hooks/common/useModalSpringAnimation';
 import { Theme } from '~/shared/theme/Theme';
-import { isAndroid, isIos, isWeb, webContainerStyle } from '~/utils';
+import { isWeb, webContainerStyle } from '~/utils';
 import { cn } from '~/utils/general';
+import { KEYBOARD_BEHAVIOR_NATIVE_PADDING } from '~/shared/config/keyboard';
+import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/modalProps';
 
 const WEB_MAX_WIDTH = 512;
 
@@ -40,8 +42,7 @@ function CollectionModalShell({ open, title, cardStyle, footer, onClose, childre
       visible={visible}
       transparent
       animationType="none"
-      presentationStyle={isIos ? 'overFullScreen' : undefined}
-      statusBarTranslucent={isAndroid}
+      {...OVERLAY_MODAL_PLATFORM_PROPS}
       onRequestClose={onClose}
     >
       <Animated.View
@@ -53,7 +54,7 @@ function CollectionModalShell({ open, title, cardStyle, footer, onClose, childre
 
       <View style={styles.overlay} pointerEvents="box-none">
         <KeyboardAvoidingView
-          behavior={isWeb ? undefined : 'padding'}
+          behavior={KEYBOARD_BEHAVIOR_NATIVE_PADDING}
           pointerEvents="box-none"
           style={{ width: '100%', maxWidth: isWeb ? WEB_MAX_WIDTH : width }}
         >

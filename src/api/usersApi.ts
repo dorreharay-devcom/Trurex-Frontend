@@ -221,10 +221,6 @@ export async function unfollowUser(input_followed_user_id: string): Promise<void
   throwRpcIfFailed(await Backend.rpc('unfollow_user', { input_followed_user_id }));
 }
 
-export function filterOneWayFollowing(rows: NetworkUserRow[]): NetworkUserRow[] {
-  return rows.filter((r) => r.relationship_status === 'following');
-}
-
 const emptyUserConfig = (): UserConfigRow => ({
   avatar_url: null,
   pinned_category_ids: [],

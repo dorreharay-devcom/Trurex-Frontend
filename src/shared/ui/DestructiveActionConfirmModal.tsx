@@ -2,8 +2,9 @@ import React, { type ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
 import ConfirmModalCard from '~/shared/ui/destructive-confirm/ConfirmModalCard';
-import { isAndroid, isIos, isWeb } from '~/utils';
+import { isWeb } from '~/utils';
 import { cn } from '~/utils/general';
+import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/modalProps';
 
 export type DestructiveActionConfirmModalProps = {
   visible: boolean;
@@ -64,8 +65,7 @@ export function DestructiveActionConfirmModal({
       visible
       transparent
       animationType={isWeb ? 'fade' : 'slide'}
-      presentationStyle={isIos ? 'overFullScreen' : undefined}
-      statusBarTranslucent={isAndroid}
+      {...OVERLAY_MODAL_PLATFORM_PROPS}
       onRequestClose={() => {
         if (!pending) onCancel();
       }}

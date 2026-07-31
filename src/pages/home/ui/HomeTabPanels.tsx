@@ -1,5 +1,5 @@
 import React from 'react';
-import CirclesView from '~/components/circles/CirclesView';
+import CirclesPage from '~/pages/circles';
 import GemsPage from '~/pages/gems';
 import MapScreen from '~/components/map/MapScreen';
 import ProfileView from '~/components/profile/ProfileView';
@@ -37,7 +37,7 @@ function HomeTabPanels({
     return <GemsPage onRecommendationPress={onRecommendationPress} />;
   }
   if (currentTab === TAB.circles) {
-    return <CirclesView isActive onUserPress={onUserPress} />;
+    return <CirclesPage isActive onUserPress={onUserPress} />;
   }
   if (currentTab === TAB.map) {
     return (
