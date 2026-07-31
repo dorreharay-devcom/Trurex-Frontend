@@ -31,7 +31,6 @@ function patchInfiniteRecommendations(
   return changed ? { ...data, pages } : data;
 }
 
-/** Keep list/card comment counts in sync after add/delete without a full refetch. */
 export function patchFeedCommentCount(
   queryClient: QueryClient,
   rexId: string,

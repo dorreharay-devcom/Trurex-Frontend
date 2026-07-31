@@ -1,3 +1,5 @@
+import type { RexVisibility } from '~/shared/config/rexVisibility';
+
 export type CategoryQuestionType = 'select' | 'text';
 
 export type CategoryQuestion = {
@@ -54,7 +56,7 @@ export type CreateRexRpcParams = {
   p_review?: string | null;
   p_description?: string | null;
   p_reason?: string | null;
-  p_visibility?: 'public' | 'private' | 'circles' | null;
+  p_visibility?: RexVisibility | null;
   circle_ids?: string[] | null;
   tag_names: string[];
   photo_paths: string[] | null;

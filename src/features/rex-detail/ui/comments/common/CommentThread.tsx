@@ -1,14 +1,14 @@
 import React from 'react';
 import { View } from 'react-native';
 import type { RexComment } from '~/features/rex-detail/types/rexComment';
-import { CommentRow, type CommentRowProps } from './CommentRow';
+import CommentRow, { type CommentRowProps } from './CommentRow';
 
 type Props = {
   root: RexComment;
   highlightCommentId?: string | null;
 } & Omit<CommentRowProps, 'comment' | 'isReply' | 'highlight'>;
 
-export const CommentThread: React.FC<Props> = ({ root, highlightCommentId, ...rest }) => (
+const CommentThread: React.FC<Props> = ({ root, highlightCommentId, ...rest }) => (
   <View className="gap-3">
     <CommentRow
       comment={root}
@@ -27,3 +27,5 @@ export const CommentThread: React.FC<Props> = ({ root, highlightCommentId, ...re
     ))}
   </View>
 );
+
+export default CommentThread;

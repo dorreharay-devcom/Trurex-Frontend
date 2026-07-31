@@ -1,3 +1,5 @@
+import type { RexVisibility } from '~/shared/config/rexVisibility';
+
 export type CategoryRatingRead = {
   label: string;
   display_label: string;
@@ -22,7 +24,6 @@ export type RexDetailRow = {
   place_name: string;
   is_online_place?: boolean | null;
   place_website_url?: string | null;
-  /** Free-text location for non-physical/online places. */
   location_text?: string | null;
   place_location?: string | null;
   description: string | null;
@@ -41,7 +42,7 @@ export type RexDetailRow = {
       selected_label: string;
     }
   >;
-  visibility: 'public' | 'private' | 'circles';
+  visibility: RexVisibility;
   status: 'active' | 'hidden' | 'removed';
   created_at: string;
   like_count: number;
@@ -70,7 +71,7 @@ export type RexForEditRow = {
   must_know: string | null;
   category_ratings: Record<string, CategoryRatingRead>;
   question_answers: Record<string, string>;
-  visibility: 'public' | 'private' | 'circles';
+  visibility: RexVisibility;
   circle_ids: string[];
   tag_slugs: string[];
   photo_paths: string[];

@@ -32,14 +32,14 @@ export type RexCommentLikeRow = {
   created_at: string;
 };
 
-export interface RexCommentAuthor {
+export type RexCommentAuthor = {
   display_name: string | null;
   avatar_url: string | null;
   username: string | null;
   relationship_status: string | null;
-}
+};
 
-export interface RexComment {
+export type RexComment = {
   id: string;
   rex_id: string;
   parent_comment_id: string | null;
@@ -52,4 +52,4 @@ export interface RexComment {
   reply_count: number;
   profile: RexCommentAuthor;
   replies: RexComment[];
-}
+};

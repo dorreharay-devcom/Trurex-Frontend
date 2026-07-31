@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, ScrollView } from 'react-native';
-import { RexCommentsSection } from '~/features/rex-detail/ui/comments';
+import RexCommentsSection from '~/features/rex-detail/ui/comments/RexCommentsSection';
 import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
 import type { RexDetailView } from '~/features/rex-detail/hooks/useRexDetail';
 import type { SaveRexState } from '~/features/rex-detail/hooks/useSaveRex';

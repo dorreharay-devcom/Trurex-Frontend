@@ -5,10 +5,7 @@ import type { ImageStyle } from 'expo-image';
 import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
 import { Skeleton } from '~/components/ui/skeleton';
 import { cn, isHttpUrl } from '~/utils/general';
-import {
-  isRexPlaceholderPhotoPath,
-  REX_PLACEHOLDER_IMAGE_SOURCE,
-} from '~/constants/rexPlaceholderPhoto';
+import { isRexPlaceholderPhotoPath, REX_PLACEHOLDER_IMAGE_SOURCE } from '~/shared/lib/rexImages';
 
 type Props = {
   bucket: string;

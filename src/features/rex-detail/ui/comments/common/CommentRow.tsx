@@ -21,7 +21,7 @@ export type CommentRowProps = {
   onRowRef?: (commentId: string, ref: View | null) => void;
 };
 
-export const CommentRow: React.FC<CommentRowProps> = ({
+const CommentRow: React.FC<CommentRowProps> = ({
   comment,
   currentUserId,
   isReply,
@@ -96,3 +96,5 @@ export const CommentRow: React.FC<CommentRowProps> = ({
     </View>
   );
 };
+
+export default CommentRow;

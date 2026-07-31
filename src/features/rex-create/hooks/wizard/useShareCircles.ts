@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { keepKnownCircleIds, PUBLIC_CIRCLE_KEY } from '~/features/rex-create/lib/sharing';
+import { REX_VISIBILITY } from '~/shared/config/rexVisibility';
 import type { CreateRecCircle } from '~/types/circles';
 import type { RexForEditRow } from '~/features/rex-detail/types/rexDetail';
 
@@ -49,8 +50,8 @@ export function useShareCircles() {
   }, []);
 
   const prefillFromEditRow = useCallback((row: RexForEditRow) => {
-    setSelectedCircleIds(new Set(row.visibility === 'circles' ? row.circle_ids : []));
-    setPrivateRexState(row.visibility === 'private');
+    setSelectedCircleIds(new Set(row.visibility === REX_VISIBILITY.circles ? row.circle_ids : []));
+    setPrivateRexState(row.visibility === REX_VISIBILITY.private);
   }, []);
 
   const reset = useCallback(() => {

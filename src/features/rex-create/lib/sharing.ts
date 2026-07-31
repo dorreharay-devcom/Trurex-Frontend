@@ -1,4 +1,5 @@
 import type { CreateRexRpcParams } from '~/features/rex-create/types/categoryCreateConfig';
+import { REX_VISIBILITY } from '~/shared/config/rexVisibility';
 import { isStrictUuid } from '~/utils/guards';
 
 export const PUBLIC_CIRCLE_KEY = 'public';
@@ -19,14 +20,14 @@ export function resolveCreateRexVisibility(
   privateSelected: boolean,
   publicCircleId?: string | null,
 ): NonNullable<CreateRexRpcParams['p_visibility']> {
-  if (privateSelected) return 'private';
+  if (privateSelected) return REX_VISIBILITY.private;
   if (
     selectedCircleIds.has(PUBLIC_CIRCLE_KEY) ||
     (publicCircleId != null && selectedCircleIds.has(publicCircleId))
   ) {
-    return 'public';
+    return REX_VISIBILITY.public;
   }
-  return 'circles';
+  return REX_VISIBILITY.circles;
 }
 
 export function keepKnownCircleIds(
@@ -45,7 +46,7 @@ export function canPostCreateRexShare(
 ): boolean {
   if (privateSelected) return true;
   const visibility = resolveCreateRexVisibility(selectedCircleIds, privateSelected, publicCircleId);
-  if (visibility === 'public') return true;
+  if (visibility === REX_VISIBILITY.public) return true;
   const circleIds = resolveCreateRexCircleIds(selectedCircleIds, publicCircleId);
   return Array.isArray(circleIds) && circleIds.length > 0;
 }

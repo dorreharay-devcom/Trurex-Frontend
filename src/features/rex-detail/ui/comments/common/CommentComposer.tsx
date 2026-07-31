@@ -18,7 +18,7 @@ export type CommentComposerProps = {
   onInputFocus?: () => void;
 };
 
-export const CommentComposer: React.FC<CommentComposerProps> = ({
+const CommentComposer: React.FC<CommentComposerProps> = ({
   composer,
   composerAnchorRef,
   onInputFocus,
@@ -85,3 +85,5 @@ export const CommentComposer: React.FC<CommentComposerProps> = ({
     </View>
   );
 };
+
+export default CommentComposer;

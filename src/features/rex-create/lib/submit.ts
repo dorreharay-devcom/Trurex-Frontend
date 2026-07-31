@@ -9,6 +9,7 @@ import {
   resolveCreateRexVisibility,
 } from '~/features/rex-create/lib/sharing';
 import { SEARCH_MODE } from '~/features/rex-create/types/create';
+import { REX_VISIBILITY } from '~/shared/config/rexVisibility';
 import type { CategoryQuestion } from '~/features/rex-create/types/categoryCreateConfig';
 
 export function createRexErrorMessage(
@@ -118,7 +119,7 @@ export function buildCreateRexParams(
     p_must_know: config.showQuickTip ? scorecard.scoreQuickTip.trim() || null : null,
     p_visibility,
     circle_ids:
-      p_visibility === 'circles'
+      p_visibility === REX_VISIBILITY.circles
         ? resolveCreateRexCircleIds(circles.selectedCircleIds, circles.publicCircleId)
         : undefined,
     tag_names: scorecard.selectedTagSlugs,

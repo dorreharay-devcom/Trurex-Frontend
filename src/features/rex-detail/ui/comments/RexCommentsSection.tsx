@@ -7,8 +7,8 @@ import { useCommentComposer } from '~/features/rex-detail/hooks/comments/useComm
 import { useCommentFocus } from '~/features/rex-detail/hooks/comments/useCommentFocus';
 import { useAuth } from '~/features/auth/providers';
 import { Theme } from '~/shared/theme/Theme';
-import { CommentComposer } from './common/CommentComposer';
-import { CommentThread } from './common/CommentThread';
+import CommentComposer from './common/CommentComposer';
+import CommentThread from './common/CommentThread';
 import { totalRexCommentCount } from '~/features/rex-detail/lib/rexCommentTree';
 import type { RexComment } from '~/features/rex-detail/types/rexComment';
 
@@ -53,7 +53,7 @@ function CommentsList({ loading, comments, ...threadProps }: CommentsListProps) 
   );
 }
 
-export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
+const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
   rexId,
   onCommentTotalChange,
   composerAnchorRef,
@@ -117,3 +117,5 @@ export const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
     </View>
   );
 };
+
+export default RexCommentsSection;
