@@ -20,10 +20,10 @@ import {
 } from '~/shared/theme/Theme';
 import { isWeb } from '~/utils';
 import { NotificationBell } from '~/components/layout/NotificationBell';
-import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
-import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
+import { useSignedStorageUrl } from '~/shared/hooks/useSignedStorageUrl';
+import { USER_AVATARS_BUCKET } from '~/shared/config/storageBuckets';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
-import { ClearableSearchInput } from '~/components/common/ClearableSearchInput';
+import { ClearableSearchInput } from '~/shared/ui/ClearableSearchInput';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 
 interface HeaderProps {

@@ -6,8 +6,8 @@ import { toastSuccess } from '~/utils/appToast';
 import { buildProfileShareUrl, profileShareSlug } from '~/utils/profileShareUrl';
 import { shareMobileLink } from '~/utils/mobileShare';
 import { Theme } from '~/shared/theme/Theme';
-import { SignedStorageImage } from '~/components/common/SignedStorageImage';
-import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
+import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
+import { USER_AVATARS_BUCKET } from '~/shared/config/storageBuckets';
 import type { ProfileData } from '~/types/profile';
 
 export type { ProfileData };

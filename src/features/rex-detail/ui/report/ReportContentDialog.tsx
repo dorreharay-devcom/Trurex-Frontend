@@ -6,7 +6,7 @@ import type { ContentReportTarget } from '~/features/rex-detail/types/contentRep
 import { useContentReportFlow } from '~/features/rex-detail/hooks/report/useContentReportFlow';
 import { useAuth } from '~/features/auth/providers';
 import { toastInfo } from '~/utils/appToast';
-import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
+import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
 import ReportDialogShell from './common/ReportDialogShell';
 import ReportDialogHeader from './common/ReportDialogHeader';
 import ReportFormBody from './common/ReportFormBody';

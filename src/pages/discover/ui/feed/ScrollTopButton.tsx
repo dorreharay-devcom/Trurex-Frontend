@@ -4,10 +4,13 @@ import { ChevronUp } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
 
 type ScrollTopButtonProps = {
+  visible: boolean;
   onPress: () => void;
 };
 
-const ScrollTopButton = ({ onPress }: ScrollTopButtonProps) => {
+const ScrollTopButton = ({ visible, onPress }: ScrollTopButtonProps) => {
+  if (!visible) return null;
+
   return (
     <TouchableOpacity
       onPress={onPress}

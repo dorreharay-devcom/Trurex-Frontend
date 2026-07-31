@@ -12,7 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { OverlayModalProps } from '~/types/overlayModal';
-import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
+import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
 
 export type { OverlayModalProps } from '~/types/overlayModal';
 

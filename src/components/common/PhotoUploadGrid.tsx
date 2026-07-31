@@ -4,7 +4,7 @@ import { Plus, X, CircleAlert } from 'lucide-react-native';
 import { useAuth } from '~/features/auth/providers';
 import { useRexPhotoUploadGrid } from '~/hooks/useRexPhotoUploadGrid';
 import { SignedRexThumb } from './SignedRexThumb';
-import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
+import { REX_IMAGES_BUCKET } from '~/shared/config/storageBuckets';
 import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
 

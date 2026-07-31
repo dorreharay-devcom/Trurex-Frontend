@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import AddRexToCollectionSheet from '~/components/faves/AddRexToCollectionSheet';
-import CollectionDetailView from '~/components/faves/CollectionDetailView';
+import AddRexToCollectionSheet from '~/features/collections/ui/AddRexToCollectionSheet';
+import CollectionDetailView from '~/features/collections/ui/CollectionDetailView';
 import DeepLinkShell from '~/shared/ui/DeepLinkShell';
 import ProtectedRoute from '~/components/common/ProtectedRoute';
 import RecommendationDetailModal from '~/features/rex-detail/ui/RecommendationDetailModal';
@@ -43,7 +43,7 @@ function CollectionPage() {
         onClose={preview.close}
         onDismiss={preview.clear}
         onCommentCountChange={() => {}}
-        scrollToComments={preview.options.scrollToComments === true}
+        scrollToComments={preview.options.scrollToComments}
         scrollToCommentId={preview.options.scrollToCommentId}
       />
     </>

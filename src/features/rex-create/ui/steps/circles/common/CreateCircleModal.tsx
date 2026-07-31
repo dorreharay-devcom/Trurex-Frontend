@@ -17,12 +17,9 @@ import {
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
 import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/utils/circleTabUtils';
-import { isIos } from '~/utils';
-import { cn, webDisabledCursorStyle } from '~/utils/general';
-import { isWeb, webNoOutline } from '~/utils';
-import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
-
-const collectionFieldBg = { backgroundColor: Theme.colors.searchFieldBackground };
+import { isIos, isWeb, webDisabledCursor, webNoOutline } from '~/utils';
+import { cn } from '~/utils/general';
+import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
 
 type Props = {
   visible: boolean;
@@ -73,9 +70,8 @@ function CreateCircleModal({
               onChangeText={onChangeName}
               maxLength={40}
               editable={!creating}
-              className="mb-3 rounded-xl border border-border px-3 py-3 text-sm text-foreground"
+              className="mb-3 rounded-xl border border-border bg-search-field px-3 py-3 text-sm text-foreground"
               style={[
-                collectionFieldBg,
                 webNoOutline,
                 textFieldCaretStyle,
                 textFieldSingleLineStyle,
@@ -90,13 +86,8 @@ function CreateCircleModal({
               maxLength={100}
               multiline
               editable={!creating}
-              className="mb-3 min-h-[44px] rounded-xl border border-border px-3 py-3 text-sm text-foreground"
-              style={[
-                collectionFieldBg,
-                webNoOutline,
-                textFieldCaretStyle,
-                textFieldMultilineStyle,
-              ]}
+              className="mb-3 min-h-[44px] rounded-xl border border-border bg-search-field px-3 py-3 text-sm text-foreground"
+              style={[webNoOutline, textFieldCaretStyle, textFieldMultilineStyle]}
             />
             <Text className="mb-2 text-xs text-muted-foreground">Color</Text>
             <View className="mb-4 flex-row flex-wrap gap-2">
@@ -118,8 +109,7 @@ function CreateCircleModal({
               <Pressable
                 onPress={onClose}
                 disabled={creating}
-                className="flex-1 items-center rounded-xl border border-border py-3 active:opacity-90 disabled:opacity-50"
-                style={collectionFieldBg}
+                className="flex-1 items-center rounded-xl border border-border bg-search-field py-3 active:opacity-90 disabled:opacity-50"
               >
                 <Text className="text-sm font-medium text-foreground">Cancel</Text>
               </Pressable>
@@ -129,7 +119,7 @@ function CreateCircleModal({
                   onCreate();
                 }}
                 disabled={!canCreate}
-                style={!canCreate && isWeb ? webDisabledCursorStyle : undefined}
+                style={webDisabledCursor(!canCreate)}
                 className={cn(
                   'flex-1 items-center rounded-xl py-3',
                   canCreate

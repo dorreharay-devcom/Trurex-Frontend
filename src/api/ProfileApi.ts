@@ -1,5 +1,5 @@
 import { Backend, unwrap } from '~/shared/api/client';
-import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
+import { USER_AVATARS_BUCKET } from '~/shared/config/storageBuckets';
 import type {
   ProfileData,
   UserProfileResponse,

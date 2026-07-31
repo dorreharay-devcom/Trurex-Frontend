@@ -1,5 +1,5 @@
 import { makeRedirectUri } from 'expo-auth-session';
-import { Platform, Dimensions, type TextStyle } from 'react-native';
+import { Platform, Dimensions, type TextStyle, type ViewStyle } from 'react-native';
 import { isNonEmptyString, isPlainObject } from './guards';
 
 export { cn, type ClassValue } from './general';
@@ -34,6 +34,13 @@ export const webContainerStyle = isWeb
   : undefined;
 
 export const webNoOutline = isWeb ? ({ outlineStyle: 'none' } as object) : undefined;
+
+const notAllowedCursorStyle = { cursor: 'not-allowed' } as unknown as ViewStyle;
+
+export function webDisabledCursor(disabled: boolean): ViewStyle | undefined {
+  if (!disabled || !isWeb) return undefined;
+  return notAllowedCursorStyle;
+}
 export const { width, height } = Dimensions.get('window');
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

@@ -19,7 +19,7 @@ import { followUser } from '~/api/usersApi';
 import { Theme } from '~/shared/theme/Theme';
 import { formatCompactRelativeTime } from '~/utils/date';
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
-import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
+import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
 import type { AppNotification } from '~/types/notification/appNotification';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 import { notificationRexDeepLink } from '~/utils/notification/notificationRexDeepLink';

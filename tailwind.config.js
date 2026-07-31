@@ -35,6 +35,7 @@ module.exports = {
         'rating-star': '#F59B0A',
         destructive: '#DB2424', // hsl(0 72% 50%)
         border: '#D4D4D4', // hsl(0 0% 83%)
+        'search-field': '#DBDBDB', // hsl(0 0% 86%) — Theme.colors.searchFieldBackground
         ring: '#B7C7CF',
         gold: '#CCAB66',
         sand: '#E4DBCD', // hsl(35 30% 85%)

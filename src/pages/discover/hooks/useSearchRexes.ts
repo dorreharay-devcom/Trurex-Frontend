@@ -8,6 +8,7 @@ import {
   vfmForRpc,
   type RecencyDayToken,
 } from '~/pages/discover/lib/searchParams';
+import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 
 const SEARCH_PAGE_SIZE = 20;
 
@@ -46,7 +47,7 @@ export const useSearchRexes = (args: UseSearchRexesArgs, options?: UseSearchRexe
 
   return useQuery({
     queryKey: [
-      'search-rexes',
+      ...REX_QUERY_KEYS.searchRexes,
       trimmed,
       categoryFilter,
       [...args.searchCategoryFilter].sort().join(','),

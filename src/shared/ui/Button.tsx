@@ -1,8 +1,8 @@
 import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, View } from 'react-native';
 import { Theme } from '~/shared/theme/Theme';
-import { cn, webDisabledCursorStyle } from '~/utils/general';
-import { isWeb } from '~/utils';
+import { cn } from '~/utils/general';
+import { isWeb, webDisabledCursor } from '~/utils';
 
 export const ButtonVariant = {
   Primary: 'primary',
@@ -84,7 +84,7 @@ export const Button = ({
       onPress={handlePress}
       disabled={!isWeb && isDisabled}
       accessibilityState={{ disabled: isDisabled }}
-      style={isDisabled && isWeb ? webDisabledCursorStyle : undefined}
+      style={webDisabledCursor(isDisabled)}
       className={cn(
         'flex-row items-center justify-center',
         buttonClassByVariant[variant],

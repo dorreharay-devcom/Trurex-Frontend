@@ -10,16 +10,26 @@ import { Routes } from '~/shared/config/routes';
 import { useRexPreview } from '~/features/rex-detail/hooks/useRexPreview';
 import { isHexUuidString } from '~/utils/guards';
 
+type ProfileTarget = { userId?: string; handle?: string };
+
+function parseProfileSlug(slug: string | undefined): ProfileTarget {
+  if (!slug) return {};
+  if (isHexUuidString(slug)) return { userId: slug };
+  return { handle: slug.replace(/^@/, '') };
+}
+
 function ProfilePage() {
   const { userId: slug } = useLocalSearchParams<{ userId: string }>();
   const router = useRouter();
   const preview = useRexPreview();
-  const isUuid = isHexUuidString(slug ?? '');
-  const userId = isUuid ? slug : undefined;
-  const handle = !isUuid ? slug?.replace(/^@/, '') : undefined;
+  const { userId, handle } = parseProfileSlug(slug);
 
   const goToMain = useCallback(() => {
     router.replace(Routes.Main);
+  }, [router]);
+
+  const goToLogin = useCallback(() => {
+    router.navigate(Routes.Login);
   }, [router]);
 
   return (
@@ -31,7 +41,7 @@ function ProfilePage() {
             handle={handle}
             onBack={goToMain}
             onRexPress={preview.open}
-            onSignUp={() => router.navigate(Routes.Login)}
+            onSignUp={goToLogin}
           />
         </View>
       </DeepLinkShell>
@@ -40,7 +50,7 @@ function ProfilePage() {
         recommendation={preview.recommendation}
         onClose={preview.close}
         onDismiss={preview.clear}
-        scrollToComments={preview.options.scrollToComments === true}
+        scrollToComments={preview.options.scrollToComments}
         scrollToCommentId={preview.options.scrollToCommentId}
       />
     </>

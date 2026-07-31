@@ -1,4 +1,5 @@
 import type { InfiniteData, QueryClient } from '@tanstack/react-query';
+import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 import type { Recommendation } from '~/shared/types/recommendation';
 
 function patchRecommendationList(
@@ -36,17 +37,21 @@ export function patchFeedCommentCount(
   rexId: string,
   commentCount: number,
 ): void {
-  const infiniteKeys = ['discover-recommendations', 'my-rexes', 'my-saved-rexes'] as const;
+  const infiniteKeys = [
+    REX_QUERY_KEYS.discoverFeed,
+    REX_QUERY_KEYS.myRexes,
+    REX_QUERY_KEYS.mySavedRexes,
+  ] as const;
 
-  for (const key of infiniteKeys) {
-    queryClient.setQueriesData<InfiniteData<Recommendation[]>>({ queryKey: [key] }, (data) =>
+  for (const queryKey of infiniteKeys) {
+    queryClient.setQueriesData<InfiniteData<Recommendation[]>>({ queryKey }, (data) =>
       patchInfiniteRecommendations(data, rexId, commentCount),
     );
   }
 
-  const listKeys = ['search-rexes', 'mapRexesInBounds'] as const;
-  for (const key of listKeys) {
-    queryClient.setQueriesData<Recommendation[]>({ queryKey: [key] }, (data) =>
+  const listKeys = [REX_QUERY_KEYS.searchRexes, REX_QUERY_KEYS.mapRexesInBounds] as const;
+  for (const queryKey of listKeys) {
+    queryClient.setQueriesData<Recommendation[]>({ queryKey }, (data) =>
       patchRecommendationList(data, rexId, commentCount),
     );
   }

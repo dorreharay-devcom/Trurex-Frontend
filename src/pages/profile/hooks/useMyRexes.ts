@@ -3,13 +3,14 @@ import { useCallback, useMemo } from 'react';
 import { Backend, unwrap } from '~/shared/api/client';
 import { mapDiscoverFeedRowSafe } from '~/api/mapDiscoverFeed';
 import type { Recommendation } from '~/shared/types/recommendation';
+import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 
 const MY_REXES_PAGE_SIZE = 20;
 
 export const useMyRexes = (userId?: string) => {
   const pageSize = MY_REXES_PAGE_SIZE;
   const query = useInfiniteQuery({
-    queryKey: ['my-rexes', userId, pageSize],
+    queryKey: [...REX_QUERY_KEYS.myRexes, userId, pageSize],
     queryFn: async ({ pageParam }) => {
       const raw = unwrap(
         await Backend.rpc('user_rexes', {

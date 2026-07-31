@@ -2,12 +2,14 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { Redirect } from 'expo-router';
 import AuthLayout from '~/features/auth/ui/common/AuthLayout';
-import { Button, ButtonVariant } from '~/shared/ui/Button';
+import AuthLinkButton from '~/features/auth/ui/common/AuthLinkButton';
+import { Button } from '~/shared/ui/Button';
 import Input from '~/shared/ui/Input';
 import { AuthBrandHeader, AuthTrustDeviceField, useMfaVerification } from '~/features/auth';
 
 const MfaPage = () => {
   const mfa = useMfaVerification();
+  const resendTitle = mfa.resending ? 'Sending...' : 'Send a new code';
 
   if (mfa.redirectTo) {
     return <Redirect href={mfa.redirectTo} />;
@@ -47,21 +49,17 @@ const MfaPage = () => {
         />
 
         <View className="items-center gap-3">
-          <Button
-            title={mfa.resending ? 'Sending...' : 'Send a new code'}
+          <AuthLinkButton
+            title={resendTitle}
             onPress={mfa.handleResend}
-            variant={ButtonVariant.Link}
             disabled={mfa.busy}
-            textClassName="text-sm text-muted-foreground font-normal"
-            className="self-center hover:no-underline active:no-underline"
+            centered
           />
-          <Button
+          <AuthLinkButton
             title="Back to sign in"
             onPress={mfa.handleBackToLogin}
-            variant={ButtonVariant.Link}
             disabled={mfa.busy}
-            textClassName="text-sm text-muted-foreground font-normal"
-            className="self-center hover:no-underline active:no-underline"
+            centered
           />
         </View>
       </View>

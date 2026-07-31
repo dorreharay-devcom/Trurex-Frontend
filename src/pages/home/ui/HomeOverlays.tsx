@@ -29,7 +29,7 @@ function HomeOverlays({ create, preview, onAddYourOwn, onEditRex, onUserPress }:
         onDismiss={preview.clear}
         onAddYourOwn={onAddYourOwn}
         onCommentCountChange={() => {}}
-        scrollToComments={preview.options.scrollToComments === true}
+        scrollToComments={preview.options.scrollToComments}
         scrollToCommentId={preview.options.scrollToCommentId}
         onAuthorPress={onUserPress}
         onUserPress={onUserPress}

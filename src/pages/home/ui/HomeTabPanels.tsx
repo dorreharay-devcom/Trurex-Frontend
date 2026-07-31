@@ -1,6 +1,6 @@
 import React from 'react';
 import CirclesView from '~/components/circles/CirclesView';
-import FavesView from '~/components/faves/FavesView';
+import GemsPage from '~/pages/gems';
 import MapScreen from '~/components/map/MapScreen';
 import ProfileView from '~/components/profile/ProfileView';
 import { TAB, type Tab } from '~/components/layout/TabBar';
@@ -34,7 +34,7 @@ function HomeTabPanels({
     return <DiscoverPage searchQuery={searchQuery} onRecommendationPress={onRecommendationPress} />;
   }
   if (currentTab === TAB.faves) {
-    return <FavesView commentCountByRexId={{}} onRecommendationPress={onRecommendationPress} />;
+    return <GemsPage onRecommendationPress={onRecommendationPress} />;
   }
   if (currentTab === TAB.circles) {
     return <CirclesView isActive onUserPress={onUserPress} />;

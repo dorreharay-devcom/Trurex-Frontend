@@ -1,47 +1,23 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import { StickyTopChromeLayout } from '~/components/layout/StickyTopChromeLayout';
 import { TAB } from '~/components/layout/TabBar';
 import { useRexPreview } from '~/features/rex-detail/hooks/useRexPreview';
 import { useCreateRexModal } from '~/pages/home/hooks/useCreateRexModal';
+import { useHomePageState } from '~/pages/home/hooks/useHomePageState';
 import { useHomeTabs } from '~/pages/home/hooks/useHomeTabs';
 import AddRexFab from '~/pages/home/ui/AddRexFab';
 import HomeOverlays from '~/pages/home/ui/HomeOverlays';
 import HomeTabPanels from '~/pages/home/ui/HomeTabPanels';
 import HomeTopChrome from '~/pages/home/ui/HomeTopChrome';
-import type { AddYourOwnRecSource } from '~/features/rex-create';
 
 function HomePage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [avatarRefreshKey, setAvatarRefreshKey] = useState(0);
-  const [mapRexSheetOpen, setMapRexSheetOpen] = useState(false);
   const tabs = useHomeTabs();
   const create = useCreateRexModal();
   const preview = useRexPreview();
+  const page = useHomePageState({ tabs, create, preview });
 
-  const handleUserPress = useCallback(
-    (userId: string) => {
-      preview.close();
-      tabs.openUserProfile(userId);
-    },
-    [preview.close, tabs.openUserProfile],
-  );
-
-  const handleAddYourOwn = useCallback(
-    (source: AddYourOwnRecSource) => {
-      preview.close();
-      create.openWithPrefill(source);
-    },
-    [preview.close, create.openWithPrefill],
-  );
-
-  const handleEditRex = useCallback(
-    (rexId: string) => {
-      preview.close();
-      create.openForEdit(rexId);
-    },
-    [preview.close, create.openForEdit],
-  );
+  const fabVisible = !(tabs.currentTab === TAB.map && page.mapRexSheetOpen);
 
   return (
     <View className="min-h-0 flex-1 bg-background">
@@ -49,40 +25,37 @@ function HomePage() {
         topChrome={
           <HomeTopChrome
             currentTab={tabs.currentTab}
-            searchQuery={searchQuery}
-            avatarRefreshKey={avatarRefreshKey}
-            onSearchChange={setSearchQuery}
+            searchQuery={page.searchQuery}
+            avatarRefreshKey={page.avatarRefreshKey}
+            onSearchChange={page.setSearchQuery}
             onTabChange={tabs.changeTab}
             onAddPress={create.openBlank}
-            onUserPress={handleUserPress}
+            onUserPress={page.openUserProfile}
             onRexPress={preview.openById}
           />
         }
       >
         <HomeTabPanels
           currentTab={tabs.currentTab}
-          searchQuery={searchQuery}
+          searchQuery={page.searchQuery}
           viewingUserId={tabs.viewingUserId}
-          avatarRefreshKey={avatarRefreshKey}
+          avatarRefreshKey={page.avatarRefreshKey}
           onRecommendationPress={preview.open}
-          onUserPress={handleUserPress}
+          onUserPress={page.openUserProfile}
           onProfileBack={tabs.goBackFromProfile}
-          onAvatarUpdated={() => setAvatarRefreshKey((k) => k + 1)}
-          onMapRexSheetOpenChange={setMapRexSheetOpen}
+          onAvatarUpdated={page.bumpAvatarRefresh}
+          onMapRexSheetOpenChange={page.setMapRexSheetOpen}
         />
       </StickyTopChromeLayout>
 
-      <AddRexFab
-        visible={!(tabs.currentTab === TAB.map && mapRexSheetOpen)}
-        onPress={create.openBlank}
-      />
+      <AddRexFab visible={fabVisible} onPress={create.openBlank} />
 
       <HomeOverlays
         create={create}
         preview={preview}
-        onAddYourOwn={handleAddYourOwn}
-        onEditRex={handleEditRex}
-        onUserPress={handleUserPress}
+        onAddYourOwn={page.addYourOwn}
+        onEditRex={page.editRex}
+        onUserPress={page.openUserProfile}
       />
     </View>
   );

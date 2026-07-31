@@ -1,17 +1,17 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { View, FlatList } from 'react-native';
-import AddToCollectionSheet from '~/components/faves/AddToCollectionSheet';
+import AddToCollectionSheet from '~/features/collections/ui/AddToCollectionSheet';
 import { webContainerStyle } from '~/utils';
 import RecommendationCard from '~/pages/discover/ui/feed/RecommendationCard';
 import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
 import { useCategories } from '~/pages/discover/hooks/useCategories';
+import { useCategoryTagFilter } from '~/pages/discover/hooks/useCategoryTagFilter';
 import { useFeed } from '~/pages/discover/hooks/useFeed';
 import { useSaveToCollection } from '~/pages/discover/hooks/useSaveToCollection';
 import { useScrollTop } from '~/pages/discover/hooks/useScrollTop';
 import { useSearch } from '~/pages/discover/hooks/useSearch';
 import { useSearchFilters } from '~/pages/discover/hooks/useSearchFilters';
 import { webCardStyle } from '~/pages/discover/lib/layout';
-import { ALL_CATEGORIES } from '~/pages/discover/types';
 import EmptyState from '~/pages/discover/ui/feed/EmptyState';
 import FeedFooterSpinner from '~/pages/discover/ui/feed/FeedFooterSpinner';
 import FeedListHeader from '~/pages/discover/ui/feed/FeedListHeader';
@@ -28,8 +28,7 @@ const DiscoverPage = ({
   onRecommendationPress,
   onCreateRex,
 }: DiscoverPageProps) => {
-  const [activeCategory, setActiveCategory] = useState(ALL_CATEGORIES);
-  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const { activeCategory, activeTag, toggleCategory, toggleTag } = useCategoryTagFilter();
 
   const categories = useCategories();
   const filters = useSearchFilters();
@@ -38,22 +37,15 @@ const DiscoverPage = ({
   const save = useSaveToCollection();
   const scroll = useScrollTop<Recommendation>();
 
-  const rows = search.hasSearch ? search.rows : feed.rows;
-  const isLoading = search.hasSearch ? search.isLoading : feed.isLoading;
-
-  const toggleCategory = useCallback((code: string) => {
-    setActiveCategory((prev) => (prev === code ? ALL_CATEGORIES : code));
-  }, []);
-
-  const toggleTag = useCallback((slug: string) => {
-    setActiveTag((prev) => (prev === slug ? null : slug));
-  }, []);
+  const source = search.hasSearch ? search : feed;
+  const isLoading = source.isLoading;
+  const rows = isLoading ? [] : source.rows;
 
   return (
     <View className="flex-1">
       <FlatList
         ref={scroll.listRef}
-        data={isLoading ? [] : rows}
+        data={rows}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         onScroll={scroll.onScroll}
@@ -75,7 +67,7 @@ const DiscoverPage = ({
             onToggleTag={toggleTag}
           />
         }
-        ListEmptyComponent={isLoading ? null : <EmptyState onCreateRex={onCreateRex} />}
+        ListEmptyComponent={<EmptyState loading={isLoading} onCreateRex={onCreateRex} />}
         renderItem={({ item }) => (
           <View className="px-4 mb-4" style={webCardStyle}>
             <RecommendationCard
@@ -90,7 +82,7 @@ const DiscoverPage = ({
         }
       />
 
-      {scroll.showScrollTop && <ScrollTopButton onPress={scroll.scrollToTop} />}
+      <ScrollTopButton visible={scroll.showScrollTop} onPress={scroll.scrollToTop} />
 
       <AddToCollectionSheet
         open={!!save.saveTarget}

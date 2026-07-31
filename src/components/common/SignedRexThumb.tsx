@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
-import { useSignedStorageUrl } from '~/hooks/useSignedStorageUrl';
+import { useSignedStorageUrl } from '~/shared/hooks/useSignedStorageUrl';
 import { Theme } from '~/shared/theme/Theme';
 
 type Props = {

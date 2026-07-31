@@ -18,6 +18,7 @@ import { toastError, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { unknownErrorMessage } from '~/utils';
 import { blockedUsersQueryKey, useBlockedUsers } from '~/hooks/useBlockUser';
+import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 
 type Props = {
   onBack: () => void;
@@ -53,7 +54,7 @@ export function BlockedUsersPanel({ onBack }: Props) {
         );
         void queryClient.invalidateQueries({ queryKey: blockedUsersQueryKey(viewerId) });
       }
-      void queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
+      void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.discoverFeed });
       toastSuccess('User unblocked');
     },
     onError: (e: unknown) => {

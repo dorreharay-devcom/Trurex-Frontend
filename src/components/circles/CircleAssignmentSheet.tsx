@@ -31,6 +31,7 @@ import {
 import { isWeb } from '~/utils';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { mutationErrorToast } from '~/shared/lib/mutationErrorToast';
 import { unknownErrorMessage } from '~/utils';
 import {
   circleTabIconKind,
@@ -40,12 +41,11 @@ import {
   isUserCreatedCircle,
   sortCirclesForRingStack,
 } from '~/shared/lib/recCircles';
-import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
+import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
 import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/utils/circleTabUtils';
 import { cn } from '~/utils/general';
 
 const PRESET_DEFAULT: CirclePresetColor = CIRCLE_COLOR_PRESETS[0];
-const collectionFieldBg = { backgroundColor: Theme.colors.searchFieldBackground };
 
 type Props = {
   open: boolean;
@@ -187,10 +187,7 @@ export function CircleAssignmentSheet({
       toastSuccess('Added to circle');
       onClose();
     },
-    onError: (e: unknown) => {
-      if (didAccountFrozenMutationToast(e)) return;
-      toastError('Could not add to circle', unknownErrorMessage(e, 'Try again.'));
-    },
+    onError: mutationErrorToast('Could not add to circle'),
   });
 
   const pendingCircleId =
@@ -355,12 +352,11 @@ export function CircleAssignmentSheet({
                             onChangeText={setNewName}
                             maxLength={40}
                             style={[
-                              collectionFieldBg,
                               textFieldCaretStyle,
                               textFieldSingleLineStyle,
                               textFieldSingleLineDefaultHeightStyle,
                             ]}
-                            className="rounded-xl border border-border px-3 py-3 text-sm text-foreground"
+                            className="rounded-xl border border-border bg-search-field px-3 py-3 text-sm text-foreground"
                           />
                           <TextInput
                             placeholder="Description (optional)"
@@ -369,12 +365,8 @@ export function CircleAssignmentSheet({
                             onChangeText={setNewDesc}
                             maxLength={100}
                             multiline
-                            style={[
-                              collectionFieldBg,
-                              textFieldCaretStyle,
-                              textFieldMultilineStyle,
-                            ]}
-                            className="min-h-[44px] rounded-xl border border-border px-3 py-3 text-sm text-foreground"
+                            style={[textFieldCaretStyle, textFieldMultilineStyle]}
+                            className="min-h-[44px] rounded-xl border border-border bg-search-field px-3 py-3 text-sm text-foreground"
                           />
                           <Text className="text-xs text-muted-foreground">Color</Text>
                           <View className="flex-row flex-wrap gap-2">

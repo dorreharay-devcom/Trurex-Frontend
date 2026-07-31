@@ -19,6 +19,7 @@ import {
 import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/utils/circleTabUtils';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { mutationErrorToast } from '~/shared/lib/mutationErrorToast';
 import { unknownErrorMessage } from '~/utils';
 import { useMyCircles } from '~/hooks/useMyCircles';
 
@@ -99,10 +100,7 @@ export function useCirclesViewModel(isActive: boolean) {
       queryClient.invalidateQueries({ queryKey: ['myCircles'] });
       toastSuccess('Added to circle');
     },
-    onError: (e: unknown) => {
-      if (didAccountFrozenMutationToast(e)) return;
-      toastError('Could not add to circle', unknownErrorMessage(e, 'Try again.'));
-    },
+    onError: mutationErrorToast('Could not add to circle'),
     onSettled: () => setAddingMemberId(null),
   });
 
@@ -116,10 +114,7 @@ export function useCirclesViewModel(isActive: boolean) {
       queryClient.invalidateQueries({ queryKey: ['myCircles'] });
       toastSuccess('Removed from circle');
     },
-    onError: (e: unknown) => {
-      if (didAccountFrozenMutationToast(e)) return;
-      toastError('Could not remove from circle', unknownErrorMessage(e, 'Try again.'));
-    },
+    onError: mutationErrorToast('Could not remove from circle'),
     onSettled: () => setRemovingMemberId(null),
   });
 
@@ -139,10 +134,7 @@ export function useCirclesViewModel(isActive: boolean) {
       setNewDesc('');
       setSelectedColor(PRESET_DEFAULT);
     },
-    onError: (e: unknown) => {
-      if (didAccountFrozenMutationToast(e)) return;
-      toastError('Could not create circle', unknownErrorMessage(e, 'Try again.'));
-    },
+    onError: mutationErrorToast('Could not create circle'),
   });
 
   const updateMutation = useMutation({
@@ -160,10 +152,7 @@ export function useCirclesViewModel(isActive: boolean) {
       setShowEditModal(false);
       toastSuccess('Circle updated');
     },
-    onError: (e: unknown) => {
-      if (didAccountFrozenMutationToast(e)) return;
-      toastError('Could not update circle', unknownErrorMessage(e, 'Try again.'));
-    },
+    onError: mutationErrorToast('Could not update circle'),
   });
 
   const deleteMutation = useMutation({

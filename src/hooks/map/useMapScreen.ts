@@ -21,6 +21,7 @@ import { DEFAULT_PIN_VISIBILITY } from '~/types/map/mapPin';
 import { mapSearchTitleSuggestions } from '~/utils/map/mapSearchSuggestions';
 import { DEFAULT_SEARCH_DEBOUNCE_MS } from '~/hooks/useDebouncedValue';
 import { getCurrentLocationCoords } from '~/utils/location';
+import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 
 type Params = {
   onRecommendationPress?: (rec: Recommendation) => void;
@@ -122,7 +123,7 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     isError,
     refetch: refetchRexes,
   } = useQuery({
-    queryKey: ['mapRexesInBounds', ...queryKeyBase],
+    queryKey: [...REX_QUERY_KEYS.mapRexesInBounds, ...queryKeyBase],
     queryFn: () => MapApi.mapRexesInBounds(boundsQueryParams),
     placeholderData: keepPreviousData,
   });
@@ -132,7 +133,7 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     isLoading: pinsLoading,
     refetch: refetchPins,
   } = useQuery({
-    queryKey: ['mapRexPins', ...queryKeyBase],
+    queryKey: [...REX_QUERY_KEYS.mapRexPins, ...queryKeyBase],
     queryFn: () => MapApi.mapRexPins(boundsQueryParams),
     placeholderData: keepPreviousData,
   });

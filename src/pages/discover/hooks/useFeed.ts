@@ -2,8 +2,9 @@ import { useCallback, useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { DiscoveryApi } from '~/pages/discover/api/DiscoveryApi';
 import { ALL_CATEGORIES } from '~/pages/discover/types';
+import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 
-export const FEED_QUERY_KEY = 'discover-recommendations';
+export const FEED_QUERY_KEY = REX_QUERY_KEYS.discoverFeed[0];
 
 const FEED_PAGE_SIZE = 20;
 

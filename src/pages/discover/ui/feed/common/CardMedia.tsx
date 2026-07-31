@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, type TextStyle } from 'react-native';
 import { Link2, Star, MapPin, DollarSign, type LucideIcon } from 'lucide-react-native';
-import { SignedStorageImage } from '~/components/common/SignedStorageImage';
-import { RexPhotoPlaceholder } from '~/components/common/RexPhotoPlaceholder';
-import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
+import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
+import { RexPhotoPlaceholder } from '~/shared/ui/RexPhotoPlaceholder';
+import { REX_IMAGES_BUCKET } from '~/shared/config/storageBuckets';
 import { Theme } from '~/shared/theme/Theme';
 import {
   rexCoverRemoteHttpUrl,

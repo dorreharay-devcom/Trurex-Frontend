@@ -6,6 +6,7 @@ import { toastError, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { isPlainObject } from '~/utils/guards';
 import { unknownErrorMessage } from '~/utils';
+import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 
 export const blockedUsersQueryKey = (viewerId: string) => ['blocked-users', viewerId] as const;
 
@@ -46,9 +47,9 @@ export function useBlockUser(params: {
     if (viewerId) {
       void queryClient.invalidateQueries({ queryKey: blockedUsersQueryKey(viewerId) });
     }
-    void queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
-    void queryClient.invalidateQueries({ queryKey: ['mapRexesInBounds'] });
-    void queryClient.invalidateQueries({ queryKey: ['mapRexPins'] });
+    void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.discoverFeed });
+    void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.mapRexesInBounds });
+    void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.mapRexPins });
     void queryClient.invalidateQueries({ queryKey: ['notifications'] });
   }, [queryClient, viewerId]);
 

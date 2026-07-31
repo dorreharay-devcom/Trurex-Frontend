@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import AuthLayout from '~/features/auth/ui/common/AuthLayout';
+import AuthGeneralError from '~/features/auth/ui/common/AuthGeneralError';
 import { Button } from '~/shared/ui/Button';
 import Input from '~/shared/ui/Input';
 import {
@@ -14,30 +15,16 @@ import {
 } from '~/features/auth';
 
 const SignupPage = () => {
-  const {
-    invite,
-    email,
-    password,
-    fullName,
-    errors,
-    busy,
-    loading,
-    onFullNameChange,
-    onEmailChange,
-    onPasswordChange,
-    handleOAuthSignup,
-    handleSignup,
-    goToLogin,
-  } = useSignupByEmail();
+  const signup = useSignupByEmail();
 
   return (
     <AuthLayout>
       <AuthBrandHeader subtitle="Create your TruRex account" />
 
       <OAuthSocialButtons
-        disabled={busy}
-        onGooglePress={() => handleOAuthSignup('google')}
-        onApplePress={() => handleOAuthSignup('apple')}
+        disabled={signup.busy}
+        onGooglePress={() => signup.handleOAuthSignup('google')}
+        onApplePress={() => signup.handleOAuthSignup('apple')}
       />
 
       <AuthOrDivider />
@@ -45,37 +32,37 @@ const SignupPage = () => {
       <View className="gap-6">
         <Input
           label="Full name"
-          value={fullName}
-          onChangeText={onFullNameChange}
+          value={signup.fullName}
+          onChangeText={signup.onFullNameChange}
           placeholder="Jane Doe"
           autoCapitalize="words"
-          error={errors.fullName}
+          error={signup.errors.fullName}
         />
 
         <Input
           label="Email"
-          value={email}
-          onChangeText={onEmailChange}
+          value={signup.email}
+          onChangeText={signup.onEmailChange}
           placeholder="you@example.com"
           keyboardType="email-address"
-          error={errors.email}
+          error={signup.errors.email}
         />
 
         <Input
           label="Password"
-          value={password}
-          onChangeText={onPasswordChange}
+          value={signup.password}
+          onChangeText={signup.onPasswordChange}
           placeholder="At least 6 characters"
           secure
-          error={errors.password}
+          error={signup.errors.password}
         />
 
-        {invite.enabled && (
+        {signup.invite.enabled && (
           <InviteCodeInput
-            ref={invite.inputRef}
-            value={invite.value}
-            onChange={invite.onChange}
-            error={invite.error}
+            ref={signup.invite.inputRef}
+            value={signup.invite.value}
+            onChange={signup.invite.onChange}
+            error={signup.invite.error}
           />
         )}
 
@@ -83,20 +70,18 @@ const SignupPage = () => {
 
         <Button
           title="Create account"
-          onPress={handleSignup}
-          loading={loading}
-          disabled={busy}
+          onPress={signup.handleSignup}
+          loading={signup.loading}
+          disabled={signup.busy}
           className="w-full"
         />
-        {errors.general && (
-          <Text className="mt-1 text-xs text-center text-destructive">{errors.general}</Text>
-        )}
+        <AuthGeneralError message={signup.errors.general} className="mt-1" />
       </View>
 
       <AuthSwitchLink
         prompt="Already have an account?"
         actionLabel="Sign in"
-        onPress={goToLogin}
+        onPress={signup.goToLogin}
         accessibilityLabel="Sign in"
         promptCentered
       />

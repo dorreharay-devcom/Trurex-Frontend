@@ -4,7 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '~/features/auth/providers';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
-import { AppToast } from '~/components/toast/AppToast';
+import { AppToast } from '~/shared/ui/toast/AppToast';
 
 const queryClient = new QueryClient();
 

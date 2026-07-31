@@ -11,13 +11,13 @@ import {
 import { ArrowLeft, Pencil, Trash2, X } from 'lucide-react-native';
 import {
   CircleConnectionRow,
-  ConnectionLoadMoreButton,
   CircleGlyphIcon,
   CircleMemberRow,
   MembersEmptyState,
   SectionSpinner,
   TrustedEmptyState,
 } from '~/components/circles/common';
+import { LoadMoreButton } from '~/shared/ui/LoadMoreButton';
 import type { CirclesViewModel } from '~/hooks/circles/useCirclesViewModel';
 import {
   connectionCountLabel,
@@ -38,7 +38,7 @@ import {
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
-import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
+import { DestructiveActionConfirmModal } from '~/shared/ui/DestructiveActionConfirmModal';
 import {
   DELETE_CIRCLE_CONFIRM_MESSAGE,
   canEditOrDeleteUserCircle,
@@ -46,8 +46,8 @@ import {
   getCircleUiPolicy,
 } from '~/utils/circleTabUtils';
 import { webContainerStyle } from '~/utils';
-import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
-import { ClearableSearchInput } from '~/components/common/ClearableSearchInput';
+import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
+import { ClearableSearchInput } from '~/shared/ui/ClearableSearchInput';
 
 type Props = { vm: CirclesViewModel; onUserPress?: (userId: string) => void };
 
@@ -255,7 +255,7 @@ export function CircleDetailScreen({ vm, onUserPress }: Props) {
                     onUserPress={onUserPress}
                   />
                 ))}
-                <ConnectionLoadMoreButton
+                <LoadMoreButton
                   visible={addHasNextPage}
                   loading={addFetchingNextPage}
                   onPress={fetchNextAddPage}

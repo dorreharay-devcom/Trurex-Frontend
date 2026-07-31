@@ -7,10 +7,10 @@ import { PeopleYouMayKnowSection } from '~/components/circles/PeopleYouMayKnowSe
 import { ShareProfileCard } from '~/components/circles/ShareProfileCard';
 import {
   CircleGlyphIcon,
-  ConnectionLoadMoreButton,
   NetworkConnectionRow,
   TrustedEmptyState,
 } from '~/components/circles/common';
+import { LoadMoreButton } from '~/shared/ui/LoadMoreButton';
 import { type CirclesViewModel, useCirclesViewModel } from '~/hooks/circles/useCirclesViewModel';
 import {
   connectionCountLabel,
@@ -34,7 +34,7 @@ import {
 import { connectionScopeTabStyle } from '~/utils/circleTabUtils';
 import { cn } from '~/utils/general';
 import { webContainerStyle } from '~/utils';
-import { ClearableSearchInput } from '~/components/common/ClearableSearchInput';
+import { ClearableSearchInput } from '~/shared/ui/ClearableSearchInput';
 
 type Props = { isActive: boolean; onUserPress?: (userId: string) => void };
 
@@ -327,7 +327,7 @@ function CirclesListContent({
                     onUserPress={onUserPress}
                   />
                 ))}
-                <ConnectionLoadMoreButton
+                <LoadMoreButton
                   visible={connHasNextPage}
                   loading={connFetchingNextPage}
                   onPress={fetchNextConnPage}

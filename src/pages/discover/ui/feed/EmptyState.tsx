@@ -3,10 +3,13 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { PlusCircle } from 'lucide-react-native';
 
 type EmptyStateProps = {
+  loading: boolean;
   onCreateRex?: () => void;
 };
 
-const EmptyState = ({ onCreateRex }: EmptyStateProps) => {
+const EmptyState = ({ loading, onCreateRex }: EmptyStateProps) => {
+  if (loading) return null;
+
   return (
     <View className="items-center py-16 px-4 gap-4">
       <Text className="text-4xl">🔍</Text>

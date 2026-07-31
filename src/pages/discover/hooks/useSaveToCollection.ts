@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import type { RecSummary } from '~/components/faves/AddToCollectionSheet';
+import type { RecSummary } from '~/features/collections/types/recSummary';
 import { modalConfig } from '~/hooks/useOverlaySheetPresentation';
 import { FEED_QUERY_KEY } from '~/pages/discover/hooks/useFeed';
 import type { Recommendation } from '~/shared/types/recommendation';

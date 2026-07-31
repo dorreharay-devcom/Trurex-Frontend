@@ -6,8 +6,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const webDisabledCursorStyle = { cursor: 'not-allowed' } as unknown as ViewStyle;
-
 export function isHttpUrl(s: string): boolean {
   return /^https?:\/\//i.test(s.trim());
 }

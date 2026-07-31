@@ -19,10 +19,10 @@ import {
 import { useRouter } from 'expo-router';
 import { Routes } from '~/shared/config/routes';
 import * as ImagePicker from 'expo-image-picker';
-import { SignedStorageImage } from '~/components/common/SignedStorageImage';
-import { RexCoverThumbnail } from '~/components/common/RexCoverThumbnail';
-import { RexPhotoPlaceholder } from '~/components/common/RexPhotoPlaceholder';
-import { REX_IMAGES_BUCKET } from '~/constants/storageBuckets';
+import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
+import { RexCoverThumbnail } from '~/shared/ui/RexCoverThumbnail';
+import { RexPhotoPlaceholder } from '~/shared/ui/RexPhotoPlaceholder';
+import { REX_IMAGES_BUCKET } from '~/shared/config/storageBuckets';
 import { useAuth } from '~/features/auth/providers';
 import { ProfileApi } from '~/api/ProfileApi';
 import { Theme } from '~/shared/theme/Theme';
@@ -36,29 +36,30 @@ import {
 import ProfileHeader from './ProfileHeader';
 import CurrentlySection from './CurrentlySection';
 import EditProfile from './EditProfile';
-import CollectionCard from './CollectionCard';
+import CollectionCard from '~/features/collections/ui/CollectionCard';
 import {
   ProfileCardSkeleton,
   ProfileCollectionsSkeleton,
   ProfileRexGridSkeleton,
 } from './skeleton';
-import { useMyCollections, useAddRexToCollection } from '~/hooks/useCollections';
+import { useMyCollections } from '~/features/collections/hooks/data/useCollectionQueries';
+import { useAddRexToCollection } from '~/features/collections/hooks/data/useCollectionRexMutations';
 import { useFollowUser } from '~/hooks/useFollowUser';
 import { useBlockUser } from '~/hooks/useBlockUser';
-import { useSavedRexes } from '~/hooks/useGems';
+import { useSavedRexes } from '~/features/collections/hooks/data/useSavedRexes';
 import { useMyRexes } from '~/pages/profile/hooks/useMyRexes';
 import { ChevronLeft, Star, UserX } from 'lucide-react-native';
-import CollectionDetailView from '~/components/faves/CollectionDetailView';
+import CollectionDetailView from '~/features/collections/ui/CollectionDetailView';
 import { OverlayModal } from '~/components/common/OverlayModal';
-import { DestructiveActionConfirmModal } from '~/components/common/DestructiveActionConfirmModal';
-import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
+import { DestructiveActionConfirmModal } from '~/shared/ui/DestructiveActionConfirmModal';
+import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
 import { useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
 import { modalConfig } from '~/hooks/useOverlaySheetPresentation';
 import { useQueryClient } from '@tanstack/react-query';
 import { pickLibraryImages } from '~/utils/photos/imagePickerLaunch';
 import { photoUploadErrorMessage } from '~/utils/photos/storageUpload';
 import { toastError } from '~/utils/appToast';
-import { ConnectionLoadMoreButton } from '~/components/circles/common';
+import { LoadMoreButton } from '~/shared/ui/LoadMoreButton';
 
 const COLLECTION_REX_OPEN_DELAY_MS = 120;
 
@@ -528,7 +529,7 @@ const ProfileView = ({
                       </View>
                     </TouchableOpacity>
                   ))}
-                  <ConnectionLoadMoreButton
+                  <LoadMoreButton
                     visible={hasNextSavedRexesPage}
                     loading={isFetchingNextSavedRexesPage}
                     onPress={fetchNextSavedRexesPage}

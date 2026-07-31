@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { Redirect } from 'expo-router';
 import AuthLayout from '~/features/auth/ui/common/AuthLayout';
+import AuthGeneralError from '~/features/auth/ui/common/AuthGeneralError';
 import { Button } from '~/shared/ui/Button';
 import Input from '~/shared/ui/Input';
 import { AuthBrandHeader, ResetPasswordExpiredState, useResetPassword } from '~/features/auth';
@@ -57,9 +58,7 @@ const ResetPasswordPage = () => {
           className="w-full"
         />
 
-        {reset.errors.general && (
-          <Text className="text-xs text-destructive text-center">{reset.errors.general}</Text>
-        )}
+        <AuthGeneralError message={reset.errors.general} />
       </View>
     </AuthLayout>
   );

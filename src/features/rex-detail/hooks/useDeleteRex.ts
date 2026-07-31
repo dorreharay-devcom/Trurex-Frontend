@@ -4,6 +4,7 @@ import { deleteRex } from '~/features/rex-detail/api/rexDetailApi';
 import { deleteRexToastMessage } from '~/features/rex-detail/lib/rexDetailToRecommendation';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 
 type UseDeleteRexArgs = {
   recommendationId: string | undefined;
@@ -24,14 +25,14 @@ export function useDeleteRex({ recommendationId, visible, onDeleted }: UseDelete
     onSuccess: (_data, rexId) => {
       setConfirmOpen(false);
       toastSuccess('Deleted', 'Your recommendation was removed.');
-      void queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
-      void queryClient.invalidateQueries({ queryKey: ['search-rexes'] });
-      void queryClient.invalidateQueries({ queryKey: ['my-rexes'] });
+      void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.discoverFeed });
+      void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.searchRexes });
+      void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.myRexes });
       void queryClient.removeQueries({ queryKey: ['rexDetail', rexId] });
       void queryClient.invalidateQueries({ queryKey: ['collection-detail'] });
       void queryClient.invalidateQueries({ queryKey: ['my-collections'] });
-      void queryClient.invalidateQueries({ queryKey: ['mapRexesInBounds'] });
-      void queryClient.invalidateQueries({ queryKey: ['mapRexPins'] });
+      void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.mapRexesInBounds });
+      void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.mapRexPins });
       onDeleted();
     },
     onError: (err: unknown) => {

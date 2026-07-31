@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { SignedStorageImage } from '~/components/common/SignedStorageImage';
-import { USER_AVATARS_BUCKET } from '~/constants/storageBuckets';
+import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
+import { USER_AVATARS_BUCKET } from '~/shared/config/storageBuckets';
 import { cn, isHttpUrl } from '~/utils/general';
 
 type Props = {

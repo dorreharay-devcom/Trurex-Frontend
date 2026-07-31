@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import AuthLayout from '~/features/auth/ui/common/AuthLayout';
+import AuthGeneralError from '~/features/auth/ui/common/AuthGeneralError';
 import { Button } from '~/shared/ui/Button';
 import Input from '~/shared/ui/Input';
 import {
@@ -14,29 +15,16 @@ import {
 } from '~/features/auth';
 
 const LoginPage = () => {
-  const {
-    invite,
-    email,
-    password,
-    errors,
-    busy,
-    loading,
-    onEmailChange,
-    onPasswordChange,
-    handleOAuthLogin,
-    handleLogin,
-    goToForgotPassword,
-    goToSignup,
-  } = useLoginByEmail();
+  const login = useLoginByEmail();
 
   return (
     <AuthLayout>
       <AuthBrandHeader subtitle="Sign in to your account" />
 
       <OAuthSocialButtons
-        disabled={busy}
-        onGooglePress={() => handleOAuthLogin('google')}
-        onApplePress={() => handleOAuthLogin('apple')}
+        disabled={login.busy}
+        onGooglePress={() => login.handleOAuthLogin('google')}
+        onApplePress={() => login.handleOAuthLogin('apple')}
       />
 
       <AuthOrDivider />
@@ -44,48 +32,46 @@ const LoginPage = () => {
       <View className="gap-6">
         <Input
           label="Email"
-          value={email}
-          onChangeText={onEmailChange}
+          value={login.email}
+          onChangeText={login.onEmailChange}
           placeholder="you@example.com"
           keyboardType="email-address"
-          error={errors.email}
+          error={login.errors.email}
         />
 
         <Input
           label="Password"
-          labelRight={<ForgotPasswordLink onPress={goToForgotPassword} />}
-          value={password}
-          onChangeText={onPasswordChange}
+          labelRight={<ForgotPasswordLink onPress={login.goToForgotPassword} />}
+          value={login.password}
+          onChangeText={login.onPasswordChange}
           placeholder="Your password"
           secure
-          error={errors.password}
+          error={login.errors.password}
         />
 
-        {invite.enabled && (
+        {login.invite.enabled && (
           <InviteCodeInput
-            ref={invite.inputRef}
-            value={invite.value}
-            onChange={invite.onChange}
-            error={invite.error}
+            ref={login.invite.inputRef}
+            value={login.invite.value}
+            onChange={login.invite.onChange}
+            error={login.invite.error}
           />
         )}
 
         <Button
           title="Sign in"
-          onPress={handleLogin}
-          loading={loading}
-          disabled={busy}
+          onPress={login.handleLogin}
+          loading={login.loading}
+          disabled={login.busy}
           className="w-full"
         />
-        {errors.general && (
-          <Text className="mt-1 text-xs text-destructive text-center">{errors.general}</Text>
-        )}
+        <AuthGeneralError message={login.errors.general} className="mt-1" />
       </View>
 
       <AuthSwitchLink
         prompt="Don't have an account?"
         actionLabel="Sign up"
-        onPress={goToSignup}
+        onPress={login.goToSignup}
         accessibilityLabel="Sign up"
       />
     </AuthLayout>

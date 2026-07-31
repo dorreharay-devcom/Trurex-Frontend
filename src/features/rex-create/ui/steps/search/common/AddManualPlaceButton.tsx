@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Plus } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
-import { isWeb } from '~/utils';
-import { cn, webDisabledCursorStyle } from '~/utils/general';
+import { isWeb, webDisabledCursor } from '~/utils';
+import { cn } from '~/utils/general';
 
 type Props = {
   disabled: boolean;
@@ -11,7 +11,7 @@ type Props = {
 };
 
 function AddManualPlaceButton({ disabled, onPress }: Props) {
-  const disabledCursor = disabled && isWeb ? webDisabledCursorStyle : undefined;
+  const disabledCursor = webDisabledCursor(disabled);
   return (
     <View className={cn('mt-2 w-full', disabled && 'cursor-not-allowed')} style={disabledCursor}>
       <Pressable

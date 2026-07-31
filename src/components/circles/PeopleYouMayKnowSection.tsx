@@ -11,9 +11,8 @@ import {
 import { SignedUserAvatar } from '~/components/common/SignedUserAvatar';
 import { Theme } from '~/shared/theme/Theme';
 import type { PeopleSuggestionRow } from '~/types/peopleSuggestions';
-import { toastError, toastSuccess } from '~/utils/appToast';
-import { unknownErrorMessage } from '~/utils';
-import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { toastSuccess } from '~/utils/appToast';
+import { mutationErrorToast } from '~/shared/lib/mutationErrorToast';
 
 function ordinalDegreeLabel(degree: number): string {
   const j = degree % 10;
@@ -153,10 +152,7 @@ export function PeopleYouMayKnowSection({ isActive, onUserPress }: Props) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['people_suggestions'] });
     },
-    onError: (e: unknown) => {
-      if (didAccountFrozenMutationToast(e)) return;
-      toastError('Could not dismiss', unknownErrorMessage(e, 'Try again.'));
-    },
+    onError: mutationErrorToast('Could not dismiss'),
   });
 
   const followMutation = useMutation({
@@ -168,10 +164,7 @@ export function PeopleYouMayKnowSection({ isActive, onUserPress }: Props) {
       void queryClient.invalidateQueries({ queryKey: ['user_followers'] });
       void queryClient.invalidateQueries({ queryKey: ['user_following'] });
     },
-    onError: (e: unknown) => {
-      if (didAccountFrozenMutationToast(e)) return;
-      toastError('Could not follow', unknownErrorMessage(e, 'Try again.'));
-    },
+    onError: mutationErrorToast('Could not follow'),
   });
 
   const onDismiss = useCallback(

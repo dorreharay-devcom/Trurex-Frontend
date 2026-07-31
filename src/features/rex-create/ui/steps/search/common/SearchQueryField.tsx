@@ -1,5 +1,5 @@
 import React from 'react';
-import { isWeb, webNoOutline } from '~/utils';
+import { isWeb, webDisabledCursor, webNoOutline } from '~/utils';
 import {
   Theme,
   textFieldCaretStyle,
@@ -8,8 +8,8 @@ import {
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
 import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
-import { cn, webDisabledCursorStyle } from '~/utils/general';
-import { ClearableSearchInput } from '~/components/common/ClearableSearchInput';
+import { cn } from '~/utils/general';
+import { ClearableSearchInput } from '~/shared/ui/ClearableSearchInput';
 
 type Props = {
   value: string;
@@ -45,7 +45,7 @@ function SearchQueryField({ value, onChangeText, editable = true }: Props) {
         textFieldSingleLineStyle,
         textFieldSingleLineLargeHeightStyle,
         textFieldNativeSingleLineNoWrapStyle,
-        !editable && isWeb ? webDisabledCursorStyle : null,
+        webDisabledCursor(!editable),
       ]}
     />
   );

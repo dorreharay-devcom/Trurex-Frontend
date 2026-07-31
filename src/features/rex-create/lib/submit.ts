@@ -11,6 +11,7 @@ import {
 import { SEARCH_MODE } from '~/features/rex-create/types/create';
 import { REX_VISIBILITY } from '~/shared/config/rexVisibility';
 import type { CategoryQuestion } from '~/features/rex-create/types/categoryCreateConfig';
+import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 
 export function createRexErrorMessage(
   rawMessage: string,
@@ -139,13 +140,13 @@ export function buildCreateRexParams(
 }
 
 export function invalidateRexQueries(queryClient: QueryClient, editRexId: string | null) {
-  queryClient.invalidateQueries({ queryKey: ['discover-recommendations'] });
-  queryClient.invalidateQueries({ queryKey: ['search-rexes'] });
-  queryClient.invalidateQueries({ queryKey: ['my-rexes'] });
-  queryClient.invalidateQueries({ queryKey: ['my-saved-rexes'] });
+  queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.discoverFeed });
+  queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.searchRexes });
+  queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.myRexes });
+  queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.mySavedRexes });
   queryClient.invalidateQueries({ queryKey: ['collection-detail'] });
-  queryClient.invalidateQueries({ queryKey: ['mapRexesInBounds'] });
-  queryClient.invalidateQueries({ queryKey: ['mapRexPins'] });
+  queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.mapRexesInBounds });
+  queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.mapRexPins });
   if (editRexId == null) return;
   queryClient.invalidateQueries({ queryKey: ['rexDetail', editRexId] });
   queryClient.invalidateQueries({ queryKey: ['rexForEdit', editRexId] });
