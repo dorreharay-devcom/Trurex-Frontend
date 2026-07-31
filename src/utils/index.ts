@@ -12,6 +12,7 @@ export function unknownErrorMessage(error: unknown, fallback: string): string {
 
 export const isWeb = Platform.OS === 'web';
 export const isAndroid = Platform.OS === 'android';
+export const isIos = Platform.OS === 'ios';
 
 const flexRowSingleLineText: TextStyle = {
   flex: 1,
@@ -31,6 +32,8 @@ export const singleLineEllipsisTextStyle: TextStyle = isWeb
 export const webContainerStyle = isWeb
   ? { maxWidth: 1280, width: '100%' as const, alignSelf: 'center' as const }
   : undefined;
+
+export const webNoOutline = isWeb ? ({ outlineStyle: 'none' } as object) : undefined;
 export const { width, height } = Dimensions.get('window');
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

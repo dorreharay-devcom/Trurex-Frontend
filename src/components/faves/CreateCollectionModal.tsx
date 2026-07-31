@@ -25,7 +25,7 @@ import {
   uploadBlobToStorageBucket,
 } from '~/utils/photos/storageUpload';
 import { generateRexImageStoragePath } from '~/utils/photos/photoUtils';
-import { isWeb, webContainerStyle } from '~/utils';
+import { isWeb, webContainerStyle, webNoOutline } from '~/utils';
 import {
   Theme,
   textFieldCaretStyle,
@@ -34,7 +34,6 @@ import {
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
 import { cn, webDisabledCursorStyle } from '~/utils/general';
-import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
 import { ModalToastLayer } from '~/components/toast/ModalToastLayer';
 import { INPUT_FOCUS_BORDER_CLASS } from '~/constants/inputFocus';
 

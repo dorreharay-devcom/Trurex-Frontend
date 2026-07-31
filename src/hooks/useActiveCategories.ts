@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchActiveCategories } from '~/api/rexCreateApi';
+import { fetchActiveCategories } from '~/shared/api';
 
 export function useActiveCategories(enabled: boolean) {
   return useQuery({

@@ -6,4 +6,4 @@ export function isRexPlaceholderPhotoPath(p: string | null | undefined): boolean
   return (p?.trim().toLowerCase() ?? '') === REX_PHOTO_PLACEHOLDER_STORAGE_PATH.toLowerCase();
 }
 
-export const REX_PLACEHOLDER_IMAGE_SOURCE: ImageSource = require('../../assets/placeholder.svg');
+export const REX_PLACEHOLDER_IMAGE_SOURCE: ImageSource = require('@assets/placeholder.svg');

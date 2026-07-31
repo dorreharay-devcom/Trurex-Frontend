@@ -46,7 +46,7 @@ import type { Recommendation } from '~/types/recommendation/recommendation';
 import {
   buildAddYourOwnRecSource,
   type AddYourOwnRecSource,
-} from '~/utils/recommendation/recCreateFlow';
+} from '~/features/rex-create/lib/addYourOwn';
 import {
   buildDetailRatingsFromRexDetail,
   type DetailRatingRow,

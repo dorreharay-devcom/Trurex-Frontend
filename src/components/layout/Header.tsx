@@ -77,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
         <View className="w-full flex-row items-center pb-2">
           <View className="items-center justify-center" style={{ width: '20%' }}>
             <Image
-              source={require('../../../assets/truRexLogo.png')}
+              source={require('@assets/truRexLogo.png')}
               style={{ width: 80, height: 28, resizeMode: 'contain' }}
               accessibilityIgnoresInvertColors
             />
@@ -149,7 +149,7 @@ export const Header: React.FC<HeaderProps> = ({
       ) : (
         <View className="w-full flex-row items-center justify-between px-4 pb-2 sm:px-6 lg:px-8">
           <Image
-            source={require('../../../assets/truRexLogo.png')}
+            source={require('@assets/truRexLogo.png')}
             style={{ width: 80, height: 28, resizeMode: 'contain' }}
             accessibilityIgnoresInvertColors
           />
@@ -193,7 +193,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <PlusCircle size={16} color={Theme.colors.primaryForeground} />
               <Image
-                source={require('../../../assets/truRexIcon.png')}
+                source={require('@assets/truRexIcon.png')}
                 style={{ width: 18, height: 18, borderRadius: 4 }}
                 resizeMode="contain"
                 accessibilityIgnoresInvertColors

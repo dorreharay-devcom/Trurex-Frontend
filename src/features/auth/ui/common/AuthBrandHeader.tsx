@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image } from 'react-native';
 
-const logoSource = require('../../../../../assets/truRexLogo.png');
+const logoSource = require('@assets/truRexLogo.png');
 
 type Props = {
   title?: string;

@@ -10,10 +10,10 @@ import CirclesView from '~/components/circles/CirclesView';
 import { Header } from '~/components/layout/Header';
 import { StickyTopChromeLayout } from '~/components/layout/StickyTopChromeLayout';
 import { TabBar, Tab } from '~/components/layout/TabBar';
-import { CreateModal } from '~/components/recommendation/create/CreateModal';
+import { CreateModal } from '~/features/rex-create';
 import { RecommendationDetailModal } from '~/components/recommendation/RecommendationDetailModal';
 import { Theme } from '~/shared/theme/Theme';
-import type { AddYourOwnRecSource } from '~/utils/recommendation/recCreateFlow';
+import type { AddYourOwnRecSource } from '~/features/rex-create';
 import type {
   Recommendation,
   RecommendationOpenOptions,

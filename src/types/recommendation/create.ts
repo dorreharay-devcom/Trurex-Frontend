@@ -10,9 +10,40 @@ export const CREATE_REC_STEP_ORDER = [
 
 export type CreateRecStepId = (typeof CREATE_REC_STEP_ORDER)[number];
 
-export type SearchEntryMode = 'select' | 'manual' | 'online';
+export const STEP_ID = {
+  search: 'search',
+  category: 'category',
+  type: 'type',
+  scorecard: 'scorecard',
+  photos: 'photos',
+  circles: 'circles',
+  confirm: 'confirm',
+} as const satisfies Record<CreateRecStepId, CreateRecStepId>;
+
+export const SEARCH_MODE = {
+  select: 'select',
+  manual: 'manual',
+  online: 'online',
+} as const;
+
+export type SearchEntryMode = (typeof SEARCH_MODE)[keyof typeof SEARCH_MODE];
 
 export type PlaceSearchSource = 'database' | 'google';
+
+export type Geotag = { lat: number; lng: number };
+
+export type ManualPlaceDraft = {
+  name: string;
+  address: string;
+  geotag: Geotag | null;
+};
+
+export type OnlinePlaceDraft = {
+  name: string;
+  websiteUrl: string;
+  locationText: string;
+  geotag: Geotag | null;
+};
 
 export type CreateRecSearchPlace = {
   id: string;

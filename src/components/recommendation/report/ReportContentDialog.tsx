@@ -15,7 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ShieldAlert, X } from 'lucide-react-native';
 import { Theme, textFieldCaretStyle, textFieldMultilineStyle } from '~/shared/theme/Theme';
-import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
+import { webNoOutline } from '~/utils';
 import {
   type ContentReportTarget,
   CONTENT_REPORT_OTHER_CODE,

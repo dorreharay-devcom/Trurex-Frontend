@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, Pressable } from 'react-native';
 import { Reply, Send } from 'lucide-react-native';
-import { webNoOutline } from '~/components/recommendation/create/steps/search/common/webInputOutline';
+import { webNoOutline } from '~/utils';
 import {
   Theme,
   textFieldCaretStyle,
