@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, TextInput } from 'react-native';
 import type { CategoryQuestion } from '~/features/rex-create/types/categoryCreateConfig';
 import { CREATE_REC_MUST_KNOW_MAX } from '~/features/rex-create/config/scorecard';
-import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
+import { INPUT_FOCUS_RING_CLASS } from '~/shared/config/inputFocus';
 import {
   Theme,
   textFieldCaretStyle,

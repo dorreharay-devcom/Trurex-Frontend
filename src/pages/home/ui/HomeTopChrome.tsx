@@ -1,6 +1,6 @@
 import React from 'react';
-import { Header } from '~/components/layout/Header';
-import { TabBar, TAB, type Tab } from '~/components/layout/TabBar';
+import { Header } from '~/shared/ui/shell/Header';
+import { TabBar, TAB, type Tab } from '~/shared/ui/shell/TabBar';
 import FrozenAccountBanner from '~/pages/home/ui/FrozenAccountBanner';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 

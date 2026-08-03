@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { searchUsers } from '~/api/usersApi';
+import { searchUsers } from '~/shared/api/usersApi';
 import {
   CONNECTION_TAB_PLACEHOLDER,
   CONNECTION_TAB_SCOPE,

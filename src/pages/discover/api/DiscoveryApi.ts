@@ -1,6 +1,6 @@
 import { Backend, unwrap } from '~/shared/api/client';
 import type { Recommendation } from '~/shared/types/recommendation';
-import { mapDiscoverFeedRowSafe } from '~/api/mapDiscoverFeed';
+import { recommendationFromRowSafe } from '~/shared/lib/recommendationRow';
 import type { DiscoverQueryParams, SearchRexesParams } from './types';
 
 export const DiscoveryApi = {
@@ -17,7 +17,7 @@ export const DiscoveryApi = {
     );
     if (!Array.isArray(raw)) return [];
     return raw.flatMap((row) => {
-      const rec = mapDiscoverFeedRowSafe(row);
+      const rec = recommendationFromRowSafe(row);
       return rec ? [rec] : [];
     });
   },
@@ -42,7 +42,7 @@ export const DiscoveryApi = {
     );
     if (!Array.isArray(raw)) return [];
     return raw.flatMap((row) => {
-      const rec = mapDiscoverFeedRowSafe(row);
+      const rec = recommendationFromRowSafe(row);
       return rec ? [rec] : [];
     });
   },

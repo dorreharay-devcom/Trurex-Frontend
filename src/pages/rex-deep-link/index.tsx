@@ -1,8 +1,8 @@
 import React from 'react';
 import DeepLinkShell from '~/shared/ui/DeepLinkShell';
-import ProtectedRoute from '~/components/common/ProtectedRoute';
+import ProtectedRoute from '~/features/auth/ui/ProtectedRoute';
 import RecommendationDetailModal from '~/features/rex-detail/ui/RecommendationDetailModal';
-import { TAB } from '~/components/layout/TabBar';
+import { TAB } from '~/shared/ui/shell/TabBar';
 import { useDeepLinkNav } from '~/pages/rex-deep-link/hooks/useDeepLinkNav';
 import { useRexDeepLink } from '~/pages/rex-deep-link/hooks/useRexDeepLink';
 import RexDeepLinkBody from '~/pages/rex-deep-link/ui/RexDeepLinkBody';

@@ -1,8 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Header } from '~/components/layout/Header';
-import { TabBar, TAB, type Tab } from '~/components/layout/TabBar';
+import { Header } from '~/shared/ui/shell/Header';
+import { TabBar, TAB, type Tab } from '~/shared/ui/shell/TabBar';
 import { toUserRoute } from '~/shared/config/routes';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 

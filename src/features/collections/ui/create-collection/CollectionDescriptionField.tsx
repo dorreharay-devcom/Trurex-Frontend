@@ -2,7 +2,7 @@ import React from 'react';
 import { TextInput } from 'react-native';
 import FieldWithCounter from '~/features/collections/ui/common/FieldWithCounter';
 import { Theme, textFieldCaretStyle, textFieldMultilineStyle } from '~/shared/theme/Theme';
-import { INPUT_FOCUS_BORDER_CLASS } from '~/constants/inputFocus';
+import { INPUT_FOCUS_BORDER_CLASS } from '~/shared/config/inputFocus';
 import { webNoOutline } from '~/utils';
 import { cn } from '~/utils/general';
 

@@ -1,4 +1,4 @@
-import { isTab, type Tab } from '~/components/layout/TabBar';
+import { isTab, type Tab } from '~/shared/ui/shell/TabBar';
 import { isWeb } from '~/utils';
 
 const WEB_TAB_STORAGE_KEY = 'trurex:last-main-tab';

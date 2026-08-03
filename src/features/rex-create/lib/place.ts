@@ -2,7 +2,7 @@ import {
   createManualPlace,
   upsertGooglePlace,
   type GooglePlacesSearchResultItem,
-} from '~/api/rexPlacesApi';
+} from '~/features/rex-create/api/rexPlacesApi';
 import {
   SEARCH_MODE,
   type CreateRecSearchPlace,

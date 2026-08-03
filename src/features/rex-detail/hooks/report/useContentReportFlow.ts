@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import * as ModerationApi from '~/api/moderationApi';
+import * as ModerationApi from '~/shared/api/moderationApi';
 import {
   CONTENT_REPORT_OTHER_CODE,
   MAX_CONTENT_REPORT_DETAILS,

@@ -41,6 +41,11 @@ export function webDisabledCursor(disabled: boolean): ViewStyle | undefined {
   if (!disabled || !isWeb) return undefined;
   return notAllowedCursorStyle;
 }
+
+export function androidElevation(value: number): ViewStyle | undefined {
+  if (!isAndroid) return undefined;
+  return { elevation: value };
+}
 export const { width, height } = Dimensions.get('window');
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

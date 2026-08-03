@@ -7,7 +7,7 @@ import {
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
-import { INPUT_FOCUS_BORDER_CLASS } from '~/constants/inputFocus';
+import { INPUT_FOCUS_BORDER_CLASS } from '~/shared/config/inputFocus';
 import { webNoOutline } from '~/utils';
 import { cn } from '~/utils/general';
 

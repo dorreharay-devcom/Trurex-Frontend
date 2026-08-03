@@ -1,4 +1,4 @@
-import type { SearchUsersScope } from '~/api/usersApi';
+import type { SearchUsersScope } from '~/shared/api/usersApi';
 import type { ConnectionListPhase, ConnectionScopeTab } from '~/features/circles/types/connections';
 
 export const CONNECTION_TAB = {

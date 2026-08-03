@@ -1,6 +1,6 @@
 import React from 'react';
 import { TextInput, type TextInputProps } from 'react-native';
-import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
+import { INPUT_FOCUS_RING_CLASS } from '~/shared/config/inputFocus';
 import {
   Theme,
   textFieldCaretStyle,

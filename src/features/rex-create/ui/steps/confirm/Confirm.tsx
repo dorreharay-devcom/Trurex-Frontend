@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { Image } from 'expo-image';
 import { useQuery } from '@tanstack/react-query';
-import { getUserProfile } from '~/api/usersApi';
+import { getUserProfile } from '~/shared/api/usersApi';
 import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
 import CreateStepTitle from '../../CreateStepTitle';
 import { useAuth } from '~/features/auth/providers';

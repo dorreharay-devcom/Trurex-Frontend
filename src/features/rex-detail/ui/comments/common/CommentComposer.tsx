@@ -9,7 +9,7 @@ import {
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
 import { cn } from '~/utils/general';
-import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
+import { INPUT_FOCUS_RING_CLASS } from '~/shared/config/inputFocus';
 import type { CommentComposerState } from '~/features/rex-detail/hooks/comments/useCommentComposer';
 
 export type CommentComposerProps = {

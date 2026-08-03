@@ -3,7 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { Check, Copy, Share2 } from 'lucide-react-native';
 import { useQuery } from '@tanstack/react-query';
 import * as Clipboard from 'expo-clipboard';
-import { ProfileApi } from '~/api/ProfileApi';
+import { ProfileApi } from '~/shared/api/profileApi';
 import { useAuth } from '~/features/auth/providers';
 import { CIRCLES_QUERY_KEYS } from '~/features/circles/config/queryKeys';
 import { Theme } from '~/shared/theme/Theme';

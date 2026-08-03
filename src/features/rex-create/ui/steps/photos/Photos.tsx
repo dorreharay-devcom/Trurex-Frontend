@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
-import { PhotoUploadGrid } from '~/components/common/PhotoUploadGrid';
+import { PhotoUploadGrid } from '~/features/rex-create/ui/PhotoUploadGrid';
 import CreateStepTitle from '../../CreateStepTitle';
 import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
 

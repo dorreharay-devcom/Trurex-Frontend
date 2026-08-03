@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { followUser, unfollowUser } from '~/api/usersApi';
+import { followUser, unfollowUser } from '~/shared/api/usersApi';
 import { toastError } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 

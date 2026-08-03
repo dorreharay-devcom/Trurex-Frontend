@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, Linking } from 'react-native';
-import { LEGAL_CONTACT_EMAIL } from '~/constants/legal';
+import { LEGAL_CONTACT_EMAIL } from '~/features/auth/config/legal';
 
 type Props = {
   body: string;

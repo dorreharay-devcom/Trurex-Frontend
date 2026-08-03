@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
-import { fetchTrustedUsers, fetchUserFollowers, fetchUserFollowing } from '~/api/usersApi';
+import { fetchTrustedUsers, fetchUserFollowers, fetchUserFollowing } from '~/shared/api/usersApi';
 import { CONNECTION_TAB } from '~/features/circles/config/connections';
 import { CONNECTION_QUERY_KEY_BY_TAB } from '~/features/circles/config/queryKeys';
 import type {

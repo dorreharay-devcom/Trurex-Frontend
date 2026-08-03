@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
-import { StickyTopChromeLayout } from '~/components/layout/StickyTopChromeLayout';
-import { TAB } from '~/components/layout/TabBar';
+import { StickyTopChromeLayout } from '~/pages/home/ui/StickyTopChromeLayout';
+import { TAB } from '~/shared/ui/shell/TabBar';
 import { useRexPreview } from '~/features/rex-detail/hooks/useRexPreview';
 import { useCreateRexModal } from '~/pages/home/hooks/useCreateRexModal';
 import { useHomePageState } from '~/pages/home/hooks/useHomePageState';

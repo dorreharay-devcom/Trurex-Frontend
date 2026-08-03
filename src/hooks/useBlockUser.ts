@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { blockUser, fetchBlockedUsers, unblockUser } from '~/api/moderationApi';
+import { blockUser, fetchBlockedUsers, unblockUser } from '~/shared/api/moderationApi';
 import type { BlockedUserRow } from '~/types/moderation';
 import { toastError, toastSuccess } from '~/utils/appToast';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';

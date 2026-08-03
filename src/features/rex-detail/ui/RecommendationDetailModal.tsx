@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, useWindowDimensions } from 'react-native';
-import { OverlayModal } from '~/components/common/OverlayModal';
+import { OverlayModal } from '~/shared/ui/OverlayModal';
 import { modalConfig, useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
 import { useAuth } from '~/features/auth/providers';
 import { useCommentsScroll } from '~/features/rex-detail/hooks/comments/useCommentsScroll';

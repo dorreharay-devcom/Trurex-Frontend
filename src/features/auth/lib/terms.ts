@@ -1,4 +1,4 @@
-import { LEGAL_TERMS_STORAGE_KEY, LEGAL_TERMS_VERSION } from '~/constants/legal';
+import { LEGAL_TERMS_STORAGE_KEY, LEGAL_TERMS_VERSION } from '~/features/auth/config/legal';
 import { StorageService } from '~/shared/lib/storage';
 export async function persistTermsAcceptance(): Promise<void> {
   await StorageService.setItem(

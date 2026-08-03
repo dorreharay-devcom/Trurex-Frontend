@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { searchPlacesForRex } from '~/api/rexPlacesApi';
+import { searchPlacesForRex } from '~/features/rex-create/api/rexPlacesApi';
 import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/hooks/useDebouncedValue';
 import type { CreateRecSearchPlace } from '~/features/rex-create/types/create';
 import { mapSearchResponseToPlaces } from '~/features/rex-create/lib/place';

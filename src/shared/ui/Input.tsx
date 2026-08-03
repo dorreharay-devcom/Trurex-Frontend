@@ -16,7 +16,7 @@ import {
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
-import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
+import { INPUT_FOCUS_RING_CLASS } from '~/shared/config/inputFocus';
 import { cn, isWeb } from '~/utils';
 
 type InputProps = TextInputProps & {

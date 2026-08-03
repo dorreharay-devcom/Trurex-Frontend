@@ -4,9 +4,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import AddRexToCollectionSheet from '~/features/collections/ui/AddRexToCollectionSheet';
 import CollectionDetailView from '~/features/collections/ui/CollectionDetailView';
 import DeepLinkShell from '~/shared/ui/DeepLinkShell';
-import ProtectedRoute from '~/components/common/ProtectedRoute';
+import ProtectedRoute from '~/features/auth/ui/ProtectedRoute';
 import RecommendationDetailModal from '~/features/rex-detail/ui/RecommendationDetailModal';
-import { TAB } from '~/components/layout/TabBar';
+import { TAB } from '~/shared/ui/shell/TabBar';
 import { toMainTabRoute } from '~/shared/config/routes';
 import { useRexPreview } from '~/features/rex-detail/hooks/useRexPreview';
 

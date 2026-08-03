@@ -1,9 +1,9 @@
 import React from 'react';
 import CirclesPage from '~/pages/circles';
 import GemsPage from '~/pages/gems';
-import MapScreen from '~/components/map/MapScreen';
-import ProfileView from '~/components/profile/ProfileView';
-import { TAB, type Tab } from '~/components/layout/TabBar';
+import MapPage from '~/pages/map';
+import ProfileView from '~/features/profile/ui/ProfileView';
+import { TAB, type Tab } from '~/shared/ui/shell/TabBar';
 import DiscoverPage from '~/pages/discover';
 import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
 
@@ -41,7 +41,7 @@ function HomeTabPanels({
   }
   if (currentTab === TAB.map) {
     return (
-      <MapScreen
+      <MapPage
         onRecommendationPress={onRecommendationPress}
         onRexSheetOpenChange={onMapRexSheetOpenChange}
       />

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput } from 'react-native';
 import { CREATE_REC_REVIEW_MAX } from '~/features/rex-create/config/scorecard';
-import { INPUT_FOCUS_RING_CLASS } from '~/constants/inputFocus';
+import { INPUT_FOCUS_RING_CLASS } from '~/shared/config/inputFocus';
 import { Theme, textFieldCaretStyle, textFieldMultilineStyle } from '~/shared/theme/Theme';
 import { webNoOutline } from '~/utils';
 

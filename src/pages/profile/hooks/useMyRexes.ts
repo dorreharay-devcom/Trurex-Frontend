@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { Backend, unwrap } from '~/shared/api/client';
-import { mapDiscoverFeedRowSafe } from '~/api/mapDiscoverFeed';
+import { recommendationFromRowSafe } from '~/shared/lib/recommendationRow';
 import type { Recommendation } from '~/shared/types/recommendation';
 import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 import { nextPageOffset } from '~/shared/lib/pagination';
@@ -22,7 +22,7 @@ export const useMyRexes = (userId?: string) => {
       );
       if (!Array.isArray(raw)) return [] as Recommendation[];
       return raw.flatMap((row) => {
-        const rec = mapDiscoverFeedRowSafe(row);
+        const rec = recommendationFromRowSafe(row);
         return rec ? [rec] : [];
       });
     },
