@@ -8,7 +8,7 @@ import {
   parseCircleAccentHex,
 } from '~/shared/lib/circles';
 import { Theme } from '~/shared/theme/Theme';
-import CircleGlyphIcon from '~/features/circles/ui/common/CircleGlyphIcon';
+import CircleGlyph from '~/shared/ui/CircleGlyph';
 
 type Props = {
   circle: CircleApiRow;
@@ -26,17 +26,14 @@ const AssignableCircleRow = ({ circle, pending, disabled, onPress }: Props) => {
       disabled={disabled}
       className="flex-row items-center gap-3 rounded-xl border border-border bg-background p-4 active:opacity-90"
     >
-      <CircleGlyphIcon
+      <CircleGlyph
         iconKind={circleIconKind(circle)}
         color={accent}
         bg={hexToSoftIconBackground(accent)}
         size={18}
       />
       <View className="min-w-0 flex-1">
-        <Text
-          className="text-sm font-semibold text-foreground"
-          numberOfLines={1}
-        >
+        <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
           {circle.name}
         </Text>
         <Text className="text-xs text-muted-foreground" numberOfLines={2}>

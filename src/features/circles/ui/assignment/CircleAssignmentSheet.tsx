@@ -38,9 +38,7 @@ const CircleAssignmentSheet = ({ open, onClose, memberId, memberName }: Props) =
         onPress={onClose}
         className="mt-4 items-center rounded-xl border border-border py-3 active:bg-muted/40"
       >
-        <Text className="text-sm font-medium text-foreground">
-          Skip for now
-        </Text>
+        <Text className="text-sm font-medium text-foreground">Skip for now</Text>
       </Pressable>
     </AssignmentSheetShell>
   );

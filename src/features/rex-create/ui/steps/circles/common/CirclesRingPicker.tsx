@@ -12,7 +12,7 @@ import {
   ringPaintOrderBackToFront,
   selectionAnnuliLargestFirst,
 } from '~/features/rex-create/lib/circles';
-import CircleGlyph from './CircleGlyph';
+import CircleGlyph from '~/shared/ui/CircleGlyph';
 
 const CHIP_ICON = 12;
 
@@ -144,7 +144,7 @@ function CirclesRingPicker({
                   )}
                   style={{ borderColor: rgbaFromHexColor(ring.accent, 0.45) }}
                 >
-                  <CircleGlyph circle={ring} size={CHIP_ICON} />
+                  <CircleGlyph iconKind={ring.iconKind} color={ring.accent} size={CHIP_ICON} />
                   <Text
                     className="max-w-[140px] text-[11px] font-semibold"
                     style={{ color: ring.accent }}

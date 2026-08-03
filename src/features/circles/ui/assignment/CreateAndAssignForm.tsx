@@ -15,9 +15,7 @@ const CreateAndAssignForm = ({ sheet }: Props) => {
       onLayout={sheet.autofocus.onFormLayout}
     >
       <View className="flex-row items-center justify-between">
-        <Text className="text-sm font-semibold text-foreground">
-          New Circle
-        </Text>
+        <Text className="text-sm font-semibold text-foreground">New Circle</Text>
         <Pressable onPress={sheet.closeCreateForm} hitSlop={8}>
           <X size={16} color={Theme.colors.muted} />
         </Pressable>

@@ -419,7 +419,10 @@ const ProfileView = ({
 
   if (isEditing) {
     return (
-      <KeyboardAvoidingView behavior={KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT} className="min-h-0 flex-1">
+      <KeyboardAvoidingView
+        behavior={KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT}
+        className="min-h-0 flex-1"
+      >
         <ScrollView
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"

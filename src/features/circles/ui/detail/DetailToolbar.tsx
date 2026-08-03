@@ -17,9 +17,7 @@ const DeleteButtonContent = ({ pending }: { pending: boolean }) => {
   return (
     <>
       <Trash2 size={14} color={Theme.colors.destructive} />
-      <Text className="text-xs font-medium text-destructive">
-        Delete
-      </Text>
+      <Text className="text-xs font-medium text-destructive">Delete</Text>
     </>
   );
 };

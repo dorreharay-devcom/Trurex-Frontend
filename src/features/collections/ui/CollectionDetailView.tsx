@@ -56,7 +56,10 @@ function CollectionDetailView({
 
   return (
     <>
-      <KeyboardAvoidingView behavior={KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT} className="min-h-0 flex-1">
+      <KeyboardAvoidingView
+        behavior={KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT}
+        className="min-h-0 flex-1"
+      >
         <CollectionHeaderBar
           isMyCollection={detail.is_my_collection}
           actions={actions}

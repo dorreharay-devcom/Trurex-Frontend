@@ -2,6 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { Globe, Heart, Lock, Users } from 'lucide-react-native';
 import type { CircleIconKind } from '~/shared/types/circles';
+import { cn } from '~/utils/general';
 
 const GLYPH_ICONS: Record<CircleIconKind, typeof Lock> = {
   lock: Lock,
@@ -13,21 +14,28 @@ const GLYPH_ICONS: Record<CircleIconKind, typeof Lock> = {
 type Props = {
   iconKind: CircleIconKind;
   color: string;
-  bg: string;
   size?: number;
+  bg?: string;
   large?: boolean;
 };
 
-const CircleGlyphIcon = ({ iconKind, color, bg, size = 20, large }: Props) => {
+const CircleGlyph = ({ iconKind, color, size = 20, bg, large }: Props) => {
   const Icon = GLYPH_ICONS[iconKind];
+  const icon = <Icon size={size} color={color} />;
+
+  if (!bg) return icon;
+
   return (
     <View
-      className={`${large ? 'h-12 w-12' : 'h-11 w-11'} shrink-0 items-center justify-center rounded-xl`}
+      className={cn(
+        'shrink-0 items-center justify-center rounded-xl',
+        large ? 'h-12 w-12' : 'h-11 w-11',
+      )}
       style={{ backgroundColor: bg }}
     >
-      <Icon size={size} color={color} />
+      {icon}
     </View>
   );
 };
 
-export default CircleGlyphIcon;
+export default CircleGlyph;

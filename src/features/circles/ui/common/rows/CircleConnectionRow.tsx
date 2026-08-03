@@ -17,11 +17,7 @@ type Props = {
 const AddButtonContent = ({ isMember, isAdding }: { isMember: boolean; isAdding: boolean }) => {
   if (isAdding) return <ActivityIndicator size="small" color={Theme.colors.primary} />;
   if (isMember) {
-    return (
-      <Text className="text-xs font-medium text-foreground">
-        In circle
-      </Text>
-    );
+    return <Text className="text-xs font-medium text-foreground">In circle</Text>;
   }
   return (
     <>

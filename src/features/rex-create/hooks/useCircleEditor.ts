@@ -13,7 +13,6 @@ import { isNonEmptyString } from '~/utils/guards';
 import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
 import { unknownErrorMessage } from '~/utils';
 
-
 type UseCircleEditorArgs = {
   onCreated: (circleId: string) => void;
 };

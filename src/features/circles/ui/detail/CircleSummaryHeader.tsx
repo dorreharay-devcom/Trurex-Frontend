@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import type { CircleApiRow } from '~/shared/api/circlesApi';
 import type { CircleDisplayRow } from '~/shared/types/circles';
 import { memberCountLabel } from '~/features/circles/lib/labels';
-import CircleGlyphIcon from '~/features/circles/ui/common/CircleGlyphIcon';
+import CircleGlyph from '~/shared/ui/CircleGlyph';
 
 type Props = {
   circle: CircleApiRow;
@@ -16,7 +16,7 @@ const CircleSummaryHeader = ({ circle, displayRow, memberCount }: Props) => {
 
   return (
     <View className="mb-6 flex-row items-start gap-3">
-      <CircleGlyphIcon
+      <CircleGlyph
         iconKind={displayRow.iconKind}
         color={displayRow.accent}
         bg={displayRow.iconBg}

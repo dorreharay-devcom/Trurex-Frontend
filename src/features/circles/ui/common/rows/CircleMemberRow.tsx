@@ -33,9 +33,7 @@ const CircleMemberRow = ({ member, onUserPress, onRemove, removing }: Props) => 
           ) : (
             <>
               <UserMinus size={14} color={Theme.colors.destructive} />
-              <Text className="text-xs font-medium text-destructive">
-                Remove
-              </Text>
+              <Text className="text-xs font-medium text-destructive">Remove</Text>
             </>
           )}
         </Pressable>

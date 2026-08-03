@@ -18,9 +18,7 @@ const CreateCircleTrigger = ({ disabled, onPress }: Props) => {
       <View className="h-11 w-11 items-center justify-center rounded-full bg-primary">
         <Plus size={18} color={Theme.colors.primaryForeground} />
       </View>
-      <Text className="text-sm font-medium text-foreground">
-        Create new circle
-      </Text>
+      <Text className="text-sm font-medium text-foreground">Create new circle</Text>
     </Pressable>
   );
 };

@@ -24,7 +24,13 @@ type Props = {
   onUserPress?: (userId: string) => void;
 };
 
-const AddToCircleSection = ({ userId, memberIds, addingMemberId, onAddMember, onUserPress }: Props) => {
+const AddToCircleSection = ({
+  userId,
+  memberIds,
+  addingMemberId,
+  onAddMember,
+  onUserPress,
+}: Props) => {
   const scoped = useScopedConnections({ userId, enabled: Boolean(userId) });
 
   return (

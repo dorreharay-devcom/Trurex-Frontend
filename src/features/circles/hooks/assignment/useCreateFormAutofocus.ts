@@ -17,7 +17,10 @@ export function useCreateFormAutofocus(active: boolean) {
     if (!isWeb || !active || !measured || focusRequest === 0) return;
 
     const scrollTimer = setTimeout(() => {
-      scrollRef.current?.scrollTo({ y: Math.max(0, formY - FORM_SCROLL_MARGIN_PX), animated: true });
+      scrollRef.current?.scrollTo({
+        y: Math.max(0, formY - FORM_SCROLL_MARGIN_PX),
+        animated: true,
+      });
     }, SCROLL_TO_FORM_DELAY_MS);
     const focusTimer = setTimeout(() => {
       nameInputRef.current?.focus();

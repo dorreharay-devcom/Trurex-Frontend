@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import type { CircleDisplayRow } from '~/shared/types/circles';
 import { cn } from '~/utils/general';
-import CircleGlyph from './CircleGlyph';
+import CircleGlyph from '~/shared/ui/CircleGlyph';
 import CircleRadioIndicator from './CircleRadioIndicator';
 
 const GLYPH_SIZE = 24;
@@ -31,7 +31,7 @@ function CircleRow({ circle: c, selected, onToggle }: Props) {
         className="h-12 w-12 shrink-0 items-center justify-center rounded-full"
         style={{ backgroundColor: c.iconBg }}
       >
-        <CircleGlyph circle={c} size={GLYPH_SIZE} />
+        <CircleGlyph iconKind={c.iconKind} color={c.accent} size={GLYPH_SIZE} />
       </View>
 
       <View className="min-w-0 flex-1">

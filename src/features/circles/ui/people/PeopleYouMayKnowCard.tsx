@@ -54,7 +54,11 @@ const PeopleYouMayKnowCard = ({
         disabled={!pressProfile}
         className={cn('flex-row items-start gap-3 pr-6', pressProfile && 'active:opacity-80')}
       >
-        <SignedUserAvatar name={label} avatar={suggestion.avatar_url} className="h-12 w-12 rounded-xl" />
+        <SignedUserAvatar
+          name={label}
+          avatar={suggestion.avatar_url}
+          className="h-12 w-12 rounded-xl"
+        />
         <View className="min-w-0 flex-1">
           <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
             {label}
@@ -66,7 +70,10 @@ const PeopleYouMayKnowCard = ({
             </Text>
           )}
           <Text
-            className={cn('mt-0.5 text-xs text-muted-foreground', !suggestion.handle && 'opacity-0')}
+            className={cn(
+              'mt-0.5 text-xs text-muted-foreground',
+              !suggestion.handle && 'opacity-0',
+            )}
             numberOfLines={1}
           >
             {suggestion.handle ? `@${suggestion.handle}` : '@placeholder'}

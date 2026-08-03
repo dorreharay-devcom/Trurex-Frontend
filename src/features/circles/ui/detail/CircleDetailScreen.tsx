@@ -65,7 +65,11 @@ const CircleDetailScreen = ({ circleId, onBack, onUserPress }: Props) => {
           onDelete={remove.request}
         />
 
-        <CircleSummaryHeader circle={circle} displayRow={displayRow} memberCount={listedMembers.length} />
+        <CircleSummaryHeader
+          circle={circle}
+          displayRow={displayRow}
+          memberCount={listedMembers.length}
+        />
 
         <MembersSection
           members={listedMembers}
