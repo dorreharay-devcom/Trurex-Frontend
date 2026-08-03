@@ -5,7 +5,7 @@ import {
   type CreateRecSearchPlace,
   type SearchEntryMode,
 } from '~/features/rex-create/types/create';
-import type { UserProfileRow } from '~/types/network';
+import type { ProfileData } from '~/features/profile/types/profile';
 
 export type ConfirmAuthorPreview = {
   name: string;
@@ -48,11 +48,11 @@ export function authorFromAuthUser(user: User | null | undefined): ConfirmAuthor
 
 export function authorForConfirmPreview(
   user: User | null | undefined,
-  profile: UserProfileRow | null | undefined,
+  profile: ProfileData | null | undefined,
 ): ConfirmAuthorPreview {
   if (!profile) return authorFromAuthUser(user);
   const fallback = authorFromAuthUser(user);
-  const name = profile.display_name?.trim() || fallback.name;
+  const name = profile.displayName?.trim() || fallback.name;
   const raw = profile.handle?.replace(/^@/, '').trim();
   const handle = raw ? `@${raw}` : fallback.handle;
   return {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { isWeb, webDisabledCursor, webNoOutline } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
 import {
   Theme,
   textFieldCaretStyle,
@@ -8,8 +8,8 @@ import {
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
 import { INPUT_FOCUS_RING_CLASS } from '~/shared/config/inputFocus';
-import { cn } from '~/utils/general';
 import { ClearableSearchInput } from '~/shared/ui/ClearableSearchInput';
+import { webDisabledCursor, webNoOutline, cn } from '~/shared/lib/ui/styles';
 
 type Props = {
   value: string;

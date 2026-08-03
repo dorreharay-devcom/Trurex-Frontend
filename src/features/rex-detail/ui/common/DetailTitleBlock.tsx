@@ -4,7 +4,8 @@ import { MapPin, Link2, Bookmark } from 'lucide-react-native';
 import type { RexDetailView } from '~/features/rex-detail/hooks/useRexDetail';
 import { Theme } from '~/shared/theme/Theme';
 import type { Recommendation } from '~/shared/types/recommendation';
-import { singleLineEllipsisTextStyle } from '~/utils';
+import { categoryDisplayLabel, placeDisplayTitle } from '~/shared/lib/recommendation';
+import { singleLineEllipsisTextStyle } from '~/shared/lib/ui/styles';
 
 type SaveButtonProps = {
   isSaved: boolean;
@@ -65,13 +66,13 @@ function DetailTitleBlock({ recommendation, detail, isSaved, onSavePress }: Prop
       <View className="mb-1 flex-row items-center justify-between gap-2">
         <View className="rounded-full border border-border/80 bg-border/40 px-2.5 py-1">
           <Text className="text-xs font-medium capitalize text-foreground">
-            {recommendation.category}
+            {categoryDisplayLabel(recommendation.category)}
           </Text>
         </View>
         <SaveButton isSaved={isSaved} onPress={onSavePress} />
       </View>
       <Text className="mt-2 font-display text-2xl font-bold text-foreground">
-        {recommendation.title}
+        {placeDisplayTitle(recommendation.title)}
       </Text>
       {detail.placeLocationLine ? (
         <View className="mt-1 flex-row items-center gap-1.5">

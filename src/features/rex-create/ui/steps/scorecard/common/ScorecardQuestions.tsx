@@ -9,8 +9,8 @@ import {
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
-import { isWeb, webNoOutline } from '~/utils';
-import { cn } from '~/utils/general';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { webNoOutline, cn } from '~/shared/lib/ui/styles';
 
 const OFF_MARKET_HELPER = 'Did they provide access to off-market opportunities?';
 const NATIVE_MT_4 = isWeb ? undefined : { marginTop: 4 };

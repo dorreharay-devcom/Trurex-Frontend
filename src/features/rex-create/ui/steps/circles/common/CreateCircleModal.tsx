@@ -18,9 +18,9 @@ import {
 } from '~/shared/theme/Theme';
 import { CIRCLE_COLOR_PRESETS, type CirclePresetColor } from '~/shared/config/circles';
 import { KEYBOARD_BEHAVIOR_IOS_PADDING } from '~/shared/config/keyboard';
-import { isWeb, webDisabledCursor, webNoOutline } from '~/utils';
-import { cn } from '~/utils/general';
+import { isWeb } from '~/shared/lib/ui/platform';
 import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
+import { webDisabledCursor, webNoOutline, cn } from '~/shared/lib/ui/styles';
 
 type Props = {
   visible: boolean;

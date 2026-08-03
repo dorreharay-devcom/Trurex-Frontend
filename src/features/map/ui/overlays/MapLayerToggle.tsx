@@ -8,7 +8,7 @@ import {
 } from '~/features/map/config/mapUi';
 import { MAP_PIN_COLOR, MAP_PIN_TYPE } from '~/features/map/config/pins';
 import { Theme } from '~/shared/theme/Theme';
-import { androidElevation } from '~/utils';
+import { androidElevation } from '~/shared/lib/ui/styles';
 import type { PinVisibility } from '~/features/map/types/mapPin';
 
 type Props = {

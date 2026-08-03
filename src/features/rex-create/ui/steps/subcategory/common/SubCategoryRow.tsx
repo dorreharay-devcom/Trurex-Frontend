@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import type { RexSubcategoryOption } from '~/features/rex-create/lib/categories';
 import { CATEGORY_ICON_FALLBACK } from '~/shared/api/categories';
-import { isWeb } from '~/utils';
-import { cn } from '~/utils/general';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { cn } from '~/shared/lib/ui/styles';
 
 function pluralCount(count: number, noun: string): string | null {
   if (count <= 0) return null;

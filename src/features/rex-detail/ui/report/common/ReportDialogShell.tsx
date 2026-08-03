@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Pressable, KeyboardAvoidingView, useWindowDimensions } from 'react-native';
-import { isIos, isWeb } from '~/utils';
-import { cn } from '~/utils/general';
+import { isIos, isWeb } from '~/shared/lib/ui/platform';
+import { cn } from '~/shared/lib/ui/styles';
 import { CREATE_REC_MODAL_MAX_W } from '~/features/rex-create/config/layout';
 
 type Props = {

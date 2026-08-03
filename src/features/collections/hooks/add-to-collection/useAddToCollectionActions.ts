@@ -2,11 +2,11 @@ import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { CollectionsApi } from '~/features/collections/api/collectionsApi';
 import { COLLECTIONS_QUERY_KEYS } from '~/features/collections/config/queryKeys';
-import { modalConfig } from '~/hooks/useOverlaySheetPresentation';
+import { modalConfig } from '~/shared/config/overlaySheet';
 import type { RecSummary } from '~/features/collections/types/recSummary';
-import { toastError, toastSuccessAfterDismiss } from '~/utils/appToast';
-import { unknownErrorMessage } from '~/utils';
-import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { toastError, toastSuccessAfterDismiss } from '~/shared/lib/appToast';
+import { unknownErrorMessage } from '~/shared/lib/data/guards';
+import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
 
 const TOAST_AFTER_SHEET_CLOSE_DELAY_MS = modalConfig.timing.sheetCloseMs + 180;
 

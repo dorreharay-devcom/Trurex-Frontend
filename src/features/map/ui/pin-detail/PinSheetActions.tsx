@@ -2,7 +2,7 @@ import React from 'react';
 import { Linking, Pressable, Text, View } from 'react-native';
 import { Bookmark, ExternalLink, Navigation, Share2 } from 'lucide-react-native';
 import { mapDirectionsUrl } from '~/features/map/lib/directions';
-import { useShareRex } from '~/shared/hooks/useShareRex';
+import { useShareRex } from '~/features/rex-detail/hooks/useShareRex';
 import { Theme } from '~/shared/theme/Theme';
 import type { Recommendation } from '~/shared/types/recommendation';
 

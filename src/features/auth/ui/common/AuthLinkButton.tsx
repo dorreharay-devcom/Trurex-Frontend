@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, ButtonVariant } from '~/shared/ui/Button';
 import { Theme } from '~/shared/theme/Theme';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 export type AuthLinkTone = 'muted' | 'accent';
 

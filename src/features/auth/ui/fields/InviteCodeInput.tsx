@@ -2,7 +2,7 @@ import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { AUTH_INVITE_CODE_LENGTH, normalizeInviteCode } from '~/features/auth/config/authInvite';
 import type { InviteCodeInputRef } from '~/features/auth/types';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 type Props = {
   value: string;

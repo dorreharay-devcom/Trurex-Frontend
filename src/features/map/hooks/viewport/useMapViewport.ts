@@ -3,7 +3,7 @@ import type { Region } from 'react-native-maps';
 import { MAP_BOUNDS_DEBOUNCE_MS } from '~/features/map/config/mapUi';
 import { boundsToRegion, DEFAULT_MAP_BOUNDS, type LatLngBounds } from '~/features/map/lib/geo';
 import { MAP_SEARCH_SUGGEST_MIN_QUERY_LENGTH } from '~/features/map/lib/mapSearchSuggestions';
-import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/hooks/useDebouncedValue';
+import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/shared/hooks/useDebouncedValue';
 
 export function useMapViewport() {
   const [searchQuery, setSearchQuery] = useState('');

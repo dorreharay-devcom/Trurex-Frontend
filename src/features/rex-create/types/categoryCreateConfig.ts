@@ -1,4 +1,4 @@
-import type { RexVisibility } from '~/shared/config/rexVisibility';
+import type { RexVisibility } from '~/features/rex-create/lib/sharing';
 
 export type CategoryQuestionType = 'select' | 'text';
 

@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { deleteCircle, type CircleApiRow } from '~/shared/api/circlesApi';
+import { deleteCircle } from '~/features/circles/api/circlesApi';
 import { CIRCLES_QUERY_KEYS } from '~/features/circles/config/queryKeys';
-import { unknownErrorMessage } from '~/utils';
-import { toastError, toastSuccess } from '~/utils/appToast';
-import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import type { CircleApiRow } from '~/features/circles/types/circle';
+import { unknownErrorMessage } from '~/shared/lib/data/guards';
+import { toastError, toastSuccess } from '~/shared/lib/appToast';
+import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
 
 export type DeleteCircleState = ReturnType<typeof useDeleteCircle>;
 

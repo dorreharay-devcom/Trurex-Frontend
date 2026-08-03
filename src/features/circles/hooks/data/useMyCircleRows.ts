@@ -1,6 +1,9 @@
 import { useMemo } from 'react';
-import { mapApiCirclesToDisplayRows, sortCirclesForRingStack } from '~/shared/lib/circles';
-import { useMyCircles } from '~/shared/hooks/useMyCircles';
+import {
+  mapApiCirclesToDisplayRows,
+  sortCirclesForRingStack,
+} from '~/features/circles/lib/display';
+import { useMyCircles } from '~/features/circles/hooks/data/useMyCircles';
 
 export function useMyCircleRows(enabled: boolean) {
   const { data = [], isLoading, isError } = useMyCircles(enabled);

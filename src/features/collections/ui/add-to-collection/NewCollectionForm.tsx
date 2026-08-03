@@ -1,13 +1,12 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native';
+import { cn, webDisabledCursor } from '~/shared/lib/ui/styles';
 import {
   Theme,
   textFieldCaretStyle,
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
-import { webDisabledCursor } from '~/utils';
-import { cn } from '~/utils/general';
 
 const NAME_MAX_LENGTH = 60;
 

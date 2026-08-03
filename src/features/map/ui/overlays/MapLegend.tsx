@@ -9,7 +9,8 @@ import {
   MAP_PIN_TYPE,
 } from '~/features/map/config/pins';
 import { Theme } from '~/shared/theme/Theme';
-import { androidElevation, isAndroid, isIos } from '~/utils';
+import { isAndroid, isIos } from '~/shared/lib/ui/platform';
+import { androidElevation } from '~/shared/lib/ui/styles';
 
 const legendItems = [
   { label: 'Rex', pinType: MAP_PIN_TYPE.rex },

@@ -1,6 +1,6 @@
 import { Backend } from '~/shared/api/client';
 import type { PeopleSuggestionRow } from '~/features/circles/types/peopleSuggestions';
-import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
+import { throwRpcIfFailed } from '~/shared/lib/errors/restriction';
 
 export async function fetchPeopleSuggestions(params?: {
   input_limit?: number;

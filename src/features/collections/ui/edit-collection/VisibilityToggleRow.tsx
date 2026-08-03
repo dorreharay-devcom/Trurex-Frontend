@@ -3,7 +3,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { Globe, Lock, Users, type LucideIcon } from 'lucide-react-native';
 import type { CollectionVisibility } from '~/features/collections/types/collection';
 import { Theme } from '~/shared/theme/Theme';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 const VISIBILITY_OPTIONS: {
   value: CollectionVisibility;

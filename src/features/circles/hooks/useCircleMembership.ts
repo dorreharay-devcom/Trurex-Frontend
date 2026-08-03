@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { addCircleMember, removeCircleMember } from '~/shared/api/circlesApi';
+import { addCircleMember, removeCircleMember } from '~/features/circles/api/circlesApi';
 import { CIRCLES_QUERY_KEYS } from '~/features/circles/config/queryKeys';
-import { mutationErrorToast } from '~/shared/lib/mutationErrorToast';
-import { toastSuccess } from '~/utils/appToast';
+import { mutationErrorToast } from '~/shared/lib/errors/restriction';
+import { toastSuccess } from '~/shared/lib/appToast';
 
 export function useCircleMembership(circleId: string) {
   const queryClient = useQueryClient();

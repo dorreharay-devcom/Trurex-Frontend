@@ -1,7 +1,7 @@
 import { Backend, unwrap } from '~/shared/api/client';
 import type { Recommendation } from '~/shared/types/recommendation';
 import type { SavedRexesParams } from '~/features/collections/types/savedRexes';
-import { recommendationFromRowSafe } from '~/shared/lib/recommendationRow';
+import { mapApiRowToRecommendation } from '~/shared/lib/recommendation';
 
 export const GemsApi = {
   getSavedRexes: async (params: SavedRexesParams = {}): Promise<Recommendation[]> => {
@@ -15,7 +15,7 @@ export const GemsApi = {
     const raw = unwrap(await Backend.rpc('saved_rexes_view', rpcParams));
     if (!Array.isArray(raw)) return [];
     return raw.flatMap((row) => {
-      const rec = recommendationFromRowSafe(row);
+      const rec = mapApiRowToRecommendation(row);
       return rec ? [rec] : [];
     });
   },

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput } from 'react-native';
 import { Theme, textFieldCaretStyle, textFieldMultilineStyle } from '~/shared/theme/Theme';
-import { webNoOutline } from '~/utils';
+import { webNoOutline } from '~/shared/lib/ui/styles';
 import { MAX_CONTENT_REPORT_DETAILS } from '~/features/rex-detail/config/contentReport';
 
 type Props = {

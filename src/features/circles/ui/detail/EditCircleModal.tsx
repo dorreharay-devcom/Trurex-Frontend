@@ -5,7 +5,7 @@ import type { EditCircleState } from '~/features/circles/hooks/detail/useEditCir
 import CircleFormFields from '~/features/circles/ui/form/CircleFormFields';
 import { Theme } from '~/shared/theme/Theme';
 import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 type Props = { edit: EditCircleState };
 

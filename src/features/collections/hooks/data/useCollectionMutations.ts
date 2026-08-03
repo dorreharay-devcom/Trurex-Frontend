@@ -5,8 +5,8 @@ import type {
   UpdateCollectionInput,
 } from '~/features/collections/types/collection';
 import { COLLECTIONS_QUERY_KEYS } from '~/features/collections/config/queryKeys';
-import { mutationErrorToast } from '~/shared/lib/mutationErrorToast';
-import { toastSuccess } from '~/utils/appToast';
+import { mutationErrorToast } from '~/shared/lib/errors/restriction';
+import { toastSuccess } from '~/shared/lib/appToast';
 
 export const useCreateCollection = () => {
   const queryClient = useQueryClient();

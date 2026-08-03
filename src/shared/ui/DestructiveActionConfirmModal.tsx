@@ -1,10 +1,10 @@
 import React, { type ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
-import ConfirmModalCard from '~/shared/ui/destructive-confirm/ConfirmModalCard';
-import { isWeb } from '~/utils';
-import { cn } from '~/utils/general';
-import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/modalProps';
+import { ConfirmModalCard } from '~/shared/ui/destructive-confirm/ConfirmModalCard';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { cn } from '~/shared/lib/ui/styles';
+import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/overlaySheet';
 
 export type DestructiveActionConfirmModalProps = {
   visible: boolean;

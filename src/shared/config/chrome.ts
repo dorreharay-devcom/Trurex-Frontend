@@ -1,0 +1,1 @@
+export const MAIN_CHROME_COMPACT_MAX_WIDTH = 640;

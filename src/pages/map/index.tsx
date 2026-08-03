@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useMapScreen } from '~/features/map/hooks/screen/useMapScreen';
+import { useMapScreen } from '~/features/map/hooks/useMapScreen';
 import MapLocationPromptBanner from '~/features/map/ui/overlays/MapLocationPromptBanner';
 import MapSearchBar from '~/features/map/ui/search/MapSearchBar';
 import { useMapLocationPrompt } from '~/pages/map/hooks/useMapLocationPrompt';
@@ -11,7 +11,7 @@ import MapEmptyBanners from '~/pages/map/ui/MapEmptyBanners';
 import MapListView from '~/pages/map/ui/MapListView';
 import MapPinOverlays from '~/pages/map/ui/MapPinOverlays';
 import type { Recommendation } from '~/shared/types/recommendation';
-import { webContainerStyle } from '~/utils';
+import { webContainerStyle } from '~/shared/lib/ui/styles';
 
 type Props = {
   onRecommendationPress?: (rec: Recommendation) => void;

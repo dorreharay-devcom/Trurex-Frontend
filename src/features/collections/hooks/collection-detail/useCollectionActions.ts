@@ -6,10 +6,9 @@ import {
   useUnsaveCollection,
 } from '~/features/collections/hooks/data/useCollectionMutations';
 import type { CollectionDetailRow } from '~/features/collections/types/collection';
-import { toastError, toastSuccessAfterDismiss } from '~/utils/appToast';
-import { buildCurrentWebPath, buildPublicWebPath } from '~/utils/shareUrls';
-import { shareMobileLink } from '~/utils/mobileShare';
-import { isWeb } from '~/utils';
+import { toastError, toastSuccessAfterDismiss } from '~/shared/lib/appToast';
+import { buildShareUrl, shareMobileLink } from '~/shared/lib/share';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 type Params = {
   collectionId: string;
@@ -31,8 +30,7 @@ export function useCollectionActions({ collectionId, detail, onBack }: Params) {
 
   const shareCollection = useCallback(async () => {
     if (!detail) return;
-    const path = `/collection/${collectionId}`;
-    const url = isWeb ? buildCurrentWebPath(path) : buildPublicWebPath(path);
+    const url = buildShareUrl(`/collection/${collectionId}`);
     if (isWeb) {
       await Clipboard.setStringAsync(url);
       toastSuccessAfterDismiss(() => setShowMenu(false), 'Link copied!');

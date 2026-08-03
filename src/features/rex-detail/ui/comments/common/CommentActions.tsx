@@ -2,8 +2,8 @@ import React from 'react';
 import { Pressable, Text } from 'react-native';
 import { Heart, Reply, Trash2, type LucideIcon } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
-import { isWeb } from '~/utils';
-import { cn } from '~/utils/general';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { cn } from '~/shared/lib/ui/styles';
 
 const LIKE_ICON_SIZE = 15;
 const LIKE_ACTIVE_COLOR = Theme.colors.destructive;

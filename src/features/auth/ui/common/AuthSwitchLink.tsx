@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 type Props = {
   prompt: string;

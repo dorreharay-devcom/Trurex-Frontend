@@ -1,17 +1,17 @@
 import React from 'react';
 import { View, Modal, ScrollView, useWindowDimensions, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
 import type { ContentReportTarget } from '~/features/rex-detail/types/contentReport';
 import { useContentReportFlow } from '~/features/rex-detail/hooks/report/useContentReportFlow';
 import { useAuth } from '~/features/auth/providers';
-import { toastInfo } from '~/utils/appToast';
+import { toastInfo } from '~/shared/lib/appToast';
 import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
 import ReportDialogShell from './common/ReportDialogShell';
 import ReportDialogHeader from './common/ReportDialogHeader';
 import ReportFormBody from './common/ReportFormBody';
 import ReportFooter from './common/ReportFooter';
-import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/modalProps';
+import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/overlaySheet';
 
 const FORM_FOOTER_EST = 100;
 const HEADER_EST = 56;

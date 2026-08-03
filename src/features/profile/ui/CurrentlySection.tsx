@@ -1,34 +1,31 @@
 import React from 'react';
-import { View, Text } from 'react-native';
-import type { ProfileData } from '~/types/profile';
+import { Text, View } from 'react-native';
+import { CURRENTLY_FIELDS } from '~/features/profile/config/currently';
+import type { ProfileData } from '~/features/profile/types/profile';
 
-interface CurrentlySectionProps {
+type Props = {
   currently?: ProfileData['currently'];
-}
+};
 
-const ITEMS = [
-  { key: 'binging' as const, emoji: '🎬', label: 'Currently Binging' },
-  { key: 'listening' as const, emoji: '🎵', label: 'Currently Listening to' },
-  { key: 'reading' as const, emoji: '📖', label: 'Currently Reading' },
-];
+const CurrentlySection = ({ currently }: Props) => {
+  if (!currently) return null;
 
-const CurrentlySection = ({ currently }: CurrentlySectionProps) => {
-  const active = ITEMS.filter((item) => currently?.[item.key]);
-  if (!currently || active.length === 0) return null;
+  const active = CURRENTLY_FIELDS.filter((item) => currently[item.key]);
+  if (active.length === 0) return null;
 
   return (
-    <View className="px-4 pt-5 pb-3 gap-2">
-      <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">
+    <View className="gap-2 px-4 pb-3 pt-5">
+      <Text className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
         Currently...
       </Text>
       {active.map((item) => (
         <View
           key={item.key}
-          className="flex-row items-center gap-3 p-3 rounded-xl bg-background border border-border"
+          className="flex-row items-center gap-3 rounded-xl border border-border bg-background p-3"
         >
           <Text className="text-xl">{item.emoji}</Text>
           <View className="flex-1">
-            <Text className="text-[11px] text-muted-foreground mb-0.5">{item.label}</Text>
+            <Text className="mb-0.5 text-[11px] text-muted-foreground">{item.viewLabel}</Text>
             <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
               {currently[item.key]}
             </Text>

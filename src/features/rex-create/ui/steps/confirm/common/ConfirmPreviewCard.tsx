@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { ExternalLink, MapPin, Star } from 'lucide-react-native';
-import { useCategoryIcon } from '~/hooks/useCategoryIcon';
+import { useCategoryIcon } from '~/shared/hooks/useActiveCategories';
 import type {
   ConfirmAuthorPreview,
   ConfirmPreviewPlace,

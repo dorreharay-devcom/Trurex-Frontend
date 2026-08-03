@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 type Props = {
   categoryIcon?: string | null;

@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { useAuth } from '~/features/auth/providers';
 import type { ContentReportTarget } from '~/features/rex-detail/types/contentReport';
 import type { Recommendation } from '~/shared/types/recommendation';
-import { toastInfo } from '~/utils/appToast';
+import { toastInfo } from '~/shared/lib/appToast';
 
 export function useReportTarget(recommendation: Recommendation | null) {
   const { user: authUser } = useAuth();

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { ArrowLeft, Flag, Trash2, Pencil } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
-import { isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
 import HeaderActionPill from './HeaderActionPill';
 
 type HeaderActionsProps = {

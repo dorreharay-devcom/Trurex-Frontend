@@ -8,8 +8,8 @@ import {
 } from '~/shared/api/categories';
 import { Theme } from '~/shared/theme/Theme';
 import type { CreateRecSearchPlace } from '~/features/rex-create/types/create';
-import { cn } from '~/utils/general';
-import { isStrictUuid } from '~/utils/guards';
+import { cn } from '~/shared/lib/ui/styles';
+import { isStrictUuid } from '~/shared/lib/data/guards';
 
 type Props = {
   place: CreateRecSearchPlace;

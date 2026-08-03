@@ -1,6 +1,6 @@
 import { useNavigation, useRouter } from 'expo-router';
 import { Routes } from '~/shared/config/routes';
-import { isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 export function useLeaveLegalDocument() {
   const router = useRouter();

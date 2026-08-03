@@ -1,18 +1,16 @@
 import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { createCircle, updateCircle } from '~/shared/api/circlesApi';
+import { createCircle, updateCircle } from '~/features/circles/api/circlesApi';
 import type { CircleDisplayRow } from '~/shared/types/circles';
-import { toastError, toastSuccess } from '~/utils/appToast';
+import { toastError, toastSuccess } from '~/shared/lib/appToast';
 import {
   CIRCLE_COLOR_PRESETS,
   CIRCLE_PRESET_DEFAULT,
   type CirclePresetColor,
 } from '~/shared/config/circles';
 import { CIRCLE_QUERY_KEYS } from '~/shared/config/queryKeys';
-import { isNonEmptyString } from '~/utils/guards';
-import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
-import { unknownErrorMessage } from '~/utils';
-
+import { isNonEmptyString, unknownErrorMessage } from '~/shared/lib/data/guards';
+import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
 type UseCircleEditorArgs = {
   onCreated: (circleId: string) => void;
 };

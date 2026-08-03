@@ -1,6 +1,13 @@
 import type { CreateRexRpcParams } from '~/features/rex-create/types/categoryCreateConfig';
-import { REX_VISIBILITY } from '~/shared/config/rexVisibility';
-import { isStrictUuid } from '~/utils/guards';
+import { isStrictUuid } from '~/shared/lib/data/guards';
+
+export const REX_VISIBILITY = {
+  public: 'public',
+  private: 'private',
+  circles: 'circles',
+} as const;
+
+export type RexVisibility = (typeof REX_VISIBILITY)[keyof typeof REX_VISIBILITY];
 
 export const PUBLIC_CIRCLE_KEY = 'public';
 

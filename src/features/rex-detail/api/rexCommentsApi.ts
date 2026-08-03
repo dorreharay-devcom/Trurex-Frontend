@@ -7,7 +7,7 @@ import type {
   RexCommentRpc,
 } from '~/features/rex-detail/types/rexComment';
 
-function mapRpcToComment(node: RexCommentRpc, isReply: boolean): RexComment {
+function mapRpcCommentFields(node: RexCommentRpc): Omit<RexComment, 'replies'> {
   return {
     id: node.id,
     rex_id: node.rex_id,
@@ -25,9 +25,20 @@ function mapRpcToComment(node: RexCommentRpc, isReply: boolean): RexComment {
       username: node.author_username,
       relationship_status: node.author_relationship_status,
     },
-    replies: isReply
-      ? []
-      : (node.subcomments ?? []).map((subcomment) => mapRpcToComment(subcomment, true)),
+  };
+}
+
+function mapRpcToReply(node: RexCommentRpc): RexComment {
+  return {
+    ...mapRpcCommentFields(node),
+    replies: [],
+  };
+}
+
+function mapRpcToComment(node: RexCommentRpc): RexComment {
+  return {
+    ...mapRpcCommentFields(node),
+    replies: (node.subcomments ?? []).map(mapRpcToReply),
   };
 }
 
@@ -38,7 +49,7 @@ export async function getRexComments(rexId: string): Promise<RexComment[]> {
     }),
   ) as RexCommentRpc[] | null;
   const list = Array.isArray(data) ? data : [];
-  return list.map((node) => mapRpcToComment(node, false));
+  return list.map(mapRpcToComment);
 }
 
 export async function addRexComment(

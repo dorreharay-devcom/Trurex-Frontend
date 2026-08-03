@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import {
   useManualPlaceGeotag,
   type ManualPlaceGeotagResult,
-} from '~/hooks/location/useManualPlaceGeotag';
+} from '~/features/rex-create/hooks/useManualPlaceGeotag';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
 import { SEARCH_MODE } from '~/features/rex-create/types/create';
 

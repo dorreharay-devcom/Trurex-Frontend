@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, Text } from 'react-native';
 import { Theme } from '~/shared/theme/Theme';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 type Props = {
   label: string;

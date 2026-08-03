@@ -1,3 +1,7 @@
 export { AuthApi } from './AuthApi';
-export type { SignUpParams, SignInParams, AuthSessionData, SignInWithOAuthParams } from './types';
-export { AuthSessionErrorCode, isFatalAuthSessionErrorCode } from './sessionErrors';
+export type {
+  AuthSessionData,
+  SignInParams,
+  SignInWithOAuthParams,
+  SignUpParams,
+} from '~/shared/types/auth';

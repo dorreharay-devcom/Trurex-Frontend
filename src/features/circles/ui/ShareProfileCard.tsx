@@ -3,13 +3,13 @@ import { Pressable, Text, View } from 'react-native';
 import { Check, Copy, Share2 } from 'lucide-react-native';
 import { useQuery } from '@tanstack/react-query';
 import * as Clipboard from 'expo-clipboard';
-import { ProfileApi } from '~/shared/api/profileApi';
+import { ProfileApi } from '~/features/profile/api/profileApi';
 import { useAuth } from '~/features/auth/providers';
 import { CIRCLES_QUERY_KEYS } from '~/features/circles/config/queryKeys';
 import { Theme } from '~/shared/theme/Theme';
-import { toastSuccess } from '~/utils/appToast';
-import { buildProfileShareUrl, profileShareSlug } from '~/utils/profileShareUrl';
-import { cn } from '~/utils/general';
+import { toastSuccess } from '~/shared/lib/appToast';
+import { buildProfileShareUrl, profileShareSlug } from '~/features/profile/lib/share';
+import { cn } from '~/shared/lib/ui/styles';
 
 const COPIED_RESET_MS = 2000;
 

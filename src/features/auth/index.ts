@@ -14,6 +14,7 @@ export { default as LegalDocumentScreen } from './ui/legal/LegalDocumentScreen';
 
 export { AuthProvider, useAuth } from './providers';
 
+export { useUserConfig } from './hooks/useUserConfig';
 export { useAuthInviteCode } from './hooks/useAuthInviteCode';
 export type { AuthInviteCodeFieldState } from './hooks/useAuthInviteCode';
 export { useOAuthSignIn } from './hooks/useOAuthSignIn';

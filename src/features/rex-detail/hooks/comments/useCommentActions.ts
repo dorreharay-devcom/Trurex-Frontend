@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import { toastError } from '~/utils/appToast';
-import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
-import { unknownErrorMessage } from '~/utils';
+import { toastError } from '~/shared/lib/appToast';
+import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
+import { unknownErrorMessage } from '~/shared/lib/data/guards';
 
 export async function runCommentMutation(
   failTitle: string,

@@ -10,7 +10,13 @@ type Props = {
   onConfirm: () => void;
 };
 
-function ConfirmModalActions({ confirmLabel, cancelLabel, pending, onCancel, onConfirm }: Props) {
+export function ConfirmModalActions({
+  confirmLabel,
+  cancelLabel,
+  pending,
+  onCancel,
+  onConfirm,
+}: Props) {
   return (
     <View className="flex-row gap-3">
       <Pressable
@@ -38,5 +44,3 @@ function ConfirmModalActions({ confirmLabel, cancelLabel, pending, onCancel, onC
     </View>
   );
 }
-
-export default ConfirmModalActions;

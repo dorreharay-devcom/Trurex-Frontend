@@ -17,9 +17,9 @@ import type {
 } from '~/features/collections/hooks/add-to-collection/useCollectionPicker';
 import { itemCountLabel } from '~/features/collections/lib/labels';
 import { useSignedStorageUrl } from '~/shared/hooks/useSignedStorageUrl';
-import { REX_IMAGES_BUCKET } from '~/shared/config/storageBuckets';
+import { REX_IMAGES_BUCKET } from '~/shared/config/app';
 import { Theme } from '~/shared/theme/Theme';
-import { webContainerStyle } from '~/utils';
+import { withWebContainer } from '~/shared/lib/ui/styles';
 
 const COLLECTION_FALLBACK_GRADIENT_COLORS = ['#F59B0A', '#B7C7CF'] as const;
 
@@ -102,7 +102,7 @@ function CollectionPickerList({ picker, maxHeight }: Props) {
       style={{ maxHeight }}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
-      contentContainerStyle={[{ padding: 12, gap: 2, minHeight: 160 }, webContainerStyle]}
+      contentContainerStyle={withWebContainer({ padding: 12, gap: 2, minHeight: 160 })}
     >
       {picker.error ? (
         <LoadErrorRow error={picker.error} onRetry={() => void picker.reload()} />

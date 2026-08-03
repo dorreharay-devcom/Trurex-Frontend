@@ -1,4 +1,4 @@
-import type { NetworkUserRow } from '~/types/network';
+import type { NetworkUserRow } from '~/features/circles/types/networkUser';
 
 export type ConnectionScopeTab = 'trusted' | 'followers' | 'following';
 

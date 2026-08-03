@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import { isWeb } from '~/utils';
-import { cn } from '~/utils/general';
-import { VALUE_FOR_MONEY_LABELS } from '~/shared/lib/valueForMoney';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { cn } from '~/shared/lib/ui/styles';
+import { VALUE_FOR_MONEY_LABELS } from '~/shared/lib/recommendation';
 
 type Props = {
   value: number | null;

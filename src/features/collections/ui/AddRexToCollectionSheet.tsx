@@ -1,10 +1,10 @@
 import React from 'react';
 import { ScrollView, useWindowDimensions } from 'react-native';
-import BottomSheet from '~/features/collections/ui/common/BottomSheet';
+import BottomSheet from '~/shared/ui/BottomSheet';
 import SheetHeader from '~/features/collections/ui/common/SheetHeader';
-import SavedRexList from '~/features/collections/ui/add-rex-to-collection/SavedRexList';
-import { useAddRexesToCollection } from '~/features/collections/hooks/add-rex-to-collection/useAddRexesToCollection';
-import { webContainerStyle } from '~/utils';
+import SavedRexList from '~/features/collections/ui/SavedRexList';
+import { useAddRexesToCollection } from '~/features/collections/hooks/useAddRexesToCollection';
+import { withWebContainer } from '~/shared/lib/ui/styles';
 
 const SHEET_MAX_HEIGHT = 500;
 const SHEET_HEIGHT_RATIO = 0.55;
@@ -43,7 +43,7 @@ function AddRexToCollectionSheet({ open, collectionId, onClose }: Props) {
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={[{ padding: 12, gap: 2 }, webContainerStyle]}
+        contentContainerStyle={withWebContainer({ padding: 12, gap: 2 })}
         style={{ flex: 1 }}
       >
         <SavedRexList list={list} selected={selection.selected} onToggle={selection.toggle} />

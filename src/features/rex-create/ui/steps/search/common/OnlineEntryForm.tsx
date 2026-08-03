@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
 import { SEARCH_MODE } from '~/features/rex-create/types/create';
-import { isAndroid } from '~/utils';
+import { isAndroid } from '~/shared/lib/ui/platform';
 import SearchTextField from './SearchTextField';
 import TagLocationButton from './TagLocationButton';
 

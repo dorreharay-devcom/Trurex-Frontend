@@ -8,8 +8,8 @@ import {
   CIRCLES_QUERY_KEYS,
   CONNECTION_DEPENDENT_QUERY_KEYS,
 } from '~/features/circles/config/queryKeys';
-import { mutationErrorToast } from '~/shared/lib/mutationErrorToast';
-import { toastSuccess } from '~/utils/appToast';
+import { mutationErrorToast } from '~/shared/lib/errors/restriction';
+import { toastSuccess } from '~/shared/lib/appToast';
 
 const SUGGESTIONS_LIMIT = 20;
 const SUGGESTIONS_STALE_MS = 60_000;

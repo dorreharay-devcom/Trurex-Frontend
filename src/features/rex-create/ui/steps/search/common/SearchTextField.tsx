@@ -8,8 +8,8 @@ import {
   textFieldSingleLineLargeHeightStyle,
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
-import { isWeb, webNoOutline } from '~/utils';
-import { cn } from '~/utils/general';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { webNoOutline, cn } from '~/shared/lib/ui/styles';
 
 type Props = {
   value: string;

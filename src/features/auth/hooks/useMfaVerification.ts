@@ -11,7 +11,7 @@ import {
   verifyMfaCode,
   getDeviceFingerprint,
 } from '~/features/auth/lib/mfa';
-import { unknownErrorMessage } from '~/utils';
+import { unknownErrorMessage } from '~/shared/lib/data/guards';
 
 const MIN_CODE_LENGTH = 6;
 

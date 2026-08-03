@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { MapRecenterTarget } from '~/features/map/types/mapMarker';
-import { getCurrentLocationCoords } from '~/utils/location';
+import { getCurrentLocationCoords } from '~/features/map/lib/location';
 
 export type UserCoords = { latitude: number; longitude: number };
 

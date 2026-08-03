@@ -5,7 +5,7 @@ import AssignableCircleRow from '~/features/circles/ui/assignment/AssignableCirc
 import CreateAndAssignForm from '~/features/circles/ui/assignment/CreateAndAssignForm';
 import CreateCircleTrigger from '~/features/circles/ui/assignment/CreateCircleTrigger';
 import ScrollBottomFade from '~/features/circles/ui/assignment/ScrollBottomFade';
-import { isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 const LIST_MAX_HEIGHT = isWeb ? 360 : 320;
 const SCROLL_EVENT_THROTTLE_MS = 16;

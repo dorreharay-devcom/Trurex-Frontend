@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 const CATEGORY_TAGS = [
   'Food & Drink',

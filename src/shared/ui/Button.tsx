@@ -1,8 +1,8 @@
 import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, View } from 'react-native';
 import { Theme } from '~/shared/theme/Theme';
-import { cn } from '~/utils/general';
-import { isWeb, webDisabledCursor } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { cn, webDisabledCursor } from '~/shared/lib/ui/styles';
 
 export const ButtonVariant = {
   Primary: 'primary',
@@ -16,101 +16,104 @@ export const ButtonVariant = {
 
 export type ButtonVariant = (typeof ButtonVariant)[keyof typeof ButtonVariant];
 
-type ButtonProps = {
+type Props = {
   title?: string;
   onPress: () => void;
-  label?: string;
   variant?: ButtonVariant;
   loading?: boolean;
   disabled?: boolean;
   className?: string;
   textClassName?: string;
-  labelClassName?: string;
   icon?: React.ReactNode;
 };
 
-const buttonClassByVariant: Record<ButtonVariant, string> = {
-  [ButtonVariant.Primary]: 'py-2.5 px-6 bg-primary rounded-lg hover:bg-primary/90',
-  [ButtonVariant.Secondary]: 'py-2.5 px-6 bg-card border border-border rounded-lg hover:bg-muted',
-  [ButtonVariant.Muted]: 'py-2.5 px-6 bg-muted rounded-lg hover:bg-muted/80',
-  [ButtonVariant.Ghost]: 'py-2.5 px-6 bg-transparent rounded-lg hover:bg-muted/10',
-  [ButtonVariant.Danger]: 'py-2.5 px-6 bg-destructive rounded-lg hover:bg-destructive/90',
-  [ButtonVariant.Outline]: 'py-2.5 px-6 bg-card border border-border rounded-lg hover:bg-muted',
-  [ButtonVariant.Link]: 'p-0 bg-transparent hover:underline',
+const PADDED = 'py-2.5 px-6 rounded-lg';
+const BORDERED = `${PADDED} bg-card border border-border hover:bg-muted`;
+
+const VARIANT: Record<ButtonVariant, { root: string; text: string; spinner: string }> = {
+  [ButtonVariant.Primary]: {
+    root: `${PADDED} bg-primary hover:bg-primary/90`,
+    text: 'text-sm font-medium text-primary-foreground',
+    spinner: Theme.colors.primaryForeground,
+  },
+  [ButtonVariant.Secondary]: {
+    root: BORDERED,
+    text: 'text-sm font-medium text-foreground',
+    spinner: Theme.colors.foreground,
+  },
+  [ButtonVariant.Muted]: {
+    root: `${PADDED} bg-muted hover:bg-muted/80`,
+    text: 'text-sm font-medium text-muted-foreground',
+    spinner: Theme.colors.muted,
+  },
+  [ButtonVariant.Ghost]: {
+    root: `${PADDED} bg-transparent hover:bg-muted/10`,
+    text: 'text-sm font-medium text-primary',
+    spinner: Theme.colors.primary,
+  },
+  [ButtonVariant.Danger]: {
+    root: `${PADDED} bg-destructive hover:bg-destructive/90`,
+    text: 'text-sm font-medium text-white',
+    spinner: Theme.colors.white,
+  },
+  [ButtonVariant.Outline]: {
+    root: BORDERED,
+    text: 'text-sm font-medium text-foreground',
+    spinner: Theme.colors.foreground,
+  },
+  [ButtonVariant.Link]: {
+    root: 'bg-transparent p-0 hover:underline',
+    text: 'text-sm font-medium text-foreground',
+    spinner: Theme.colors.foreground,
+  },
 };
 
-const textClassByVariant: Record<ButtonVariant, string> = {
-  [ButtonVariant.Primary]: 'text-primary-foreground font-medium',
-  [ButtonVariant.Secondary]: 'text-foreground font-medium',
-  [ButtonVariant.Muted]: 'text-muted-foreground font-medium',
-  [ButtonVariant.Ghost]: 'text-primary font-medium',
-  [ButtonVariant.Danger]: 'text-white font-medium',
-  [ButtonVariant.Outline]: 'text-foreground font-medium',
-  [ButtonVariant.Link]: 'text-foreground font-medium',
-};
-
-const spinnerColorByVariant: Record<ButtonVariant, string> = {
-  [ButtonVariant.Primary]: Theme.colors.primaryForeground,
-  [ButtonVariant.Secondary]: Theme.colors.foreground,
-  [ButtonVariant.Muted]: Theme.colors.muted,
-  [ButtonVariant.Ghost]: Theme.colors.primary,
-  [ButtonVariant.Danger]: Theme.colors.white,
-  [ButtonVariant.Outline]: Theme.colors.foreground,
-  [ButtonVariant.Link]: Theme.colors.foreground,
-};
-
-export const Button = ({
+export function Button({
   title,
   onPress,
-  label,
   variant = ButtonVariant.Primary,
   loading = false,
   disabled = false,
   className,
   textClassName,
-  labelClassName,
   icon,
-}: ButtonProps) => {
+}: Props) {
+  const styles = VARIANT[variant];
   const isDisabled = disabled || loading;
 
-  function handlePress() {
-    if (isDisabled) return;
-    onPress();
+  let body: React.ReactNode = null;
+  if (loading) {
+    body = <ActivityIndicator color={styles.spinner} />;
+  } else {
+    body = (
+      <>
+        {icon ? <View className={cn(!!title && 'mr-2')}>{icon}</View> : null}
+        {title ? (
+          <Text className={cn(styles.text, textClassName)} pointerEvents="none">
+            {title}
+          </Text>
+        ) : null}
+      </>
+    );
   }
 
   return (
     <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={handlePress}
-      disabled={!isWeb && isDisabled}
+      accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled }}
+      activeOpacity={0.7}
+      disabled={isDisabled}
+      onPress={onPress}
       style={webDisabledCursor(isDisabled)}
       className={cn(
         'flex-row items-center justify-center',
-        buttonClassByVariant[variant],
-        isDisabled ? 'cursor-not-allowed opacity-50' : isWeb && 'cursor-pointer',
+        styles.root,
+        isDisabled && 'opacity-50',
+        isWeb && (isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'),
         className,
       )}
     >
-      {loading ? (
-        <ActivityIndicator color={spinnerColorByVariant[variant]} />
-      ) : (
-        <>
-          {icon ? <View className={title ? 'mr-2' : undefined}>{icon}</View> : null}
-          <View className="flex-row items-center" pointerEvents="none">
-            {label ? (
-              <Text className={cn('mr-1.5 font-medium text-gray-500', labelClassName)}>
-                {label}
-              </Text>
-            ) : null}
-            {title ? (
-              <Text className={cn('text-sm', textClassByVariant[variant], textClassName)}>
-                {title}
-              </Text>
-            ) : null}
-          </View>
-        </>
-      )}
+      {body}
     </TouchableOpacity>
   );
-};
+}

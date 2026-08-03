@@ -1,13 +1,13 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { MAP_ACTION_INSET } from '~/features/map/config/mapUi';
-import { useMapSearchFocus } from '~/features/map/hooks/search/useMapSearchFocus';
+import { useMapSearchFocus } from '~/features/map/hooks/useMapSearchFocus';
 import MapSearchField from '~/features/map/ui/search/MapSearchField';
 import MapSearchRow from '~/features/map/ui/search/MapSearchRow';
 import MapSearchSuggestions from '~/features/map/ui/search/MapSearchSuggestions';
 import MapViewModeToggle from '~/features/map/ui/search/MapViewModeToggle';
 import type { Recommendation } from '~/shared/types/recommendation';
-import { androidElevation } from '~/utils';
+import { androidElevation } from '~/shared/lib/ui/styles';
 
 type Props = {
   value: string;

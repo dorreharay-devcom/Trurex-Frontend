@@ -22,13 +22,6 @@ body {
   [role='button']:focus {
     outline: none;
   }
-
-  input:focus,
-  textarea:focus {
-    border-color: #b7c7cf;
-    outline: 2px solid #b7c7cf;
-    outline-offset: 0;
-  }
 }
 
 .header-search-input::placeholder {

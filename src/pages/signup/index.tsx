@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import AuthLayout from '~/features/auth/ui/common/AuthLayout';
 import AuthGeneralError from '~/features/auth/ui/common/AuthGeneralError';
 import { Button } from '~/shared/ui/Button';
-import Input from '~/shared/ui/Input';
+import { Input } from '~/shared/ui/Input';
 import {
   AuthBrandHeader,
   AuthOrDivider,

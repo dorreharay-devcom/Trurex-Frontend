@@ -1,156 +1,83 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
-import { Share2, Camera, LogOut } from 'lucide-react-native';
-import * as Clipboard from 'expo-clipboard';
-import { toastSuccess } from '~/utils/appToast';
-import { buildProfileShareUrl, profileShareSlug } from '~/utils/profileShareUrl';
-import { shareMobileLink } from '~/utils/mobileShare';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { LogOut, Share2 } from 'lucide-react-native';
+import { shareProfile } from '~/features/profile/lib/share';
+import ProfileHeaderAvatar from '~/features/profile/ui/header/ProfileHeaderAvatar';
+import ProfileHeaderIdentity from '~/features/profile/ui/header/ProfileHeaderIdentity';
+import ProfileHeaderOtherActions from '~/features/profile/ui/header/ProfileHeaderOtherActions';
+import type { ProfileData } from '~/features/profile/types/profile';
 import { Theme } from '~/shared/theme/Theme';
-import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
-import { USER_AVATARS_BUCKET } from '~/shared/config/storageBuckets';
-import type { ProfileData } from '~/types/profile';
 
-export type { ProfileData };
-
-interface ProfileHeaderProps {
+type Props = {
   profile: ProfileData;
   isOwnProfile?: boolean;
-  isGuest?: boolean;
   onEditProfile?: () => void;
   onSignOut?: () => void;
   onAvatarPress?: () => void;
   avatarUploading?: boolean;
   onFollow?: () => void;
   onUnfollow?: () => void;
-  onGuestAction?: () => void;
   followLoading?: boolean;
   avatarRefreshKey?: number;
   isBlocked?: boolean;
   onBlockPress?: () => void;
   onUnblockPress?: () => void;
   blockLoading?: boolean;
-}
+};
 
 const ProfileHeader = ({
   profile,
   isOwnProfile = false,
-  isGuest = false,
   onEditProfile,
   onSignOut,
   onAvatarPress,
   avatarUploading = false,
   onFollow,
   onUnfollow,
-  onGuestAction,
   followLoading = false,
   avatarRefreshKey,
   isBlocked = false,
   onBlockPress,
   onUnblockPress,
   blockLoading = false,
-}: ProfileHeaderProps) => {
-  const handleShare = async () => {
-    const slug = profileShareSlug(profile);
-    const url = buildProfileShareUrl(slug);
-    const name = profile.displayName || 'someone';
-    try {
-      if (Platform.OS === 'web') {
-        await Clipboard.setStringAsync(url);
-        toastSuccess('Link copied!');
-      } else {
-        await shareMobileLink({
-          title: 'TruRex Profile',
-          message: `Check out ${isOwnProfile ? 'my' : `${name}'s`} profile on TruRex`,
-          url,
-        });
-      }
-    } catch {}
-  };
+}: Props) => {
+  const onShare = () => void shareProfile(profile, isOwnProfile);
 
   return (
     <View className="overflow-hidden rounded-t-xl bg-card">
       <View className="px-4 pt-5">
         <View className="self-start">
-          <TouchableOpacity
-            onPress={isOwnProfile ? onAvatarPress : undefined}
-            activeOpacity={isOwnProfile ? 0.8 : 1}
-            disabled={avatarUploading}
-          >
-            <View className="w-24 h-24 rounded-2xl bg-muted overflow-hidden border-4 border-border">
-              {profile.avatarUrl ? (
-                <SignedStorageImage
-                  bucket={USER_AVATARS_BUCKET}
-                  storagePath={profile.avatarUrl}
-                  className="w-full h-full"
-                  cacheVersion={avatarRefreshKey}
-                />
-              ) : (
-                <View className="flex-1 items-center justify-center">
-                  <Text className="text-3xl font-bold text-muted">
-                    {profile.displayName?.charAt(0)?.toUpperCase() || '?'}
-                  </Text>
-                </View>
-              )}
-              {isOwnProfile && (
-                <View className="absolute bottom-0 left-0 right-0 items-center justify-center py-1.5 bg-black/45">
-                  <Camera size={14} color="white" />
-                </View>
-              )}
-            </View>
-          </TouchableOpacity>
+          <ProfileHeaderAvatar
+            displayName={profile.displayName}
+            avatarUrl={profile.avatarUrl}
+            editable={isOwnProfile}
+            disabled={!isOwnProfile || avatarUploading}
+            avatarRefreshKey={avatarRefreshKey}
+            onPress={onAvatarPress}
+          />
         </View>
 
-        <View className="mt-3">
-          <View className="flex-row items-center gap-2 flex-wrap">
-            <Text className="text-xl font-bold text-foreground">{profile.displayName}</Text>
-            {profile.relationshipStatus && (
-              <View
-                className="px-1.5 py-0.5 rounded-full"
-                style={{
-                  backgroundColor:
-                    profile.relationshipStatus === 'trusted'
-                      ? Theme.colors.primary
-                      : Theme.colors.secondary,
-                }}
-              >
-                <Text
-                  className="text-[10px] font-bold uppercase"
-                  style={{
-                    color:
-                      profile.relationshipStatus === 'trusted'
-                        ? Theme.colors.primaryForeground
-                        : Theme.colors.secondaryForeground,
-                  }}
-                >
-                  {profile.relationshipStatus.replace('_', ' ')}
-                </Text>
-              </View>
-            )}
-          </View>
-          <Text className="text-sm text-muted-foreground">{profile.handle}</Text>
-          {!!profile.bio && (
-            <Text className="text-sm mt-2 leading-relaxed" style={{ color: 'rgba(0,0,0,0.8)' }}>
-              {profile.bio}
-            </Text>
-          )}
-          {!!profile.location && (
-            <Text className="text-xs text-muted-foreground mt-1.5">📍 {profile.location}</Text>
-          )}
-        </View>
+        <ProfileHeaderIdentity
+          displayName={profile.displayName}
+          handle={profile.handle}
+          bio={profile.bio}
+          location={profile.location}
+          relationshipStatus={profile.relationshipStatus}
+        />
 
         {isOwnProfile ? (
-          <View className="flex-row gap-2 mt-4 mb-2">
+          <View className="mb-2 mt-4 flex-row gap-2">
             <TouchableOpacity
               onPress={onEditProfile}
               activeOpacity={0.7}
-              className="flex-1 py-2.5 rounded-lg border border-border items-center"
+              className="flex-1 items-center rounded-lg border border-border py-2.5"
             >
               <Text className="text-sm font-medium text-foreground">Edit Profile</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={handleShare}
+              onPress={onShare}
               activeOpacity={0.7}
-              className="flex-row items-center gap-1.5 px-4 py-2.5 rounded-lg border border-border"
+              className="flex-row items-center gap-1.5 rounded-lg border border-border px-4 py-2.5"
             >
               <Share2 size={15} color={Theme.colors.foreground} />
               <Text className="text-sm font-medium text-foreground">Share</Text>
@@ -159,65 +86,24 @@ const ProfileHeader = ({
               onPress={onSignOut}
               activeOpacity={0.7}
               className="items-center justify-center rounded-lg border border-destructive px-3 py-2.5"
+              accessibilityRole="button"
               accessibilityLabel="Log out"
             >
               <LogOut size={16} color={Theme.colors.destructive} />
             </TouchableOpacity>
           </View>
         ) : (
-          <View className="flex-row gap-2 mt-4 mb-2">
-            {(() => {
-              const isFollowing =
-                profile.relationshipStatus === 'following' ||
-                profile.relationshipStatus === 'trusted';
-              return (
-                <TouchableOpacity
-                  onPress={isGuest ? onGuestAction : isFollowing ? onUnfollow : onFollow}
-                  disabled={followLoading || blockLoading}
-                  activeOpacity={0.8}
-                  className={`flex-1 py-2.5 rounded-lg items-center justify-center ${isFollowing && !isGuest ? 'border border-border bg-card' : 'bg-primary'}`}
-                >
-                  {followLoading ? (
-                    <ActivityIndicator
-                      size="small"
-                      color={isFollowing ? Theme.colors.foreground : Theme.colors.primaryForeground}
-                    />
-                  ) : (
-                    <Text
-                      className={`text-sm font-bold ${isFollowing && !isGuest ? 'text-foreground' : 'text-primary-foreground'}`}
-                    >
-                      {isGuest ? 'Follow' : isFollowing ? 'Following' : 'Follow'}
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              );
-            })()}
-            <TouchableOpacity
-              onPress={handleShare}
-              activeOpacity={0.7}
-              className="flex-row items-center gap-1.5 px-4 py-2.5 rounded-lg border border-border"
-            >
-              <Share2 size={15} color={Theme.colors.foreground} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={isGuest ? onGuestAction : isBlocked ? onUnblockPress : onBlockPress}
-              disabled={blockLoading}
-              activeOpacity={0.7}
-              accessibilityRole="button"
-              accessibilityLabel={isBlocked ? 'Unblock user' : 'Block user'}
-              className="min-w-[88px] items-center justify-center rounded-lg border border-border px-3 py-2.5"
-            >
-              {blockLoading ? (
-                <ActivityIndicator size="small" color={Theme.colors.destructive} />
-              ) : (
-                <Text
-                  className={`text-sm font-medium ${isBlocked ? 'text-foreground' : 'text-destructive'}`}
-                >
-                  {isBlocked ? 'Unblock' : 'Block'}
-                </Text>
-              )}
-            </TouchableOpacity>
-          </View>
+          <ProfileHeaderOtherActions
+            relationshipStatus={profile.relationshipStatus}
+            followLoading={followLoading}
+            blockLoading={blockLoading}
+            isBlocked={isBlocked}
+            onFollow={onFollow}
+            onUnfollow={onUnfollow}
+            onShare={onShare}
+            onBlockPress={onBlockPress}
+            onUnblockPress={onUnblockPress}
+          />
         )}
       </View>
     </View>

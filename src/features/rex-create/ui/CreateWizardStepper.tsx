@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import type { CreateRecStepId } from '~/features/rex-create/types/create';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 const LABELS: Record<CreateRecStepId, string> = {
   search: 'Search',

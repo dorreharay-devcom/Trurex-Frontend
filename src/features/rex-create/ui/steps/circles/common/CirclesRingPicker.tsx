@@ -2,8 +2,8 @@ import React, { useMemo } from 'react';
 import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 import type { CircleDisplayRow } from '~/shared/types/circles';
 import { Theme } from '~/shared/theme/Theme';
-import { cn } from '~/utils/general';
-import { rgbaFromHexColor } from '~/utils/color';
+import { cn } from '~/shared/lib/ui/styles';
+import { rgbaFromHexColor } from '~/shared/lib/ui/color';
 import {
   RING_CENTER_DIAMETER,
   distanceFromInnerForRingId,
@@ -12,7 +12,7 @@ import {
   ringPaintOrderBackToFront,
   selectionAnnuliLargestFirst,
 } from '~/features/rex-create/lib/circles';
-import CircleGlyph from '~/shared/ui/CircleGlyph';
+import { CircleGlyph } from '~/features/circles/ui/CircleGlyph';
 
 const CHIP_ICON = 12;
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { Auth } from '~/shared/api/client';
-import { isFatalAuthSessionErrorCode } from '~/shared/api/auth/sessionErrors';
+import { isFatalAuthSessionErrorCode } from '~/shared/lib/errors/authSession';
 
 type Params = {
   onSessionCleared: () => void;

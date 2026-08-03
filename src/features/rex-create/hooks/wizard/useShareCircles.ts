@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { keepKnownCircleIds, PUBLIC_CIRCLE_KEY } from '~/features/rex-create/lib/sharing';
-import { REX_VISIBILITY } from '~/shared/config/rexVisibility';
+import { REX_VISIBILITY } from '~/features/rex-create/lib/sharing';
 import type { CircleDisplayRow } from '~/shared/types/circles';
 import type { RexForEditRow } from '~/features/rex-detail/types/rexDetail';
 

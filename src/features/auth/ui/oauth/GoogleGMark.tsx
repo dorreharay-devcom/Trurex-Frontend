@@ -1,6 +1,6 @@
 import React from 'react';
 import Svg, { Path } from 'react-native-svg';
-import { isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 type Props = { size?: number };
 

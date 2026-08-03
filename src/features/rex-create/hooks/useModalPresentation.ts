@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { Animated as RNAnimated, Dimensions, Easing as RNEasing } from 'react-native';
-import { modalConfig } from '~/hooks/useOverlaySheetPresentation';
-import { isWeb } from '~/utils';
+import { modalConfig } from '~/shared/config/overlaySheet';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 const { timing } = modalConfig;
 

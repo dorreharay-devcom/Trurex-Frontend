@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import type { LucideIcon } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
-import { singleLineEllipsisTextStyle } from '~/utils';
+import { singleLineEllipsisTextStyle } from '~/shared/lib/ui/styles';
 
 type Props = {
   icon: LucideIcon;

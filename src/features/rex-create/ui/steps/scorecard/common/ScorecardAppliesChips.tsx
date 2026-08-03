@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { CREATE_REC_SCORE_CHIPS } from '~/features/rex-create/config/scorecard';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 type Props = {
   appliesSelected: Record<string, boolean>;

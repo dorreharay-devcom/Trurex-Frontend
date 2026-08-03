@@ -4,7 +4,7 @@ import { Flag } from 'lucide-react-native';
 import { SignedUserAvatar } from '~/shared/ui/SignedUserAvatar';
 import { canDeleteRexComment } from '~/features/rex-detail/api/rexCommentsApi';
 import type { RexComment } from '~/features/rex-detail/types/rexComment';
-import { formatCompactRelativeTime } from '~/utils/date';
+import { formatCompactRelativeTime } from '~/shared/lib/data/date';
 import { Theme } from '~/shared/theme/Theme';
 import { DeleteAction, LikeAction, ReplyAction } from './CommentActions';
 

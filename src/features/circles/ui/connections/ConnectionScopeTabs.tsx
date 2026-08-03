@@ -3,7 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { CONNECTION_TAB_LABEL } from '~/features/circles/config/connections';
 import { connectionCountLabel } from '~/features/circles/lib/labels';
 import type { ConnectionScopeTab, ConnectionsByTab } from '~/features/circles/types/connections';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 type Props = {
   tabs: readonly ConnectionScopeTab[];

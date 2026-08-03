@@ -1,6 +1,9 @@
 import { useEffect, useMemo } from 'react';
-import { useMyCircles } from '~/shared/hooks/useMyCircles';
-import { mapApiCirclesToDisplayRows, sortCirclesForRingStack } from '~/shared/lib/circles';
+import { useMyCircles } from '~/features/circles/hooks/data/useMyCircles';
+import {
+  mapApiCirclesToDisplayRows,
+  sortCirclesForRingStack,
+} from '~/features/circles/lib/display';
 import type { CircleDisplayRow } from '~/shared/types/circles';
 
 export type DisplayCirclesState = ReturnType<typeof useDisplayCircles>;

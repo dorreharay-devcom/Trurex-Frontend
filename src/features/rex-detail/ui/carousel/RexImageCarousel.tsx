@@ -3,9 +3,9 @@ import { View, FlatList, useWindowDimensions } from 'react-native';
 import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
 import { Skeleton } from '~/shared/ui/Skeleton';
 import { CREATE_REC_MODAL_MAX_W } from '~/features/rex-create/config/layout';
-import { REX_IMAGES_BUCKET } from '~/shared/config/storageBuckets';
-import { useInfiniteHorizontalCarousel } from '~/hooks/useInfiniteHorizontalCarousel';
-import { cn } from '~/utils/general';
+import { REX_IMAGES_BUCKET } from '~/shared/config/app';
+import { useInfiniteHorizontalCarousel } from '~/features/rex-detail/hooks/useInfiniteHorizontalCarousel';
+import { cn } from '~/shared/lib/ui/styles';
 import CarouselArrows from './common/CarouselArrows';
 import CarouselDots from './common/CarouselDots';
 

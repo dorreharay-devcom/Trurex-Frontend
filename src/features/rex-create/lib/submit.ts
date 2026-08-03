@@ -9,7 +9,7 @@ import {
   resolveCreateRexVisibility,
 } from '~/features/rex-create/lib/sharing';
 import { SEARCH_MODE } from '~/features/rex-create/types/create';
-import { REX_VISIBILITY } from '~/shared/config/rexVisibility';
+import { REX_VISIBILITY } from '~/features/rex-create/lib/sharing';
 import type { CategoryQuestion } from '~/features/rex-create/types/categoryCreateConfig';
 import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 

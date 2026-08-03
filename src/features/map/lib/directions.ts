@@ -1,4 +1,4 @@
-import { isAndroid, isIos, isWeb } from '~/utils';
+import { isAndroid, isIos, isWeb } from '~/shared/lib/ui/platform';
 
 export function mapDirectionsUrl(query: string): string {
   const encoded = encodeURIComponent(query);

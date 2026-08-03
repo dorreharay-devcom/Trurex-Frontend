@@ -5,7 +5,7 @@ import type { LegalDocumentContent } from '~/features/auth/config/legalDocuments
 import { useLeaveLegalDocument } from '~/features/auth/hooks/useLeaveLegalDocument';
 import LegalBackButton from '~/features/auth/ui/legal/LegalBackButton';
 import LegalSectionBody from '~/features/auth/ui/legal/LegalSectionBody';
-import { isAndroid } from '~/utils';
+import { isAndroid } from '~/shared/lib/ui/platform';
 
 type Props = {
   document: LegalDocumentContent;

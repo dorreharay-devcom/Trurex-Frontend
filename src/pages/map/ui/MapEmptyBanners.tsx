@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { MAP_ACTION_INSET, MAP_LOCATION_PROMPT_TOP } from '~/features/map/config/mapUi';
 import MapSearchRow from '~/features/map/ui/search/MapSearchRow';
-import { androidElevation } from '~/utils';
+import { androidElevation } from '~/shared/lib/ui/styles';
 
 type Props = {
   showEmptyArea: boolean;

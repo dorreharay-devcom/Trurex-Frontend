@@ -1,8 +1,18 @@
 import { Auth, Backend, unwrap } from '~/shared/api/client';
-import type { Session, User, OAuthResponse } from '@supabase/supabase-js';
-import type { SignUpParams, SignInParams, AuthSessionData, SignInWithOAuthParams } from './types';
+import type {
+  AuthSessionData,
+  SignInParams,
+  SignInWithOAuthParams,
+  SignUpParams,
+} from '~/shared/types/auth';
+import type { OAuthResponse, Session, User } from '@supabase/supabase-js';
 
-export type { SignUpParams, SignInParams, AuthSessionData, SignInWithOAuthParams } from './types';
+export type {
+  AuthSessionData,
+  SignInParams,
+  SignInWithOAuthParams,
+  SignUpParams,
+} from '~/shared/types/auth';
 
 export const AuthApi = {
   signUp: async (params: SignUpParams): Promise<AuthSessionData> => {

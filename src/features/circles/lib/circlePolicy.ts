@@ -1,5 +1,5 @@
-import type { CircleApiRow } from '~/shared/api/circlesApi';
-import { isNonEmptyString } from '~/utils/guards';
+import type { CircleApiRow } from '~/features/circles/types/circle';
+import { isNonEmptyString } from '~/shared/lib/data/guards';
 
 export const DELETE_CIRCLE_CONFIRM_MESSAGE =
   'This removes the circle and its memberships. This cannot be undone.';

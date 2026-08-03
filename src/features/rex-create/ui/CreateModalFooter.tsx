@@ -3,10 +3,10 @@ import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import { ChevronRight } from 'lucide-react-native';
 import { CREATE_REC_MODAL_MAX_W } from '~/features/rex-create/config/layout';
-import { modalConfig } from '~/hooks/useOverlaySheetPresentation';
+import { modalConfig } from '~/shared/config/overlaySheet';
 import { Theme } from '~/shared/theme/Theme';
-import { isWeb } from '~/utils';
-import { cn } from '~/utils/general';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { cn } from '~/shared/lib/ui/styles';
 
 const DYNO_IMAGE_SOURCE = require('@assets/dyno.svg');
 

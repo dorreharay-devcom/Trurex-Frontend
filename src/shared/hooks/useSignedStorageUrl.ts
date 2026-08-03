@@ -3,13 +3,12 @@ import {
   cacheSignedUrl,
   getCachedSignedUrl,
   resolveSignedUrlOnce,
-} from '~/shared/lib/signedUrlCache';
+} from '~/shared/lib/storage/signedUrlCache';
 
 const DEFAULT_EXPIRES_IN_SEC = 3600;
 
 function normalizeObjectPath(bucket: string, objectPath: string): string {
   const raw = (objectPath ?? '').trim().replace(/^\/+/, '');
-  // If the path already starts with the bucket name, strip it to avoid double-prefixing.
   const bucketPrefix = `${bucket}/`;
   if (raw.startsWith(bucketPrefix)) return raw.slice(bucketPrefix.length);
   return raw;

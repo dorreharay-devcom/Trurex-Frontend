@@ -6,7 +6,7 @@ import {
   type CreateRecSearchPlace,
   type SearchEntryMode,
 } from '~/features/rex-create/types/create';
-import { isStrictUuid } from '~/utils/guards';
+import { isStrictUuid } from '~/shared/lib/data/guards';
 
 export function getActiveCreateRecSteps(
   selectedCategoryId: string | null,

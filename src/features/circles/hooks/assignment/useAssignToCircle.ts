@@ -1,11 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { addCircleMember, createCircle } from '~/shared/api/circlesApi';
+import { addCircleMember, createCircle } from '~/features/circles/api/circlesApi';
 import { CIRCLES_QUERY_KEYS } from '~/features/circles/config/queryKeys';
-import { mutationErrorToast } from '~/shared/lib/mutationErrorToast';
-import { unknownErrorMessage } from '~/utils';
-import { toastError, toastSuccess } from '~/utils/appToast';
-import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { unknownErrorMessage } from '~/shared/lib/data/guards';
+import { didAccountFrozenMutationToast, mutationErrorToast } from '~/shared/lib/errors/restriction';
+import { toastError, toastSuccess } from '~/shared/lib/appToast';
 
 type CircleFormInput = {
   name: string;

@@ -10,8 +10,9 @@ import {
   type AddYourOwnRecSource,
 } from '~/features/rex-create/lib/addYourOwn';
 import type { Recommendation } from '~/shared/types/recommendation';
-import { isIos, isWeb } from '~/utils';
-import { cn } from '~/utils/general';
+import { authorDisplayName } from '~/shared/lib/recommendation';
+import { isIos, isWeb } from '~/shared/lib/ui/platform';
+import { cn } from '~/shared/lib/ui/styles';
 import AddYourOwnButton from './AddYourOwnButton';
 import DetailAuthorCard from './DetailAuthorCard';
 import DetailHero from './DetailHero';
@@ -49,7 +50,7 @@ function DetailBody({
   onUserPress,
   onReportComment,
 }: Props) {
-  const user = recommendation.user ?? { name: 'Member', handle: '', avatar: '' };
+  const authorName = authorDisplayName(recommendation.user);
   return (
     <ScrollView
       ref={commentsScroll.scrollRef}
@@ -70,8 +71,8 @@ function DetailBody({
           onSavePress={save.openSave}
         />
         <DetailAuthorCard
-          name={user.name}
-          avatar={user.avatar}
+          name={authorName}
+          avatar={recommendation.user?.avatar ?? ''}
           authorId={effectiveAuthorId}
           onPress={onAuthorPress}
         />

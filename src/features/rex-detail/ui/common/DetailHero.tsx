@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
 import { RexPhotoPlaceholder } from '~/shared/ui/RexPhotoPlaceholder';
 import { Skeleton } from '~/shared/ui/Skeleton';
-import { REX_IMAGES_BUCKET } from '~/shared/config/storageBuckets';
+import { REX_IMAGES_BUCKET } from '~/shared/config/app';
 import type { RexDetailView } from '~/features/rex-detail/hooks/useRexDetail';
 import type { Recommendation } from '~/shared/types/recommendation';
 import RexImageCarousel from '../carousel/RexImageCarousel';

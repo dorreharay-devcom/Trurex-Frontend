@@ -10,7 +10,7 @@ import ConnectionScopeTabs from '~/features/circles/ui/connections/ConnectionSco
 import ConnectionSearchField from '~/features/circles/ui/connections/ConnectionSearchField';
 import PeopleYouMayKnowSection from '~/features/circles/ui/people/PeopleYouMayKnowSection';
 import { LoadMoreButton } from '~/shared/ui/LoadMoreButton';
-import type { NetworkUserRow } from '~/types/network';
+import type { NetworkUserRow } from '~/features/circles/types/networkUser';
 
 const TAB_ORDER: readonly ConnectionScopeTab[] = [
   CONNECTION_TAB.trusted,

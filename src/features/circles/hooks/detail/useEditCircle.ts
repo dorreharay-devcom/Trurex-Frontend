@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { updateCircle, type CircleApiRow } from '~/shared/api/circlesApi';
+import { updateCircle } from '~/features/circles/api/circlesApi';
 import { CIRCLES_QUERY_KEYS } from '~/features/circles/config/queryKeys';
 import { useCircleForm } from '~/features/circles/hooks/useCircleForm';
-import { mutationErrorToast } from '~/shared/lib/mutationErrorToast';
-import { toastSuccess } from '~/utils/appToast';
+import type { CircleApiRow } from '~/features/circles/types/circle';
+import { mutationErrorToast } from '~/shared/lib/errors/restriction';
+import { toastSuccess } from '~/shared/lib/appToast';
 
 export type EditCircleState = ReturnType<typeof useEditCircle>;
 

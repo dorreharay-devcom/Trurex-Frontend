@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
 import type { CircleDisplayRow } from '~/shared/types/circles';
-import CircleGlyph from '~/shared/ui/CircleGlyph';
+import { CircleGlyph } from '~/features/circles/ui/CircleGlyph';
 import { Theme } from '~/shared/theme/Theme';
 
 type Props = {

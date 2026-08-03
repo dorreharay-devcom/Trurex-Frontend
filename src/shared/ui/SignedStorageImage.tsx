@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { Image } from 'expo-image';
-import type { ImageStyle } from 'expo-image';
+import { Image, type ImageStyle } from 'expo-image';
 import { useSignedStorageUrl } from '~/shared/hooks/useSignedStorageUrl';
 import { Skeleton } from '~/shared/ui/Skeleton';
-import { cn, isHttpUrl } from '~/utils/general';
-import { isRexPlaceholderPhotoPath, REX_PLACEHOLDER_IMAGE_SOURCE } from '~/shared/lib/rexImages';
+import { isHttpUrl } from '~/shared/lib/data/guards';
+import { cn } from '~/shared/lib/ui/styles';
+import {
+  isRexPlaceholderPhotoPath,
+  REX_PLACEHOLDER_IMAGE_SOURCE,
+} from '~/shared/lib/media/rexImages';
 
 const SIGNED_URL_TTL_SECONDS = 3600;
 const FADE_TRANSITION_MS = 200;
+const FILL_STYLE: ImageStyle = { width: '100%', height: '100%' };
 
 type ImageLoadEvent = { source: { width: number; height: number } };
 
@@ -25,10 +29,22 @@ type Props = {
   cacheVersion?: string | number;
 };
 
+type Display =
+  | { kind: 'bundled' }
+  | { kind: 'remote'; uri: string }
+  | { kind: 'pending' }
+  | { kind: 'empty' };
+
 function resolveHttpUri(remoteUri: string | null | undefined): string | null {
   const trimmed = remoteUri?.trim();
   if (!trimmed || !isHttpUrl(trimmed)) return null;
   return trimmed;
+}
+
+function LoadingSkeleton({ soft }: { soft: boolean }) {
+  return (
+    <Skeleton className={cn('h-full w-full rounded-none', soft ? 'bg-muted/40' : 'bg-muted/60')} />
+  );
 }
 
 export function SignedStorageImage({
@@ -45,8 +61,8 @@ export function SignedStorageImage({
 }: Props) {
   const http = resolveHttpUri(remoteUri);
   const path = storagePath?.trim() ?? '';
-  const useBundledPlaceholder = !http && isRexPlaceholderPhotoPath(path);
-  const signedPath = http || useBundledPlaceholder ? '' : path;
+  const bundled = !http && isRexPlaceholderPhotoPath(path);
+  const signedPath = http || bundled ? '' : path;
 
   const { uri, loading } = useSignedStorageUrl(
     bucket,
@@ -54,70 +70,66 @@ export function SignedStorageImage({
     SIGNED_URL_TTL_SECONDS,
     cacheVersion,
   );
-  const displayUri = http ?? uri;
 
+  const display: Display = (() => {
+    if (bundled) return { kind: 'bundled' };
+    const remote = http ?? uri;
+    if (remote) return { kind: 'remote', uri: remote };
+    if (loading) return { kind: 'pending' };
+    return { kind: 'empty' };
+  })();
+
+  const sourceKey = display.kind === 'remote' ? display.uri : display.kind;
   const [decoded, setDecoded] = useState(false);
   useEffect(() => {
     setDecoded(false);
-  }, [displayUri]);
+  }, [sourceKey]);
 
-  const backgroundClass = skeletonUntilLoaded ? 'bg-transparent' : 'bg-muted';
-  const containerClass = cn('relative overflow-hidden', backgroundClass, className);
-  const showSkeletonOverlay = skeletonUntilLoaded && !decoded;
-
-  const handleLoad = (e: ImageLoadEvent) => {
+  const markDecoded = (e?: ImageLoadEvent) => {
     setDecoded(true);
-    onLoad?.(e);
+    if (e) onLoad?.(e);
   };
 
-  if (useBundledPlaceholder) {
-    return (
-      <View className={containerClass} style={style}>
-        <Image
-          source={REX_PLACEHOLDER_IMAGE_SOURCE}
-          className="h-full w-full"
-          style={{ width: '100%', height: '100%' }}
-          contentFit={contentFit}
-          accessibilityLabel={accessibilityLabel}
-          onLoad={handleLoad}
-        />
-      </View>
-    );
-  }
-
-  if (!displayUri) {
-    return (
-      <View className={cn(backgroundClass, className)} style={style}>
-        {loading && (
-          <Skeleton
-            className={cn(
-              'h-full w-full',
-              skeletonUntilLoaded ? 'rounded-none bg-muted/40' : 'bg-muted/60',
-            )}
-          />
-        )}
-      </View>
-    );
-  }
+  const waitingToDecode = skeletonUntilLoaded && display.kind === 'remote' && !decoded;
+  const showSkeleton = display.kind === 'pending' || waitingToDecode;
 
   return (
-    <View className={containerClass} style={style}>
-      {showSkeletonOverlay && (
-        <View className="absolute inset-0 z-[1]" pointerEvents="none">
-          <Skeleton className="h-full w-full rounded-none bg-muted/40" />
-        </View>
+    <View
+      className={cn(
+        'relative overflow-hidden',
+        skeletonUntilLoaded ? 'bg-transparent' : 'bg-muted',
+        className,
       )}
-      <Image
-        source={{ uri: displayUri }}
-        className={cn('h-full w-full', showSkeletonOverlay && 'opacity-0')}
-        style={{ width: '100%', height: '100%' }}
-        contentFit={contentFit}
-        transition={skeletonUntilLoaded ? 0 : FADE_TRANSITION_MS}
-        cachePolicy="memory-disk"
-        accessibilityLabel={accessibilityLabel}
-        onLoad={handleLoad}
-        onError={() => setDecoded(true)}
-      />
+      style={style}
+    >
+      {display.kind === 'bundled' ? (
+        <Image
+          source={REX_PLACEHOLDER_IMAGE_SOURCE}
+          style={FILL_STYLE}
+          contentFit={contentFit}
+          accessibilityLabel={accessibilityLabel}
+          onLoad={(e) => markDecoded(e)}
+        />
+      ) : null}
+
+      {display.kind === 'remote' ? (
+        <Image
+          source={{ uri: display.uri }}
+          style={[FILL_STYLE, waitingToDecode ? { opacity: 0 } : null]}
+          contentFit={contentFit}
+          transition={skeletonUntilLoaded ? 0 : FADE_TRANSITION_MS}
+          cachePolicy="memory-disk"
+          accessibilityLabel={accessibilityLabel}
+          onLoad={(e) => markDecoded(e)}
+          onError={() => markDecoded()}
+        />
+      ) : null}
+
+      {showSkeleton ? (
+        <View className="absolute inset-0 z-[1]" pointerEvents="none">
+          <LoadingSkeleton soft={skeletonUntilLoaded} />
+        </View>
+      ) : null}
     </View>
   );
 }

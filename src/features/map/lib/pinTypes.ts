@@ -90,7 +90,7 @@ export function mapAuthorRecommendedLabel(user: {
   handle?: string | null;
 }): string | null {
   const name = user.name?.trim() ?? '';
-  if (name && name !== 'Member') return `${name} recommended it`;
+  if (name) return `${name} recommended it`;
   const rawHandle = user.handle?.trim().replace(/^@/, '') ?? '';
   if (rawHandle) return `@${rawHandle} recommended it`;
   return null;

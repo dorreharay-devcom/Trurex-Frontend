@@ -5,7 +5,7 @@ import NewCollectionForm from '~/features/collections/ui/add-to-collection/NewCo
 import UncollectedActions from '~/features/collections/ui/add-to-collection/UncollectedActions';
 import type { SavedRexActionsState } from '~/features/collections/hooks/add-to-collection/useSavedRexActions';
 import { Theme } from '~/shared/theme/Theme';
-import { webContainerStyle } from '~/utils';
+import { withWebContainer } from '~/shared/lib/ui/styles';
 
 type Props = {
   open: boolean;
@@ -26,7 +26,7 @@ function SheetFooter({ open, saved, creating, onCreateAndAdd }: Props) {
 
   return (
     <View className="border-t border-border">
-      <View style={[{ padding: 16 }, webContainerStyle]}>
+      <View style={withWebContainer({ padding: 16 })}>
         {showNewCollection ? (
           <NewCollectionForm
             name={newName}

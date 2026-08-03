@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CIRCLE_SYSTEM_KIND } from '~/shared/config/circles';
-import { isUserCreatedCircle } from '~/shared/lib/circles';
+import { isUserCreatedCircle } from '~/features/circles/lib/display';
 import { useMyCircleRows } from '~/features/circles/hooks/data/useMyCircleRows';
 import { useAssignToCircle } from '~/features/circles/hooks/assignment/useAssignToCircle';
 import { useCreateFormAutofocus } from '~/features/circles/hooks/assignment/useCreateFormAutofocus';

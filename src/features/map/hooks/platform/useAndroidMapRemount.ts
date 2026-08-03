@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
-import { isAndroid } from '~/utils';
+import { isAndroid } from '~/shared/lib/ui/platform';
 
 const ANDROID_TILE_LOAD_TIMEOUT_MS = 2500;
 

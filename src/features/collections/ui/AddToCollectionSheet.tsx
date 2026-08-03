@@ -1,6 +1,6 @@
 import React from 'react';
 import { useWindowDimensions } from 'react-native';
-import BottomSheet from '~/features/collections/ui/common/BottomSheet';
+import BottomSheet from '~/shared/ui/BottomSheet';
 import SheetHeader from '~/features/collections/ui/common/SheetHeader';
 import CollectionPickerList from '~/features/collections/ui/add-to-collection/CollectionPickerList';
 import SheetFooter from '~/features/collections/ui/add-to-collection/SheetFooter';

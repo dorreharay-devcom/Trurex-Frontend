@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { NetworkUserRow } from '~/types/network';
+import type { NetworkUserRow } from '~/features/circles/types/networkUser';
 
 type AssignTarget = { id: string; name: string };
 

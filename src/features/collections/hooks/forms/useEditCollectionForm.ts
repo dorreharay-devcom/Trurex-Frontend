@@ -6,7 +6,7 @@ import type {
   EditableCollection,
 } from '~/features/collections/types/collection';
 import { useSignedStorageUrl } from '~/shared/hooks/useSignedStorageUrl';
-import { REX_IMAGES_BUCKET } from '~/shared/config/storageBuckets';
+import { REX_IMAGES_BUCKET } from '~/shared/config/app';
 
 type Params = {
   open: boolean;
@@ -24,7 +24,6 @@ export function useEditCollectionForm({ open, collection, onUpdated }: Params) {
   const cover = useCoverImagePicker();
   const { clear: clearCover } = cover;
 
-  // Sync form fields when the modal reopens or targets another collection.
   useEffect(() => {
     setName(collection.display_name);
     setDescription(collection.description ?? '');

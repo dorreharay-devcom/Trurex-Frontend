@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
-import { REX_IMAGES_BUCKET } from '~/shared/config/storageBuckets';
+import { REX_IMAGES_BUCKET } from '~/shared/config/app';
 import type { UserCollection } from '~/features/collections/types/collection';
 
 const CARD_WIDTH = 176;

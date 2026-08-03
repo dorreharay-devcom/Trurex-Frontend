@@ -1,5 +1,5 @@
 import type { KeyboardAvoidingView } from 'react-native';
-import { isAndroid, isIos, isWeb } from '~/utils';
+import { isAndroid, isIos, isWeb } from '~/shared/lib/ui/platform';
 
 type KeyboardBehavior = React.ComponentProps<typeof KeyboardAvoidingView>['behavior'];
 

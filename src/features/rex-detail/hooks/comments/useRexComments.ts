@@ -14,7 +14,7 @@ import {
 } from '~/features/rex-detail/lib/rexCommentTree';
 import { patchFeedCommentCount } from '~/features/rex-detail/lib/patchFeedCommentCount';
 import type { RexComment } from '~/features/rex-detail/types/rexComment';
-import { unknownErrorMessage } from '~/utils';
+import { unknownErrorMessage } from '~/shared/lib/data/guards';
 
 export function useRexComments(rexId: string | undefined) {
   const queryClient = useQueryClient();

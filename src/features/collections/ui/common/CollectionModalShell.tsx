@@ -15,12 +15,12 @@ import {
 } from 'react-native';
 import { X } from 'lucide-react-native';
 import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
-import { useModalSpringAnimation } from '~/features/collections/hooks/common/useModalSpringAnimation';
+import { useSheetSpringAnimation } from '~/shared/hooks/useSheetSpringAnimation';
 import { Theme } from '~/shared/theme/Theme';
-import { isWeb, webContainerStyle } from '~/utils';
-import { cn } from '~/utils/general';
+import { isWeb } from '~/shared/lib/ui/platform';
 import { KEYBOARD_BEHAVIOR_NATIVE_PADDING } from '~/shared/config/keyboard';
-import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/modalProps';
+import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/overlaySheet';
+import { withWebContainer, cn } from '~/shared/lib/ui/styles';
 
 const WEB_MAX_WIDTH = 512;
 
@@ -33,9 +33,9 @@ type Props = {
   children: ReactNode;
 };
 
-function CollectionModalShell({ open, title, cardStyle, footer, onClose, children }: Props) {
+const CollectionModalShell = ({ open, title, cardStyle, footer, onClose, children }: Props) => {
   const { width } = useWindowDimensions();
-  const { visible, backdropOpacity, sheetTranslateY } = useModalSpringAnimation(open);
+  const { visible, backdropOpacity, sheetTranslateY } = useSheetSpringAnimation(open);
 
   return (
     <Modal
@@ -62,12 +62,12 @@ function CollectionModalShell({ open, title, cardStyle, footer, onClose, childre
             <View
               style={cardStyle}
               className={cn(
-                'bg-card border border-border shadow-elevated overflow-hidden',
+                'overflow-hidden border border-border bg-card shadow-elevated',
                 isWeb ? 'rounded-2xl' : 'rounded-t-2xl',
               )}
             >
-              <View className="flex-row items-center justify-between p-4 border-b border-border bg-card">
-                <Text className="font-display font-bold text-foreground text-lg">{title}</Text>
+              <View className="flex-row items-center justify-between border-b border-border bg-card p-4">
+                <Text className="font-display text-lg font-bold text-foreground">{title}</Text>
                 <TouchableOpacity onPress={onClose} className="p-1">
                   <X size={20} color={Theme.colors.muted} />
                 </TouchableOpacity>
@@ -77,13 +77,13 @@ function CollectionModalShell({ open, title, cardStyle, footer, onClose, childre
                 style={styles.scroll}
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={[{ padding: 16, gap: 20 }, webContainerStyle]}
+                contentContainerStyle={withWebContainer({ padding: 16, gap: 20 })}
               >
                 {children}
               </ScrollView>
 
               <View className="border-t border-border bg-card">
-                <View style={[{ padding: 16 }, webContainerStyle]}>{footer}</View>
+                <View style={withWebContainer({ padding: 16 })}>{footer}</View>
               </View>
             </View>
           </Animated.View>
@@ -92,7 +92,7 @@ function CollectionModalShell({ open, title, cardStyle, footer, onClose, childre
       <ModalToastLayer />
     </Modal>
   );
-}
+};
 
 const styles = StyleSheet.create({
   backdrop: { backgroundColor: 'rgba(0,0,0,0.5)' },

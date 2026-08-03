@@ -1,5 +1,5 @@
-import { isTab, type Tab } from '~/shared/ui/shell/TabBar';
-import { isWeb } from '~/utils';
+import { isTab, type Tab } from '~/shared/config/mainTabs';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 const WEB_TAB_STORAGE_KEY = 'trurex:last-main-tab';
 

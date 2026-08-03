@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import type { CircleMemberProfile } from '~/shared/api/circlesApi';
+import type { CircleMemberProfile } from '~/features/circles/types/circle';
 import SectionSpinner from '~/features/circles/ui/common/SectionSpinner';
 import CircleMemberRow from '~/features/circles/ui/common/rows/CircleMemberRow';
 

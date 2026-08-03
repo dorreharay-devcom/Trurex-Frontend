@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { OverlayModal } from '~/shared/ui/OverlayModal';
-import { modalConfig, useOverlaySheetPresentation } from '~/hooks/useOverlaySheetPresentation';
+import { useOverlaySheetPresentation } from '~/shared/hooks/useOverlaySheetPresentation';
 import { useAuth } from '~/features/auth/providers';
 import { useCommentsScroll } from '~/features/rex-detail/hooks/comments/useCommentsScroll';
 import { useDeleteRex } from '~/features/rex-detail/hooks/useDeleteRex';
@@ -10,7 +10,7 @@ import { useRexDetail } from '~/features/rex-detail/hooks/useRexDetail';
 import { useSaveRex } from '~/features/rex-detail/hooks/useSaveRex';
 import type { AddYourOwnRecSource } from '~/features/rex-create/lib/addYourOwn';
 import type { Recommendation } from '~/shared/types/recommendation';
-import { isIos } from '~/utils';
+import { isIos } from '~/shared/lib/ui/platform';
 import DetailBody from './common/DetailBody';
 import DetailHeader from './common/DetailHeader';
 import DetailOverlays from './common/DetailOverlays';
@@ -91,7 +91,6 @@ const RecommendationDetailModal: React.FC<Props> = ({
       onRequestClose={handleClose}
       onDismiss={onDismiss}
       contentTranslateY={sheetTranslateY}
-      backdropBackground={modalConfig.layout.backdropBackground}
     >
       <View className="flex-1 min-h-0 flex-col">
         <DetailHeader

@@ -10,7 +10,7 @@ import {
   type SearchEntryMode,
 } from '~/features/rex-create/types/create';
 import type { RexForEditRow } from '~/features/rex-detail/types/rexDetail';
-import { isStrictUuid } from '~/utils/guards';
+import { isStrictUuid } from '~/shared/lib/data/guards';
 
 export function getPlaceNameForRex(
   searchMode: SearchEntryMode,

@@ -1,16 +1,15 @@
 import React from 'react';
 import { View, Text, TextInput, Pressable } from 'react-native';
 import { Reply, Send } from 'lucide-react-native';
-import { webNoOutline } from '~/utils';
 import {
   Theme,
   textFieldCaretStyle,
   textFieldSingleLineCompactHeightStyle,
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
-import { cn } from '~/utils/general';
 import { INPUT_FOCUS_RING_CLASS } from '~/shared/config/inputFocus';
 import type { CommentComposerState } from '~/features/rex-detail/hooks/comments/useCommentComposer';
+import { webNoOutline, cn } from '~/shared/lib/ui/styles';
 
 export type CommentComposerProps = {
   composer: CommentComposerState;

@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { getRexCategoryApiCode } from '~/features/rex-create/lib/categories';
-import { modalConfig } from '~/hooks/useOverlaySheetPresentation';
+import { modalConfig } from '~/shared/config/overlaySheet';
 import { createRex, updateRex } from '~/features/rex-create/api/rexCreateApi';
 import {
   buildCreateRexParams,
@@ -12,9 +12,9 @@ import {
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
 import { STEP_ID } from '~/features/rex-create/types/create';
 import type { CreateConfigState } from '~/features/rex-create/hooks/useCategoryCreateConfig';
-import { toastError, toastInfo, toastSuccess } from '~/utils/appToast';
-import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
-import { unknownErrorMessage } from '~/utils';
+import { toastError, toastInfo, toastSuccess } from '~/shared/lib/appToast';
+import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
+import { unknownErrorMessage } from '~/shared/lib/data/guards';
 
 const SUCCESS_TOAST_DELAY_MS = modalConfig.timing.sheetCloseMs + 180;
 

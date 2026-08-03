@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteRex } from '~/features/rex-detail/api/rexDetailApi';
 import { deleteRexToastMessage } from '~/features/rex-detail/lib/rexDetailToRecommendation';
-import { toastError, toastSuccess } from '~/utils/appToast';
-import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { toastError, toastSuccess } from '~/shared/lib/appToast';
+import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
 import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 
 type UseDeleteRexArgs = {

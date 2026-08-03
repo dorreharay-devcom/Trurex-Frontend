@@ -8,7 +8,7 @@ import CollectionDescriptionField from '~/features/collections/ui/create-collect
 import CollectionNameField from '~/features/collections/ui/create-collection/CollectionNameField';
 import CreateCollectionButton from '~/features/collections/ui/create-collection/CreateCollectionButton';
 import PrivacyOptionList from '~/features/collections/ui/create-collection/PrivacyOptionList';
-import { isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 const CARD_MAX_HEIGHT_RATIO = 0.9;
 const NATIVE_CARD_HEIGHT_RATIO = 0.82;

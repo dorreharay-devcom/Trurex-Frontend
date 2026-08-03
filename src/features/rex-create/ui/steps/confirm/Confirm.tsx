@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { Image } from 'expo-image';
 import { useQuery } from '@tanstack/react-query';
-import { getUserProfile } from '~/shared/api/usersApi';
+import { ProfileApi } from '~/features/profile/api/profileApi';
 import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
 import CreateStepTitle from '../../CreateStepTitle';
 import { useAuth } from '~/features/auth/providers';
@@ -67,7 +67,7 @@ const Confirm: React.FC<Props> = ({
   const { user } = useAuth();
   const { data: meProfile } = useQuery({
     queryKey: ['getUserProfile', 'confirmPreview', user?.id],
-    queryFn: () => getUserProfile({ input_user_id: user!.id }),
+    queryFn: () => ProfileApi.getProfile({ userId: user!.id }),
     enabled: !!user?.id,
   });
   const author = useMemo(

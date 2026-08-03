@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 import { Minus, Plus } from 'lucide-react-native';
 import { MAP_ACTION_INSET, MAP_ZOOM_CONTROLS_BOTTOM } from '~/features/map/config/mapUi';
 import { Theme } from '~/shared/theme/Theme';
-import { androidElevation } from '~/utils';
+import { androidElevation } from '~/shared/lib/ui/styles';
 
 type Props = {
   onZoomIn: () => void;

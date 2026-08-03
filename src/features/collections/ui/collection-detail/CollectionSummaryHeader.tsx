@@ -7,7 +7,7 @@ import type {
 } from '~/features/collections/types/collection';
 import { rexCountLabel } from '~/features/collections/lib/labels';
 import { Theme } from '~/shared/theme/Theme';
-import { webContainerStyle } from '~/utils';
+import { webContainerStyle } from '~/shared/lib/ui/styles';
 
 const VISIBILITY_BADGES: Record<CollectionVisibility, { Icon: LucideIcon; label: string }> = {
   public: { Icon: Globe, label: 'Public' },

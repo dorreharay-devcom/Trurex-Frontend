@@ -1,1 +1,1 @@
-export { default } from '~/pages/rex-deep-link';
+export { default } from '~/pages/rex';

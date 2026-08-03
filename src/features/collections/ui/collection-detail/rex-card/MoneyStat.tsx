@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { DollarSign } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
-import { valueForMoneyLabel } from '~/shared/lib/valueForMoney';
+import { valueForMoneyLabel } from '~/shared/lib/recommendation';
 
 function MoneyStat({ score }: { score: number | null | undefined }) {
   if (!score) return null;

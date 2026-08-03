@@ -1,4 +1,5 @@
-import type { RexVisibility } from '~/shared/config/rexVisibility';
+import type { RexVisibility } from '~/features/rex-create/lib/sharing';
+import type { RelationshipStatus } from '~/shared/config/relationshipStatus';
 
 export type CategoryRatingRead = {
   label: string;
@@ -13,7 +14,7 @@ export type RexDetailRow = {
   author_display_name: string;
   author_username: string | null;
   author_profile_picture_url: string | null;
-  author_relationship_status: 'follows_you' | 'following' | 'trusted' | null;
+  author_relationship_status: RelationshipStatus | null;
   category_code: string;
   category_name: string;
   category_icon: string | null;

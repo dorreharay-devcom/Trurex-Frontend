@@ -1,4 +1,4 @@
-import { encodeBase64 } from '~/shared/lib/encodeBase64';
+import { encodeBase64 } from '~/features/auth/lib/mfa/encodeBase64';
 
 export async function getDeviceFingerprint(): Promise<string> {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;

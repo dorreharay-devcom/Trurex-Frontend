@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Plus } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
-import { isWeb, webDisabledCursor } from '~/utils';
-import { cn } from '~/utils/general';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { webDisabledCursor, cn } from '~/shared/lib/ui/styles';
 
 type Props = {
   disabled: boolean;

@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import type { CircleDisplayRow } from '~/shared/types/circles';
-import { cn } from '~/utils/general';
-import CircleGlyph from '~/shared/ui/CircleGlyph';
+import { cn } from '~/shared/lib/ui/styles';
+import { CircleGlyph } from '~/features/circles/ui/CircleGlyph';
 import CircleRadioIndicator from './CircleRadioIndicator';
 
 const GLYPH_SIZE = 24;

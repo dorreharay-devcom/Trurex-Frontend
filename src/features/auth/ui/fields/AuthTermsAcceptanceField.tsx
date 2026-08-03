@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text } from 'react-native';
 import { useRouter } from 'expo-router';
-import { getLegalDocumentRoute } from '~/utils/openLegalDocument';
+import { getLegalDocumentRoute } from '~/features/auth/lib/openLegalDocument';
 
 const AuthTermsAcceptanceField = () => {
   const router = useRouter();

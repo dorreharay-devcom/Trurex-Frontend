@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, ScrollView, View, useWindowDimensions } from 'rea
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT } from '~/shared/config/keyboard';
 import { Theme } from '~/shared/theme/Theme';
-import { isIos, isWeb } from '~/utils';
+import { isIos, isWeb } from '~/shared/lib/ui/platform';
 
 const FORM_MAX_WIDTH = 384;
 const HORIZONTAL_PADDING = 32;

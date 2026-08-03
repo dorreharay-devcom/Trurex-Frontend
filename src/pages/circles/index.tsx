@@ -7,7 +7,7 @@ import ShareProfileCard from '~/features/circles/ui/ShareProfileCard';
 import { useCirclesPageState } from '~/pages/circles/hooks/useCirclesPageState';
 import ConnectionsSection from '~/pages/circles/ui/ConnectionsSection';
 import MyCirclesSection from '~/pages/circles/ui/MyCirclesSection';
-import { webContainerStyle } from '~/utils';
+import { webContainerStyle } from '~/shared/lib/ui/styles';
 
 const SHOW_SHARE_PROFILE_CARD = false;
 

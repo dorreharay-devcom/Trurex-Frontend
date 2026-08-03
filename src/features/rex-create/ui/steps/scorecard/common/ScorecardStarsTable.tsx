@@ -3,7 +3,7 @@ import { View, Text, Pressable } from 'react-native';
 import { Star } from 'lucide-react-native';
 import type { CategoryRatingDimension } from '~/features/rex-create/types/categoryCreateConfig';
 import { Theme } from '~/shared/theme/Theme';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 type Props = {
   sectionTitle?: string;

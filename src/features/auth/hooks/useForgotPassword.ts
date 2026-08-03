@@ -4,7 +4,7 @@ import { AuthApi } from '~/shared/api/auth';
 import { Routes } from '~/shared/config/routes';
 import { getEmailValidationError } from '~/features/auth/lib/credentials';
 import { mapAuthError } from '~/features/auth/lib/errors';
-import { getResetPasswordRedirectUrl } from '~/utils';
+import { getResetPasswordRedirectUrl } from '~/features/auth/lib/redirect';
 
 export function useForgotPassword() {
   const router = useRouter();

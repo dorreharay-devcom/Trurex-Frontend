@@ -1,4 +1,4 @@
-import { StorageService } from '~/shared/lib/storage';
+import { StorageService } from '~/shared/lib/storage/kv';
 
 export const MFA_PENDING_STORAGE_KEY = 'trurex.mfa.pending';
 

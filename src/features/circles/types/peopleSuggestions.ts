@@ -1,4 +1,6 @@
-export type PeopleSuggestionRelationshipStatus = 'follows_you' | 'following' | 'trusted';
+import type { RelationshipStatus } from '~/shared/config/relationshipStatus';
+
+export type PeopleSuggestionRelationshipStatus = RelationshipStatus;
 
 export type PeopleSuggestionPrimaryReason = 'second_degree' | 'third_degree' | 'fallback_global';
 

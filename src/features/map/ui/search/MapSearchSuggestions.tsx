@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { Recommendation } from '~/shared/types/recommendation';
-import { isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 const WEB_SUGGESTION_ROW_HANDLERS = isWeb
   ? { onMouseDown: (e: { preventDefault: () => void }) => e.preventDefault() }

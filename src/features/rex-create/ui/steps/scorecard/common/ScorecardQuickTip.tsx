@@ -9,7 +9,7 @@ import {
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
-import { webNoOutline } from '~/utils';
+import { webNoOutline } from '~/shared/lib/ui/styles';
 
 type Props = {
   value: string;

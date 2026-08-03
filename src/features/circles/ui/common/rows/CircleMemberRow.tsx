@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, Text } from 'react-native';
 import { UserMinus } from 'lucide-react-native';
-import type { CircleMemberProfile } from '~/shared/api/circlesApi';
+import type { CircleMemberProfile } from '~/features/circles/types/circle';
 import { Theme } from '~/shared/theme/Theme';
 import ConnectionRowShell from '~/features/circles/ui/common/rows/ConnectionRowShell';
 

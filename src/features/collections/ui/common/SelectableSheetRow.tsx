@@ -2,7 +2,7 @@ import React, { type ReactNode } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Check } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 type Props = {
   thumbnail: ReactNode;

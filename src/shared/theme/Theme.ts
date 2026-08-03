@@ -1,5 +1,6 @@
-import type { TextStyle } from 'react-native';
-import { isWeb } from '~/utils';
+import { StyleSheet, type TextStyle } from 'react-native';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { nativeOnly } from '~/shared/lib/ui/styles';
 
 export const FontFamily = {
   light: 'HankenGrotesk-Light',
@@ -46,62 +47,64 @@ export const Colors = {
   transparent: 'transparent',
 } as const;
 
-export const textFieldCaretStyle = {
-  caretColor: Colors.foreground,
-  ...(isWeb ? null : { fontFamily: FontFamily.regular }),
+const textFieldNative = StyleSheet.create({
+  font: {
+    fontFamily: FontFamily.regular,
+  },
+  singleLine: {
+    overflow: 'hidden',
+    fontSize: 16,
+    lineHeight: 22,
+    paddingTop: 0,
+    paddingBottom: 0,
+    textAlignVertical: 'center',
+    includeFontPadding: false,
+  },
+  compactHeight: { height: 40 },
+  defaultHeight: { height: 44 },
+  largeHeight: { height: 48 },
+  headerSearch: {
+    height: 32,
+    fontSize: 14,
+    lineHeight: 17,
+  },
+  singleLineNoWrap: {
+    height: 40,
+    maxHeight: 40,
+    lineHeight: 22,
+    paddingTop: 0,
+    paddingBottom: 0,
+    textAlignVertical: 'center',
+  },
+  multiline: {
+    fontSize: 16,
+    lineHeight: 22,
+    paddingTop: 10,
+    paddingBottom: 10,
+    textAlignVertical: 'top',
+    includeFontPadding: false,
+  },
+});
+
+const textFieldWebSingleLine = {
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 } as TextStyle;
 
-export const textFieldSingleLineStyle = isWeb
-  ? ({
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap',
-    } as TextStyle)
-  : ({
-      overflow: 'hidden',
-      fontSize: 16,
-      lineHeight: 22,
-      paddingTop: 0,
-      paddingBottom: 0,
-      textAlignVertical: 'center',
-      includeFontPadding: false,
-    } as TextStyle);
+export const textFieldCaretStyle = {
+  caretColor: Colors.foreground,
+  ...nativeOnly(textFieldNative.font),
+} as TextStyle;
 
-export const textFieldSingleLineCompactHeightStyle = isWeb ? null : ({ height: 40 } as TextStyle);
+export const textFieldSingleLineStyle = isWeb ? textFieldWebSingleLine : textFieldNative.singleLine;
 
-export const textFieldSingleLineDefaultHeightStyle = isWeb ? null : ({ height: 44 } as TextStyle);
-
-export const textFieldSingleLineLargeHeightStyle = isWeb ? null : ({ height: 48 } as TextStyle);
-
-export const textFieldHeaderSearchStyle = isWeb
-  ? null
-  : ({
-      height: 32,
-      fontSize: 14,
-      lineHeight: 17,
-    } as TextStyle);
-
-export const textFieldNativeSingleLineNoWrapStyle = isWeb
-  ? null
-  : ({
-      height: 40,
-      maxHeight: 40,
-      lineHeight: 22,
-      paddingTop: 0,
-      paddingBottom: 0,
-      textAlignVertical: 'center',
-    } as TextStyle);
-
-export const textFieldMultilineStyle = isWeb
-  ? null
-  : ({
-      fontSize: 16,
-      lineHeight: 22,
-      paddingTop: 10,
-      paddingBottom: 10,
-      textAlignVertical: 'top',
-      includeFontPadding: false,
-    } as TextStyle);
+export const textFieldSingleLineCompactHeightStyle = nativeOnly(textFieldNative.compactHeight);
+export const textFieldSingleLineDefaultHeightStyle = nativeOnly(textFieldNative.defaultHeight);
+export const textFieldSingleLineLargeHeightStyle = nativeOnly(textFieldNative.largeHeight);
+export const textFieldHeaderSearchStyle = nativeOnly(textFieldNative.headerSearch);
+export const textFieldNativeSingleLineNoWrapStyle = nativeOnly(textFieldNative.singleLineNoWrap);
+export const textFieldMultilineStyle = nativeOnly(textFieldNative.multiline);
 
 export const Size = {
   icon: {

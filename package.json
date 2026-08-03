@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
-    "@hookform/resolvers": "^5.2.2",
     "@react-google-maps/api": "^2.20.8",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-navigation/native": "^7.1.8",
@@ -59,14 +58,10 @@
     "nativewind": "^4.2.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-hook-form": "^7.72.0",
     "react-native": "0.81.5",
-    "react-native-css-interop": "^0.2.3",
     "react-native-device-info": "^15.0.2",
-    "react-native-image-colors": "^2.6.0",
     "react-native-maps": "1.20.1",
     "react-native-reanimated": "~4.1.1",
-    "react-native-render-html": "^6.3.4",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
     "react-native-svg": "15.12.1",
@@ -75,7 +70,6 @@
     "react-native-web": "^0.21.0",
     "react-native-worklets": "0.5.1",
     "tailwind-merge": "^3.5.0",
-    "tailwindcss": "^3.4.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -85,7 +79,9 @@
     "eslint-config-expo": "~10.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-react": "^7.37.5",
     "prettier": "3.4.1",
+    "tailwindcss": "^3.4.1",
     "typescript": "~5.9.2"
   },
   "private": true,

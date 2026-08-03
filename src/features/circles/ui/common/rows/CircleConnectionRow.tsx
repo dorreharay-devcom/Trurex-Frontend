@@ -2,8 +2,8 @@ import React from 'react';
 import { ActivityIndicator, Pressable, Text } from 'react-native';
 import { UserPlus } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
-import type { NetworkUserRow } from '~/types/network';
-import { cn } from '~/utils/general';
+import type { NetworkUserRow } from '~/features/circles/types/networkUser';
+import { cn } from '~/shared/lib/ui/styles';
 import ConnectionRowShell from '~/features/circles/ui/common/rows/ConnectionRowShell';
 
 type Props = {

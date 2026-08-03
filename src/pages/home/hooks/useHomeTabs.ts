@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
-import { isTab, TAB, type Tab } from '~/shared/ui/shell/TabBar';
+import { isTab, TAB, type Tab } from '~/shared/config/mainTabs';
 import { useAuth } from '~/features/auth/providers';
 import { getStoredWebTab, storeWebTab } from '~/pages/home/lib/webTabStorage';
 

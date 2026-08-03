@@ -1,6 +1,10 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
-import { fetchTrustedUsers, fetchUserFollowers, fetchUserFollowing } from '~/shared/api/usersApi';
+import {
+  fetchTrustedUsers,
+  fetchUserFollowers,
+  fetchUserFollowing,
+} from '~/features/circles/api/networkUsersApi';
 import { CONNECTION_TAB } from '~/features/circles/config/connections';
 import { CONNECTION_QUERY_KEY_BY_TAB } from '~/features/circles/config/queryKeys';
 import type {
@@ -8,8 +12,8 @@ import type {
   ConnectionScopeTab,
   ConnectionsByTab,
 } from '~/features/circles/types/connections';
-import type { NetworkUserRow } from '~/types/network';
-import { nextPageOffset } from '~/shared/lib/pagination';
+import type { NetworkUserRow } from '~/features/circles/types/networkUser';
+import { nextPageOffset } from '~/shared/lib/data/guards';
 
 const CONNECTION_PAGE_LIMIT = 50;
 

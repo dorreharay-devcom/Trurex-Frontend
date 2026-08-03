@@ -8,12 +8,12 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import { useSheetSpringAnimation } from '~/features/circles/hooks/assignment/useSheetSpringAnimation';
+import { useSheetSpringAnimation } from '~/shared/hooks/useSheetSpringAnimation';
 import { KEYBOARD_BEHAVIOR_IOS_PADDING } from '~/shared/config/keyboard';
-import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/modalProps';
+import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/overlaySheet';
 import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
-import { isWeb } from '~/utils';
-import { cn } from '~/utils/general';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { cn } from '~/shared/lib/ui/styles';
 
 const SHEET_MAX_WIDTH_WEB = 448;
 const SHEET_MAX_HEIGHT_RATIO = 0.85;

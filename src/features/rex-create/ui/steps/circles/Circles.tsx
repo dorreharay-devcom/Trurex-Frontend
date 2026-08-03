@@ -11,7 +11,7 @@ import {
 import { useCircleEditor } from '~/features/rex-create/hooks/useCircleEditor';
 import { Theme } from '~/shared/theme/Theme';
 import CreateStepTitle from '../../CreateStepTitle';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 import CircleActionChips from './common/CircleActionChips';
 import CircleRenameRow from './common/CircleRenameRow';
 import CirclesRingPicker from './common/CirclesRingPicker';

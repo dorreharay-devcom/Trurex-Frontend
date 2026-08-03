@@ -20,7 +20,7 @@ export function entryToRecommendation(entry: CollectionRexEntry): Recommendation
       entry.recommender_name || entry.recommender_handle
         ? { name: entry.recommender_name ?? '', handle: entry.recommender_handle ?? '', avatar: '' }
         : null,
-    timeAgo: '',
+    createdAt: null,
     likes: 0,
     comments: 0,
     saves: 0,

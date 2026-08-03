@@ -3,7 +3,7 @@ import { View, Text, ScrollView } from 'react-native';
 import type { RexSubcategoryOption } from '~/features/rex-create/lib/categories';
 import CreateStepTitle from '../../CreateStepTitle';
 import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 import SubCategoryRow from './common/SubCategoryRow';
 
 type Props = {

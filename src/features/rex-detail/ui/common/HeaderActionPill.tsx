@@ -2,8 +2,8 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import type { LucideIcon } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
-import { isWeb } from '~/utils';
-import { cn } from '~/utils/general';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { cn } from '~/shared/lib/ui/styles';
 
 const PILL_VARIANTS = {
   primary: {

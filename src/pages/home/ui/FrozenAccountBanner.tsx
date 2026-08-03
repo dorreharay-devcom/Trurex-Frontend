@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import { useUserConfig } from '~/hooks/useUserConfig';
+import { useUserConfig } from '~/features/auth/hooks/useUserConfig';
 
 function FrozenAccountBanner() {
   const { isAccountFrozen } = useUserConfig();

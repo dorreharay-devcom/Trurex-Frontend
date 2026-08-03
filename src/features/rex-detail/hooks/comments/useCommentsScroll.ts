@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { findNodeHandle, type ScrollView, type View } from 'react-native';
-import { isIos, isWeb } from '~/utils';
+import { isIos, isWeb } from '~/shared/lib/ui/platform';
 
 const NATIVE_SCROLL_TOP_PAD = isIos ? 160 : 96;
 const FOCUS_COMMENT_DELAYS_MS = isWeb ? [80] : [60, 280];

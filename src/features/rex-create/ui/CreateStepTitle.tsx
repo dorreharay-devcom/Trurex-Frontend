@@ -1,6 +1,6 @@
 import { createElement, type ReactNode } from 'react';
 import { Text } from 'react-native';
-import { isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 type Props = {
   children: ReactNode;

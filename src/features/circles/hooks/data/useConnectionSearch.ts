@@ -1,14 +1,14 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { searchUsers } from '~/shared/api/usersApi';
+import { searchUsers } from '~/features/circles/api/networkUsersApi';
 import {
   CONNECTION_TAB_PLACEHOLDER,
   CONNECTION_TAB_SCOPE,
 } from '~/features/circles/config/connections';
 import { CIRCLES_QUERY_KEYS } from '~/features/circles/config/queryKeys';
 import type { ConnectionScopeTab } from '~/features/circles/types/connections';
-import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/hooks/useDebouncedValue';
-import { nextPageOffset } from '~/shared/lib/pagination';
+import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/shared/hooks/useDebouncedValue';
+import { nextPageOffset } from '~/shared/lib/data/guards';
 
 const SEARCH_PAGE_LIMIT = 20;
 

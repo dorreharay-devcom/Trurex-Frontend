@@ -16,54 +16,52 @@ import {
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
-import { INPUT_FOCUS_RING_CLASS } from '~/shared/config/inputFocus';
-import { cn, isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { cn } from '~/shared/lib/ui/styles';
 
-type InputProps = TextInputProps & {
+type Props = TextInputProps & {
   label: string;
   labelRight?: React.ReactNode;
   labelClassName?: string;
   inputClassName?: string;
+  prefix?: string;
   secure?: boolean;
   error?: string;
 };
 
-const Input = ({
+const WEB_FOCUS_WITHIN =
+  'focus-within:outline-none focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/40';
+
+function fieldInputStyle(
+  multiline: boolean | undefined,
+  style: StyleProp<TextStyle>,
+): StyleProp<TextStyle> {
+  if (multiline) return [style, textFieldCaretStyle, textFieldMultilineStyle];
+  if (isWeb) return [style, textFieldCaretStyle];
+  return [
+    style,
+    textFieldCaretStyle,
+    textFieldSingleLineStyle,
+    textFieldSingleLineDefaultHeightStyle,
+  ];
+}
+
+export function Input({
   label,
   labelRight,
   labelClassName,
   inputClassName,
+  prefix,
   secure = false,
   error,
   style,
+  multiline,
+  autoCapitalize,
+  secureTextEntry,
   ...props
-}: InputProps) => {
-  const [showPassword, setShowPassword] = useState(false);
-
-  const borderClass = error ? 'border-destructive' : 'border-border';
-  const inputStyle: StyleProp<TextStyle> = props.multiline
-    ? [style, textFieldCaretStyle, textFieldMultilineStyle]
-    : [
-        style,
-        textFieldCaretStyle,
-        isWeb ? null : [textFieldSingleLineStyle, textFieldSingleLineDefaultHeightStyle],
-      ];
-
-  const textInput = (
-    <TextInput
-      {...props}
-      className={cn(
-        'px-3 py-2.5 text-sm text-foreground',
-        INPUT_FOCUS_RING_CLASS,
-        secure ? 'flex-1' : cn('w-full rounded-lg border bg-card', borderClass, inputClassName),
-      )}
-      style={inputStyle}
-      secureTextEntry={secure ? !showPassword : props.secureTextEntry}
-      placeholderTextColor={Theme.colors.muted}
-      autoCapitalize={props.autoCapitalize ?? 'none'}
-      selectionColor={Theme.colors.foreground}
-    />
-  );
+}: Props) {
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const hasError = Boolean(error);
 
   return (
     <View>
@@ -72,35 +70,52 @@ const Input = ({
         {labelRight}
       </View>
 
-      {secure ? (
-        <View
+      <View
+        className={cn(
+          'flex-row items-center rounded-lg border bg-card',
+          hasError ? 'border-destructive' : 'border-border',
+          isWeb && WEB_FOCUS_WITHIN,
+          inputClassName,
+        )}
+      >
+        {prefix ? (
+          <Text className="pl-3 text-sm text-muted-foreground" pointerEvents="none">
+            {prefix}
+          </Text>
+        ) : null}
+
+        <TextInput
+          {...props}
+          multiline={multiline}
           className={cn(
-            'flex-row items-center rounded-lg border bg-card',
-            borderClass,
-            inputClassName,
+            'min-w-0 flex-1 px-3 py-2.5 text-sm text-foreground',
+            isWeb && 'outline-none',
+            prefix && 'pl-2',
           )}
-        >
-          {textInput}
+          style={fieldInputStyle(multiline, style)}
+          secureTextEntry={secure ? !passwordVisible : secureTextEntry}
+          placeholderTextColor={Theme.colors.muted}
+          autoCapitalize={autoCapitalize ?? 'none'}
+          selectionColor={Theme.colors.foreground}
+        />
+
+        {secure ? (
           <TouchableOpacity
-            onPress={() => setShowPassword((visible) => !visible)}
+            onPress={() => setPasswordVisible((visible) => !visible)}
             className="px-3"
             accessibilityRole="button"
-            accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+            accessibilityLabel={passwordVisible ? 'Hide password' : 'Show password'}
           >
-            {showPassword ? (
+            {passwordVisible ? (
               <Eye size={16} color={Theme.colors.muted} />
             ) : (
               <EyeOff size={16} color={Theme.colors.muted} />
             )}
           </TouchableOpacity>
-        </View>
-      ) : (
-        textInput
-      )}
+        ) : null}
+      </View>
 
       {error ? <Text className="mt-1 text-xs text-destructive">{error}</Text> : null}
     </View>
   );
-};
-
-export default Input;
+}

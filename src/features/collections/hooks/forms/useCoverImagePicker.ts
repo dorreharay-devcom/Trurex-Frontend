@@ -1,13 +1,13 @@
 import { useCallback, useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '~/features/auth/providers';
-import { REX_IMAGES_BUCKET } from '~/shared/config/storageBuckets';
-import { toastError } from '~/utils/appToast';
-import { generateRexImageStoragePath } from '~/utils/photos/photoUtils';
+import { REX_IMAGES_BUCKET } from '~/shared/config/app';
+import { toastError } from '~/shared/lib/appToast';
+import { generateRexImageStoragePath } from '~/shared/lib/media/photos/photoUtils';
 import {
   preparePickerImageForUpload,
   uploadBlobToStorageBucket,
-} from '~/utils/photos/storageUpload';
+} from '~/shared/lib/media/photos/storageUpload';
 
 const COVER_MAX_DIMENSION = 800;
 

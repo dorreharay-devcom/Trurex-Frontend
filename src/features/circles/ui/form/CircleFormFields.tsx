@@ -8,7 +8,7 @@ import {
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 import CircleColorPicker from '~/features/circles/ui/form/CircleColorPicker';
 
 const NAME_MAX_LENGTH = 40;

@@ -8,7 +8,7 @@ import DegreeBadge from '~/features/circles/ui/people/DegreeBadge';
 import FollowAction from '~/features/circles/ui/people/FollowAction';
 import { Theme } from '~/shared/theme/Theme';
 import { SignedUserAvatar } from '~/shared/ui/SignedUserAvatar';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 type Props = {
   suggestion: PeopleSuggestionRow;

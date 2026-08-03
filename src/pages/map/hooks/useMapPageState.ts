@@ -10,7 +10,7 @@ import {
 import { isOwnRecommendation } from '~/features/map/lib/pinTypes';
 import type { MapPinType } from '~/features/map/types/mapPin';
 import type { Recommendation } from '~/shared/types/recommendation';
-import { isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 type Flow = {
   selectedRec: Recommendation | null;

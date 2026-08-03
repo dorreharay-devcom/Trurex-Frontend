@@ -3,7 +3,8 @@ import { View, Text, Pressable } from 'react-native';
 import { CATEGORY_ICON_FALLBACK } from '~/shared/api/categories';
 import { Theme } from '~/shared/theme/Theme';
 import { MAP_ACTION_INSET, MAP_LOCATION_PROMPT_TOP } from '~/features/map/config/mapUi';
-import { androidElevation, isIos } from '~/utils';
+import { isIos } from '~/shared/lib/ui/platform';
+import { androidElevation } from '~/shared/lib/ui/styles';
 
 type Props = {
   visible: boolean;

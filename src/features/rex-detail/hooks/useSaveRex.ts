@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { RecSummary } from '~/features/collections/types/recSummary';
 import { useAuth } from '~/features/auth/providers';
 import type { Recommendation } from '~/shared/types/recommendation';
-import { toastInfo } from '~/utils/appToast';
+import { toastInfo } from '~/shared/lib/appToast';
 
 export function useSaveRex(recommendation: Recommendation | null) {
   const { user: authUser } = useAuth();

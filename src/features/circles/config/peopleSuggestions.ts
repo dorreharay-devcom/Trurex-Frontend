@@ -1,3 +1,4 @@
+import { RELATIONSHIP_STATUS } from '~/shared/config/relationshipStatus';
 import type {
   PeopleSuggestionPrimaryReason,
   PeopleSuggestionRelationshipStatus,
@@ -9,8 +10,7 @@ export const SUGGESTION_REASON = {
   fallbackGlobal: 'fallback_global',
 } as const satisfies Record<string, PeopleSuggestionPrimaryReason>;
 
-export const SUGGESTION_RELATIONSHIP = {
-  followsYou: 'follows_you',
-  following: 'following',
-  trusted: 'trusted',
-} as const satisfies Record<string, PeopleSuggestionRelationshipStatus>;
+export const SUGGESTION_RELATIONSHIP = RELATIONSHIP_STATUS satisfies Record<
+  string,
+  PeopleSuggestionRelationshipStatus
+>;

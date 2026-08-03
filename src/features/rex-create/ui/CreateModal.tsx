@@ -1,7 +1,6 @@
 import React, { useLayoutEffect } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { OverlayModal } from '~/shared/ui/OverlayModal';
-import { modalConfig } from '~/hooks/useOverlaySheetPresentation';
 import { useCreateRecWizard } from '~/features/rex-create/hooks/useCreateRecWizard';
 import { useModalPresentation } from '~/features/rex-create/hooks/useModalPresentation';
 import { useCategoryCreateConfig } from '~/features/rex-create/hooks/useCategoryCreateConfig';
@@ -73,7 +72,6 @@ const CreateModal: React.FC<Props> = ({
       visible={visible}
       onRequestClose={abandonDraftAndClose}
       contentTranslateY={sheetTranslateY}
-      backdropBackground={modalConfig.layout.backdropBackground}
     >
       <View className="flex-1 min-h-0 flex-col">
         <CreateModalHeader

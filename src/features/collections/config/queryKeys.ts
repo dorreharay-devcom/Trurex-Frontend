@@ -7,7 +7,6 @@ export const COLLECTIONS_QUERY_KEYS = {
   mySavedRexes: REX_QUERY_KEYS.mySavedRexes,
 } as const;
 
-/** Queries to refresh whenever a rex's saved state changes. */
 export const SAVED_REX_DEPENDENT_QUERY_KEYS = [
   REX_QUERY_KEYS.mySavedRexes,
   REX_QUERY_KEYS.discoverFeed,

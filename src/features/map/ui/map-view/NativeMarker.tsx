@@ -4,7 +4,7 @@ import { Marker } from 'react-native-maps';
 import { View, Text } from 'react-native';
 import { MAP_PIN_GLYPH_COLOR, MAP_PIN_TYPE } from '~/features/map/config/pins';
 import { Theme } from '~/shared/theme/Theme';
-import { isAndroid, isWeb } from '~/utils';
+import { isAndroid, isWeb } from '~/shared/lib/ui/platform';
 import { nativeMarkerStyles as styles } from '~/features/map/ui/map-view/nativeMarkerStyles';
 import type { MapMarkerItem } from '~/features/map/types/mapMarker';
 import type { MapPinType } from '~/features/map/types/mapPin';

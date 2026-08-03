@@ -1,10 +1,10 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { MapPin } from 'lucide-react-native';
-import ListRow from '~/features/map/ui/list/ListRow';
+import ListRow from '~/features/map/ui/ListRow';
 import { Theme } from '~/shared/theme/Theme';
 import type { Recommendation } from '~/shared/types/recommendation';
-import { androidElevation, webContainerStyle } from '~/utils';
+import { androidElevation, webContainerStyle } from '~/shared/lib/ui/styles';
 
 type Props = {
   visible: boolean;

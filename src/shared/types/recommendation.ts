@@ -1,6 +1,14 @@
+import type { RelationshipStatus } from '~/shared/config/relationshipStatus';
+
 export type RecommendationOpenOptions = {
   scrollToComments?: boolean;
   scrollToCommentId?: string;
+};
+
+export type RecommendationAuthor = {
+  name: string;
+  handle: string;
+  avatar: string;
 };
 
 export type Recommendation = {
@@ -16,7 +24,7 @@ export type Recommendation = {
   category: string;
   categoryIcon?: string | null;
   authorId?: string;
-  authorRelationshipStatus?: 'follows_you' | 'following' | 'trusted' | null;
+  authorRelationshipStatus?: RelationshipStatus | null;
   location?: string;
   locationText?: string | null;
   placeWebsiteUrl?: string | null;
@@ -27,8 +35,8 @@ export type Recommendation = {
   scoreValueForMoney?: number | null;
   tags?: string[] | null;
   savedAt?: string | null;
-  user?: { name: string; handle: string; avatar: string } | null;
-  timeAgo: string;
+  createdAt?: string | null;
+  user?: RecommendationAuthor | null;
   likes: number;
   comments: number;
   saves: number;

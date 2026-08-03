@@ -1,4 +1,4 @@
-import { isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 export type RecoveryLinkError = {
   code: string | null;

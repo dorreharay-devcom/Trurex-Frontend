@@ -4,9 +4,9 @@ import { CollectionsApi } from '~/features/collections/api/collectionsApi';
 import { SAVED_REX_DEPENDENT_QUERY_KEYS } from '~/features/collections/config/queryKeys';
 import { useAuth } from '~/features/auth/providers';
 import type { RecSummary } from '~/features/collections/types/recSummary';
-import { toastError, toastSuccess } from '~/utils/appToast';
-import { unknownErrorMessage } from '~/utils';
-import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { toastError, toastSuccess } from '~/shared/lib/appToast';
+import { unknownErrorMessage } from '~/shared/lib/data/guards';
+import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
 
 type Params = {
   open: boolean;

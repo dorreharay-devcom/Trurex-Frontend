@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import * as ModerationApi from '~/shared/api/moderationApi';
+import * as ContentReportApi from '~/features/rex-detail/api/contentReportApi';
 import {
   CONTENT_REPORT_OTHER_CODE,
   MAX_CONTENT_REPORT_DETAILS,
 } from '~/features/rex-detail/config/contentReport';
 import type { ContentReportTarget } from '~/features/rex-detail/types/contentReport';
-import { toastError, toastSuccess } from '~/utils/appToast';
+import { toastError, toastSuccess } from '~/shared/lib/appToast';
 import { useAuth } from '~/features/auth/providers';
-import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
-import { unknownErrorMessage } from '~/utils';
+import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
+import { unknownErrorMessage } from '~/shared/lib/data/guards';
 
 type Params = {
   open: boolean;
@@ -24,7 +24,7 @@ export function useContentReportFlow({ open, target }: Params) {
 
   const reasonsQuery = useQuery({
     queryKey: ['moderation', 'flagReasons'],
-    queryFn: () => ModerationApi.fetchFlagReasons(),
+    queryFn: () => ContentReportApi.fetchFlagReasons(),
     enabled: open && user != null,
     staleTime: 60 * 60 * 1000,
   });
@@ -75,13 +75,13 @@ export function useContentReportFlow({ open, target }: Params) {
     try {
       const detailPayload = details.trim() || null;
       if (target.kind === 'recommendation') {
-        await ModerationApi.flagRex({
+        await ContentReportApi.flagRex({
           rexId: target.rexId,
           reasonCode: reason,
           details: detailPayload,
         });
       } else {
-        await ModerationApi.flagComment({
+        await ContentReportApi.flagComment({
           commentId: target.commentId,
           reasonCode: reason,
           details: detailPayload,

@@ -7,7 +7,7 @@ import type {
   UserCollection,
   UserCollectionRex,
 } from '~/features/collections/types/collection';
-import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
+import { throwRpcIfFailed } from '~/shared/lib/errors/restriction';
 
 export const CollectionsApi = {
   createCollection: async (params: CreateCollectionInput): Promise<UserCollection> => {

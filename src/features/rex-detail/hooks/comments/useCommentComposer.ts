@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Keyboard, type TextInput } from 'react-native';
-import { isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
 import { runCommentMutation } from './useCommentActions';
 
 const AUTO_FOCUS_DELAY_MS = isWeb ? 780 : 600;

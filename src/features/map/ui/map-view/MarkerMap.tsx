@@ -8,7 +8,7 @@ import type { MarkerMapProps } from '~/features/map/types/markerMap';
 import MapZoomControls from '~/features/map/ui/map-view/MapZoomControls';
 import NativeMarker from '~/features/map/ui/map-view/NativeMarker';
 import { Theme } from '~/shared/theme/Theme';
-import { isAndroid, isIos } from '~/utils';
+import { isAndroid, isIos } from '~/shared/lib/ui/platform';
 
 const ZOOM_IN_FACTOR = 0.65;
 const ZOOM_OUT_FACTOR = 1.55;

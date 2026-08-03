@@ -8,7 +8,7 @@ import { AuthEvent } from '~/features/auth/types';
 import { Auth } from '~/shared/api/client';
 import { AuthApi } from '~/shared/api/auth';
 import { Routes } from '~/shared/config/routes';
-import { isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 export function useOAuthCallback() {
   const router = useRouter();

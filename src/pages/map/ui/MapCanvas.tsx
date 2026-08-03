@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import MarkerMap from '~/features/map/ui/map-view/MarkerMap';
 import type { MarkerMapProps } from '~/features/map/types/markerMap';
-import { isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 type Props = MarkerMapProps & {
   hidden: boolean;

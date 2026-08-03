@@ -1,14 +1,14 @@
 import 'react-native-url-polyfill/auto';
 import { createClient } from '@supabase/supabase-js';
-import { StorageService } from '~/shared/lib/storage';
-import { isFatalAuthSessionErrorCode } from '~/shared/api/auth/sessionErrors';
+import { StorageService } from '~/shared/lib/storage/kv';
+import { isFatalAuthSessionErrorCode } from '~/shared/lib/errors/authSession';
 import {
   terminateIfAccountSuspendedRpcError,
   terminateIfUnauthorizedRequestError,
+  terminateSessionForUnauthorizedRequest,
   toastIfAccountFrozenMutationError,
-} from '~/utils/mutationRestrictionError';
-import { terminateSessionForUnauthorizedRequest } from '~/utils/accountSuspension';
-import { isWeb } from '~/utils';
+} from '~/shared/lib/errors/restriction';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const BACKEND_KEY =

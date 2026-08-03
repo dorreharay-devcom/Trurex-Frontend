@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text } from 'react-native';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 type Props = {
   message: string | null | undefined;

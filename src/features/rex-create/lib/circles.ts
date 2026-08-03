@@ -1,5 +1,5 @@
 import type { CircleDisplayRow } from '~/shared/types/circles';
-import { isNonEmptyString } from '~/utils/guards';
+import { isNonEmptyString } from '~/shared/lib/data/guards';
 
 export function canRenameCircleDisplayRow(c: CircleDisplayRow): boolean {
   return c.systemKind == null || c.systemKind === '';

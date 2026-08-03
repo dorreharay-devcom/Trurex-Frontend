@@ -4,9 +4,9 @@ import { CollectionsApi } from '~/features/collections/api/collectionsApi';
 import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 import { useAuth } from '~/features/auth/providers';
 import type { Recommendation } from '~/shared/types/recommendation';
-import { toastError } from '~/utils/appToast';
-import { unknownErrorMessage } from '~/utils';
-import { didAccountFrozenMutationToast } from '~/utils/mutationRestrictionError';
+import { toastError } from '~/shared/lib/appToast';
+import { unknownErrorMessage } from '~/shared/lib/data/guards';
+import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
 
 export function useRemoveUncollected() {
   const { user } = useAuth();

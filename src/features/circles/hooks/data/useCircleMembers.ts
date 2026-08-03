@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchCircleMembers } from '~/shared/api/circlesApi';
+import { fetchCircleMembers } from '~/features/circles/api/circlesApi';
 import { CIRCLES_QUERY_KEYS } from '~/features/circles/config/queryKeys';
 
 export function useCircleMembers(circleId: string, enabled: boolean) {

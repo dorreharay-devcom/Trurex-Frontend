@@ -1,5 +1,5 @@
 import { Backend } from '~/shared/api/client';
-import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
+import { throwRpcIfFailed } from '~/shared/lib/errors/restriction';
 
 export type GooglePlacesSearchMeta = {
   localCount: number;

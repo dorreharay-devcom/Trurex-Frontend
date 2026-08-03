@@ -2,15 +2,15 @@ import { useCallback, useMemo } from 'react';
 import { Linking } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { fetchRexDetail } from '~/features/rex-detail/api/rexDetailApi';
-import { normalizeWebsiteUrl } from '~/utils/general';
+import { normalizeWebsiteUrl } from '~/shared/lib/data/guards';
 import type { Recommendation } from '~/shared/types/recommendation';
 import { buildDetailRatingsFromRexDetail } from '~/features/rex-detail/lib/detailRatings';
 import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
   rexPhotoStoragePathsFromRecommendation,
-} from '~/shared/lib/rexImages';
-import { toastError } from '~/utils/appToast';
+} from '~/shared/lib/media/rexImages';
+import { toastError } from '~/shared/lib/appToast';
 
 function normalizeGalleryPath(raw: string): string | null {
   const trimmed = raw.trim();

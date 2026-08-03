@@ -10,8 +10,8 @@ import {
 } from '~/features/auth/lib/credentials';
 import { mapAuthError } from '~/features/auth/lib/errors';
 import { navigateAfterAuthenticatedSession } from '~/features/auth/lib/mfa';
-import { unknownErrorMessage } from '~/utils';
-import { toastError } from '~/utils/appToast';
+import { unknownErrorMessage } from '~/shared/lib/data/guards';
+import { toastError } from '~/shared/lib/appToast';
 import { useAuthInviteCode } from '~/features/auth/hooks/useAuthInviteCode';
 import type { OAuthProvider } from '~/features/auth/lib/oauth';
 import { useOAuthSignIn } from '~/features/auth/hooks/useOAuthSignIn';

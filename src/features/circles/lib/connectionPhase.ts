@@ -4,7 +4,7 @@ import type {
   ConnectionListState,
   ConnectionScopeTab,
 } from '~/features/circles/types/connections';
-import type { NetworkUserRow } from '~/types/network';
+import type { NetworkUserRow } from '~/features/circles/types/networkUser';
 
 const EMPTY_PHASE_BY_TAB: Record<ConnectionScopeTab, ConnectionListPhase> = {
   trusted: CONNECTION_PHASE.trustedEmpty,

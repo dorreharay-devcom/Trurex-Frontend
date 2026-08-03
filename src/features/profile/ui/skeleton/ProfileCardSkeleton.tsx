@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, ScrollView } from 'react-native';
-import { webContainerStyle } from '~/utils';
+import { webContainerStyle } from '~/shared/lib/ui/styles';
 import { ProfileRexGridSkeleton } from './ProfileRexGridSkeleton';
 
 type Props = {

@@ -1,5 +1,5 @@
 import { Backend } from '~/shared/api/client';
-import { throwRpcIfFailed } from '~/utils/mutationRestrictionError';
+import { throwRpcIfFailed } from '~/shared/lib/errors/restriction';
 import type {
   CategoryCreateConfig,
   CreateRexRpcParams,
@@ -7,7 +7,7 @@ import type {
 } from '~/features/rex-create/types/categoryCreateConfig';
 import type { RexForEditRow } from '~/features/rex-detail/types/rexDetail';
 import type { DiscardDraftRexDataResult } from '~/features/rex-create/types/rexApi';
-import { isFiniteNumber, isPlainObject } from '~/utils/guards';
+import { isFiniteNumber, isPlainObject } from '~/shared/lib/data/guards';
 
 export async function fetchAllCategoryCreateConfigs(): Promise<CategoryCreateConfig[]> {
   const { data, error } = await Backend.rpc('get_all_category_create_configs');

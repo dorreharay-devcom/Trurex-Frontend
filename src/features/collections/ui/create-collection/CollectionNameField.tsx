@@ -8,8 +8,7 @@ import {
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
 import { INPUT_FOCUS_BORDER_CLASS } from '~/shared/config/inputFocus';
-import { webNoOutline } from '~/utils';
-import { cn } from '~/utils/general';
+import { webNoOutline, cn } from '~/shared/lib/ui/styles';
 
 const NAME_MAX_LENGTH = 60;
 

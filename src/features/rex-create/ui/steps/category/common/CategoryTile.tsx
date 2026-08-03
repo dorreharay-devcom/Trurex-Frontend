@@ -3,8 +3,8 @@ import { View, Text, Pressable } from 'react-native';
 import type { CategoryPickerTile } from '~/features/rex-create/lib/categories';
 import type { CategoryGridConfig } from '~/features/rex-create/lib/categories';
 import { Theme } from '~/shared/theme/Theme';
-import { isWeb } from '~/utils';
-import { cn } from '~/utils/general';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { cn } from '~/shared/lib/ui/styles';
 
 export type CategoryTileProps = {
   grid: CategoryGridConfig;

@@ -9,7 +9,8 @@ import {
 import MapLayerToggle from '~/features/map/ui/overlays/MapLayerToggle';
 import MapLegend from '~/features/map/ui/overlays/MapLegend';
 import { Theme } from '~/shared/theme/Theme';
-import { androidElevation, isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { androidElevation } from '~/shared/lib/ui/styles';
 import type { PinVisibility } from '~/features/map/types/mapPin';
 
 type Props = {

@@ -12,7 +12,7 @@ import { entryToRecommendation } from '~/features/collections/lib/mappers';
 import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
 import { Theme } from '~/shared/theme/Theme';
 import { KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT } from '~/shared/config/keyboard';
-import { webContainerStyle } from '~/utils';
+import { webContainerStyle } from '~/shared/lib/ui/styles';
 
 function EmptyCollection() {
   return (

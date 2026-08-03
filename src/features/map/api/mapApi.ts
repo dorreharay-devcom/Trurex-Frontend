@@ -1,10 +1,10 @@
 import { Backend, unwrap } from '~/shared/api/client';
-import { recommendationFromRowSafe } from '~/shared/lib/recommendationRow';
+import { mapApiRowToRecommendation } from '~/shared/lib/recommendation';
 import type { Recommendation } from '~/shared/types/recommendation';
 import type { MapPinRow } from '~/features/map/types/mapPinRow';
 import { filterRecommendationsByRexTitle } from '~/features/map/lib/filters';
 import { API_PIN_TYPE } from '~/features/map/config/pins';
-import { finiteNum } from '~/utils/guards';
+import { finiteNum } from '~/shared/lib/data/guards';
 
 export type MapBoundsParams = {
   min_lat: number;
@@ -72,7 +72,7 @@ export const MapApi = {
     const raw = unwrap(await Backend.rpc('map_rexes_in_bounds', rpcBoundsPayload(params, 100)));
     if (!Array.isArray(raw)) return [];
     let recs = raw.flatMap((row) => {
-      const rec = recommendationFromRowSafe(row);
+      const rec = mapApiRowToRecommendation(row);
       return rec ? [rec] : [];
     });
     const term = params.search_term?.trim();

@@ -2,13 +2,13 @@ import React from 'react';
 import { View } from 'react-native';
 import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
 import { RexPhotoPlaceholder } from '~/shared/ui/RexPhotoPlaceholder';
-import { REX_IMAGES_BUCKET } from '~/shared/config/storageBuckets';
+import { REX_IMAGES_BUCKET } from '~/shared/config/app';
 import type { Recommendation } from '~/shared/types/recommendation';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
-} from '~/shared/lib/rexImages';
+} from '~/shared/lib/media/rexImages';
 
 type Props = {
   rec: Pick<Recommendation, 'title' | 'photoPath' | 'image' | 'categoryIcon' | 'placeholderColors'>;

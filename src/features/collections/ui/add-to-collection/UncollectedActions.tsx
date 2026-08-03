@@ -3,7 +3,7 @@ import { ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import { Bookmark, Trash2, type LucideIcon } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
 import type { SavedRexActionsState } from '~/features/collections/hooks/add-to-collection/useSavedRexActions';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 type ActionButtonProps = {
   icon: LucideIcon;

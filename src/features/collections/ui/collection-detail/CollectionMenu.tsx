@@ -10,7 +10,7 @@ import {
 } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
 import type { CollectionActionsState } from '~/features/collections/hooks/collection-detail/useCollectionActions';
-import { cn } from '~/utils/general';
+import { cn } from '~/shared/lib/ui/styles';
 
 type MenuItemProps = {
   icon: LucideIcon;

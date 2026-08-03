@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { LayoutChangeEvent, ScrollView, TextInput } from 'react-native';
-import { isWeb } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 const SCROLL_TO_FORM_DELAY_MS = 50;
 const FOCUS_DELAY_MS = 180;

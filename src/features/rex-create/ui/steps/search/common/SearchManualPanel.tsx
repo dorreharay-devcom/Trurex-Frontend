@@ -3,11 +3,11 @@ import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-nati
 import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
 import CreateStepTitle from '../../../CreateStepTitle';
 import { Theme } from '~/shared/theme/Theme';
-import { isAndroid } from '~/utils';
-import { cn } from '~/utils/general';
+import { isAndroid } from '~/shared/lib/ui/platform';
+import { cn } from '~/shared/lib/ui/styles';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
 import type { CreateRecSearchPlace } from '~/features/rex-create/types/create';
-import { useActiveCategories } from '~/hooks/useActiveCategories';
+import { useActiveCategories } from '~/shared/hooks/useActiveCategories';
 import SearchPlaceRow from './SearchPlaceRow';
 import SearchTextField from './SearchTextField';
 import TagLocationButton from './TagLocationButton';

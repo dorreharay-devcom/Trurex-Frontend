@@ -10,7 +10,7 @@ import GemsOverlays from '~/pages/gems/ui/GemsOverlays';
 import UncollectedEmpty from '~/pages/gems/ui/UncollectedEmpty';
 import UncollectedRexRow from '~/pages/gems/ui/uncollected-rex-row/UncollectedRexRow';
 import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
-import { webContainerStyle } from '~/utils';
+import { webContainerStyle } from '~/shared/lib/ui/styles';
 
 type GemsPageProps = {
   onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;

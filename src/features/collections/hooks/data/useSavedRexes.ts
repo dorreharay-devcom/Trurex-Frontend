@@ -3,8 +3,8 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { GemsApi } from '~/features/collections/api/gemsApi';
 import { COLLECTIONS_QUERY_KEYS } from '~/features/collections/config/queryKeys';
 import type { SavedRexesParams } from '~/features/collections/types/savedRexes';
-import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/hooks/useDebouncedValue';
-import { nextPageOffset } from '~/shared/lib/pagination';
+import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/shared/hooks/useDebouncedValue';
+import { nextPageOffset } from '~/shared/lib/data/guards';
 
 const SAVED_REXES_PAGE_LIMIT = 20;
 

@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
-import type { CircleApiRow } from '~/shared/api/circlesApi';
+import type { CircleApiRow } from '~/features/circles/types/circle';
 import { CIRCLE_PRESET_DEFAULT } from '~/shared/config/circles';
-import { parseCircleAccentHex } from '~/shared/lib/circles';
+import { parseCircleAccentHex } from '~/features/circles/lib/display';
 
 export type CircleFormState = ReturnType<typeof useCircleForm>;
 

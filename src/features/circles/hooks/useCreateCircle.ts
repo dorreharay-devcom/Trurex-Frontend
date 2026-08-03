@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createCircle, type CircleApiRow } from '~/shared/api/circlesApi';
+import { createCircle } from '~/features/circles/api/circlesApi';
 import { CIRCLES_QUERY_KEYS } from '~/features/circles/config/queryKeys';
-import { mutationErrorToast } from '~/shared/lib/mutationErrorToast';
-import { toastSuccess } from '~/utils/appToast';
+import type { CircleApiRow } from '~/features/circles/types/circle';
+import { mutationErrorToast } from '~/shared/lib/errors/restriction';
+import { toastSuccess } from '~/shared/lib/appToast';
 
 type CircleFormInput = {
   name: string;

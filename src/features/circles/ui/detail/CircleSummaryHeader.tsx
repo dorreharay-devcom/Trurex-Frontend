@@ -1,9 +1,9 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import type { CircleApiRow } from '~/shared/api/circlesApi';
+import type { CircleApiRow } from '~/features/circles/types/circle';
 import type { CircleDisplayRow } from '~/shared/types/circles';
 import { memberCountLabel } from '~/features/circles/lib/labels';
-import CircleGlyph from '~/shared/ui/CircleGlyph';
+import { CircleGlyph } from '~/features/circles/ui/CircleGlyph';
 
 type Props = {
   circle: CircleApiRow;

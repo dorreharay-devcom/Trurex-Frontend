@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { Theme } from '~/shared/theme/Theme';
-import { useActiveCategories } from '~/hooks/useActiveCategories';
+import { useActiveCategories } from '~/shared/hooks/useActiveCategories';
 import type { UseRexPlaceSearchResult } from '~/features/rex-create/hooks/useRexPlaceSearch';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
 import { SEARCH_MODE } from '~/features/rex-create/types/create';

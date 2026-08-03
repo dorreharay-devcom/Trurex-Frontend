@@ -1,3 +1,4 @@
+import { placeDisplayTitle } from '~/shared/lib/recommendation';
 import type { CreateRecSearchPlace } from '~/features/rex-create/types/create';
 import type { Recommendation } from '~/shared/types/recommendation';
 import type { RexDetailRow } from '~/features/rex-detail/types/rexDetail';
@@ -29,7 +30,7 @@ function normalizeCategoryCode(
 }
 
 function resolvePlaceName(detail: RexDetailRow | null | undefined, rec: Recommendation): string {
-  return detail?.place_name?.trim() || rec.title?.trim() || 'Place';
+  return detail?.place_name?.trim() || placeDisplayTitle(rec.title);
 }
 
 export function buildAddYourOwnRecSource(

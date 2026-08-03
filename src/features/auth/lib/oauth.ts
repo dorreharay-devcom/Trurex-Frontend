@@ -2,7 +2,8 @@ import * as WebBrowser from 'expo-web-browser';
 import * as QueryParams from 'expo-auth-session/build/QueryParams';
 import { Auth } from '~/shared/api/client';
 import { AuthApi } from '~/shared/api/auth';
-import { isWeb, getRedirectUrl } from '~/utils';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { getRedirectUrl } from '~/features/auth/lib/redirect';
 import type { OAuthProvider } from '../types/oauth';
 
 export type { OAuthProvider };

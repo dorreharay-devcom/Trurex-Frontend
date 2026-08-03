@@ -1,14 +1,14 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import type { CircleApiRow } from '~/shared/api/circlesApi';
+import type { CircleApiRow } from '~/features/circles/types/circle';
 import {
   circleIconKind,
   defaultCircleSubtitle,
   hexToSoftIconBackground,
   parseCircleAccentHex,
-} from '~/shared/lib/circles';
+} from '~/features/circles/lib/display';
 import { Theme } from '~/shared/theme/Theme';
-import CircleGlyph from '~/shared/ui/CircleGlyph';
+import { CircleGlyph } from '~/features/circles/ui/CircleGlyph';
 
 type Props = {
   circle: CircleApiRow;

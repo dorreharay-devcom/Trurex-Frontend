@@ -9,7 +9,7 @@ import {
   isFieldErrorsEmpty,
 } from '~/features/auth/lib/credentials';
 import { mapAuthError } from '~/features/auth/lib/errors';
-import { getRedirectUrl } from '~/utils';
+import { getRedirectUrl } from '~/features/auth/lib/redirect';
 import { useAuthInviteCode } from '~/features/auth/hooks/useAuthInviteCode';
 import { persistTermsAcceptance } from '~/features/auth/lib/terms';
 import type { OAuthProvider } from '~/features/auth/lib/oauth';
