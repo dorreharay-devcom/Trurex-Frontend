@@ -1,5 +1,6 @@
-import React from 'react';
-import { View, FlatList } from 'react-native';
+import React, { memo, useCallback, useMemo } from 'react';
+import { View } from 'react-native';
+import { FlashList, type ListRenderItem } from '@shopify/flash-list';
 import AddToCollectionSheet from '~/features/collections/ui/AddToCollectionSheet';
 import { webContainerStyle } from '~/shared/lib/ui/styles';
 import RecommendationCard from '~/features/discover/ui/feed/RecommendationCard';
@@ -23,6 +24,22 @@ type DiscoverPageProps = {
   onCreateRex?: () => void;
 };
 
+type FeedRowProps = {
+  item: Recommendation;
+  onTap?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
+  onSave: (rec: Recommendation) => void;
+};
+
+const FeedRow = memo(function FeedRow({ item, onTap, onSave }: FeedRowProps) {
+  return (
+    <View className="px-4 mb-4" style={webCardStyle}>
+      <RecommendationCard recommendation={item} onTap={onTap} onSave={onSave} />
+    </View>
+  );
+});
+
+const keyExtractor = (item: Recommendation) => item.id;
+
 const DiscoverPage = ({
   searchQuery = '',
   onRecommendationPress,
@@ -41,45 +58,70 @@ const DiscoverPage = ({
   const isLoading = source.isLoading;
   const rows = isLoading ? [] : source.rows;
 
+  const onSave = save.openForRec;
+  const onTap = onRecommendationPress;
+
+  const renderItem = useCallback<ListRenderItem<Recommendation>>(
+    ({ item }) => <FeedRow item={item} onTap={onTap} onSave={onSave} />,
+    [onTap, onSave],
+  );
+
+  const listHeader = useMemo(
+    () => (
+      <FeedListHeader
+        hasSearch={search.hasSearch}
+        searchQuery={searchQuery}
+        filters={filters}
+        categories={categories}
+        activeCategory={activeCategory}
+        activeTag={activeTag}
+        isLoading={isLoading}
+        onToggleCategory={toggleCategory}
+        onToggleTag={toggleTag}
+      />
+    ),
+    [
+      search.hasSearch,
+      searchQuery,
+      filters,
+      categories,
+      activeCategory,
+      activeTag,
+      isLoading,
+      toggleCategory,
+      toggleTag,
+    ],
+  );
+
+  const listEmpty = useMemo(
+    () => <EmptyState loading={isLoading} onCreateRex={onCreateRex} />,
+    [isLoading, onCreateRex],
+  );
+
+  const listFooter = useMemo(
+    () => <FeedFooterSpinner visible={!search.hasSearch && feed.isFetchingNextPage} />,
+    [search.hasSearch, feed.isFetchingNextPage],
+  );
+
+  const contentContainerStyle = useMemo(() => [webContainerStyle, { paddingBottom: 96 }], []);
+
   return (
     <View className="flex-1">
-      <FlatList
+      <FlashList
         ref={scroll.listRef}
         data={rows}
-        keyExtractor={(item) => item.id}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
         showsVerticalScrollIndicator={false}
         onScroll={scroll.onScroll}
         onEndReached={feed.loadMore}
         onEndReachedThreshold={0.6}
         scrollEventThrottle={16}
-        contentContainerStyle={webContainerStyle}
-        contentContainerClassName="pb-24"
-        ListHeaderComponent={
-          <FeedListHeader
-            hasSearch={search.hasSearch}
-            searchQuery={searchQuery}
-            filters={filters}
-            categories={categories}
-            activeCategory={activeCategory}
-            activeTag={activeTag}
-            isLoading={isLoading}
-            onToggleCategory={toggleCategory}
-            onToggleTag={toggleTag}
-          />
-        }
-        ListEmptyComponent={<EmptyState loading={isLoading} onCreateRex={onCreateRex} />}
-        renderItem={({ item }) => (
-          <View className="px-4 mb-4" style={webCardStyle}>
-            <RecommendationCard
-              recommendation={item}
-              onTap={onRecommendationPress}
-              onSave={save.openForRec}
-            />
-          </View>
-        )}
-        ListFooterComponent={
-          <FeedFooterSpinner visible={!search.hasSearch && feed.isFetchingNextPage} />
-        }
+        contentContainerStyle={contentContainerStyle}
+        ListHeaderComponent={listHeader}
+        ListEmptyComponent={listEmpty}
+        ListFooterComponent={listFooter}
+        drawDistance={500}
       />
 
       <ScrollTopButton visible={scroll.showScrollTop} onPress={scroll.scrollToTop} />

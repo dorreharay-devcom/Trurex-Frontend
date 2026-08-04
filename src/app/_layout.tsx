@@ -5,8 +5,19 @@ import { AuthProvider } from '~/features/auth/providers';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { AppToast } from '~/shared/ui/toast/AppToast';
+import BrandBootLoader from '~/shared/ui/BrandBootLoader';
+import AppErrorBoundary from '~/shared/ui/AppErrorBoundary';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 45_000,
+      gcTime: 5 * 60_000,
+    },
+  },
+});
+
+export { AppErrorBoundary as ErrorBoundary };
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -18,7 +29,7 @@ export default function RootLayout() {
     'HankenGrotesk-ExtraBold': require('@assets/fonts/HankenGrotesk-ExtraBold.ttf'),
   });
 
-  if (!loaded) return null;
+  if (!loaded) return <BrandBootLoader />;
 
   return (
     <QueryClientProvider client={queryClient}>

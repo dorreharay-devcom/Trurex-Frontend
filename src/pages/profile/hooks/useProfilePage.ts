@@ -2,8 +2,9 @@ import { useCallback } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { parseProfileRouteSlug } from '~/features/profile/lib/handle';
 import { useRexPreview } from '~/features/rex-detail/hooks/useRexPreview';
-import { toMainTabRoute, toUserRoute } from '~/shared/config/routes';
+import { toUserRoute } from '~/shared/config/routes';
 import { TAB, type Tab } from '~/shared/config/mainTabs';
+import { openMainTab } from '~/shared/lib/mainTab';
 
 export function useProfilePage() {
   const { userId: slug } = useLocalSearchParams<{ userId: string }>();
@@ -13,13 +14,13 @@ export function useProfilePage() {
 
   const goToTab = useCallback(
     (tab: Tab) => {
-      router.replace(toMainTabRoute(tab));
+      openMainTab(router, tab);
     },
     [router],
   );
 
   const goBack = useCallback(() => {
-    router.replace(toMainTabRoute(TAB.profile));
+    openMainTab(router, TAB.profile);
   }, [router]);
 
   const openUser = useCallback(

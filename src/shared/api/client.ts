@@ -1,4 +1,5 @@
 import 'react-native-url-polyfill/auto';
+import { processLock } from '@supabase/auth-js';
 import { createClient } from '@supabase/supabase-js';
 import { StorageService } from '~/shared/lib/storage/kv';
 import { isFatalAuthSessionErrorCode } from '~/shared/lib/errors/authSession';
@@ -30,11 +31,21 @@ const client = createClient(BACKEND_URL, BACKEND_KEY, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: isWeb,
+    lock: processLock,
   },
   global: {
     fetch: supabaseFetch,
   },
 });
+
+if (isWeb) {
+  window.addEventListener('unhandledrejection', (event) => {
+    const reason = event.reason as { isAcquireTimeout?: boolean } | null;
+    if (!reason?.isAcquireTimeout) return;
+    event.preventDefault();
+    console.warn('[auth] suppressed lock contention', event.reason);
+  });
+}
 
 export const Auth = client.auth;
 export const Backend = client;

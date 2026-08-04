@@ -9,11 +9,7 @@ type Props = {
   hideOnWeb?: boolean;
 };
 
-const SheetHandle = ({
-  className,
-  barClassName,
-  hideOnWeb = true,
-}: Props) => {
+const SheetHandle = ({ className, barClassName, hideOnWeb = true }: Props) => {
   if (hideOnWeb && isWeb) return null;
 
   return (

@@ -9,6 +9,8 @@ import { Auth } from '~/shared/api/client';
 import { AuthApi } from '~/shared/api/auth';
 import { Routes } from '~/shared/config/routes';
 import { isWeb } from '~/shared/lib/ui/platform';
+import { TAB } from '~/shared/config/mainTabs';
+import { openMainTab } from '~/shared/lib/mainTab';
 
 export function useOAuthCallback() {
   const router = useRouter();
@@ -19,7 +21,7 @@ export function useOAuthCallback() {
     let active = true;
 
     const goMain = () => {
-      if (active) router.replace(Routes.Main);
+      if (active) openMainTab(router, TAB.discover);
     };
 
     const goLogin = () => {

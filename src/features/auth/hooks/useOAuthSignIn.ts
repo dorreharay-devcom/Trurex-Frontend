@@ -2,12 +2,14 @@ import { useCallback, useState } from 'react';
 import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { signInWithOAuthProvider, type OAuthProvider } from '~/features/auth/lib/oauth';
+import { TAB } from '~/shared/config/mainTabs';
+import { openMainTab } from '~/shared/lib/mainTab';
+import { navigateAfterAuthenticatedSession } from '~/features/auth/lib/mfa';
+import { useAuth } from '~/features/auth/providers/AuthProvider';
 import { Routes } from '~/shared/config/routes';
 import { isWeb } from '~/shared/lib/ui/platform';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 import { AuthApi } from '~/shared/api/auth';
-import { useAuth } from '~/features/auth/providers/AuthProvider';
-import { navigateAfterAuthenticatedSession } from '~/features/auth/lib/mfa';
 
 const providerLabel: Record<OAuthProvider, string> = {
   google: 'Google',
@@ -34,7 +36,7 @@ export function useOAuthSignIn() {
               setMfaPending,
               setMfaChecking,
               onRequireMfa: () => router.replace(Routes.Mfa),
-              onReady: () => router.replace(Routes.Main),
+              onReady: () => openMainTab(router, TAB.discover),
             });
           } else {
             await setMfaPending(false);

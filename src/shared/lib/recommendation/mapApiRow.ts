@@ -24,10 +24,7 @@ function withHandlePrefix(raw: string | null): string {
   return trimmed.startsWith('@') ? trimmed : `@${trimmed}`;
 }
 
-function optionalBoolean(
-  record: Record<string, unknown>,
-  ...keys: string[]
-): boolean | null {
+function optionalBoolean(record: Record<string, unknown>, ...keys: string[]): boolean | null {
   for (const key of keys) {
     const raw = record[key];
     if (typeof raw === 'boolean') return raw;

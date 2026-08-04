@@ -55,7 +55,13 @@ const NotificationPanel = ({
   onMarkAllRead,
   children,
 }: Props) => (
-  <Modal visible={open} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
+  <Modal
+    visible={open}
+    transparent
+    animationType="fade"
+    onRequestClose={onClose}
+    statusBarTranslucent
+  >
     <View className="flex-1" style={StyleSheet.absoluteFillObject}>
       <Pressable
         style={[

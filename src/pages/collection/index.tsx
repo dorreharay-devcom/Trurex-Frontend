@@ -7,7 +7,7 @@ import DeepLinkShell from '~/widgets/DeepLinkShell';
 import ProtectedRoute from '~/features/auth/ui/ProtectedRoute';
 import RecommendationDetailModal from '~/features/rex-detail/ui/RecommendationDetailModal';
 import { TAB } from '~/shared/config/mainTabs';
-import { toMainTabRoute } from '~/shared/config/routes';
+import { openMainTab } from '~/shared/lib/mainTab';
 import { useRexPreview } from '~/features/rex-detail/hooks/useRexPreview';
 
 function CollectionPage() {
@@ -20,13 +20,13 @@ function CollectionPage() {
     <>
       <DeepLinkShell
         currentTab={TAB.faves}
-        onTabChange={(tab) => router.replace(toMainTabRoute(tab))}
+        onTabChange={(tab) => openMainTab(router, tab)}
         onRexPress={preview.openById}
       >
         <View className="flex-1">
           <CollectionDetailView
             collectionId={id}
-            onBack={() => router.replace(toMainTabRoute(TAB.faves))}
+            onBack={() => openMainTab(router, TAB.faves)}
             onAddItem={setAddToCollectionId}
             onRecommendationPress={preview.open}
           />

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Routes } from '~/shared/config/routes';
 import { useAuth } from '~/features/auth/providers/AuthProvider';
+import { TAB } from '~/shared/config/mainTabs';
+import { openMainTab } from '~/shared/lib/mainTab';
 import {
   MfaErrorCode,
   MfaMessage,
@@ -38,7 +40,7 @@ export function useMfaVerification() {
 
     if (!result.required) {
       await setMfaPending(false);
-      router.replace(Routes.Main);
+      openMainTab(router, TAB.discover);
       return;
     }
 
@@ -100,7 +102,7 @@ export function useMfaVerification() {
       }
 
       await setMfaPending(false);
-      router.replace(Routes.Main);
+      openMainTab(router, TAB.discover);
     } catch (err) {
       await handleVerifyFailure(err);
     } finally {

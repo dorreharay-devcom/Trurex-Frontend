@@ -44,6 +44,5 @@ export async function shareProfile(
       message: `Check out ${whose} profile on TruRex`,
       url,
     });
-  } catch {
-  }
+  } catch {}
 }

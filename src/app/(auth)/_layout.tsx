@@ -1,14 +1,14 @@
 import { Redirect, Stack, usePathname } from 'expo-router';
-import { View, ActivityIndicator } from 'react-native';
 import { useAuth } from '~/features/auth/providers';
 import { Routes } from '~/shared/config/routes';
-import { Theme } from '~/shared/theme/Theme';
+import BrandBootLoader from '~/shared/ui/BrandBootLoader';
 
 const SIGNED_IN_ALLOWED_AUTH_ROUTES: readonly string[] = [
   Routes.ResetPassword,
   Routes.Mfa,
   Routes.Terms,
   Routes.CommunityGuidelines,
+  Routes.Privacy,
 ];
 
 export default function AuthLayout() {
@@ -16,11 +16,7 @@ export default function AuthLayout() {
   const pathname = usePathname();
 
   if (loading || mfaChecking) {
-    return (
-      <View className="flex-1 justify-center items-center bg-background">
-        <ActivityIndicator size="large" color={Theme.colors.primary} />
-      </View>
-    );
+    return <BrandBootLoader />;
   }
 
   if (session && mfaPending && pathname !== Routes.Mfa) {

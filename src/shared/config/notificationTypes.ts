@@ -13,5 +13,4 @@ export const NOTIFICATION_TYPE = {
   message: 'message',
 } as const;
 
-export type KnownNotificationType =
-  (typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICATION_TYPE];
+export type KnownNotificationType = (typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICATION_TYPE];

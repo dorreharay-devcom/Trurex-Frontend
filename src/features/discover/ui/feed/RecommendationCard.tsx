@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
 import CardActions from './common/CardActions';
@@ -13,7 +13,12 @@ type Props = {
   onRemove?: () => void;
 };
 
-const RecommendationCard: React.FC<Props> = ({ recommendation: rec, onTap, onSave, onRemove }) => {
+const RecommendationCard = memo(function RecommendationCard({
+  recommendation: rec,
+  onTap,
+  onSave,
+  onRemove,
+}: Props) {
   const Wrapper = onTap ? TouchableOpacity : View;
 
   return (
@@ -30,6 +35,6 @@ const RecommendationCard: React.FC<Props> = ({ recommendation: rec, onTap, onSav
       <CardActions rec={rec} onTap={onTap} onSave={onSave} />
     </Wrapper>
   );
-};
+});
 
 export default RecommendationCard;

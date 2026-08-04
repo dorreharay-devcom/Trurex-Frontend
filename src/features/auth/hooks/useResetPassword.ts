@@ -10,6 +10,8 @@ import {
   isFieldErrorsEmpty,
 } from '~/features/auth/lib/credentials';
 import { mapAuthError } from '~/features/auth/lib/errors';
+import { TAB } from '~/shared/config/mainTabs';
+import { openMainTab } from '~/shared/lib/mainTab';
 import { AuthEvent } from '~/features/auth/types/authEvent';
 import {
   currentUrlHasPasswordRecoveryToken,
@@ -105,7 +107,7 @@ export function useResetPassword() {
     try {
       await AuthApi.updatePassword(password);
       Alert.alert(ResetPasswordMessage.updatedTitle, ResetPasswordMessage.updatedBody);
-      router.replace(Routes.Main);
+      openMainTab(router, TAB.discover);
     } catch (err: unknown) {
       mapAuthError(err, (e) => setErrors({ password: e.password, general: e.general }));
     } finally {

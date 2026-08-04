@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useLocalSearchParams } from 'expo-router';
-import { isTab, TAB, type Tab } from '~/shared/config/mainTabs';
+import { TAB, type Tab } from '~/shared/config/mainTabs';
 import { useAuth } from '~/features/auth/providers';
-import { getStoredWebTab, storeWebTab } from '~/pages/home/lib/webTabStorage';
+import { getStoredMainTab, storeMainTab } from '~/shared/lib/mainTab';
 
 type ProfileBackTarget = {
   tab: Tab;
@@ -10,16 +9,13 @@ type ProfileBackTarget = {
 };
 
 export function useHomeTabs() {
-  const { tab } = useLocalSearchParams<{ tab?: string }>();
   const { user: authUser } = useAuth();
-  const [currentTab, setCurrentTab] = useState<Tab>(() =>
-    isTab(tab) ? tab : (getStoredWebTab() ?? TAB.discover),
-  );
+  const [currentTab, setCurrentTab] = useState<Tab>(() => getStoredMainTab() ?? TAB.discover);
   const [viewingUserId, setViewingUserId] = useState<string | undefined>(undefined);
   const [profileBackStack, setProfileBackStack] = useState<ProfileBackTarget[]>([]);
 
   useEffect(() => {
-    storeWebTab(currentTab);
+    storeMainTab(currentTab);
   }, [currentTab]);
 
   const changeTab = useCallback((nextTab: Tab) => {

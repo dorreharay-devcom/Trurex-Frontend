@@ -1,18 +1,13 @@
 import { Redirect, Stack } from 'expo-router';
-import { View, ActivityIndicator } from 'react-native';
 import { useAuth } from '~/features/auth/providers';
 import { Routes } from '~/shared/config/routes';
-import { Theme } from '~/shared/theme/Theme';
+import BrandBootLoader from '~/shared/ui/BrandBootLoader';
 
 export default function MainLayout() {
   const { session, loading, mfaPending, mfaChecking } = useAuth();
 
   if (loading || mfaChecking) {
-    return (
-      <View className="flex-1 justify-center items-center bg-background">
-        <ActivityIndicator size="large" color={Theme.colors.primary} />
-      </View>
-    );
+    return <BrandBootLoader />;
   }
 
   if (!session) {

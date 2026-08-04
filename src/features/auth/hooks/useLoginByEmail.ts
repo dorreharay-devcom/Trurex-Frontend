@@ -10,6 +10,8 @@ import {
 } from '~/features/auth/lib/credentials';
 import { mapAuthError } from '~/features/auth/lib/errors';
 import { navigateAfterAuthenticatedSession } from '~/features/auth/lib/mfa';
+import { TAB } from '~/shared/config/mainTabs';
+import { openMainTab } from '~/shared/lib/mainTab';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 import { toastError } from '~/shared/lib/appToast';
 import { useAuthInviteCode } from '~/features/auth/hooks/useAuthInviteCode';
@@ -78,7 +80,7 @@ export function useLoginByEmail() {
         setMfaPending,
         setMfaChecking,
         onRequireMfa: () => router.replace(Routes.Mfa),
-        onReady: () => router.replace(Routes.Main),
+        onReady: () => openMainTab(router, TAB.discover),
       });
     } catch (error: unknown) {
       await resetMfaGate();

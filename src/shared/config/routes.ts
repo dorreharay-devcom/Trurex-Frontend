@@ -16,10 +16,6 @@ export function toUserRoute(userId: string): Href {
   return `/user/${userId}`;
 }
 
-export function toMainTabRoute(tab: string): Href {
-  return `/?tab=${tab}`;
-}
-
 export function toRexRoute(
   rexId: string,
   options?: { scrollToCommentId?: string; scrollToComments?: boolean },
