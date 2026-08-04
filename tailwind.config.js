@@ -1,8 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  // Required for NativeWind on web: avoids "Cannot manually set color scheme" when dark mode is `media`.
   darkMode: 'class',
-  content: ['./app/**/*.{js,jsx,ts,tsx}', './src/**/*.{js,jsx,ts,tsx}'],
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
   presets: [require('nativewind/preset')],
   theme: {
     fontFamily: {
@@ -35,6 +34,7 @@ module.exports = {
         'rating-star': '#F59B0A',
         destructive: '#DB2424', // hsl(0 72% 50%)
         border: '#D4D4D4', // hsl(0 0% 83%)
+        'search-field': '#DBDBDB', // hsl(0 0% 86%) — Theme.colors.searchFieldBackground
         ring: '#B7C7CF',
         gold: '#CCAB66',
         sand: '#E4DBCD', // hsl(35 30% 85%)
