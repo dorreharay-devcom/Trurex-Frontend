@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react';
 import {
+  imageTransformCacheSuffix,
+  type StorageImageTransform,
+} from '~/shared/lib/media/imageTransform';
+import {
   cacheSignedUrl,
   getCachedSignedUrl,
   resolveSignedUrlOnce,
+  signedUrlCacheKey,
 } from '~/shared/lib/storage/signedUrlCache';
 
 const DEFAULT_EXPIRES_IN_SEC = 3600;
@@ -19,10 +24,11 @@ export function useSignedStorageUrl(
   objectPath: string,
   expiresInSec = DEFAULT_EXPIRES_IN_SEC,
   cacheVersion?: string | number,
-): { uri: string | null; loading: boolean } {
+  transform?: StorageImageTransform | null,
+): { uri: string | null; loading: boolean; cacheKey: string } {
   const path = normalizeObjectPath(bucket, objectPath);
-  const version = cacheVersion == null ? '' : `:${cacheVersion}`;
-  const cacheKey = path ? `${bucket}:${path}${version}` : '';
+  const transformKey = imageTransformCacheSuffix(transform);
+  const cacheKey = path ? signedUrlCacheKey(bucket, path, transform, cacheVersion) : '';
 
   const [uri, setUri] = useState<string | null>(() =>
     cacheKey ? getCachedSignedUrl(cacheKey) : null,
@@ -49,7 +55,13 @@ export function useSignedStorageUrl(
     setLoading(true);
     let active = true;
     void (async () => {
-      const resolved = await resolveSignedUrlOnce(cacheKey, bucket, path, expiresInSec);
+      const resolved = await resolveSignedUrlOnce(
+        cacheKey,
+        bucket,
+        path,
+        expiresInSec,
+        transform,
+      );
       if (!active) return;
       if (resolved) cacheSignedUrl(cacheKey, resolved);
       setUri(resolved?.url ?? null);
@@ -59,7 +71,7 @@ export function useSignedStorageUrl(
     return () => {
       active = false;
     };
-  }, [bucket, path, cacheKey, expiresInSec]);
+  }, [bucket, path, cacheKey, expiresInSec, transformKey, transform]);
 
-  return { uri, loading };
+  return { uri, loading, cacheKey };
 }

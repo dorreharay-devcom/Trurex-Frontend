@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { Image, type ImageStyle } from 'expo-image';
 import { useSignedStorageUrl } from '~/shared/hooks/useSignedStorageUrl';
 import { Skeleton } from '~/shared/ui/Skeleton';
@@ -9,29 +9,20 @@ import {
   isRexPlaceholderPhotoPath,
   REX_PLACEHOLDER_IMAGE_SOURCE,
 } from '~/shared/lib/media/rexImages';
+import type {
+  SignedStorageImageLoadEvent,
+  SignedStorageImageProps,
+} from '~/shared/ui/SignedStorageImage.types';
+
+export type { SignedStorageImageProps } from '~/shared/ui/SignedStorageImage.types';
 
 const SIGNED_URL_TTL_SECONDS = 3600;
 const FADE_TRANSITION_MS = 200;
-const FILL_STYLE: ImageStyle = { width: '100%', height: '100%' };
-
-type ImageLoadEvent = { source: { width: number; height: number } };
-
-type Props = {
-  bucket: string;
-  storagePath?: string | null;
-  remoteUri?: string | null;
-  className?: string;
-  style?: ImageStyle;
-  accessibilityLabel?: string;
-  contentFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
-  onLoad?: (e: ImageLoadEvent) => void;
-  skeletonUntilLoaded?: boolean;
-  cacheVersion?: string | number;
-};
+const FILL_STYLE: ImageStyle = StyleSheet.absoluteFillObject;
 
 type Display =
   | { kind: 'bundled' }
-  | { kind: 'remote'; uri: string }
+  | { kind: 'remote'; uri: string; cacheKey?: string }
   | { kind: 'pending' }
   | { kind: 'empty' };
 
@@ -47,7 +38,7 @@ function LoadingSkeleton({ soft }: { soft: boolean }) {
   );
 }
 
-export function SignedStorageImage({
+export const SignedStorageImage: React.FC<SignedStorageImageProps> = ({
   bucket,
   storagePath,
   remoteUri,
@@ -58,37 +49,52 @@ export function SignedStorageImage({
   onLoad,
   skeletonUntilLoaded = false,
   cacheVersion,
-}: Props) {
+  imageTransform,
+  recyclingKey,
+  priority,
+}) => {
   const http = resolveHttpUri(remoteUri);
   const path = storagePath?.trim() ?? '';
   const bundled = !http && isRexPlaceholderPhotoPath(path);
   const signedPath = http || bundled ? '' : path;
+  const activeTransform = http || bundled ? null : (imageTransform ?? null);
 
-  const { uri, loading } = useSignedStorageUrl(
+  const { uri, loading, cacheKey } = useSignedStorageUrl(
     bucket,
     signedPath,
     SIGNED_URL_TTL_SECONDS,
     cacheVersion,
+    activeTransform,
   );
 
   const display: Display = (() => {
     if (bundled) return { kind: 'bundled' };
-    const remote = http ?? uri;
-    if (remote) return { kind: 'remote', uri: remote };
+    if (http) return { kind: 'remote', uri: http, cacheKey: http };
+    if (uri) return { kind: 'remote', uri, cacheKey: cacheKey || uri };
     if (loading) return { kind: 'pending' };
     return { kind: 'empty' };
   })();
 
-  const sourceKey = display.kind === 'remote' ? display.uri : display.kind;
+  const sourceKey = display.kind === 'remote' ? (display.cacheKey ?? display.uri) : display.kind;
   const [decoded, setDecoded] = useState(false);
   useEffect(() => {
     setDecoded(false);
   }, [sourceKey]);
 
-  const markDecoded = (e?: ImageLoadEvent) => {
+  const markDecoded = (e?: SignedStorageImageLoadEvent) => {
     setDecoded(true);
     if (e) onLoad?.(e);
   };
+
+  const remoteUriStable = display.kind === 'remote' ? display.uri : null;
+  const remoteCacheKey = display.kind === 'remote' ? (display.cacheKey ?? display.uri) : null;
+  const remoteSource = useMemo(() => {
+    if (!remoteUriStable) return null;
+    return {
+      uri: remoteUriStable,
+      cacheKey: remoteCacheKey ?? remoteUriStable,
+    };
+  }, [remoteUriStable, remoteCacheKey]);
 
   const waitingToDecode = skeletonUntilLoaded && display.kind === 'remote' && !decoded;
   const showSkeleton = display.kind === 'pending' || waitingToDecode;
@@ -108,17 +114,20 @@ export function SignedStorageImage({
           style={FILL_STYLE}
           contentFit={contentFit}
           accessibilityLabel={accessibilityLabel}
+          recyclingKey={recyclingKey}
           onLoad={(e) => markDecoded(e)}
         />
       ) : null}
 
-      {display.kind === 'remote' ? (
+      {display.kind === 'remote' && remoteSource ? (
         <Image
-          source={{ uri: display.uri }}
+          source={remoteSource}
           style={[FILL_STYLE, waitingToDecode ? { opacity: 0 } : null]}
           contentFit={contentFit}
           transition={skeletonUntilLoaded ? 0 : FADE_TRANSITION_MS}
           cachePolicy="memory-disk"
+          recyclingKey={recyclingKey}
+          priority={priority}
           accessibilityLabel={accessibilityLabel}
           onLoad={(e) => markDecoded(e)}
           onError={() => markDecoded()}
@@ -132,4 +141,4 @@ export function SignedStorageImage({
       ) : null}
     </View>
   );
-}
+};

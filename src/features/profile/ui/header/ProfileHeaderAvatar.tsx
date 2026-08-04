@@ -3,6 +3,9 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { Camera } from 'lucide-react-native';
 import { USER_AVATARS_BUCKET } from '~/shared/config/app';
 import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
+import { avatarImageTransform } from '~/shared/lib/media/imageTransform';
+
+const PROFILE_AVATAR_TRANSFORM = avatarImageTransform(96);
 
 type Props = {
   displayName: string;
@@ -36,8 +39,11 @@ const ProfileHeaderAvatar = ({
           <SignedStorageImage
             bucket={USER_AVATARS_BUCKET}
             storagePath={avatarUrl}
-            className="h-full w-full"
+            className="absolute inset-0"
             cacheVersion={avatarRefreshKey}
+            imageTransform={PROFILE_AVATAR_TRANSFORM}
+            recyclingKey={avatarUrl}
+            priority="low"
           />
         ) : (
           <View className="flex-1 items-center justify-center">

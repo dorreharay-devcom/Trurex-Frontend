@@ -21,7 +21,12 @@ const PinSheetMeta = ({ pin, pinType }: Props) => {
       <View className="mb-3 flex-row items-center gap-2">
         {authorLabel && pin.user ? (
           <>
-            <SignedUserAvatar name={pin.user.name} avatar={pin.user.avatar} className="h-6 w-6" />
+            <SignedUserAvatar
+              name={pin.user.name}
+              avatar={pin.user.avatar}
+              className="h-6 w-6"
+              sizePt={24}
+            />
             <Text className="flex-1 text-xs text-muted-foreground">{authorLabel}</Text>
           </>
         ) : (

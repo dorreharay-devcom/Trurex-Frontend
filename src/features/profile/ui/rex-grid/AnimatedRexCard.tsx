@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Animated, Text, TouchableOpacity, View } from 'react-native';
 import { Star } from 'lucide-react-native';
 import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
@@ -10,6 +10,7 @@ import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
 } from '~/shared/lib/media/rexImages';
+import { gridCoverImageTransform } from '~/shared/lib/media/imageTransform';
 
 type Props = {
   rec: Recommendation;
@@ -24,6 +25,7 @@ const AnimatedRexCard = ({ rec, index, width, onPress }: Props) => {
   const coverPath = rexCoverStoragePathFromRecommendation(rec);
   const coverHttp = rexCoverRemoteHttpUrl(rec);
   const hasCoverImage = Boolean(coverPath || coverHttp);
+  const transform = useMemo(() => gridCoverImageTransform(width), [width]);
 
   useEffect(() => {
     Animated.parallel([
@@ -56,6 +58,9 @@ const AnimatedRexCard = ({ rec, index, width, onPress }: Props) => {
             remoteUri={coverHttp}
             className="aspect-square w-full"
             accessibilityLabel={rec.title}
+            imageTransform={transform}
+            recyclingKey={rec.id}
+            priority="low"
           />
         ) : (
           <RexPhotoPlaceholder

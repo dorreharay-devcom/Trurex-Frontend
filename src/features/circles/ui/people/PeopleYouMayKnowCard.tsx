@@ -58,6 +58,7 @@ const PeopleYouMayKnowCard = ({
           name={label}
           avatar={suggestion.avatar_url}
           className="h-12 w-12 rounded-xl"
+          sizePt={48}
         />
         <View className="min-w-0 flex-1">
           <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>

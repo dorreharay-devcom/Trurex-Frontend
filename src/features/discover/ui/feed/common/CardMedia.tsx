@@ -10,11 +10,13 @@ import {
   rexCoverStoragePathFromRecommendation,
   rexPhotoStoragePathsFromRecommendation,
 } from '~/shared/lib/media/rexImages';
+import { feedCoverImageTransform } from '~/shared/lib/media/imageTransform';
 import type { Recommendation } from '~/shared/types/recommendation';
 import { placeDisplayTitle, valueForMoneyLabel } from '~/shared/lib/recommendation';
 import { isWeb } from '~/shared/lib/ui/platform';
 
 const MAX_GALLERY_DOTS = 5;
+const FEED_COVER_TRANSFORM = feedCoverImageTransform();
 
 const addressEllipsisStyle = isWeb
   ? ({ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } as TextStyle)
@@ -29,9 +31,12 @@ function CardCoverImage({ rec }: { rec: Recommendation }) {
         bucket={REX_IMAGES_BUCKET}
         storagePath={coverPath}
         remoteUri={coverHttp}
-        style={{ width: '100%', height: '100%' }}
+        className="absolute inset-0"
         contentFit="cover"
         accessibilityLabel={rec.title}
+        imageTransform={FEED_COVER_TRANSFORM}
+        recyclingKey={rec.id}
+        priority="normal"
       />
     );
   }
@@ -39,7 +44,7 @@ function CardCoverImage({ rec }: { rec: Recommendation }) {
     <RexPhotoPlaceholder
       categoryIcon={rec.categoryIcon}
       colors={rec.placeholderColors}
-      className="h-full w-full"
+      className="absolute inset-0 h-full w-full"
       emojiSize={46}
       accessibilityLabel={rec.title}
     />

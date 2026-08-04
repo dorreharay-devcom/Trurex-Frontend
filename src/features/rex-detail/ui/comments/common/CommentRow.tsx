@@ -55,6 +55,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
           name={name}
           avatar={comment.profile?.avatar_url ?? undefined}
           className="mt-0.5 h-7 w-7"
+          sizePt={28}
         />
       </TouchableOpacity>
       <View className="min-w-0 flex-1">

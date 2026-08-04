@@ -9,9 +9,15 @@ import {
   rexCoverRemoteHttpUrl,
   rexCoverStoragePathFromRecommendation,
 } from '~/shared/lib/media/rexImages';
+import { listThumbImageTransform } from '~/shared/lib/media/imageTransform';
+
+const LIST_THUMB_TRANSFORM = listThumbImageTransform(48);
 
 type Props = {
-  rec: Pick<Recommendation, 'title' | 'photoPath' | 'image' | 'categoryIcon' | 'placeholderColors'>;
+  rec: Pick<
+    Recommendation,
+    'id' | 'title' | 'photoPath' | 'image' | 'categoryIcon' | 'placeholderColors'
+  >;
   className?: string;
   imageClassName?: string;
 };
@@ -42,8 +48,11 @@ export function RexCoverThumbnail({
         bucket={REX_IMAGES_BUCKET}
         storagePath={coverPath}
         remoteUri={coverHttp}
-        className={cn('h-full w-full', imageClassName)}
+        className={cn('absolute inset-0 h-full w-full', imageClassName)}
         accessibilityLabel={rec.title}
+        imageTransform={LIST_THUMB_TRANSFORM}
+        recyclingKey={rec.id}
+        priority="low"
       />
     </View>
   );
