@@ -1,7 +1,7 @@
 import { Redirect, Stack, usePathname } from 'expo-router';
 import { useAuth } from '~/features/auth/providers';
 import { Routes } from '~/shared/config/routes';
-import BrandBootLoader from '~/shared/ui/BrandBootLoader';
+import { Theme } from '~/shared/theme/Theme';
 
 const SIGNED_IN_ALLOWED_AUTH_ROUTES: readonly string[] = [
   Routes.ResetPassword,
@@ -12,12 +12,10 @@ const SIGNED_IN_ALLOWED_AUTH_ROUTES: readonly string[] = [
 ];
 
 export default function AuthLayout() {
-  const { session, loading, mfaPending, mfaChecking } = useAuth();
+  const { session, booting, mfaPending } = useAuth();
   const pathname = usePathname();
 
-  if (loading || mfaChecking) {
-    return <BrandBootLoader />;
-  }
+  if (booting) return null;
 
   if (session && mfaPending && pathname !== Routes.Mfa) {
     return <Redirect href={Routes.Mfa} />;
@@ -27,5 +25,12 @@ export default function AuthLayout() {
     return <Redirect href={Routes.Main} />;
   }
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { flex: 1, backgroundColor: Theme.colors.background },
+      }}
+    />
+  );
 }

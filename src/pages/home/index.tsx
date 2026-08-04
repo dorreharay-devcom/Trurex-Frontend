@@ -2,6 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { StickyTopChromeLayout } from '~/pages/home/ui/StickyTopChromeLayout';
 import { TAB } from '~/shared/config/mainTabs';
+import { useEndAuthBoot } from '~/features/auth/hooks/useEndAuthBoot';
 import { useRexPreview } from '~/features/rex-detail/hooks/useRexPreview';
 import { useCreateRexModal } from '~/pages/home/hooks/useCreateRexModal';
 import { useHomePageState } from '~/pages/home/hooks/useHomePageState';
@@ -12,6 +13,7 @@ import HomeTabPanels from '~/pages/home/ui/HomeTabPanels';
 import HomeTopChrome from '~/pages/home/ui/HomeTopChrome';
 
 function HomePage() {
+  useEndAuthBoot();
   const tabs = useHomeTabs();
   const create = useCreateRexModal();
   const preview = useRexPreview();

@@ -79,6 +79,8 @@ const styles = StyleSheet.create({
   fullScreen: {
     ...StyleSheet.absoluteFillObject,
     flex: 1,
+    zIndex: 9999,
+    elevation: 9999,
   },
   logo: {
     width: 168,

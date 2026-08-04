@@ -32,6 +32,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => registerAccountSuspendedHandler(signOut), [signOut]);
 
+  useEffect(() => {
+    if (!mfaChecking) return;
+    const timeout = setTimeout(() => setMfaChecking(false), 10_000);
+    return () => clearTimeout(timeout);
+  }, [mfaChecking, setMfaChecking]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -42,6 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setMfaPending,
         mfaChecking,
         setMfaChecking,
+        booting: loading || mfaChecking,
         signOut,
       }}
     >

@@ -22,7 +22,7 @@ type Feedback = { tone: 'error' | 'notice'; text: string };
 
 export function useMfaVerification() {
   const router = useRouter();
-  const { session, mfaPending, setMfaPending, signOut } = useAuth();
+  const { session, mfaPending, setMfaPending, setMfaChecking, signOut } = useAuth();
 
   const [code, setCode] = useState('');
   const [trustDevice, setTrustDevice] = useState(true);
@@ -40,6 +40,7 @@ export function useMfaVerification() {
 
     if (!result.required) {
       await setMfaPending(false);
+      setMfaChecking(true);
       openMainTab(router, TAB.discover);
       return;
     }
@@ -102,6 +103,7 @@ export function useMfaVerification() {
       }
 
       await setMfaPending(false);
+      setMfaChecking(true);
       openMainTab(router, TAB.discover);
     } catch (err) {
       await handleVerifyFailure(err);

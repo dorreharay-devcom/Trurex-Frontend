@@ -19,13 +19,17 @@ export function useOAuthCallback() {
 
   useEffect(() => {
     let active = true;
+    setMfaChecking(true);
 
     const goMain = () => {
       if (active) openMainTab(router, TAB.discover);
     };
 
     const goLogin = () => {
-      if (active) router.replace(Routes.Login);
+      if (active) {
+        setMfaChecking(false);
+        router.replace(Routes.Login);
+      }
     };
 
     const goAfterMfaCheck = async () => {
@@ -38,7 +42,10 @@ export function useOAuthCallback() {
           setMfaPending,
           setMfaChecking,
           onRequireMfa: () => {
-            if (active) router.replace(Routes.Mfa);
+            if (active) {
+              setMfaChecking(false);
+              router.replace(Routes.Mfa);
+            }
           },
           onReady: goMain,
         });

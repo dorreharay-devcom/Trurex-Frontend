@@ -8,5 +8,6 @@ export type AuthState = {
   setMfaPending: (pending: boolean) => Promise<void>;
   mfaChecking: boolean;
   setMfaChecking: (checking: boolean) => void;
+  booting: boolean;
   signOut: () => Promise<void>;
 };

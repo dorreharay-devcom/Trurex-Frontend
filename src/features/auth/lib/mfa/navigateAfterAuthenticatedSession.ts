@@ -19,6 +19,5 @@ export async function navigateAfterAuthenticatedSession(
   }
 
   await params.setMfaPending(false);
-  params.setMfaChecking(false);
   params.onReady();
 }

@@ -2,14 +2,11 @@ import React from 'react';
 import { Redirect } from 'expo-router';
 import { useAuth } from '~/features/auth/providers';
 import { Routes } from '~/shared/config/routes';
-import BrandBootLoader from '~/shared/ui/BrandBootLoader';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { session, loading } = useAuth();
+  const { session, booting } = useAuth();
 
-  if (loading) {
-    return <BrandBootLoader />;
-  }
+  if (booting) return null;
 
   if (!session) {
     return <Redirect href={Routes.Login} />;
