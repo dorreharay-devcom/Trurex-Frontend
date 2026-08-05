@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { Users } from 'lucide-react-native';
 import type { CircleDisplayRow } from '~/shared/types/circles';
-import CircleListItem from '~/pages/circles/ui/CircleListItem';
+import CircleListItem from '~/features/circles/ui/CircleListItem';
 import { Theme } from '~/shared/theme/Theme';
 
 type Props = {

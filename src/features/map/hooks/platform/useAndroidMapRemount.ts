@@ -3,6 +3,7 @@ import type { LayoutChangeEvent } from 'react-native';
 import { isAndroid } from '~/shared/lib/ui/platform';
 
 const ANDROID_TILE_LOAD_TIMEOUT_MS = 2500;
+const ANDROID_MAX_TILE_RETRIES = 1;
 
 export function useAndroidMapRemount() {
   const tileRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -27,7 +28,7 @@ export function useAndroidMapRemount() {
   const handleMapReady = useCallback(() => {
     if (!isAndroid) return;
     clearTileRetry();
-    if (tileRetryCountRef.current > 0) return;
+    if (tileRetryCountRef.current >= ANDROID_MAX_TILE_RETRIES) return;
     tileRetryRef.current = setTimeout(() => {
       tileRetryCountRef.current += 1;
       setAndroidMapKey((key) => key + 1);
@@ -36,7 +37,7 @@ export function useAndroidMapRemount() {
 
   const handleMapLoaded = useCallback(() => {
     if (!isAndroid) return;
-    tileRetryCountRef.current = 0;
+    tileRetryCountRef.current = ANDROID_MAX_TILE_RETRIES;
     clearTileRetry();
   }, [clearTileRetry]);
 

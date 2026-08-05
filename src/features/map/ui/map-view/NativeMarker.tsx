@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Check, Diamond, Star, User, Users } from 'lucide-react-native';
 import { Marker } from 'react-native-maps';
 import { View, Text } from 'react-native';
@@ -15,8 +15,7 @@ type Props = {
   onPress: (id: string) => void;
 };
 
-const NATIVE_MARKER_TRACKING_MS = 700;
-const ANDROID_MARKER_TRACKING_MS = 1500;
+const MARKER_TRACK_MS = isAndroid ? 400 : 250;
 
 const markerAnchor = isAndroid ? { x: 0.5, y: 0.5 } : { x: 0.5, y: 0.91 };
 
@@ -78,26 +77,26 @@ const MarkerContent = React.memo(
 const NativeMarkerComponent = ({ marker: m, active, onPress }: Props) => {
   const [tracksViewChanges, setTracksViewChanges] = useState(!isWeb);
 
-  useEffect(() => {
-    if (isWeb) return;
-    const timeout = setTimeout(() => setTracksViewChanges(false), NATIVE_MARKER_TRACKING_MS);
-    return () => clearTimeout(timeout);
-  }, []);
+  const coordinate = useMemo(
+    () => ({ latitude: m.latitude, longitude: m.longitude }),
+    [m.latitude, m.longitude],
+  );
 
   useEffect(() => {
-    if (!isAndroid) return;
+    if (isWeb) return;
     setTracksViewChanges(true);
-    const timeout = setTimeout(() => setTracksViewChanges(false), ANDROID_MARKER_TRACKING_MS);
+    const timeout = setTimeout(() => setTracksViewChanges(false), MARKER_TRACK_MS);
     return () => clearTimeout(timeout);
-  }, [m.glyph, m.pinColor]);
+  }, [m.glyph, m.pinColor, m.pinType, m.latitude, m.longitude, active]);
 
   return (
     <Marker
-      coordinate={{ latitude: m.latitude, longitude: m.longitude }}
+      coordinate={coordinate}
       anchor={markerAnchor}
       onPress={() => onPress(m.id)}
       tracksViewChanges={tracksViewChanges}
       zIndex={active ? 10 : 1}
+      stopPropagation
     >
       <MarkerContent marker={m} />
     </Marker>
@@ -117,7 +116,11 @@ function areMarkerVisualPropsEqual(prev: MapMarkerItem, next: MapMarkerItem): bo
 }
 
 function areNativeMarkerPropsEqual(prev: Props, next: Props): boolean {
-  return prev.active === next.active && areMarkerVisualPropsEqual(prev.marker, next.marker);
+  return (
+    prev.active === next.active &&
+    prev.onPress === next.onPress &&
+    areMarkerVisualPropsEqual(prev.marker, next.marker)
+  );
 }
 
 const NativeMarker = React.memo(NativeMarkerComponent, areNativeMarkerPropsEqual);

@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Plus } from 'lucide-react-native';
 import RemoveIconButton from '~/features/collections/ui/common/RemoveIconButton';
-import SavedDate from '~/pages/gems/ui/uncollected-rex-row/SavedDate';
+import SavedDate from '~/features/gems/ui/uncollected-rex-row/SavedDate';
 import { Theme } from '~/shared/theme/Theme';
 
 type Props = {

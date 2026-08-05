@@ -9,7 +9,7 @@ import { useAuth } from '~/features/auth/providers/AuthProvider';
 import { Routes } from '~/shared/config/routes';
 import { isWeb } from '~/shared/lib/ui/platform';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
-import { AuthApi } from '~/shared/api/auth';
+import { AuthApi } from '~/shared/api/authApi';
 
 const providerLabel: Record<OAuthProvider, string> = {
   google: 'Google',

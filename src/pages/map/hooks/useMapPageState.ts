@@ -21,7 +21,6 @@ type Flow = {
   listView: boolean;
   isLoading: boolean;
   isError: boolean;
-  locatedRexCount: number;
   searchQuery: string;
   mapMarkers: readonly unknown[];
   clearSelection: () => void;
@@ -60,7 +59,6 @@ export function useMapPageState({ flow, onRexSheetOpenChange }: Params) {
     listView,
     isLoading,
     isError,
-    locatedRexCount,
     searchQuery,
     mapMarkers,
     clearSelection,
@@ -129,7 +127,7 @@ export function useMapPageState({ flow, onRexSheetOpenChange }: Params) {
     sortedList,
     mapViewVisible,
     showEmptyMapAreaBanner:
-      mapViewVisible && mapDataReady && locatedRexCount === 0 && !hasSearchQuery,
+      mapViewVisible && mapDataReady && mapMarkers.length === 0 && !hasSearchQuery,
     showNoSearchMatchBanner: mapViewVisible && mapMarkers.length === 0 && hasSearchQuery,
     toggleListView,
     onMarkerPress,

@@ -44,6 +44,36 @@ export function regionToBounds(region: Region): LatLngBounds {
   };
 }
 
+export function roundBounds(bounds: LatLngBounds, decimals = 4): LatLngBounds {
+  const f = 10 ** decimals;
+  return {
+    min_lat: Math.round(bounds.min_lat * f) / f,
+    max_lat: Math.round(bounds.max_lat * f) / f,
+    min_lng: Math.round(bounds.min_lng * f) / f,
+    max_lng: Math.round(bounds.max_lng * f) / f,
+  };
+}
+
+export function expandBounds(bounds: LatLngBounds, factor: number): LatLngBounds {
+  const latPad = Math.max((bounds.max_lat - bounds.min_lat) * factor, 0.002);
+  const lngPad = Math.max((bounds.max_lng - bounds.min_lng) * factor, 0.002);
+  return {
+    min_lat: bounds.min_lat - latPad,
+    max_lat: bounds.max_lat + latPad,
+    min_lng: bounds.min_lng - lngPad,
+    max_lng: bounds.max_lng + lngPad,
+  };
+}
+
+export function isViewportCoveredBy(view: LatLngBounds, coverage: LatLngBounds): boolean {
+  return (
+    view.min_lat >= coverage.min_lat &&
+    view.max_lat <= coverage.max_lat &&
+    view.min_lng >= coverage.min_lng &&
+    view.max_lng <= coverage.max_lng
+  );
+}
+
 export function regionForMarkers(markers: MapMarkerItem[]): Region {
   if (markers.length === 0) return EMPTY_REGION;
   const lats = markers.map((m) => m.latitude);

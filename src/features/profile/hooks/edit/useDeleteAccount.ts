@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useRouter } from 'expo-router';
-import { AuthApi } from '~/shared/api/auth';
+import { AuthApi } from '~/shared/api/authApi';
 import { Routes } from '~/shared/config/routes';
 import { toastError } from '~/shared/lib/appToast';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';

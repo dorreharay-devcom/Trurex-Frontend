@@ -3,7 +3,6 @@ import { View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { User } from '@supabase/supabase-js';
 import { useAuth } from '~/features/auth/providers';
-import { MAIN_CHROME_COMPACT_MAX_WIDTH } from '~/shared/config/chrome';
 import { isWeb } from '~/shared/lib/ui/platform';
 import { cn } from '~/shared/lib/ui/styles';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
@@ -32,6 +31,7 @@ const profileDisplayName = (user: User | null | undefined) => {
 };
 
 const headerTopPadding = (safeTop: number) => (isWeb ? 12 : safeTop + 6);
+const COMPACT_MAX_WIDTH = 640;
 
 const Header = ({
   searchQuery = '',
@@ -47,7 +47,7 @@ const Header = ({
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
-  const compact = !isWeb || width < MAIN_CHROME_COMPACT_MAX_WIDTH;
+  const compact = !isWeb || width < COMPACT_MAX_WIDTH;
   const avatarPath = useHeaderAvatar(user?.id, avatarRefreshKey);
   const searchVisible = showSearch && !!onSearchChange;
 

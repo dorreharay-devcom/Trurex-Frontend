@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect } from 'react';
-import { AuthApi } from '~/shared/api/auth';
+import { AuthApi } from '~/shared/api/authApi';
 import { registerAccountSuspendedHandler } from '~/shared/lib/errors/restriction';
 import { clearMfaRequirementCache } from '~/features/auth/lib/mfa';
 import { useAuthSession } from '~/features/auth/hooks/useAuthSession';

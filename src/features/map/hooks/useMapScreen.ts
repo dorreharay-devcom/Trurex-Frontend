@@ -20,9 +20,14 @@ export function useMapScreen({ onRecommendationPress }: Params) {
   const saved = useSavedRexOverrides();
   const selection = useMapSelection({ recenterOn, onRecommendationPress });
   const viewport = useMapViewport();
+  const needCardRows =
+    selection.listView ||
+    selection.selectedRecId != null ||
+    viewport.debouncedSearch.trim().length > 0;
   const data = useMapBoundsData({
-    bounds: viewport.debouncedBounds,
+    bounds: viewport.queryBounds,
     searchTerm: viewport.debouncedSearch,
+    needCardRows,
   });
   const derived = useMapDerivedData({
     fetchedRecs: data.fetchedRecs,
@@ -54,7 +59,6 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     layers: selection.layers,
     setLayers: selection.setLayers,
     mapMarkers: derived.mapMarkers,
-    locatedRexCount: derived.locatedRexCount,
     selectedRecId: selection.selectedRecId,
     selectedRec: derived.selectedRec,
     selectedPinType: derived.selectedPinType,
