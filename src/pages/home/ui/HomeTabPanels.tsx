@@ -1,10 +1,10 @@
 import React from 'react';
-import CirclesPage from '~/pages/circles';
-import GemsPage from '~/pages/gems';
+import CirclesPage from '~/features/circles/ui/CirclesPage';
+import DiscoverPage from '~/features/discover/ui/DiscoverPage';
+import GemsPage from '~/features/gems/ui/GemsPage';
 import MapPage from '~/pages/map';
 import ProfileView from '~/features/profile/ui/ProfileView';
 import { TAB, type Tab } from '~/shared/config/mainTabs';
-import DiscoverPage from '~/features/discover/ui/DiscoverPage';
 import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
 
 type Props = {

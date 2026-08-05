@@ -6,7 +6,7 @@ import { navigateAfterAuthenticatedSession } from '~/features/auth/lib/mfa';
 import { useAuth } from '~/features/auth/providers';
 import { AuthEvent } from '~/features/auth/types';
 import { Auth } from '~/shared/api/client';
-import { AuthApi } from '~/shared/api/auth';
+import { AuthApi } from '~/shared/api/authApi';
 import { Routes } from '~/shared/config/routes';
 import { isWeb } from '~/shared/lib/ui/platform';
 import { TAB } from '~/shared/config/mainTabs';

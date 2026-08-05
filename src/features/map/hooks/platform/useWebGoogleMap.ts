@@ -54,6 +54,8 @@ function webMapOptionsFromRegion(initialRegion?: Region): google.maps.MapOptions
     zoomControl: false,
     rotateControl: false,
     scaleControl: false,
+    clickableIcons: false,
+    keyboardShortcuts: false,
     minZoom: 2,
     maxZoom: 22,
     gestureHandling: 'greedy',
@@ -89,14 +91,11 @@ export function useWebGoogleMap({
     (map: google.maps.Map) => {
       mapRef.current = map;
       setMapReady(true);
-      const sync = () => {
+      triggerGoogleMapResize(map);
+      requestAnimationFrame(() => {
         triggerGoogleMapResize(map);
         pushBoundsToParent(map);
-      };
-      sync();
-      requestAnimationFrame(sync);
-      window.setTimeout(sync, 50);
-      window.setTimeout(sync, 300);
+      });
     },
     [pushBoundsToParent],
   );
@@ -104,7 +103,6 @@ export function useWebGoogleMap({
   const onIdle = useCallback(() => {
     const map = mapRef.current;
     if (!map) return;
-    triggerGoogleMapResize(map);
     pushBoundsToParent(map);
   }, [pushBoundsToParent]);
 

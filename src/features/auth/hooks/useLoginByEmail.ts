@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
-import { AuthApi } from '~/shared/api/auth';
+import { AuthApi } from '~/shared/api/authApi';
 import { useAuth } from '~/features/auth/providers/AuthProvider';
 import { Routes } from '~/shared/config/routes';
 import {

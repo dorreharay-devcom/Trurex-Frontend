@@ -2,8 +2,8 @@ import React from 'react';
 import { ScrollView, View } from 'react-native';
 import CollectionCard from '~/features/collections/ui/CollectionCard';
 import { LoadMoreButton } from '~/shared/ui/LoadMoreButton';
-import EmptyCollectionsCard from '~/pages/gems/ui/EmptyCollectionsCard';
-import type { GemsCollectionsState } from '~/pages/gems/hooks/useGemsData';
+import EmptyCollectionsCard from '~/features/gems/ui/EmptyCollectionsCard';
+import type { GemsCollectionsState } from '~/features/gems/hooks/useGemsData';
 
 const SKELETON_COUNT = 3;
 

@@ -7,7 +7,13 @@ export function isValidMapCoordinate(lat: number, lng: number): boolean {
   );
 }
 
+const webPinIconUrlCache = new Map<string, string>();
+
 export function createWebMapPinIconUrl(marker: MapMarkerItem, size = 36): string {
+  const cacheKey = `${marker.pinType}|${marker.pinColor}|${marker.glyph}|${size}`;
+  const cached = webPinIconUrlCache.get(cacheKey);
+  if (cached) return cached;
+
   const topPad = 4;
   const h = size + 10 + topPad;
   const glyphFill = MAP_PIN_GLYPH_COLOR[marker.pinType];
@@ -20,7 +26,9 @@ export function createWebMapPinIconUrl(marker: MapMarkerItem, size = 36): string
       <text x="${size / 2}" y="${size * 0.45 + topPad}" text-anchor="middle" dominant-baseline="central"
         fill="${glyphFill}" font-size="${size * 0.35}" font-family="system-ui">${marker.glyph}</text>
     </svg>`;
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  const url = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  webPinIconUrlCache.set(cacheKey, url);
+  return url;
 }
 
 export const WEB_MAP_DEFAULT_CENTER = { lat: -33.8688, lng: 151.2093 } as const;

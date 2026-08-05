@@ -92,14 +92,15 @@ const MarkerMap = ({
           loadingEnabled={isAndroid}
           loadingBackgroundColor={Theme.colors.card}
           loadingIndicatorColor={Theme.colors.primary}
-          showsPointsOfInterest
+          showsPointsOfInterest={false}
+          moveOnMarkerPress={false}
           rotateEnabled={false}
           pitchEnabled={false}
-          toolbarEnabled={isAndroid}
+          toolbarEnabled={false}
         >
           {markers.map((marker) => (
             <NativeMarker
-              key={isAndroid ? `${androidMapKey}-${marker.id}` : marker.id}
+              key={marker.id}
               marker={marker}
               active={isIos ? false : selectedId === marker.id}
               onPress={onMarkerPress}

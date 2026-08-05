@@ -3,8 +3,8 @@ import { Pressable, Text, View } from 'react-native';
 import { Plus } from 'lucide-react-native';
 import { useMyCircleRows } from '~/features/circles/hooks/data/useMyCircleRows';
 import RowSkeletonList from '~/features/circles/ui/common/RowSkeletonList';
-import CircleList from '~/pages/circles/ui/CircleList';
-import CreateCircleCard from '~/pages/circles/ui/CreateCircleCard';
+import CircleList from '~/features/circles/ui/CircleList';
+import CreateCircleCard from '~/features/circles/ui/CreateCircleCard';
 import { Theme } from '~/shared/theme/Theme';
 
 type Props = {

@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { Sparkles, Gem, Orbit, MapPinned, UserCircle2 } from 'lucide-react-native';
-import { MAIN_CHROME_COMPACT_MAX_WIDTH } from '~/shared/config/chrome';
 import { TAB, type Tab } from '~/shared/config/mainTabs';
 import { Theme } from '~/shared/theme/Theme';
 import { isWeb } from '~/shared/lib/ui/platform';
@@ -48,9 +47,11 @@ const labelClassName = (active: boolean, desktop: boolean) => {
   );
 };
 
+const DESKTOP_MIN_WIDTH = 640;
+
 const TabBar = ({ currentTab, onTabChange }: Props) => {
   const { width } = useWindowDimensions();
-  const desktop = isWeb && width >= MAIN_CHROME_COMPACT_MAX_WIDTH;
+  const desktop = isWeb && width >= DESKTOP_MIN_WIDTH;
 
   return (
     <View className="border-b border-border bg-card">

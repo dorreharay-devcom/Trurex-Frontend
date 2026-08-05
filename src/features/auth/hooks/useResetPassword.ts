@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Auth } from '~/shared/api/client';
-import { AuthApi } from '~/shared/api/auth';
+import { AuthApi } from '~/shared/api/authApi';
 import { Routes } from '~/shared/config/routes';
 import {
   getConfirmPasswordValidationError,

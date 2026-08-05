@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, useWindowDimensions, type LayoutChangeEvent } from 'react-native';
-import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
 import { MAP_VIEW_MIN_HEIGHT } from '~/features/map/config/mapUi';
 import { useWebGoogleMap } from '~/features/map/hooks/platform/useWebGoogleMap';
-import { createWebMapPinIconUrl, isValidMapCoordinate } from '~/features/map/lib/webMapCamera';
+import { isValidMapCoordinate } from '~/features/map/lib/webMapCamera';
 import type { MarkerMapProps } from '~/features/map/types/markerMap';
 import MapZoomControls from '~/features/map/ui/map-view/MapZoomControls';
 import WebMapLoading from '~/features/map/ui/map-view/WebMapLoading';
+import WebMapMarker from '~/features/map/ui/map-view/WebMapMarker';
 import WebMapMessage from '~/features/map/ui/map-view/WebMapMessage';
 
 const GOOGLE_MAPS_SCRIPT_ID = 'trurex-google-maps-js';
@@ -78,12 +79,11 @@ const MarkerMapWithLoader = ({
         options={googleMap.mapOptions}
       >
         {validMarkers.map((marker) => (
-          <Marker
+          <WebMapMarker
             key={marker.id}
-            position={{ lat: marker.latitude, lng: marker.longitude }}
-            icon={{ url: createWebMapPinIconUrl(marker) }}
-            zIndex={selectedId === marker.id ? 1000 : 1}
-            onClick={() => onMarkerPress(marker.id)}
+            marker={marker}
+            selected={selectedId === marker.id}
+            onPress={onMarkerPress}
           />
         ))}
       </GoogleMap>

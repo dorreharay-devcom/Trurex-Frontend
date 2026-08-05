@@ -1,8 +1,8 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { Link2, MapPin } from 'lucide-react-native';
-import CategoryBadge from '~/pages/gems/ui/uncollected-rex-row/CategoryBadge';
-import IconMetaRow from '~/pages/gems/ui/uncollected-rex-row/IconMetaRow';
+import CategoryBadge from '~/features/gems/ui/uncollected-rex-row/CategoryBadge';
+import IconMetaRow from '~/features/gems/ui/uncollected-rex-row/IconMetaRow';
 import type { Recommendation } from '~/shared/types/recommendation';
 
 function RexRowDetails({ item }: { item: Recommendation }) {

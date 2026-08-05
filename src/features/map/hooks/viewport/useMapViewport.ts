@@ -1,22 +1,47 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Region } from 'react-native-maps';
-import { MAP_BOUNDS_DEBOUNCE_MS } from '~/features/map/config/mapUi';
-import { boundsToRegion, DEFAULT_MAP_BOUNDS, type LatLngBounds } from '~/features/map/lib/geo';
+import { MAP_BOUNDS_DEBOUNCE_MS, MAP_QUERY_BOUNDS_PAD_FACTOR } from '~/features/map/config/mapUi';
+import {
+  boundsToRegion,
+  DEFAULT_MAP_BOUNDS,
+  expandBounds,
+  isViewportCoveredBy,
+  roundBounds,
+  type LatLngBounds,
+} from '~/features/map/lib/geo';
 import { MAP_SEARCH_SUGGEST_MIN_QUERY_LENGTH } from '~/features/map/lib/mapSearchSuggestions';
 import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/shared/hooks/useDebouncedValue';
+
+function toQueryBounds(view: LatLngBounds): LatLngBounds {
+  return expandBounds(roundBounds(view), MAP_QUERY_BOUNDS_PAD_FACTOR);
+}
 
 export function useMapViewport() {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebouncedValue(searchQuery.trim(), DEFAULT_SEARCH_DEBOUNCE_MS);
   const debouncedSearchSuggest = useDebouncedValue(searchQuery, DEFAULT_SEARCH_DEBOUNCE_MS);
 
-  const [bounds, setBounds] = useState<LatLngBounds>(DEFAULT_MAP_BOUNDS);
-  const debouncedBounds = useDebouncedValue(bounds, MAP_BOUNDS_DEBOUNCE_MS);
-  const [mapRegion, setMapRegion] = useState<Region>(() => boundsToRegion(DEFAULT_MAP_BOUNDS));
+  const [queryBounds, setQueryBounds] = useState<LatLngBounds | null>(null);
+  const coverageRef = useRef<LatLngBounds | null>(null);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const onBoundsChange = useCallback((next: LatLngBounds, region?: Region) => {
-    setBounds(next);
-    setMapRegion(region ?? boundsToRegion(next));
+  const [mapRegion] = useState<Region>(() => boundsToRegion(DEFAULT_MAP_BOUNDS));
+
+  const onBoundsChange = useCallback((next: LatLngBounds, _region?: Region) => {
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = setTimeout(() => {
+      const coverage = coverageRef.current;
+      if (coverage && isViewportCoveredBy(next, coverage)) return;
+      const nextQuery = toQueryBounds(next);
+      coverageRef.current = nextQuery;
+      setQueryBounds(nextQuery);
+    }, MAP_BOUNDS_DEBOUNCE_MS);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
   }, []);
 
   const suggestQuery =
@@ -29,7 +54,7 @@ export function useMapViewport() {
     setSearchQuery,
     debouncedSearch,
     suggestQuery,
-    debouncedBounds,
+    queryBounds,
     mapRegion,
     onBoundsChange,
   };

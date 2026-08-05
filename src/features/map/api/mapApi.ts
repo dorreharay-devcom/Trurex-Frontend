@@ -71,23 +71,23 @@ export const MapApi = {
   mapRexesInBounds: async (params: MapBoundsParams): Promise<Recommendation[]> => {
     const raw = unwrap(await Backend.rpc('map_rexes_in_bounds', rpcBoundsPayload(params, 100)));
     if (!Array.isArray(raw)) return [];
-    let recs = raw.flatMap((row) => {
+    const recs = raw.flatMap((row) => {
       const rec = mapApiRowToRecommendation(row);
       return rec ? [rec] : [];
     });
     const term = params.search_term?.trim();
-    if (term) recs = filterRecommendationsByRexTitle(recs, term);
+    if (term) return filterRecommendationsByRexTitle(recs, term);
     return recs;
   },
 
   mapRexPins: async (params: MapBoundsParams): Promise<MapPinRow[]> => {
     const raw = unwrap(await Backend.rpc('map_rex_pins', rpcBoundsPayload(params, 500)));
     if (!Array.isArray(raw)) return [];
-    let pins = (raw as Record<string, unknown>[])
+    const pins = (raw as Record<string, unknown>[])
       .map((row) => parseMapPinRow(row))
       .filter((r): r is MapPinRow => r != null);
     const term = params.search_term?.trim();
-    if (term) pins = filterPinRowsByRexName(pins, term);
+    if (term) return filterPinRowsByRexName(pins, term);
     return pins;
   },
 };

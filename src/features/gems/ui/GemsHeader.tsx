@@ -2,8 +2,8 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Plus } from 'lucide-react-native';
 import { ClearableSearchInput } from '~/shared/ui/ClearableSearchInput';
-import CollectionsRail from '~/pages/gems/ui/CollectionsRail';
-import type { GemsCollectionsState } from '~/pages/gems/hooks/useGemsData';
+import CollectionsRail from '~/features/gems/ui/CollectionsRail';
+import type { GemsCollectionsState } from '~/features/gems/hooks/useGemsData';
 import {
   Theme,
   textFieldCaretStyle,
