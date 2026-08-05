@@ -8,8 +8,8 @@ import EditProfileBasics from '~/features/profile/ui/edit/EditProfileBasics';
 import EditProfileCurrently from '~/features/profile/ui/edit/EditProfileCurrently';
 import EditProfileDangerZone from '~/features/profile/ui/edit/EditProfileDangerZone';
 import { Theme } from '~/shared/theme/Theme';
-import { Button } from '~/shared/ui/Button';
-import { DestructiveActionConfirmModal } from '~/shared/ui/DestructiveActionConfirmModal';
+import { Button } from '~/shared/ui/primitives/Button';
+import DestructiveActionConfirmModal from '~/shared/ui/destructive-confirm/DestructiveActionConfirmModal';
 
 type Props = {
   onClose: () => void;

@@ -5,7 +5,7 @@ import {
   textFieldSingleLineDefaultHeightStyle,
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
-import { ClearableSearchInput } from '~/shared/ui/ClearableSearchInput';
+import { ClearableSearchInput } from '~/shared/ui/primitives/ClearableSearchInput';
 
 type Props = {
   value: string;

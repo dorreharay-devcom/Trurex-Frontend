@@ -3,8 +3,8 @@ import { View } from 'react-native';
 import AuthLayout from '~/features/auth/ui/common/AuthLayout';
 import BackToLoginLink from '~/features/auth/ui/common/BackToLoginLink';
 import ResetLinkSentState from '~/features/auth/ui/password/ResetLinkSentState';
-import { Button } from '~/shared/ui/Button';
-import { Input } from '~/shared/ui/Input';
+import { Button } from '~/shared/ui/primitives/Button';
+import { Input } from '~/shared/ui/primitives/Input';
 import { AuthBrandHeader, useForgotPassword } from '~/features/auth';
 
 const ForgotPasswordPage = () => {

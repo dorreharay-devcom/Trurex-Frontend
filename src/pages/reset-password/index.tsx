@@ -3,8 +3,8 @@ import { View } from 'react-native';
 import { Redirect } from 'expo-router';
 import AuthLayout from '~/features/auth/ui/common/AuthLayout';
 import AuthGeneralError from '~/features/auth/ui/common/AuthGeneralError';
-import { Button } from '~/shared/ui/Button';
-import { Input } from '~/shared/ui/Input';
+import { Button } from '~/shared/ui/primitives/Button';
+import { Input } from '~/shared/ui/primitives/Input';
 import { AuthBrandHeader, ResetPasswordExpiredState, useResetPassword } from '~/features/auth';
 import { Routes } from '~/shared/config/routes';
 

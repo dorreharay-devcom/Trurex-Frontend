@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react';
-import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { useAuth } from '~/features/auth/providers';
 import { useMyCollections } from '~/features/collections/hooks/data/useCollectionQueries';
 import { PROFILE_TAB, type ProfileTab } from '~/features/profile/config/tabs';
@@ -9,8 +8,6 @@ import { useProfileAvatarUpload } from '~/features/profile/hooks/useProfileAvata
 import { useProfileCollectionOverlay } from '~/features/profile/hooks/useProfileCollectionOverlay';
 import { useProfileSocial } from '~/features/profile/hooks/useProfileSocial';
 import type { Recommendation } from '~/shared/types/recommendation';
-
-const SCROLL_LOAD_MORE_THRESHOLD_PX = 320;
 
 type Params = {
   userId?: string;
@@ -39,40 +36,54 @@ export function useProfileScreen({
 
   const rexes = useMyRexes(profileData.profileContentUserId);
   const collections = useMyCollections(profileData.profileContentUserId);
-  const collectionsList = collections.data ?? [];
+  const {
+    fetchNextPage: fetchNextRexesPage,
+    data: rexesData,
+    isLoading: rexesLoading,
+    isError: rexesIsError,
+    isFetchingNextPage: isFetchingNextRexesPage,
+    isFetchNextPageError: isFetchNextRexesError,
+    refetch: refetchRexes,
+  } = rexes;
+  const {
+    fetchNextPage: fetchNextCollectionsPage,
+    data: collectionsData,
+    isLoading: collectionsLoading,
+    isError: collectionsIsError,
+    isFetchingNextPage: isFetchingNextCollectionsPage,
+    isFetchNextPageError: isFetchNextCollectionsError,
+    refetch: refetchCollections,
+  } = collections;
+  const collectionsList = collectionsData ?? [];
+  const { beginLoading, fetchProfile } = profileData;
 
   const collectionOverlay = useProfileCollectionOverlay({ onRexPress });
   const avatar = useProfileAvatarUpload({
     userId: authUser?.id,
-    onUploaded: profileData.fetchProfile,
+    onUploaded: fetchProfile,
     onAvatarUpdated,
   });
   const social = useProfileSocial({
     viewerId: authUser?.id,
     targetUserId: profileData.followTargetId,
-    onRefresh: profileData.fetchProfile,
+    onRefresh: fetchProfile,
     onBlocked: onBack,
   });
 
-  const loadMoreOnScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-      const nearBottom =
-        layoutMeasurement.height + contentOffset.y >=
-        contentSize.height - SCROLL_LOAD_MORE_THRESHOLD_PX;
-      if (!nearBottom) return;
-      if (activeTab === PROFILE_TAB.recs) rexes.fetchNextPage();
-      if (activeTab === PROFILE_TAB.collections) collections.fetchNextPage();
-    },
-    [activeTab, rexes.fetchNextPage, collections.fetchNextPage],
-  );
+  const loadMoreRexes = useCallback(() => {
+    void fetchNextRexesPage();
+  }, [fetchNextRexesPage]);
+
+  const loadMoreCollections = useCallback(() => {
+    void fetchNextCollectionsPage();
+  }, [fetchNextCollectionsPage]);
 
   const closeEdit = useCallback(() => {
     setIsEditing(false);
-    profileData.beginLoading();
-    void profileData.fetchProfile();
+    beginLoading();
+    void fetchProfile();
     onAvatarUpdated?.();
-  }, [profileData.beginLoading, profileData.fetchProfile, onAvatarUpdated]);
+  }, [beginLoading, fetchProfile, onAvatarUpdated]);
 
   return {
     isEditing,
@@ -81,6 +92,11 @@ export function useProfileScreen({
     profile: profileData.profile,
     loading: profileData.loading,
     notFound: profileData.notFound,
+    isError: profileData.isError,
+    retryProfile: () => {
+      beginLoading();
+      void fetchProfile();
+    },
     awaitingHandleProfile: profileData.awaitingHandleProfile,
     isOwnProfile: profileData.isOwnProfile,
     signOut,
@@ -90,15 +106,22 @@ export function useProfileScreen({
     content: {
       activeTab,
       setActiveTab,
-      myRexes: rexes.data ?? [],
-      rexesLoading: rexes.isLoading,
-      isFetchingNextRexesPage: rexes.isFetchingNextPage,
+      myRexes: rexesData ?? [],
+      rexesLoading,
+      rexesError: rexesIsError && (rexesData?.length ?? 0) === 0,
+      isFetchingNextRexesPage,
+      isFetchNextRexesError,
       myCollections: collectionsList,
-      collectionsLoading: collections.isLoading,
-      isFetchingNextCollectionsPage: collections.isFetchingNextPage,
-      rexTabCount: rexes.data?.length ?? 0,
+      collectionsLoading,
+      collectionsError: collectionsIsError && collectionsList.length === 0,
+      isFetchingNextCollectionsPage,
+      isFetchNextCollectionsError,
+      rexTabCount: rexesData?.length ?? 0,
       collectionsTabCount: collectionsList[0]?.total_count ?? collectionsList.length,
-      loadMoreOnScroll,
+      loadMoreRexes,
+      loadMoreCollections,
+      retryRexes: () => void refetchRexes(),
+      retryCollections: () => void refetchCollections(),
     },
     social,
     collectionOverlay,

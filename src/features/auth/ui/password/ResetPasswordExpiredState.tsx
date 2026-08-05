@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import AuthLayout from '~/features/auth/ui/common/AuthLayout';
-import { Button } from '~/shared/ui/Button';
+import { Button } from '~/shared/ui/primitives/Button';
 import AuthBrandHeader from '~/features/auth/ui/common/AuthBrandHeader';
 import { RecoveryLinkErrorCode, ResetPasswordMessage } from '~/features/auth/lib/password';
 

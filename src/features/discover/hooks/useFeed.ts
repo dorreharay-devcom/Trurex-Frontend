@@ -18,7 +18,16 @@ export function useFeed({ activeCategory, activeTag, enabled }: UseFeedArgs) {
   const categoryFilter = activeCategory !== ALL_CATEGORIES ? activeCategory : null;
   const tagFilters = activeTag ? [activeTag] : null;
 
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+  const {
+    data,
+    isLoading,
+    isError,
+    isFetchNextPageError,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch: refetchQuery,
+  } = useInfiniteQuery({
     queryKey: [
       FEED_QUERY_KEY,
       categoryFilter,
@@ -48,8 +57,25 @@ export function useFeed({ activeCategory, activeTag, enabled }: UseFeedArgs) {
     if (!enabled || !hasNextPage || isFetchingNextPage || isLoading) {
       return;
     }
-    fetchNextPage();
-  }, [enabled, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading]);
+    void fetchNextPage();
+  }, [enabled, hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
 
-  return { rows, isLoading, loadMore, isFetchingNextPage };
+  const refetch = useCallback(() => {
+    void refetchQuery();
+  }, [refetchQuery]);
+
+  const retryNextPage = useCallback(() => {
+    void fetchNextPage();
+  }, [fetchNextPage]);
+
+  return {
+    rows,
+    isLoading,
+    isError: isError && rows.length === 0,
+    isFetchNextPageError,
+    loadMore,
+    isFetchingNextPage,
+    refetch,
+    retryNextPage,
+  };
 }

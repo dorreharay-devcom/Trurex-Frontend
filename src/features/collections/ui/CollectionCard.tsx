@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
+import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
 import { REX_IMAGES_BUCKET } from '~/shared/config/app';
 import type { UserCollection } from '~/features/collections/types/collection';
 

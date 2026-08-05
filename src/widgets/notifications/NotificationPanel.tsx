@@ -12,7 +12,7 @@ import {
 import { CheckCheck } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
 import { isWeb } from '~/shared/lib/ui/platform';
-import SheetHandle from '~/shared/ui/SheetHandle';
+import SheetHandle from '~/shared/ui/overlay/SheetHandle';
 import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
 
 type Props = {

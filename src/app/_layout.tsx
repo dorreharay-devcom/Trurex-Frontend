@@ -1,22 +1,21 @@
+import 'react-native-gesture-handler';
 import '../../global.css';
+import { useEffect } from 'react';
 import { Stack } from 'expo-router';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider, useAuth } from '~/features/auth/providers';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { useFonts } from 'expo-font';
 import { AppToast } from '~/shared/ui/toast/AppToast';
-import BrandBootLoader from '~/shared/ui/BrandBootLoader';
-import AppErrorBoundary from '~/shared/ui/AppErrorBoundary';
+import BrandBootLoader from '~/shared/ui/shell/BrandBootLoader';
+import AppErrorBoundary from '~/shared/ui/shell/AppErrorBoundary';
+import { setupQueryNetwork } from '~/shared/lib/query/setupQueryNetwork';
+import { queryClient, queryPersister } from '~/shared/lib/query/queryClient';
+import { track, AnalyticsEvent } from '~/shared/lib/analytics/track';
 import { Theme } from '~/shared/theme/Theme';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 45_000,
-      gcTime: 5 * 60_000,
-    },
-  },
-});
+setupQueryNetwork();
 
 export { AppErrorBoundary as ErrorBoundary };
 
@@ -24,6 +23,13 @@ function AuthBootGate() {
   const { booting } = useAuth();
   if (!booting) return null;
   return <BrandBootLoader />;
+}
+
+function BootstrapEffects() {
+  useEffect(() => {
+    track(AnalyticsEvent.AppOpened);
+  }, []);
+  return null;
 }
 
 export default function RootLayout() {
@@ -39,19 +45,31 @@ export default function RootLayout() {
   if (!loaded) return <BrandBootLoader />;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <SafeAreaProvider style={{ flex: 1, backgroundColor: Theme.colors.background }}>
-        <AuthProvider>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { flex: 1, backgroundColor: Theme.colors.background },
-            }}
-          />
-          <AuthBootGate />
-          <AppToast />
-        </AuthProvider>
-      </SafeAreaProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{
+          persister: queryPersister,
+          maxAge: 24 * 60 * 60_000,
+          dehydrateOptions: {
+            shouldDehydrateQuery: (query) => query.state.status === 'success',
+          },
+        }}
+      >
+        <SafeAreaProvider style={{ flex: 1, backgroundColor: Theme.colors.background }}>
+          <AuthProvider>
+            <BootstrapEffects />
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { flex: 1, backgroundColor: Theme.colors.background },
+              }}
+            />
+            <AuthBootGate />
+            <AppToast />
+          </AuthProvider>
+        </SafeAreaProvider>
+      </PersistQueryClientProvider>
+    </GestureHandlerRootView>
   );
 }

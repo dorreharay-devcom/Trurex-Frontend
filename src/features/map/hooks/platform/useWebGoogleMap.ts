@@ -111,6 +111,22 @@ export function useWebGoogleMap({
     const map = mapRef.current;
     if (!map || !recenterTo) return;
 
+    if (recenterTo.fitCoords?.length) {
+      createFitBoundsHandler(
+        recenterTo.fitCoords.map((c) => ({
+          id: 'fit',
+          latitude: c.latitude,
+          longitude: c.longitude,
+          title: '',
+          pinType: 'rex' as const,
+          glyph: '',
+          pinColor: '',
+        })),
+      )(map);
+      requestAnimationFrame(() => triggerGoogleMapResize(map));
+      return;
+    }
+
     if (recenterTo.fitMarkers) {
       const markers = validMarkersRef.current;
       if (markers.length === 0) return;

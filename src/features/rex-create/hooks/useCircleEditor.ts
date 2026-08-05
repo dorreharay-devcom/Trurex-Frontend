@@ -3,14 +3,11 @@ import { useQueryClient } from '@tanstack/react-query';
 import { createCircle, updateCircle } from '~/features/circles/api/circlesApi';
 import type { CircleDisplayRow } from '~/shared/types/circles';
 import { toastError, toastSuccess } from '~/shared/lib/appToast';
-import {
-  CIRCLE_COLOR_PRESETS,
-  CIRCLE_PRESET_DEFAULT,
-  type CirclePresetColor,
-} from '~/shared/config/circles';
+import { CIRCLE_PRESET_DEFAULT, type CirclePresetColor } from '~/shared/config/circles';
 import { CIRCLE_QUERY_KEYS } from '~/shared/config/queryKeys';
 import { isNonEmptyString, unknownErrorMessage } from '~/shared/lib/data/guards';
 import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
+import { assertOnlineForMutation } from '~/shared/lib/network/assertOnline';
 type UseCircleEditorArgs = {
   onCreated: (circleId: string) => void;
 };
@@ -47,6 +44,7 @@ export function useCircleEditor({ onCreated }: UseCircleEditorArgs) {
   const submitCreate = useCallback(async () => {
     const trimmed = name.trim();
     if (!isNonEmptyString(trimmed)) return;
+    if (!assertOnlineForMutation('Creating circles')) return;
     setBusy(true);
     try {
       const created = await createCircle({
@@ -80,6 +78,7 @@ export function useCircleEditor({ onCreated }: UseCircleEditorArgs) {
   const submitRename = useCallback(async () => {
     const trimmed = name.trim();
     if (!isNonEmptyString(trimmed) || editingId == null) return;
+    if (!assertOnlineForMutation('Updating circles')) return;
     setBusy(true);
     try {
       await updateCircle({ input_circle_id: editingId, input_name: trimmed });

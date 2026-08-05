@@ -1,20 +1,30 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { getRexCategoryApiCode } from '~/features/rex-create/lib/categories';
-import { modalConfig } from '~/shared/config/overlaySheet';
+import { useAuth } from '~/features/auth/providers';
 import { createRex, updateRex } from '~/features/rex-create/api/rexCreateApi';
+import type { CreateConfigState } from '~/features/rex-create/hooks/useCategoryCreateConfig';
+import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
+import { buildOptimisticRecommendationFromCreate } from '~/features/rex-create/lib/buildOptimisticRecommendation';
+import { getRexCategoryApiCode } from '~/features/rex-create/lib/categories';
+import { parseCreatedRexId } from '~/features/rex-create/lib/parseCreatedRexId';
 import {
   buildCreateRexParams,
   createRexErrorMessage,
   findSubmitBlocker,
-  invalidateRexQueries,
 } from '~/features/rex-create/lib/submit';
-import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
 import { STEP_ID } from '~/features/rex-create/types/create';
-import type { CreateConfigState } from '~/features/rex-create/hooks/useCategoryCreateConfig';
+import { mapPinRowFromOptimisticRec } from '~/features/map/lib/pinTypes';
 import { toastError, toastInfo, toastSuccess } from '~/shared/lib/appToast';
-import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
+import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
+import { assertOnlineForMutation } from '~/shared/lib/network/assertOnline';
+import { track, AnalyticsEvent } from '~/shared/lib/analytics/track';
+import {
+  invalidateAfterRexWrite,
+  prependMapPinToCaches,
+  prependRecommendationToFeedCaches,
+} from '~/shared/lib/query/invalidateAfterRexWrite';
+import { modalConfig } from '~/shared/config/overlaySheet';
 
 const SUCCESS_TOAST_DELAY_MS = modalConfig.timing.sheetCloseMs + 180;
 
@@ -40,6 +50,7 @@ export function usePrimaryAction({
   onPosted,
 }: UsePrimaryActionArgs) {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [submitting, setSubmitting] = useState(false);
 
   const advanceStep = useCallback(async () => {
@@ -52,6 +63,7 @@ export function usePrimaryAction({
       toastError('Category', 'Choose a category to continue.');
       return;
     }
+    if (!assertOnlineForMutation('Saving place')) return;
     setSubmitting(true);
     try {
       await flow.place.persistPlaceForCategory(code);
@@ -71,16 +83,40 @@ export function usePrimaryAction({
       showToast(blocker.title, blocker.message);
       return;
     }
+    if (!assertOnlineForMutation(isEditMode ? 'Updating' : 'Posting')) return;
     setSubmitting(true);
     try {
       const params = buildCreateRexParams(flow, config, config.categoryApiCode!);
+
       if (isEditMode && editRexId) {
         await updateRex({ ...params, p_rex_id: editRexId });
       } else {
-        await createRex(params);
+        const created = await createRex(params);
+        const rexId = parseCreatedRexId(created);
+        if (rexId) {
+          const authorName =
+            (typeof user?.user_metadata?.display_name === 'string' &&
+              user.user_metadata.display_name) ||
+            user?.email ||
+            undefined;
+          const stub = buildOptimisticRecommendationFromCreate({
+            rexId,
+            flow,
+            config,
+            authorId: user?.id,
+            authorName,
+          });
+          prependRecommendationToFeedCaches(queryClient, stub);
+          const pin = mapPinRowFromOptimisticRec(stub);
+          if (pin) prependMapPinToCaches(queryClient, pin);
+        }
+        track(AnalyticsEvent.RexCreated);
       }
+
       onPosted();
-      invalidateRexQueries(queryClient, isEditMode ? editRexId : null);
+      invalidateAfterRexWrite(queryClient, {
+        editRexId: isEditMode ? editRexId : null,
+      });
       onClose();
       setTimeout(() => {
         toastSuccess(
@@ -97,7 +133,7 @@ export function usePrimaryAction({
     } finally {
       setSubmitting(false);
     }
-  }, [flow, config, isEditMode, editRexId, onClose, onPosted, queryClient]);
+  }, [flow, config, isEditMode, editRexId, onClose, onPosted, queryClient, user]);
 
   const handlePrimaryFooter = useCallback(
     () => (flow.nav.isLastStep ? submitRex() : advanceStep()),

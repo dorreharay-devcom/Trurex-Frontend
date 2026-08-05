@@ -1,15 +1,22 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { PackageOpen } from 'lucide-react-native';
+import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 import { Theme } from '~/shared/theme/Theme';
 
 type Props = {
   loading: boolean;
+  isError?: boolean;
   hasSearch: boolean;
+  onRetry?: () => void;
 };
 
-function UncollectedEmpty({ loading, hasSearch }: Props) {
+function UncollectedEmpty({ loading, isError, hasSearch, onRetry }: Props) {
   if (loading) return null;
+
+  if (isError) {
+    return <QueryErrorState title="Couldn't load uncollected" onRetry={onRetry} />;
+  }
 
   return (
     <View className="items-center py-10 gap-2">

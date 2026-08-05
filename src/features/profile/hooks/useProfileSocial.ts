@@ -4,6 +4,7 @@ import { followUser, unfollowUser } from '~/features/profile/api/followApi';
 import { useBlockUser } from '~/features/profile/hooks/useBlockUser';
 import { toastError } from '~/shared/lib/appToast';
 import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
+import { isOfflineMutationBlocked, withOnlineMutation } from '~/shared/lib/network/assertOnline';
 
 type Params = {
   viewerId?: string;
@@ -15,19 +16,24 @@ type Params = {
 export function useProfileSocial({ viewerId, targetUserId, onRefresh, onBlocked }: Params) {
   const [showBlockConfirm, setShowBlockConfirm] = useState(false);
 
+  const followFn = withOnlineMutation('Following', (_: void) => followUser(targetUserId));
+  const unfollowFn = withOnlineMutation('Unfollowing', (_: void) => unfollowUser(targetUserId));
+
   const follow = useMutation({
-    mutationFn: () => followUser(targetUserId),
+    mutationFn: followFn,
     onSuccess: onRefresh,
     onError: (e: unknown) => {
+      if (isOfflineMutationBlocked(e)) return;
       if (didAccountFrozenMutationToast(e)) return;
       toastError('Failed to follow user');
     },
   });
 
   const unfollow = useMutation({
-    mutationFn: () => unfollowUser(targetUserId),
+    mutationFn: unfollowFn,
     onSuccess: onRefresh,
     onError: (e: unknown) => {
+      if (isOfflineMutationBlocked(e)) return;
       if (didAccountFrozenMutationToast(e)) return;
       toastError('Failed to unfollow user');
     },
@@ -48,19 +54,19 @@ export function useProfileSocial({ viewerId, targetUserId, onRefresh, onBlocked 
   });
 
   const onFollow = useCallback(() => {
-    follow.mutate();
+    follow.mutate(undefined);
   }, [follow]);
 
   const onUnfollow = useCallback(() => {
-    unfollow.mutate();
+    unfollow.mutate(undefined);
   }, [unfollow]);
 
   const onUnblock = useCallback(() => {
-    unblock.mutate();
+    unblock.mutate(undefined);
   }, [unblock]);
 
   const onConfirmBlock = useCallback(() => {
-    block.mutate();
+    block.mutate(undefined);
   }, [block]);
 
   const openBlockConfirm = useCallback(() => setShowBlockConfirm(true), []);

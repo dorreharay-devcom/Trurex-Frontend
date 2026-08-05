@@ -4,6 +4,12 @@ import { Auth } from '~/shared/api/client';
 import { AuthApi } from '~/shared/api/authApi';
 import { isWeb } from '~/shared/lib/ui/platform';
 import { getRedirectUrl } from '~/features/auth/lib/redirect';
+import {
+  isLikelyJwt,
+  isSafeOAuthCallbackUrl,
+  isSafeOAuthCode,
+  isSafeRefreshToken,
+} from '~/features/auth/lib/oauthCallback';
 import type { OAuthProvider } from '../types/oauth';
 
 export type { OAuthProvider };
@@ -26,12 +32,19 @@ function throwIfAuthError(error: Error | null): void {
 }
 
 export async function completeOAuthSessionFromUrl(url: string): Promise<void> {
+  if (!isSafeOAuthCallbackUrl(url, getRedirectUrl())) {
+    throw new Error('OAuth callback URL is not allowed');
+  }
+
   const { params, errorCode } = QueryParams.getQueryParams(url);
   if (errorCode) throw new Error(errorCode);
 
   const accessToken = params.access_token;
   const refreshToken = params.refresh_token;
   if (accessToken && refreshToken) {
+    if (!isLikelyJwt(accessToken) || !isSafeRefreshToken(refreshToken)) {
+      throw new Error('OAuth tokens are invalid');
+    }
     const { error } = await Auth.setSession({
       access_token: accessToken,
       refresh_token: refreshToken,
@@ -41,7 +54,9 @@ export async function completeOAuthSessionFromUrl(url: string): Promise<void> {
   }
 
   const code = params.code;
-  if (!code) throw new Error('OAuth callback missing session credentials');
+  if (!code || !isSafeOAuthCode(code)) {
+    throw new Error('OAuth callback missing session credentials');
+  }
 
   const { error } = await Auth.exchangeCodeForSession(code);
   throwIfAuthError(error);

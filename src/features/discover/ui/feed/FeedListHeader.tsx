@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import type { CategoriesState } from '~/features/discover/hooks/useCategories';
 import type { SearchFiltersState } from '~/features/discover/hooks/useSearchFilters';
 import { ALL_CATEGORIES } from '~/features/discover/types';
-import { webCardStyle } from '~/features/discover/lib/layout';
+import { webCardStyle } from '~/shared/lib/ui/styles';
 import AllCategoriesSection from '~/features/discover/ui/categories/AllCategoriesSection';
 import PinnedCategoriesRow from '~/features/discover/ui/categories/PinnedCategoriesRow';
 import FilterBar from '~/features/discover/ui/search/FilterBar';

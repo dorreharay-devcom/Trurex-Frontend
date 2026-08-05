@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 import { pickLibraryImages } from '~/shared/lib/media/photos/imagePickerLaunch';
 import { uploadLocalPickerImage } from '~/shared/lib/media/photos/storageUpload';
 import { toastError } from '~/shared/lib/appToast';
+import { assertOnlineForMutation } from '~/shared/lib/network/assertOnline';
 
 export type UseRexPhotoUploadGridParams = {
   bucket: string;
@@ -27,6 +28,7 @@ export function useRexPhotoUploadGrid({
 
   const pickAndUpload = useCallback(async () => {
     if (!userId) return;
+    if (!assertOnlineForMutation('Uploading photos')) return;
     setError(null);
 
     const remaining = maxPhotos - photos.length;

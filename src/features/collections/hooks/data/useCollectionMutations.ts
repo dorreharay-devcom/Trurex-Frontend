@@ -1,18 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CollectionsApi } from '~/features/collections/api/collectionsApi';
-import type {
-  CreateCollectionInput,
-  UpdateCollectionInput,
-} from '~/features/collections/types/collection';
 import { COLLECTIONS_QUERY_KEYS } from '~/features/collections/config/queryKeys';
 import { mutationErrorToast } from '~/shared/lib/errors/restriction';
+import { withOnlineMutation } from '~/shared/lib/network/assertOnline';
 import { toastSuccess } from '~/shared/lib/appToast';
 
 export const useCreateCollection = () => {
   const queryClient = useQueryClient();
+  const mutationFn = withOnlineMutation('Creating collections', CollectionsApi.createCollection);
 
   return useMutation({
-    mutationFn: (params: CreateCollectionInput) => CollectionsApi.createCollection(params),
+    mutationFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [...COLLECTIONS_QUERY_KEYS.myCollections] });
       toastSuccess('Collection created!');
@@ -23,9 +21,10 @@ export const useCreateCollection = () => {
 
 export const useUpdateCollection = () => {
   const queryClient = useQueryClient();
+  const mutationFn = withOnlineMutation('Updating collections', CollectionsApi.updateCollection);
 
   return useMutation({
-    mutationFn: (params: UpdateCollectionInput) => CollectionsApi.updateCollection(params),
+    mutationFn,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [...COLLECTIONS_QUERY_KEYS.myCollections] });
       queryClient.invalidateQueries({
@@ -39,9 +38,10 @@ export const useUpdateCollection = () => {
 
 export const useDeleteCollection = () => {
   const queryClient = useQueryClient();
+  const mutationFn = withOnlineMutation('Deleting collections', CollectionsApi.deleteCollection);
 
   return useMutation({
-    mutationFn: (collectionId: string) => CollectionsApi.deleteCollection(collectionId),
+    mutationFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [...COLLECTIONS_QUERY_KEYS.myCollections] });
       toastSuccess('Collection deleted');
@@ -52,9 +52,10 @@ export const useDeleteCollection = () => {
 
 export const useSaveCollection = () => {
   const queryClient = useQueryClient();
+  const mutationFn = withOnlineMutation('Saving collections', CollectionsApi.saveCollection);
 
   return useMutation({
-    mutationFn: (collectionId: string) => CollectionsApi.saveCollection(collectionId),
+    mutationFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [...COLLECTIONS_QUERY_KEYS.mySavedCollections] });
     },
@@ -64,9 +65,10 @@ export const useSaveCollection = () => {
 
 export const useUnsaveCollection = () => {
   const queryClient = useQueryClient();
+  const mutationFn = withOnlineMutation('Updating collections', CollectionsApi.unsaveCollection);
 
   return useMutation({
-    mutationFn: (collectionId: string) => CollectionsApi.unsaveCollection(collectionId),
+    mutationFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [...COLLECTIONS_QUERY_KEYS.mySavedCollections] });
     },

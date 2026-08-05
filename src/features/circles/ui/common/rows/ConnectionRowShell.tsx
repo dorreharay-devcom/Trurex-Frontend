@@ -1,6 +1,6 @@
 import React, { type ReactNode } from 'react';
 import { Text, View } from 'react-native';
-import { SignedUserAvatar } from '~/shared/ui/SignedUserAvatar';
+import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 import ProfileChevronButton from '~/features/circles/ui/common/rows/ProfileChevronButton';
 import ProfileTapArea from '~/features/circles/ui/common/rows/ProfileTapArea';
 

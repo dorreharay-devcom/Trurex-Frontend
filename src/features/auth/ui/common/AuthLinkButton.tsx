@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, ButtonVariant } from '~/shared/ui/Button';
+import { Button, ButtonVariant } from '~/shared/ui/primitives/Button';
 import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/shared/lib/ui/styles';
 

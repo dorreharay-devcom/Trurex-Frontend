@@ -1,3 +1,9 @@
+import {
+  isRateLimitError,
+  isTimeoutError,
+  userFacingNetworkErrorMessage,
+} from '~/shared/lib/errors/network';
+
 export const AuthErrorCode = {
   InvalidCredentials: 'invalid_credentials',
   EmailNotConfirmed: 'email_not_confirmed',
@@ -24,6 +30,10 @@ const FALLBACK_ERROR_MESSAGE = 'An unexpected error occurred.';
 export function getErrorMessage(error: unknown): string {
   if (!error) return FALLBACK_ERROR_MESSAGE;
   if (typeof error === 'string') return error;
+
+  if (isTimeoutError(error) || isRateLimitError(error)) {
+    return userFacingNetworkErrorMessage(error, FALLBACK_ERROR_MESSAGE);
+  }
 
   const err = error as Record<string, unknown>;
   const errDetail = err?.error as Record<string, unknown> | undefined;

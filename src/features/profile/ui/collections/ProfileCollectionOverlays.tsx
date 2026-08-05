@@ -3,7 +3,7 @@ import type { Animated } from 'react-native';
 import AddRexToCollectionSheet from '~/features/collections/ui/AddRexToCollectionSheet';
 import CollectionDetailView from '~/features/collections/ui/CollectionDetailView';
 import type { Recommendation } from '~/shared/types/recommendation';
-import { OverlayModal } from '~/shared/ui/OverlayModal';
+import { OverlayModal } from '~/shared/ui/overlay/OverlayModal';
 
 export type ProfileCollectionOverlayState = {
   openCollectionId: string | null;

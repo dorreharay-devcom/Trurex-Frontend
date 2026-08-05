@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 import { AuthApi } from '~/shared/api/authApi';
 import { registerAccountSuspendedHandler } from '~/shared/lib/errors/restriction';
 import { clearMfaRequirementCache } from '~/features/auth/lib/mfa';
@@ -38,23 +38,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => clearTimeout(timeout);
   }, [mfaChecking, setMfaChecking]);
 
-  return (
-    <AuthContext.Provider
-      value={{
-        session,
-        user: session?.user ?? null,
-        loading,
-        mfaPending,
-        setMfaPending,
-        mfaChecking,
-        setMfaChecking,
-        booting: loading || mfaChecking,
-        signOut,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo<AuthState>(
+    () => ({
+      session,
+      user: session?.user ?? null,
+      loading,
+      mfaPending,
+      setMfaPending,
+      mfaChecking,
+      setMfaChecking,
+      booting: loading || mfaChecking,
+      signOut,
+    }),
+    [session, loading, mfaPending, setMfaPending, mfaChecking, setMfaChecking, signOut],
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export function useAuth(): AuthState {

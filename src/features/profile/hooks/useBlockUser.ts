@@ -5,7 +5,8 @@ import type { BlockedUserRow } from '~/features/profile/types/blockedUser';
 import { toastError, toastSuccess } from '~/shared/lib/appToast';
 import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
 import { isPlainObject, unknownErrorMessage } from '~/shared/lib/data/guards';
-import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
+import { invalidateActiveRexSurfaces } from '~/shared/lib/query/invalidateActiveRexSurfaces';
+import { isOfflineMutationBlocked, withOnlineMutation } from '~/shared/lib/network/assertOnline';
 
 export const blockedUsersQueryKey = (viewerId: string) => ['blocked-users', viewerId] as const;
 
@@ -46,14 +47,15 @@ export function useBlockUser(params: {
     if (viewerId) {
       void queryClient.invalidateQueries({ queryKey: blockedUsersQueryKey(viewerId) });
     }
-    void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.discoverFeed });
-    void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.mapRexesInBounds });
-    void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.mapRexPins });
-    void queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    invalidateActiveRexSurfaces(queryClient, { includeCollections: false });
+    void queryClient.invalidateQueries({ queryKey: ['notifications'], refetchType: 'active' });
   }, [queryClient, viewerId]);
 
+  const blockFn = withOnlineMutation('Blocking', (_: void) => blockUser(targetUserId));
+  const unblockFn = withOnlineMutation('Unblocking', (_: void) => unblockUser(targetUserId));
+
   const block = useMutation({
-    mutationFn: () => blockUser(targetUserId),
+    mutationFn: blockFn,
     onSuccess: () => {
       if (viewerId) {
         queryClient.setQueryData<BlockedUserRow[]>(blockedUsersQueryKey(viewerId), (prev) => {
@@ -76,13 +78,14 @@ export function useBlockUser(params: {
       onBlocked?.();
     },
     onError: (e: unknown) => {
+      if (isOfflineMutationBlocked(e)) return;
       if (didAccountFrozenMutationToast(e)) return;
       toastError(blockErrorMessage(e));
     },
   });
 
   const unblock = useMutation({
-    mutationFn: () => unblockUser(targetUserId),
+    mutationFn: unblockFn,
     onSuccess: () => {
       if (viewerId) {
         queryClient.setQueryData<BlockedUserRow[]>(blockedUsersQueryKey(viewerId), (prev) =>
@@ -93,6 +96,7 @@ export function useBlockUser(params: {
       toastSuccess('User unblocked');
     },
     onError: (e: unknown) => {
+      if (isOfflineMutationBlocked(e)) return;
       if (didAccountFrozenMutationToast(e)) return;
       toastError(blockErrorMessage(e));
     },

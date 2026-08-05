@@ -34,8 +34,12 @@ const WEB_CONTENT_COLUMN: ViewStyle = {
 
 export const webContainerStyle: ViewStyle | undefined = isWeb ? WEB_CONTENT_COLUMN : undefined;
 
+export const webCardStyle: ViewStyle | undefined = isWeb
+  ? { maxWidth: 680, width: '100%', alignSelf: 'center' }
+  : undefined;
+
 export function withWebContainer(
-  ...styles: Array<StyleProp<ViewStyle> | undefined | false | null>
+  ...styles: (StyleProp<ViewStyle> | undefined | false | null)[]
 ): StyleProp<ViewStyle> {
   return [...styles.filter(Boolean), webContainerStyle] as StyleProp<ViewStyle>;
 }

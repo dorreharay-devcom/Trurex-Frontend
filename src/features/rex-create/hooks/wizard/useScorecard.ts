@@ -70,6 +70,25 @@ export function useScorecard() {
     setScoreReviewState('');
   }, []);
 
+  const hydrateFromDraft = useCallback(
+    (draft: {
+      categoryRatings: Record<string, number | null>;
+      questionAnswers: Record<string, string>;
+      selectedTagSlugs: string[];
+      scoreQuickTip: string;
+      scoreValueForMoney: number | null;
+      scoreReview: string;
+    }) => {
+      setCategoryRatings(draft.categoryRatings);
+      setQuestionAnswers(draft.questionAnswers);
+      setSelectedTagSlugs(draft.selectedTagSlugs);
+      setScoreQuickTipState(draft.scoreQuickTip);
+      setScoreValueForMoney(draft.scoreValueForMoney);
+      setScoreReviewState(draft.scoreReview);
+    },
+    [],
+  );
+
   return {
     categoryRatings,
     setCategoryRating,
@@ -85,5 +104,6 @@ export function useScorecard() {
     setScoreReview,
     syncToConfig,
     clear,
+    hydrateFromDraft,
   };
 }

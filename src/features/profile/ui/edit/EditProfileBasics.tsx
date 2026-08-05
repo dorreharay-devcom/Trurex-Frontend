@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { isIos } from '~/shared/lib/ui/platform';
-import { Input } from '~/shared/ui/Input';
+import { Input } from '~/shared/ui/primitives/Input';
 
 const FIELD_LABEL_CLASS = 'text-xs uppercase tracking-wide text-muted-foreground';
 

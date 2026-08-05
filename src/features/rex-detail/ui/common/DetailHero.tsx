@@ -1,8 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
-import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
-import { RexPhotoPlaceholder } from '~/shared/ui/RexPhotoPlaceholder';
-import { Skeleton } from '~/shared/ui/Skeleton';
+import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
+import { RexPhotoPlaceholder } from '~/shared/ui/media/RexPhotoPlaceholder';
+import { Skeleton } from '~/shared/ui/primitives/Skeleton';
 import { REX_IMAGES_BUCKET } from '~/shared/config/app';
 import type { RexDetailView } from '~/features/rex-detail/hooks/useRexDetail';
 import type { Recommendation } from '~/shared/types/recommendation';

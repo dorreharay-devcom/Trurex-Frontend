@@ -1,7 +1,7 @@
 import React from 'react';
 import { BookmarkMinus } from 'lucide-react-native';
 import EditCollectionModal from '~/features/collections/ui/EditCollectionModal';
-import { DestructiveActionConfirmModal } from '~/shared/ui/DestructiveActionConfirmModal';
+import DestructiveActionConfirmModal from '~/shared/ui/destructive-confirm/DestructiveActionConfirmModal';
 import type { CollectionActionsState } from '~/features/collections/hooks/collection-detail/useCollectionActions';
 import type { CollectionDetailRow } from '~/features/collections/types/collection';
 import { Theme } from '~/shared/theme/Theme';

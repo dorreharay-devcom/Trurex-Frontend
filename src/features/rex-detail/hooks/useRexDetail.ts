@@ -29,8 +29,8 @@ export function useRexDetail(recommendation: Recommendation | null, visible: boo
       return fetchRexDetail(id);
     },
     enabled: visible && typeof recommendation?.id === 'string',
-    staleTime: 0,
-    refetchOnMount: 'always',
+    staleTime: 60_000,
+    refetchOnMount: true,
   });
 
   const detailRatings = useMemo(() => {

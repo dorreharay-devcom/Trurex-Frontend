@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView, useWindowDimensions } from 'react-native';
-import BottomSheet from '~/shared/ui/BottomSheet';
+import BottomSheet from '~/shared/ui/overlay/BottomSheet';
 import SheetHeader from '~/features/collections/ui/common/SheetHeader';
 import SavedRexList from '~/features/collections/ui/SavedRexList';
 import { useAddRexesToCollection } from '~/features/collections/hooks/useAddRexesToCollection';

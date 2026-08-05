@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '~/features/auth/providers';
 import { useMapBoundsData } from '~/features/map/hooks/data/useMapBoundsData';
 import { useMapDerivedData } from '~/features/map/hooks/data/useMapDerivedData';
@@ -16,7 +16,7 @@ export function useMapScreen({ onRecommendationPress }: Params) {
   const { user } = useAuth();
   const userId = user?.id ?? null;
 
-  const { userCoords, recenterTo, locateMe, recenterOn, fitMarkers } = useMapLocation();
+  const { userCoords, recenterTo, locateMe, recenterOn, fitMarkers, fitCoords } = useMapLocation();
   const saved = useSavedRexOverrides();
   const selection = useMapSelection({ recenterOn, onRecommendationPress });
   const viewport = useMapViewport();
@@ -37,6 +37,7 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     withSavedOverride: saved.withSavedOverride,
     selectedRecId: selection.selectedRecId,
     suggestQuery: viewport.suggestQuery,
+    latitudeDelta: viewport.viewRegion.latitudeDelta,
   });
 
   const fittedForSearchRef = useRef<string | null>(null);
@@ -53,6 +54,18 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     fitMarkers();
   }, [viewport.debouncedSearch, derived.mapMarkers.length, fitMarkers]);
 
+  const selectMarker = useCallback(
+    (id: string) => {
+      const marker = derived.mapMarkers.find((m) => m.id === id);
+      if (marker?.clusterCount && marker.memberCoords?.length) {
+        fitCoords(marker.memberCoords);
+        return;
+      }
+      selection.selectMarker(id);
+    },
+    [derived.mapMarkers, fitCoords, selection],
+  );
+
   return {
     searchQuery: viewport.searchQuery,
     setSearchQuery: viewport.setSearchQuery,
@@ -62,7 +75,7 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     selectedRecId: selection.selectedRecId,
     selectedRec: derived.selectedRec,
     selectedPinType: derived.selectedPinType,
-    selectMarker: selection.selectMarker,
+    selectMarker,
     clearSelection: selection.clearSelection,
     listView: selection.listView,
     setListView: selection.setListView,

@@ -85,6 +85,26 @@ export function mapPinRowToMapMarkerItem(row: MapPinRow): MapMarkerItem {
   };
 }
 
+export function mapPinRowFromOptimisticRec(rec: Recommendation): MapPinRow | null {
+  if (rec.latitude == null || rec.longitude == null) return null;
+  if (!Number.isFinite(rec.latitude) || !Number.isFinite(rec.longitude)) return null;
+
+  return {
+    rex_id: rec.id,
+    place_id: '',
+    place_name: rec.title,
+    place_rex_author_count: 1,
+    latitude: rec.latitude,
+    longitude: rec.longitude,
+    category_code: rec.categoryId,
+    category_name: rec.category,
+    category_icon: rec.categoryIcon ?? null,
+    category_color: null,
+    is_saved: false,
+    pin_type: 'been_there',
+  };
+}
+
 export function mapAuthorRecommendedLabel(user: {
   name?: string | null;
   handle?: string | null;

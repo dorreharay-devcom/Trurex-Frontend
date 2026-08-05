@@ -54,9 +54,12 @@ export function useConnectionUsers(
   return {
     rows,
     isInitialLoading: query.isLoading && rows.length === 0,
+    isError: query.isError && rows.length === 0,
     hasNextPage: Boolean(query.hasNextPage),
     isFetchingNextPage: query.isFetchingNextPage,
+    isFetchNextPageError: query.isFetchNextPageError,
     fetchNextPage,
+    retry: () => void query.refetch(),
   };
 }
 

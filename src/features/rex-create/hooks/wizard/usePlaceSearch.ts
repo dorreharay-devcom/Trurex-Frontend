@@ -145,6 +145,24 @@ export function usePlaceSearch() {
     setOnline(EMPTY_ONLINE);
   }, []);
 
+  const hydrateFromDraft = useCallback(
+    (draft: {
+      searchMode: SearchEntryMode;
+      searchQuery: string;
+      selectedSearchPlace: CreateRecSearchPlace | null;
+      manual: ManualPlaceDraft;
+      online: OnlinePlaceDraft;
+    }) => {
+      setSearchMode(draft.searchMode);
+      setSearchQuery(draft.searchQuery);
+      setSelectedSearchPlace(draft.selectedSearchPlace);
+      setLinkedPlaceId(null);
+      setManual(draft.manual);
+      setOnline(draft.online);
+    },
+    [],
+  );
+
   return {
     searchMode,
     searchQuery,
@@ -174,6 +192,7 @@ export function usePlaceSearch() {
     persistPlaceForCategory,
     prefillFromAddYourOwn,
     prefillFromEditRow,
+    hydrateFromDraft,
     reset,
   };
 }

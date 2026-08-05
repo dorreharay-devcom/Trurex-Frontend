@@ -7,7 +7,7 @@ import type { PeopleSuggestionRow } from '~/features/circles/types/peopleSuggest
 import DegreeBadge from '~/features/circles/ui/people/DegreeBadge';
 import FollowAction from '~/features/circles/ui/people/FollowAction';
 import { Theme } from '~/shared/theme/Theme';
-import { SignedUserAvatar } from '~/shared/ui/SignedUserAvatar';
+import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 import { cn } from '~/shared/lib/ui/styles';
 
 type Props = {

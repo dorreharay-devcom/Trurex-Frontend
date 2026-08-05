@@ -4,6 +4,7 @@ import { SUGGESTION_RELATIONSHIP } from '~/features/circles/config/peopleSuggest
 import { usePeopleSuggestions } from '~/features/circles/hooks/data/usePeopleSuggestions';
 import PeopleYouMayKnowCard from '~/features/circles/ui/people/PeopleYouMayKnowCard';
 import RowSkeletonList from '~/features/circles/ui/common/RowSkeletonList';
+import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 
 const CARD_MAX_WIDTH = 288;
 const CARD_MIN_WIDTH = 240;
@@ -22,21 +23,27 @@ const PeopleYouMayKnowSection = ({ enabled, onUserPress }: Props) => {
     Math.max(CARD_MIN_WIDTH, Math.floor(windowWidth - CARD_WINDOW_MARGIN)),
   );
 
-  if (people.isError) return null;
-
   const showSkeleton = people.isLoading && people.suggestions.length === 0;
 
   return (
     <View className="mt-10 w-full max-w-full overflow-hidden">
       <Text className="mb-3 text-base font-semibold text-foreground">People you might know</Text>
 
-      {showSkeleton && <RowSkeletonList count={3} className="gap-2" />}
+      {people.isError ? (
+        <QueryErrorState
+          compact
+          title="Couldn't load suggestions"
+          onRetry={() => void people.refetch()}
+        />
+      ) : null}
 
-      {!showSkeleton && people.suggestions.length === 0 && (
+      {!people.isError && showSkeleton && <RowSkeletonList count={3} className="gap-2" />}
+
+      {!people.isError && !showSkeleton && people.suggestions.length === 0 && (
         <Text className="text-center text-sm text-muted-foreground">No suggestions right now.</Text>
       )}
 
-      {!showSkeleton && people.suggestions.length > 0 && (
+      {!people.isError && !showSkeleton && people.suggestions.length > 0 && (
         <ScrollView
           horizontal
           nestedScrollEnabled

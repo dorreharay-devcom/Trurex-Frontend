@@ -38,3 +38,15 @@ export function toRecSummary(rec: Recommendation): RecSummary {
     isSaved: rec.isSaved,
   };
 }
+
+export function collectionMembershipDiff(
+  selected: Iterable<string>,
+  original: Iterable<string>,
+): { toAdd: string[]; toRemove: string[] } {
+  const selectedSet = selected instanceof Set ? selected : new Set(selected);
+  const originalSet = original instanceof Set ? original : new Set(original);
+  return {
+    toAdd: [...selectedSet].filter((id) => !originalSet.has(id)),
+    toRemove: [...originalSet].filter((id) => !selectedSet.has(id)),
+  };
+}

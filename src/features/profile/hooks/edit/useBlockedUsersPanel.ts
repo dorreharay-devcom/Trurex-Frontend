@@ -7,6 +7,7 @@ import type { BlockedUserRow } from '~/features/profile/types/blockedUser';
 import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
+import { withOnlineMutation } from '~/shared/lib/network/assertOnline';
 import { toastError, toastSuccess } from '~/shared/lib/appToast';
 
 export function useBlockedUsersPanel() {
@@ -16,8 +17,9 @@ export function useBlockedUsersPanel() {
   const list = useBlockedUsers(viewerId);
   const [pendingUserId, setPendingUserId] = useState<string | null>(null);
 
+  const unblockFn = withOnlineMutation('Unblocking', unblockUserRequest);
   const unblock = useMutation({
-    mutationFn: (targetUserId: string) => unblockUserRequest(targetUserId),
+    mutationFn: unblockFn,
     onMutate: (targetUserId) => {
       setPendingUserId(targetUserId);
     },
@@ -28,7 +30,10 @@ export function useBlockedUsersPanel() {
         );
         void queryClient.invalidateQueries({ queryKey: blockedUsersQueryKey(viewerId) });
       }
-      void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.discoverFeed });
+      void queryClient.invalidateQueries({
+        queryKey: REX_QUERY_KEYS.discoverFeed,
+        refetchType: 'active',
+      });
       toastSuccess('User unblocked');
     },
     onError: (e: unknown) => {

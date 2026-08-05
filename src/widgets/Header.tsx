@@ -72,7 +72,7 @@ const Header = ({
 
         <View className={cn('min-w-0 flex-1', compact ? 'px-1' : 'mx-4 max-w-md sm:mx-8')}>
           {searchVisible ? (
-            <HeaderSearch value={searchQuery} onChangeText={onSearchChange} />
+            <HeaderSearch initialValue={searchQuery} onDebouncedChange={onSearchChange} />
           ) : null}
         </View>
 

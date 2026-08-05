@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import { MAP_PIN_TYPE_COPY } from '~/features/map/config/pinCopy';
 import { MAP_PIN_TYPE } from '~/features/map/config/pins';
 import { mapAuthorRecommendedLabel } from '~/features/map/lib/pinTypes';
-import { SignedUserAvatar } from '~/shared/ui/SignedUserAvatar';
+import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 import type { MapPinType } from '~/features/map/types/mapPin';
 import type { Recommendation } from '~/shared/types/recommendation';
 

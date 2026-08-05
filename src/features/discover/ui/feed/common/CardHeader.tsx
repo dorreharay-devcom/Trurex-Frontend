@@ -4,7 +4,7 @@ import { X } from 'lucide-react-native';
 import type { Recommendation } from '~/shared/types/recommendation';
 import { authorDisplayName, categoryDisplayLabel } from '~/shared/lib/recommendation';
 import { formatRelativeTime } from '~/shared/lib/data/date';
-import { SignedUserAvatar } from '~/shared/ui/SignedUserAvatar';
+import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 
 type Props = {
   rec: Recommendation;

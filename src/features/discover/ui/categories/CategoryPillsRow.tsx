@@ -19,13 +19,13 @@ const CategoryPillsRow = ({ cats, activeCategory, onSelectCategory }: CategoryPi
               key={cat.id}
               onPress={() => onSelectCategory(cat.code)}
               activeOpacity={0.8}
-              className={`flex-row items-center gap-1.5 px-3 py-2 rounded-xl border ${
-                isActive ? 'border-primary/40 bg-primary/10' : 'bg-card border-border'
+              className={`flex-row items-center gap-1.5 px-3 py-2 rounded-xl border-2 ${
+                isActive ? 'border-primary bg-primary/15' : 'border-border bg-card'
               }`}
             >
               <Text style={{ fontSize: 16 }}>{cat.emoji}</Text>
               <Text
-                className={`text-[10px] font-semibold whitespace-nowrap ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}
+                className={`text-[10px] font-medium whitespace-nowrap ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}
               >
                 {cat.label}
               </Text>

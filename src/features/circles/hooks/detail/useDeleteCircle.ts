@@ -6,6 +6,7 @@ import type { CircleApiRow } from '~/features/circles/types/circle';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 import { toastError, toastSuccess } from '~/shared/lib/appToast';
 import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
+import { isOfflineMutationBlocked, withOnlineMutation } from '~/shared/lib/network/assertOnline';
 
 export type DeleteCircleState = ReturnType<typeof useDeleteCircle>;
 
@@ -13,11 +14,12 @@ export function useDeleteCircle(circle: CircleApiRow | undefined, onDeleted: () 
   const queryClient = useQueryClient();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
+  const mutationFn = withOnlineMutation('Deleting circles', (_: void) => {
+    if (!circle) throw new Error('No circle');
+    return deleteCircle(circle.id);
+  });
   const deleteMutation = useMutation({
-    mutationFn: () => {
-      if (!circle) throw new Error('No circle');
-      return deleteCircle(circle.id);
-    },
+    mutationFn,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: CIRCLES_QUERY_KEYS.myCircles });
       setConfirmOpen(false);
@@ -25,6 +27,7 @@ export function useDeleteCircle(circle: CircleApiRow | undefined, onDeleted: () 
       toastSuccess('Circle deleted');
     },
     onError: (e: unknown) => {
+      if (isOfflineMutationBlocked(e)) return;
       if (didAccountFrozenMutationToast(e)) return;
       setConfirmOpen(false);
       toastError('Could not delete circle', unknownErrorMessage(e, 'Try again.'));
@@ -39,7 +42,7 @@ export function useDeleteCircle(circle: CircleApiRow | undefined, onDeleted: () 
     confirmOpen,
     request: () => setConfirmOpen(true),
     dismiss,
-    commit: () => deleteMutation.mutate(),
+    commit: () => deleteMutation.mutate(undefined),
     pending: deleteMutation.isPending,
   };
 }

@@ -6,6 +6,7 @@ import RowSkeletonList from '~/features/circles/ui/common/RowSkeletonList';
 import CircleList from '~/features/circles/ui/CircleList';
 import CreateCircleCard from '~/features/circles/ui/CreateCircleCard';
 import { Theme } from '~/shared/theme/Theme';
+import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 
 type Props = {
   enabled: boolean;
@@ -13,7 +14,7 @@ type Props = {
 };
 
 const MyCirclesSection = ({ enabled, onOpenCircle }: Props) => {
-  const { displayRows, isLoading, isError } = useMyCircleRows(enabled);
+  const { displayRows, isLoading, isError, retry } = useMyCircleRows(enabled);
   const [showCreate, setShowCreate] = useState(false);
 
   return (
@@ -35,13 +36,7 @@ const MyCirclesSection = ({ enabled, onOpenCircle }: Props) => {
 
       {isLoading && <RowSkeletonList count={3} className="gap-3" />}
 
-      {isError && (
-        <View className="rounded-xl border border-destructive/30 bg-destructive/5 p-4">
-          <Text className="text-center text-sm text-foreground">
-            Could not load circles. Check your connection and try again.
-          </Text>
-        </View>
-      )}
+      {isError && <QueryErrorState title="Couldn't load circles" onRetry={retry} />}
 
       {!isLoading && !isError && <CircleList rows={displayRows} onOpenCircle={onOpenCircle} />}
     </>

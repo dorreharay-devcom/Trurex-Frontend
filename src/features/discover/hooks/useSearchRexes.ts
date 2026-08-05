@@ -59,23 +59,17 @@ export const useSearchRexes = (args: UseSearchRexesArgs, options?: UseSearchRexe
       resultLimit,
       resultOffset,
     ],
-    queryFn: async () => {
-      try {
-        return await DiscoveryApi.searchRexes({
-          search_term: trimmed || null,
-          category_filter: categoryFilter,
-          value_for_money_filters: vfmRpc,
-          quality_filter: args.qualityFilter,
-          created_from,
-          created_to,
-          result_limit: resultLimit,
-          result_offset: resultOffset,
-        });
-      } catch (error) {
-        console.warn('search_rexes error:', error);
-        return [];
-      }
-    },
+    queryFn: () =>
+      DiscoveryApi.searchRexes({
+        search_term: trimmed || null,
+        category_filter: categoryFilter,
+        value_for_money_filters: vfmRpc,
+        quality_filter: args.qualityFilter,
+        created_from,
+        created_to,
+        result_limit: resultLimit,
+        result_offset: resultOffset,
+      }),
     enabled: (options?.enabled ?? true) && trimmed.length > 0,
   });
 };

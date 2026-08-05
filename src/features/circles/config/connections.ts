@@ -10,6 +10,7 @@ export const CONNECTION_TAB = {
 export const CONNECTION_PHASE = {
   loading: 'loading',
   rows: 'rows',
+  error: 'error',
   noMatch: 'no_match',
   trustedEmpty: 'trusted_empty',
   followersEmpty: 'followers_empty',

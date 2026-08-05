@@ -9,7 +9,9 @@ import ConnectionEmptyState from '~/features/circles/ui/connections/ConnectionEm
 import ConnectionScopeTabs from '~/features/circles/ui/connections/ConnectionScopeTabs';
 import ConnectionSearchField from '~/features/circles/ui/connections/ConnectionSearchField';
 import PeopleYouMayKnowSection from '~/features/circles/ui/people/PeopleYouMayKnowSection';
-import { LoadMoreButton } from '~/shared/ui/LoadMoreButton';
+import { LoadMoreButton } from '~/shared/ui/primitives/LoadMoreButton';
+import QueryErrorState from '~/shared/ui/query/QueryErrorState';
+import QueryListFooter from '~/shared/ui/query/QueryListFooter';
 import type { NetworkUserRow } from '~/features/circles/types/networkUser';
 
 const TAB_ORDER: readonly ConnectionScopeTab[] = [
@@ -42,6 +44,10 @@ const ConnectionsSection = ({ userId, onUserPress, onAddToCircle }: Props) => {
 
       {scoped.phase === CONNECTION_PHASE.loading && <RowSkeletonList count={4} className="gap-2" />}
 
+      {scoped.phase === CONNECTION_PHASE.error && (
+        <QueryErrorState title="Couldn't load connections" onRetry={scoped.retry} />
+      )}
+
       {scoped.phase === CONNECTION_PHASE.rows && (
         <View className="gap-2">
           {scoped.rows.map((row) => (
@@ -52,11 +58,15 @@ const ConnectionsSection = ({ userId, onUserPress, onAddToCircle }: Props) => {
               onUserPress={onUserPress}
             />
           ))}
-          <LoadMoreButton
-            visible={scoped.hasNextPage}
-            loading={scoped.isFetchingNextPage}
-            onPress={scoped.fetchNextPage}
-          />
+          {scoped.isFetchNextPageError ? (
+            <QueryListFooter isError onRetry={scoped.fetchNextPage} />
+          ) : (
+            <LoadMoreButton
+              visible={scoped.hasNextPage}
+              loading={scoped.isFetchingNextPage}
+              onPress={scoped.fetchNextPage}
+            />
+          )}
         </View>
       )}
 

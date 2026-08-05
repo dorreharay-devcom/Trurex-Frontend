@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Camera } from 'lucide-react-native';
 import { USER_AVATARS_BUCKET } from '~/shared/config/app';
-import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
+import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
 import { avatarImageTransform } from '~/shared/lib/media/imageTransform';
 
 const PROFILE_AVATAR_TRANSFORM = avatarImageTransform(96);

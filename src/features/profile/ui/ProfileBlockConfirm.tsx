@@ -1,7 +1,7 @@
 import React from 'react';
 import { UserX } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
-import { DestructiveActionConfirmModal } from '~/shared/ui/DestructiveActionConfirmModal';
+import DestructiveActionConfirmModal from '~/shared/ui/destructive-confirm/DestructiveActionConfirmModal';
 
 type Props = {
   visible: boolean;

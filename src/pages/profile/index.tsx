@@ -1,7 +1,7 @@
 import React from 'react';
 import ProtectedRoute from '~/features/auth/ui/ProtectedRoute';
 import ProfileView from '~/features/profile/ui/ProfileView';
-import RecommendationDetailModal from '~/features/rex-detail/ui/RecommendationDetailModal';
+import RexDetailHost from '~/features/rex-detail/ui/RexDetailHost';
 import { useProfilePage } from '~/pages/profile/hooks/useProfilePage';
 import DeepLinkShell from '~/widgets/DeepLinkShell';
 import { TAB } from '~/shared/config/mainTabs';
@@ -23,7 +23,7 @@ function ProfilePage() {
           onRexPress={page.preview.open}
         />
       </DeepLinkShell>
-      <RecommendationDetailModal
+      <RexDetailHost
         visible={page.preview.visible}
         recommendation={page.preview.recommendation}
         onClose={page.preview.close}

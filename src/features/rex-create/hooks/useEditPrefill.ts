@@ -1,8 +1,7 @@
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchRexForEdit } from '~/features/rex-create/api/rexCreateApi';
 import type { RexForEditRow } from '~/features/rex-detail/types/rexDetail';
-import { toastError } from '~/shared/lib/appToast';
 
 type UseEditPrefillArgs = {
   visible: boolean;
@@ -17,6 +16,8 @@ export function useEditPrefill({ visible, editRexId, applyEditPrefill }: UseEdit
     data: editRow,
     isLoading: editLoading,
     isError: editLoadError,
+    refetch,
+    isFetching,
   } = useQuery({
     queryKey: ['rexForEdit', editRexId],
     queryFn: () => fetchRexForEdit(editRexId!),
@@ -34,10 +35,14 @@ export function useEditPrefill({ visible, editRexId, applyEditPrefill }: UseEdit
     appliedEditIdRef.current = editRow.id;
   }, [visible, editRow, applyEditPrefill]);
 
-  useEffect(() => {
-    if (!visible || !editLoadError) return;
-    toastError('Could not load Rex', 'This Rex may no longer be editable.');
-  }, [visible, editLoadError]);
+  const retryEdit = useCallback(() => {
+    void refetch();
+  }, [refetch]);
 
-  return { editLoading };
+  return {
+    editLoading: editLoading && !editLoadError,
+    editLoadError: Boolean(visible && editRexId != null && editLoadError),
+    editRetrying: isFetching && editLoadError,
+    retryEdit,
+  };
 }

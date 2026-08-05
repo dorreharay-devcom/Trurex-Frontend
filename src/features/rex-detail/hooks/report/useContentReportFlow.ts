@@ -10,6 +10,7 @@ import { toastError, toastSuccess } from '~/shared/lib/appToast';
 import { useAuth } from '~/features/auth/providers';
 import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
+import { assertOnlineForMutation } from '~/shared/lib/network/assertOnline';
 
 type Params = {
   open: boolean;
@@ -71,6 +72,7 @@ export function useContentReportFlow({ open, target }: Params) {
       toastError('Details required', 'Please describe the issue when reporting as Other.');
       return false;
     }
+    if (!assertOnlineForMutation('Reporting')) return false;
     setIsSubmitting(true);
     try {
       const detailPayload = details.trim() || null;

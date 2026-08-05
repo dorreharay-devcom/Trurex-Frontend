@@ -4,6 +4,11 @@ import { addCircleMember, createCircle } from '~/features/circles/api/circlesApi
 import { CIRCLES_QUERY_KEYS } from '~/features/circles/config/queryKeys';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 import { didAccountFrozenMutationToast, mutationErrorToast } from '~/shared/lib/errors/restriction';
+import {
+  isOfflineMutationBlocked,
+  requireOnlineForMutation,
+  withOnlineMutation,
+} from '~/shared/lib/network/assertOnline';
 import { toastError, toastSuccess } from '~/shared/lib/appToast';
 
 type CircleFormInput = {
@@ -21,8 +26,12 @@ export function useAssignToCircle({ memberId, onAssigned }: Args) {
   const queryClient = useQueryClient();
   const [creating, setCreating] = useState(false);
 
+  const assignMutationFn = withOnlineMutation(
+    'Adding to circles',
+    ({ circleId }: { circleId: string }) => addCircleMember(circleId, memberId),
+  );
   const assignMutation = useMutation({
-    mutationFn: ({ circleId }: { circleId: string }) => addCircleMember(circleId, memberId),
+    mutationFn: assignMutationFn,
     onSuccess: (_, vars) => {
       void queryClient.invalidateQueries({
         queryKey: [CIRCLES_QUERY_KEYS.circleMembers, vars.circleId],
@@ -39,6 +48,11 @@ export function useAssignToCircle({ memberId, onAssigned }: Args) {
   const createAndAssign = async (input: CircleFormInput): Promise<boolean> => {
     const name = input.name.trim();
     if (!name) return false;
+    try {
+      requireOnlineForMutation('Creating circles');
+    } catch {
+      return false;
+    }
     setCreating(true);
     try {
       const created = await createCircle({
@@ -51,6 +65,7 @@ export function useAssignToCircle({ memberId, onAssigned }: Args) {
       await assignMutation.mutateAsync({ circleId: created.id });
       return true;
     } catch (e) {
+      if (isOfflineMutationBlocked(e)) return false;
       if (!didAccountFrozenMutationToast(e)) {
         toastError('Could not create circle', unknownErrorMessage(e, 'Unknown error'));
       }

@@ -4,7 +4,8 @@ import { deleteRex } from '~/features/rex-detail/api/rexDetailApi';
 import { deleteRexToastMessage } from '~/features/rex-detail/lib/rexDetailToRecommendation';
 import { toastError, toastSuccess } from '~/shared/lib/appToast';
 import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
-import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
+import { invalidateActiveRexSurfaces } from '~/shared/lib/query/invalidateActiveRexSurfaces';
+import { withOnlineMutation } from '~/shared/lib/network/assertOnline';
 
 type UseDeleteRexArgs = {
   recommendationId: string | undefined;
@@ -20,19 +21,14 @@ export function useDeleteRex({ recommendationId, visible, onDeleted }: UseDelete
     if (!visible) setConfirmOpen(false);
   }, [visible]);
 
+  const mutationFn = withOnlineMutation('Deleting', deleteRex);
   const mutation = useMutation({
-    mutationFn: deleteRex,
+    mutationFn,
     onSuccess: (_data, rexId) => {
       setConfirmOpen(false);
       toastSuccess('Deleted', 'Your recommendation was removed.');
-      void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.discoverFeed });
-      void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.searchRexes });
-      void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.myRexes });
       void queryClient.removeQueries({ queryKey: ['rexDetail', rexId] });
-      void queryClient.invalidateQueries({ queryKey: ['collection-detail'] });
-      void queryClient.invalidateQueries({ queryKey: ['my-collections'] });
-      void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.mapRexesInBounds });
-      void queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.mapRexPins });
+      invalidateActiveRexSurfaces(queryClient);
       onDeleted();
     },
     onError: (err: unknown) => {

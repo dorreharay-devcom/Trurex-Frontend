@@ -3,10 +3,13 @@ import { View, Text } from 'react-native';
 import { Bell } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
 import NotificationRow from '~/widgets/notifications/NotificationRow';
+import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 import type { AppNotification } from '~/shared/types/appNotification';
 
 type Props = {
   loading: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
   notifications: AppNotification[];
   followedIds: Set<string>;
   followPending: boolean;
@@ -17,6 +20,8 @@ type Props = {
 
 const NotificationList = ({
   loading,
+  isError,
+  onRetry,
   notifications,
   followedIds,
   followPending,
@@ -24,10 +29,18 @@ const NotificationList = ({
   onOpenActor,
   onFollow,
 }: Props) => {
-  if (loading) {
+  if (loading && notifications.length === 0) {
     return (
       <View className="p-6">
         <Text className="text-center text-sm text-muted-foreground">Loading…</Text>
+      </View>
+    );
+  }
+
+  if (isError && notifications.length === 0) {
+    return (
+      <View className="px-4 py-6">
+        <QueryErrorState title="Couldn't load notifications" onRetry={onRetry} />
       </View>
     );
   }

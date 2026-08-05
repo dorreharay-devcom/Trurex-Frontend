@@ -1,7 +1,7 @@
 import React from 'react';
 import CreateCollectionModal from '~/features/collections/ui/CreateCollectionModal';
 import AddToCollectionSheet from '~/features/collections/ui/AddToCollectionSheet';
-import { DestructiveActionConfirmModal } from '~/shared/ui/DestructiveActionConfirmModal';
+import DestructiveActionConfirmModal from '~/shared/ui/destructive-confirm/DestructiveActionConfirmModal';
 import type { GemsPageState } from '~/features/gems/hooks/useGemsPageState';
 import type { RemoveUncollectedState } from '~/features/gems/hooks/useRemoveUncollected';
 

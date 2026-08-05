@@ -46,7 +46,11 @@ export function useMapBoundsData({ bounds, searchTerm, needCardRows }: Params) {
     refetch: refetchPins,
   } = useQuery({
     queryKey: [...REX_QUERY_KEYS.mapRexPins, ...queryKeyBase],
-    queryFn: () => MapApi.mapRexPins(boundsParams!),
+    queryFn: async ({ signal }) => {
+      const rows = await MapApi.mapRexPins(boundsParams!);
+      signal.throwIfAborted();
+      return rows;
+    },
     enabled: hasBounds && boundsParams != null,
     placeholderData: keepPreviousData,
     staleTime: MAP_QUERY_STALE_TIME_MS,
@@ -59,7 +63,11 @@ export function useMapBoundsData({ bounds, searchTerm, needCardRows }: Params) {
     refetch: refetchRexes,
   } = useQuery({
     queryKey: [...REX_QUERY_KEYS.mapRexesInBounds, ...queryKeyBase],
-    queryFn: () => MapApi.mapRexesInBounds(boundsParams!),
+    queryFn: async ({ signal }) => {
+      const rows = await MapApi.mapRexesInBounds(boundsParams!);
+      signal.throwIfAborted();
+      return rows;
+    },
     enabled: hasBounds && boundsParams != null && needCardRows,
     placeholderData: keepPreviousData,
     staleTime: MAP_QUERY_STALE_TIME_MS,
@@ -69,10 +77,7 @@ export function useMapBoundsData({ bounds, searchTerm, needCardRows }: Params) {
   const recSource = serverRecs ?? EMPTY_RECS;
 
   const fetchedRecs = useMemo(
-    () =>
-      searchTerm.trim()
-        ? filterRecommendationsByRexTitle(recSource, searchTerm)
-        : recSource,
+    () => (searchTerm.trim() ? filterRecommendationsByRexTitle(recSource, searchTerm) : recSource),
     [recSource, searchTerm],
   );
 

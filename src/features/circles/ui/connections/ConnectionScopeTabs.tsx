@@ -17,7 +17,11 @@ const ConnectionScopeTabs = ({ tabs, active, onChange, byTab }: Props) => {
     <View className="mb-4 flex-row flex-wrap gap-2">
       {tabs.map((tab) => {
         const isActive = tab === active;
-        const count = connectionCountLabel(byTab[tab].rows.length, byTab[tab].hasNextPage);
+        const list = byTab[tab];
+        const count = list.isInitialLoading
+          ? '…'
+          : connectionCountLabel(list.rows.length, list.hasNextPage);
+        const label = `${CONNECTION_TAB_LABEL[tab]} · ${count}`;
         return (
           <Pressable
             key={tab}
@@ -33,7 +37,7 @@ const ConnectionScopeTabs = ({ tabs, active, onChange, byTab }: Props) => {
                 isActive ? 'text-foreground' : 'text-muted-foreground',
               )}
             >
-              {`${CONNECTION_TAB_LABEL[tab]} · ${count}`}
+              {label}
             </Text>
           </Pressable>
         );

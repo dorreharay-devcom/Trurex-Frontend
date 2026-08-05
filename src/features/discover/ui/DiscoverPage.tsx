@@ -12,11 +12,12 @@ import { useSaveToCollection } from '~/features/discover/hooks/useSaveToCollecti
 import { useScrollTop } from '~/features/discover/hooks/useScrollTop';
 import { useSearch } from '~/features/discover/hooks/useSearch';
 import { useSearchFilters } from '~/features/discover/hooks/useSearchFilters';
-import { webCardStyle } from '~/features/discover/lib/layout';
+import { webCardStyle } from '~/shared/lib/ui/styles';
 import EmptyState from '~/features/discover/ui/feed/EmptyState';
 import FeedFooterSpinner from '~/features/discover/ui/feed/FeedFooterSpinner';
 import FeedListHeader from '~/features/discover/ui/feed/FeedListHeader';
 import ScrollTopButton from '~/features/discover/ui/feed/ScrollTopButton';
+import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 
 type DiscoverPageProps = {
   searchQuery?: string;
@@ -56,7 +57,8 @@ const DiscoverPage = ({
 
   const source = search.hasSearch ? search : feed;
   const isLoading = source.isLoading;
-  const rows = isLoading ? [] : source.rows;
+  const isError = source.isError;
+  const rows = isLoading && source.rows.length === 0 ? [] : source.rows;
 
   const onSave = save.openForRec;
   const onTap = onRecommendationPress;
@@ -93,15 +95,25 @@ const DiscoverPage = ({
     ],
   );
 
-  const listEmpty = useMemo(
-    () => <EmptyState loading={isLoading} onCreateRex={onCreateRex} />,
-    [isLoading, onCreateRex],
-  );
+  const listEmpty = useMemo(() => {
+    if (isError) {
+      return (
+        <QueryErrorState
+          title={search.hasSearch ? "Couldn't search" : "Couldn't load recommendations"}
+          onRetry={source.refetch}
+        />
+      );
+    }
+    return <EmptyState loading={isLoading} onCreateRex={onCreateRex} />;
+  }, [isError, isLoading, onCreateRex, search.hasSearch, source.refetch]);
 
-  const listFooter = useMemo(
-    () => <FeedFooterSpinner visible={!search.hasSearch && feed.isFetchingNextPage} />,
-    [search.hasSearch, feed.isFetchingNextPage],
-  );
+  const listFooter = useMemo(() => {
+    if (search.hasSearch) return null;
+    if (feed.isFetchNextPageError) {
+      return <QueryErrorState compact title="Couldn't load more" onRetry={feed.retryNextPage} />;
+    }
+    return <FeedFooterSpinner visible={feed.isFetchingNextPage} />;
+  }, [search.hasSearch, feed.isFetchNextPageError, feed.retryNextPage, feed.isFetchingNextPage]);
 
   const contentContainerStyle = useMemo(() => [webContainerStyle, { paddingBottom: 96 }], []);
 

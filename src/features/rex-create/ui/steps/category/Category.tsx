@@ -1,5 +1,12 @@
 import React, { useMemo } from 'react';
-import { View, FlatList, useWindowDimensions, Text, ActivityIndicator } from 'react-native';
+import {
+  View,
+  FlatList,
+  useWindowDimensions,
+  Text,
+  ActivityIndicator,
+  Pressable,
+} from 'react-native';
 import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
 import { categoryRowToPickerTile } from '~/features/rex-create/lib/categories';
 import { useActiveCategories } from '~/shared/hooks/useActiveCategories';
@@ -30,7 +37,7 @@ const Category: React.FC<Props> = ({
   const grid = useMemo(() => getCategoryGridConfig(width), [width]);
   const { onGridLayout, resolvedColumnWidth } = useResolvedColumnWidth(grid);
 
-  const { data, isLoading, isError } = useActiveCategories(true);
+  const { data, isLoading, isError, refetch } = useActiveCategories(true);
   const tiles = useMemo(() => (data ? data.map(categoryRowToPickerTile) : []), [data]);
   const suggestion = tiles.find((c) => c.id === autoSuggestedCategoryId);
   const loneTileIndex = tiles.length % grid.numColumns === 1 ? tiles.length - 1 : -1;
@@ -52,6 +59,15 @@ const Category: React.FC<Props> = ({
             ? 'Could not load categories. Check your connection and try again.'
             : 'No categories available.'}
         </Text>
+        {isError ? (
+          <Pressable
+            onPress={() => void refetch()}
+            accessibilityRole="button"
+            className="mt-4 rounded-xl border border-border bg-card px-4 py-2 active:opacity-90"
+          >
+            <Text className="text-sm font-medium text-foreground">Retry</Text>
+          </Pressable>
+        ) : null}
       </CenteredStep>
     );
   }

@@ -5,7 +5,7 @@ import { useBlockedUsersPanel } from '~/features/profile/hooks/edit/useBlockedUs
 import { formatProfileHandle } from '~/features/profile/lib/handle';
 import type { BlockedUserRow } from '~/features/profile/types/blockedUser';
 import { Theme } from '~/shared/theme/Theme';
-import { SignedUserAvatar } from '~/shared/ui/SignedUserAvatar';
+import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 
 type Props = {
   onBack: () => void;

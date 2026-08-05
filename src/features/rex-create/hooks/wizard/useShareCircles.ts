@@ -60,6 +60,14 @@ export function useShareCircles() {
     setPrivateRexState(false);
   }, []);
 
+  const hydrateFromDraft = useCallback(
+    (draft: { selectedCircleIds: string[]; privateRex: boolean }) => {
+      setSelectedCircleIds(new Set(draft.selectedCircleIds));
+      setPrivateRexState(draft.privateRex);
+    },
+    [],
+  );
+
   return {
     selectedCircleIds,
     publicCircleId,
@@ -68,6 +76,7 @@ export function useShareCircles() {
     toggleCircleId,
     ensureDefaultCircleSelectionFromApiOrder,
     prefillFromEditRow,
+    hydrateFromDraft,
     reset,
   };
 }

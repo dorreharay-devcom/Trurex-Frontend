@@ -1,6 +1,6 @@
 import React from 'react';
 import AddToCollectionSheet from '~/features/collections/ui/AddToCollectionSheet';
-import { DestructiveActionConfirmModal } from '~/shared/ui/DestructiveActionConfirmModal';
+import DestructiveActionConfirmModal from '~/shared/ui/destructive-confirm/DestructiveActionConfirmModal';
 import ReportContentDialog from '~/features/rex-detail/ui/report/ReportContentDialog';
 import type { DeleteRexState } from '~/features/rex-detail/hooks/useDeleteRex';
 import type { ReportTargetState } from '~/features/rex-detail/hooks/report/useReportTarget';

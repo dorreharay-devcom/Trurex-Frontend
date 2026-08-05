@@ -25,6 +25,7 @@ export function useScopedConnections({ userId, enabled }: Args) {
     searchActive: search.active,
     searchRows: search.rows,
     searchFetching: search.isFetching,
+    searchError: search.isError,
     fallback,
   });
 
@@ -36,7 +37,9 @@ export function useScopedConnections({ userId, enabled }: Args) {
     rows: source.rows,
     hasNextPage: source.hasNextPage,
     isFetchingNextPage: source.isFetchingNextPage,
+    isFetchNextPageError: source.isFetchNextPageError,
     fetchNextPage: source.fetchNextPage,
+    retry: source.retry,
     search: {
       value: search.query,
       onChangeText: search.setQuery,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { RexCoverThumbnail } from '~/shared/ui/RexCoverThumbnail';
+import { RexCoverThumbnail } from '~/shared/ui/media/RexCoverThumbnail';
 import OwnerActions from '~/features/collections/ui/collection-detail/rex-card/OwnerActions';
 import RexCardDetails from '~/features/collections/ui/collection-detail/rex-card/RexCardDetails';
 import SavedNote from '~/features/collections/ui/collection-detail/rex-card/SavedNote';

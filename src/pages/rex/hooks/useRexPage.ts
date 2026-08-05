@@ -3,10 +3,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { fetchRexDetail } from '~/features/rex-detail/api/rexDetailApi';
 import { rexDetailRowToRecommendation } from '~/features/rex-detail/lib/rexDetailToRecommendation';
-
-function first(value: string | string[] | undefined): string | undefined {
-  return Array.isArray(value) ? value[0] : value;
-}
+import { firstRouteParam, parseOptionalRouteId } from '~/shared/lib/navigation/routeIds';
 
 export function useRexPage() {
   const raw = useLocalSearchParams<{
@@ -14,9 +11,9 @@ export function useRexPage() {
     commentId?: string | string[];
     comments?: string | string[];
   }>();
-  const rexId = first(raw.rexId)?.trim() ?? '';
-  const comments = first(raw.comments);
-  const scrollToCommentId = first(raw.commentId)?.trim() || undefined;
+  const rexId = parseOptionalRouteId(raw.rexId) ?? '';
+  const comments = firstRouteParam(raw.comments);
+  const scrollToCommentId = parseOptionalRouteId(raw.commentId) ?? undefined;
   const scrollToComments = !scrollToCommentId && (comments === '1' || comments === 'true');
 
   const { data, isPending, isError } = useQuery({

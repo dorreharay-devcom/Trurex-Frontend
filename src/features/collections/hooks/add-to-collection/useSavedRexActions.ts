@@ -7,6 +7,11 @@ import type { RecSummary } from '~/features/collections/types/recSummary';
 import { toastError, toastSuccess } from '~/shared/lib/appToast';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
+import {
+  assertOnlineForMutation,
+  isOfflineMutationBlocked,
+  requireOnlineForMutation,
+} from '~/shared/lib/network/assertOnline';
 
 type Params = {
   open: boolean;
@@ -48,6 +53,7 @@ export function useSavedRexActions({
 
   const ensureRexSaved = useCallback(async () => {
     if (isRexSaved || !user || !rec) return;
+    requireOnlineForMutation('Saving');
     await CollectionsApi.saveRex(user.id, rec.id);
     setIsRexSaved(true);
     onSaved?.();
@@ -56,12 +62,13 @@ export function useSavedRexActions({
 
   const saveToUncollected = useCallback(async () => {
     if (!user || !rec || isRexSaved || savingUncollected) return;
+    if (!assertOnlineForMutation('Saving')) return;
     setSavingUncollected(true);
     try {
       await ensureRexSaved();
       toastSuccess('Saved to uncollected');
     } catch (e: unknown) {
-      if (didAccountFrozenMutationToast(e)) return;
+      if (isOfflineMutationBlocked(e) || didAccountFrozenMutationToast(e)) return;
       onSaveRexFailed?.();
       toastError('Failed to save', unknownErrorMessage(e, 'Try again.'));
     } finally {
@@ -71,6 +78,7 @@ export function useSavedRexActions({
 
   const removeFromUncollected = useCallback(async () => {
     if (!user || !rec || removing) return;
+    if (!assertOnlineForMutation('Removing gems')) return;
     setRemoving(true);
     onUnsaved?.();
     setIsRexSaved(false);
@@ -80,7 +88,11 @@ export function useSavedRexActions({
       onRemove?.();
       toastSuccess('Removed from saved');
     } catch (e: unknown) {
-      if (didAccountFrozenMutationToast(e)) return;
+      if (isOfflineMutationBlocked(e) || didAccountFrozenMutationToast(e)) {
+        setIsRexSaved(true);
+        onUnsaveFailed?.();
+        return;
+      }
       toastError('Could not remove', unknownErrorMessage(e, 'Try again.'));
       setIsRexSaved(true);
       onUnsaveFailed?.();

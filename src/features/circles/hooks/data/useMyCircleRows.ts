@@ -6,10 +6,16 @@ import {
 import { useMyCircles } from '~/features/circles/hooks/data/useMyCircles';
 
 export function useMyCircleRows(enabled: boolean) {
-  const { data = [], isLoading, isError } = useMyCircles(enabled);
+  const query = useMyCircles(enabled);
 
-  const circles = useMemo(() => sortCirclesForRingStack(data), [data]);
+  const circles = useMemo(() => sortCirclesForRingStack(query.data ?? []), [query.data]);
   const displayRows = useMemo(() => mapApiCirclesToDisplayRows(circles), [circles]);
 
-  return { circles, displayRows, isLoading, isError };
+  return {
+    circles,
+    displayRows,
+    isLoading: query.isLoading,
+    isError: query.isError && circles.length === 0,
+    retry: () => void query.refetch(),
+  };
 }

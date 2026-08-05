@@ -5,7 +5,7 @@ import {
   imageTransformCacheSuffix,
   type StorageImageTransform,
 } from '~/shared/lib/media/imageTransform';
-import { isWeb } from '~/shared/lib/ui/platform';
+import { StorageService } from '~/shared/lib/storage/kv';
 
 export type ResolvedSignedUrl = { url: string; cacheUntil: number };
 
@@ -14,35 +14,52 @@ type CacheEntry = { url: string; expiresAt: number };
 const STORAGE_KEY = 'trurex_signed_url_cache_v1';
 const EXPIRY_BUFFER_MS = 60_000;
 const PUBLIC_URL_TTL_MS = 24 * 60 * 60 * 1000;
+const MAX_CACHE_ENTRIES = 280;
+const PERSIST_DEBOUNCE_MS = 400;
 
 const urlCache = new Map<string, CacheEntry>();
 const inFlight = new Map<string, Promise<ResolvedSignedUrl | null>>();
+let persistTimer: ReturnType<typeof setTimeout> | null = null;
 
 function isFresh(entry: CacheEntry, now: number): boolean {
   return entry.expiresAt - EXPIRY_BUFFER_MS > now;
 }
 
-function loadPersistedCache() {
-  if (!isWeb) return;
+function touch(key: string, entry: CacheEntry): void {
+  urlCache.delete(key);
+  urlCache.set(key, entry);
+}
+
+function evictIfNeeded(): void {
+  while (urlCache.size > MAX_CACHE_ENTRIES) {
+    const oldest = urlCache.keys().next().value;
+    if (oldest == null) break;
+    urlCache.delete(oldest);
+  }
+}
+
+const hydratePromise = (async () => {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = await StorageService.getItem(STORAGE_KEY);
     if (!raw) return;
     const entries: [string, CacheEntry][] = JSON.parse(raw);
     const now = Date.now();
     for (const [key, entry] of entries) {
       if (isFresh(entry, now)) urlCache.set(key, entry);
     }
+    evictIfNeeded();
   } catch {}
-}
+})();
 
-function persistCache() {
-  if (!isWeb) return;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(urlCache.entries())));
-  } catch {}
+function schedulePersist(): void {
+  if (persistTimer != null) clearTimeout(persistTimer);
+  persistTimer = setTimeout(() => {
+    persistTimer = null;
+    void StorageService.setItem(STORAGE_KEY, JSON.stringify(Array.from(urlCache.entries()))).catch(
+      () => {},
+    );
+  }, PERSIST_DEBOUNCE_MS);
 }
-
-loadPersistedCache();
 
 export function getCachedSignedUrl(key: string): string | null {
   const entry = urlCache.get(key);
@@ -51,12 +68,14 @@ export function getCachedSignedUrl(key: string): string | null {
     urlCache.delete(key);
     return null;
   }
+  touch(key, entry);
   return entry.url;
 }
 
 export function cacheSignedUrl(key: string, resolved: ResolvedSignedUrl): void {
-  urlCache.set(key, { url: resolved.url, expiresAt: resolved.cacheUntil });
-  persistCache();
+  touch(key, { url: resolved.url, expiresAt: resolved.cacheUntil });
+  evictIfNeeded();
+  schedulePersist();
 }
 
 export function signedUrlCacheKey(
@@ -143,9 +162,18 @@ export function resolveSignedUrlOnce(
   const existing = inFlight.get(cacheKey);
   if (existing) return existing;
 
-  const request = resolveUrl(bucket, path, expiresInSec, transform).finally(() => {
+  const request = (async () => {
+    await hydratePromise;
+    const entry = urlCache.get(cacheKey);
+    if (entry && isFresh(entry, Date.now())) {
+      touch(cacheKey, entry);
+      return { url: entry.url, cacheUntil: entry.expiresAt };
+    }
+    return resolveUrl(bucket, path, expiresInSec, transform);
+  })().finally(() => {
     inFlight.delete(cacheKey);
   });
+
   inFlight.set(cacheKey, request);
   return request;
 }
