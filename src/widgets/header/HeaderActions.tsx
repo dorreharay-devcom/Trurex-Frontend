@@ -14,7 +14,6 @@ type Props = {
   profileActive?: boolean;
   profileName: string;
   avatarPath: string | null;
-  avatarRefreshKey: number;
   onAddPress?: () => void;
   onProfilePress: () => void;
   onUserPress?: (userId: string) => void;
@@ -26,7 +25,6 @@ const HeaderActions = ({
   profileActive,
   profileName,
   avatarPath,
-  avatarRefreshKey,
   onAddPress,
   onProfilePress,
   onUserPress,
@@ -75,7 +73,6 @@ const HeaderActions = ({
       <SignedUserAvatar
         name={profileName}
         avatar={avatarPath}
-        cacheVersion={avatarRefreshKey}
         className={profileActive ? 'border-primary' : undefined}
       />
     </TouchableOpacity>

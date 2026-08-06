@@ -11,7 +11,7 @@ export function ProfileCollectionsSkeleton({ windowWidth }: Props) {
   const height = Math.round(cellWidth * (224 / 176));
 
   return (
-    <View className="flex-row flex-wrap p-4" style={{ gap }}>
+    <View className="flex-row flex-wrap" style={{ gap }}>
       {Array.from({ length: numColumns * 2 }, (_, i) => (
         <View key={i} style={{ width: cellWidth, height }} className="rounded-xl bg-border/40" />
       ))}

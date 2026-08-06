@@ -2,7 +2,6 @@ import React from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 import { useEditProfile } from '~/features/profile/hooks/edit/useEditProfile';
-import BlockedUsersPanel from '~/features/profile/ui/BlockedUsersPanel';
 import EditProfileAvatar from '~/features/profile/ui/edit/EditProfileAvatar';
 import EditProfileBasics from '~/features/profile/ui/edit/EditProfileBasics';
 import EditProfileCurrently from '~/features/profile/ui/edit/EditProfileCurrently';
@@ -13,9 +12,10 @@ import DestructiveActionConfirmModal from '~/shared/ui/destructive-confirm/Destr
 
 type Props = {
   onClose: () => void;
+  onOpenBlockedUsers: () => void;
 };
 
-const EditProfile = ({ onClose }: Props) => {
+const EditProfile = ({ onClose, onOpenBlockedUsers }: Props) => {
   const form = useEditProfile({ onClose });
   const { fields, avatar, blocked, account } = form;
 
@@ -25,10 +25,6 @@ const EditProfile = ({ onClose }: Props) => {
         <ActivityIndicator color={Theme.colors.primary} />
       </View>
     );
-  }
-
-  if (blocked.show) {
-    return <BlockedUsersPanel onBack={blocked.close} />;
   }
 
   const actionsDisabled = form.saving || account.pending;
@@ -91,7 +87,7 @@ const EditProfile = ({ onClose }: Props) => {
         <EditProfileDangerZone
           blockedCount={blocked.count}
           disabled={actionsDisabled}
-          onOpenBlockedUsers={blocked.open}
+          onOpenBlockedUsers={onOpenBlockedUsers}
           onDeleteAccount={account.openConfirm}
         />
       </ScrollView>

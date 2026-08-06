@@ -7,6 +7,7 @@ import {
 } from '~/features/rex-create/api/rexCreateApi';
 import { deriveConfigView } from '~/features/rex-create/lib/configMerge';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
+import type { CategoryCreateConfig } from '~/features/rex-create/types/categoryCreateConfig';
 
 const CONFIGS_STALE_MS = 5 * 60 * 1000;
 
@@ -17,6 +18,26 @@ type UseCategoryCreateConfigArgs = {
   flow: CreateRecFlow;
 };
 
+type ConfigsByCode = Record<string, CategoryCreateConfig>;
+
+function lookupConfig(
+  data: ConfigsByCode | Map<string, CategoryCreateConfig> | undefined,
+  code: string,
+): CategoryCreateConfig | undefined {
+  if (!data) return undefined;
+  if (data instanceof Map) return data.get(code);
+  return data[code];
+}
+
+function hasConfig(
+  data: ConfigsByCode | Map<string, CategoryCreateConfig> | undefined,
+  code: string,
+): boolean {
+  if (!data) return false;
+  if (data instanceof Map) return data.has(code);
+  return Object.prototype.hasOwnProperty.call(data, code);
+}
+
 export function useCategoryCreateConfig({ visible, flow }: UseCategoryCreateConfigArgs) {
   const { selectedCategoryId, selectedSubcategoryCode, syncCategoryCreateShape } = flow.category;
   const { syncFormToConfig } = flow;
@@ -24,16 +45,16 @@ export function useCategoryCreateConfig({ visible, flow }: UseCategoryCreateConf
 
   const { data: configsByCode, isLoading: configsLoading } = useQuery({
     queryKey: ['rexAllCategoryCreateConfigs'],
-    queryFn: async () => {
+    queryFn: async (): Promise<ConfigsByCode> => {
       const list = await fetchAllCategoryCreateConfigs();
-      return new Map(list.map((c) => [c.code, c]));
+      return Object.fromEntries(list.map((c) => [c.code, c]));
     },
     enabled: visible,
     staleTime: CONFIGS_STALE_MS,
   });
 
   const needsSingleConfig = Boolean(
-    visible && categoryApiCode && configsByCode && !configsByCode.has(categoryApiCode),
+    visible && categoryApiCode && configsByCode && !hasConfig(configsByCode, categoryApiCode),
   );
 
   const { data: fetchedSingleConfig, isLoading: singleConfigLoading } = useQuery({
@@ -44,7 +65,7 @@ export function useCategoryCreateConfig({ visible, flow }: UseCategoryCreateConf
 
   const activeCreateConfig = useMemo(() => {
     if (!categoryApiCode) return null;
-    return configsByCode?.get(categoryApiCode) ?? fetchedSingleConfig ?? null;
+    return lookupConfig(configsByCode, categoryApiCode) ?? fetchedSingleConfig ?? null;
   }, [categoryApiCode, configsByCode, fetchedSingleConfig]);
 
   const categoryDefinesSubcategories = Boolean(activeCreateConfig?.subcategories.length);

@@ -6,7 +6,6 @@ import QueryListFooter from '~/shared/ui/query/QueryListFooter';
 import { useGemsData } from '~/features/gems/hooks/useGemsData';
 import { useGemsPageState } from '~/features/gems/hooks/useGemsPageState';
 import { useRemoveUncollected } from '~/features/gems/hooks/useRemoveUncollected';
-import CollectionDetailScreen from '~/features/gems/ui/CollectionDetailScreen';
 import GemsHeader from '~/features/gems/ui/GemsHeader';
 import GemsOverlays from '~/features/gems/ui/GemsOverlays';
 import UncollectedEmpty from '~/features/gems/ui/UncollectedEmpty';
@@ -16,23 +15,14 @@ import { webContainerStyle } from '~/shared/lib/ui/styles';
 
 type GemsPageProps = {
   onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
+  onOpenCollection?: (collectionId: string) => void;
 };
 
-function GemsPage({ onRecommendationPress }: GemsPageProps) {
+function GemsPage({ onRecommendationPress, onOpenCollection }: GemsPageProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const { collections, uncollected } = useGemsData(searchQuery);
-  const page = useGemsPageState();
+  const page = useGemsPageState({ onOpenCollection });
   const removeUncollected = useRemoveUncollected();
-
-  if (page.openCollectionId) {
-    return (
-      <CollectionDetailScreen
-        collectionId={page.openCollectionId}
-        onBack={page.closeCollection}
-        onRecommendationPress={onRecommendationPress}
-      />
-    );
-  }
 
   return (
     <>

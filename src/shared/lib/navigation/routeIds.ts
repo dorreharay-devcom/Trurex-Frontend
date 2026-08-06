@@ -14,3 +14,8 @@ export function firstRouteParam(value: string | string[] | undefined): string | 
   const trimmed = raw.trim();
   return trimmed.length > 0 ? trimmed : undefined;
 }
+
+export function searchParam(value: string | null): string | undefined {
+  if (value == null || value === '') return undefined;
+  return value;
+}

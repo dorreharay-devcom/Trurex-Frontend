@@ -2,7 +2,6 @@ import React from 'react';
 import { ScrollView } from 'react-native';
 import { useAuth } from '~/features/auth/providers';
 import CircleAssignmentSheet from '~/features/circles/ui/assignment/CircleAssignmentSheet';
-import CircleDetailScreen from '~/features/circles/ui/detail/CircleDetailScreen';
 import ShareProfileCard from '~/features/circles/ui/ShareProfileCard';
 import { useCirclesPageState } from '~/features/circles/hooks/useCirclesPageState';
 import ConnectionsSection from '~/features/circles/ui/ConnectionsSection';
@@ -14,21 +13,12 @@ const SHOW_SHARE_PROFILE_CARD = false;
 type Props = {
   isActive: boolean;
   onUserPress?: (userId: string) => void;
+  onOpenCircle?: (circleId: string) => void;
 };
 
-const CirclesPage = ({ isActive, onUserPress }: Props) => {
+const CirclesPage = ({ isActive, onUserPress, onOpenCircle }: Props) => {
   const { user } = useAuth();
   const page = useCirclesPageState();
-
-  if (page.openCircleId) {
-    return (
-      <CircleDetailScreen
-        circleId={page.openCircleId}
-        onBack={page.closeCircle}
-        onUserPress={onUserPress}
-      />
-    );
-  }
 
   return (
     <>
@@ -41,7 +31,10 @@ const CirclesPage = ({ isActive, onUserPress }: Props) => {
       >
         {SHOW_SHARE_PROFILE_CARD && <ShareProfileCard isActive={isActive} />}
 
-        <MyCirclesSection enabled={Boolean(user) && isActive} onOpenCircle={page.openCircle} />
+        <MyCirclesSection
+          enabled={Boolean(user) && isActive}
+          onOpenCircle={(circleId) => onOpenCircle?.(circleId)}
+        />
 
         {user && isActive && (
           <ConnectionsSection

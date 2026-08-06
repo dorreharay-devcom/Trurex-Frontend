@@ -1,15 +1,15 @@
 import { useCallback } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { parseProfileRouteSlug } from '~/features/profile/lib/handle';
-import { useRexPreview } from '~/features/rex-detail/hooks/useRexPreview';
-import { toUserRoute } from '~/shared/config/routes';
 import { TAB, type Tab } from '~/shared/config/mainTabs';
+import { toUserRoute } from '~/shared/config/routes';
 import { openMainTab } from '~/shared/lib/mainTab';
+import { openRecommendation, openRex } from '~/shared/lib/navigation/createRex';
+import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
 
 export function useProfilePage() {
   const { userId: slug } = useLocalSearchParams<{ userId: string }>();
   const router = useRouter();
-  const preview = useRexPreview();
   const target = parseProfileRouteSlug(slug);
 
   const goToTab = useCallback(
@@ -20,6 +20,10 @@ export function useProfilePage() {
   );
 
   const goBack = useCallback(() => {
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
     openMainTab(router, TAB.profile);
   }, [router]);
 
@@ -30,12 +34,28 @@ export function useProfilePage() {
     [router],
   );
 
+  const handleOpenRex = useCallback(
+    (rexId: string, options?: RecommendationOpenOptions) => {
+      openRex(router, rexId, options);
+    },
+    [router],
+  );
+
+  const handleOpenRecommendation = useCallback(
+    (rec: Recommendation, options?: RecommendationOpenOptions) => {
+      openRecommendation(router, rec, options);
+    },
+    [router],
+  );
+
   return {
+    router,
     userId: target.userId,
     handle: target.handle,
-    preview,
     goToTab,
     goBack,
     openUser,
+    openRex: handleOpenRex,
+    openRecommendation: handleOpenRecommendation,
   };
 }

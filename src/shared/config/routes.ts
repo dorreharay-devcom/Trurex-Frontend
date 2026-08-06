@@ -1,7 +1,13 @@
 import type { Href } from 'expo-router';
 
 export const Routes = {
-  Main: '/',
+  Main: '/discover',
+  Profile: '/profile',
+  ProfileEdit: '/profile/edit',
+  ProfileBlocked: '/profile/blocked',
+  Gems: '/gems',
+  Circles: '/circles',
+  Create: '/create',
   Login: '/login',
   Signup: '/signup',
   ForgotPassword: '/forgot-password',
@@ -25,4 +31,15 @@ export function toRexRoute(
   else if (options?.scrollToComments) params.set('comments', '1');
   const qs = params.toString();
   return `/rex/${rexId}${qs ? `?${qs}` : ''}`;
+}
+
+export function toCreateRoute(options?: { editRexId?: string; step?: string }): Href {
+  const params = new URLSearchParams();
+  if (options?.editRexId) params.set('edit', options.editRexId);
+  params.set('step', options?.step ?? 'search');
+  return `/create?${params.toString()}`;
+}
+
+export function toCircleRoute(circleId: string): Href {
+  return `/circles/${circleId}`;
 }

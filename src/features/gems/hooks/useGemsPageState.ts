@@ -5,9 +5,12 @@ import { toRecSummary } from '~/features/collections/lib/mappers';
 import type { RecSummary } from '~/features/collections/types/recSummary';
 import type { Recommendation } from '~/shared/types/recommendation';
 
-export function useGemsPageState() {
+type Params = {
+  onOpenCollection?: (collectionId: string) => void;
+};
+
+export function useGemsPageState({ onOpenCollection }: Params = {}) {
   const queryClient = useQueryClient();
-  const [openCollectionId, setOpenCollectionId] = useState<string | null>(null);
   const [showCreateCollection, setShowCreateCollection] = useState(false);
   const [addToCollectionRec, setAddToCollectionRec] = useState<RecSummary | null>(null);
 
@@ -15,12 +18,12 @@ export function useGemsPageState() {
     queryClient.invalidateQueries({ queryKey: [...COLLECTIONS_QUERY_KEYS.myCollections] });
   }, [queryClient]);
 
-  const closeCollection = useCallback(() => {
-    setOpenCollectionId(null);
-    invalidateMyCollections();
-    queryClient.invalidateQueries({ queryKey: [...COLLECTIONS_QUERY_KEYS.mySavedCollections] });
-    queryClient.invalidateQueries({ queryKey: [...COLLECTIONS_QUERY_KEYS.mySavedRexes] });
-  }, [queryClient, invalidateMyCollections]);
+  const openCollection = useCallback(
+    (id: string) => {
+      onOpenCollection?.(id);
+    },
+    [onOpenCollection],
+  );
 
   const openCreateCollection = useCallback(() => setShowCreateCollection(true), []);
   const closeCreateCollection = useCallback(() => setShowCreateCollection(false), []);
@@ -29,9 +32,9 @@ export function useGemsPageState() {
     (id: string) => {
       setShowCreateCollection(false);
       invalidateMyCollections();
-      setOpenCollectionId(id);
+      onOpenCollection?.(id);
     },
-    [invalidateMyCollections],
+    [invalidateMyCollections, onOpenCollection],
   );
 
   const openAddToCollection = useCallback((rec: Recommendation) => {
@@ -44,9 +47,7 @@ export function useGemsPageState() {
   }, [invalidateMyCollections]);
 
   return {
-    openCollectionId,
-    openCollection: setOpenCollectionId,
-    closeCollection,
+    openCollection,
     showCreateCollection,
     openCreateCollection,
     closeCreateCollection,

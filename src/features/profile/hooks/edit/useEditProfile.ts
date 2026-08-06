@@ -21,7 +21,6 @@ export function useEditProfile({ onClose }: Params) {
   const { user, signOut } = useAuth();
   const { data: blockedUsers } = useBlockedUsers(user?.id);
   const [saving, setSaving] = useState(false);
-  const [showBlockedUsers, setShowBlockedUsers] = useState(false);
 
   const fields = useEditProfileForm({ userId: user?.id });
   const avatar = useEditProfileAvatar({
@@ -74,9 +73,6 @@ export function useEditProfile({ onClose }: Params) {
     loading: fields.loading,
     saving,
     blocked: {
-      show: showBlockedUsers,
-      open: () => setShowBlockedUsers(true),
-      close: () => setShowBlockedUsers(false),
       count: blockedUsers?.length,
     },
     fields: {

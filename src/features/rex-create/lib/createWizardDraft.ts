@@ -37,11 +37,9 @@ function isSearchMode(value: unknown): value is SearchEntryMode {
   );
 }
 
-/** Storage object keys only (not file/content/http URIs that die after kill). */
 export function isDurablePhotoStoragePath(path: string): boolean {
   const p = path.trim();
   if (!p) return false;
-  // Schemed URIs (file:, content:, http(s):, blob:, data:, ph:, …)
   if (/^[a-z][a-z0-9+.-]*:/i.test(p)) return false;
   return true;
 }

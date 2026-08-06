@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { firstRouteParam, parseOptionalRouteId } from '~/shared/lib/navigation/routeIds';
+import {
+  firstRouteParam,
+  parseOptionalRouteId,
+  searchParam,
+} from '~/shared/lib/navigation/routeIds';
 import {
   isHttpUrl,
   isStrictUuid,
@@ -23,6 +27,12 @@ describe('routeIds', () => {
     expect(firstRouteParam([' a ', 'b'])).toBe('a');
     expect(firstRouteParam('  ')).toBeUndefined();
     expect(firstRouteParam(undefined)).toBeUndefined();
+  });
+
+  it('omits empty search params from setParams', () => {
+    expect(searchParam(null)).toBeUndefined();
+    expect(searchParam('')).toBeUndefined();
+    expect(searchParam('followers')).toBe('followers');
   });
 });
 

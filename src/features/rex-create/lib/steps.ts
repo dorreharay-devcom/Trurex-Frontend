@@ -8,6 +8,15 @@ import {
 } from '~/features/rex-create/types/create';
 import { isStrictUuid } from '~/shared/lib/data/guards';
 
+export function isCreateRecStepId(value: unknown): value is CreateRecStepId {
+  return typeof value === 'string' && (CREATE_REC_STEP_ORDER as readonly string[]).includes(value);
+}
+
+export function parseCreateStepParam(value: string | undefined): CreateRecStepId | null {
+  if (!value) return null;
+  return isCreateRecStepId(value) ? value : null;
+}
+
 export function getActiveCreateRecSteps(
   selectedCategoryId: string | null,
   includeSubcategoryStep: boolean,

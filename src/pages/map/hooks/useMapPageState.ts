@@ -59,7 +59,6 @@ export function useMapPageState({ flow, onRexSheetOpenChange }: Params) {
     locatedRecsForList,
     listView,
     isLoading,
-    isError,
     isPinsError,
     searchQuery,
     mapMarkers,

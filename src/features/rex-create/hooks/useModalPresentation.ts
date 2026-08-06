@@ -9,10 +9,9 @@ type Params = {
   windowHeight: number;
   stepIndex: number;
   onClose: () => void;
-  reset: () => void;
 };
 
-export function useModalPresentation({ visible, windowHeight, stepIndex, onClose, reset }: Params) {
+export function useModalPresentation({ visible, windowHeight, stepIndex, onClose }: Params) {
   const prevStepIndex = useRef(-1);
   const windowHeightRef = useRef(windowHeight);
   windowHeightRef.current = windowHeight;
@@ -22,11 +21,8 @@ export function useModalPresentation({ visible, windowHeight, stepIndex, onClose
   const stepOpacity = useRef(new RNAnimated.Value(1)).current;
 
   useLayoutEffect(() => {
-    if (visible) {
-      prevStepIndex.current = -1;
-      reset();
-    }
-  }, [visible, reset]);
+    if (visible) prevStepIndex.current = -1;
+  }, [visible]);
 
   useEffect(() => {
     if (!visible) return;

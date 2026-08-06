@@ -15,53 +15,50 @@ import CreateModalFooter from './CreateModalFooter';
 import CreateModalBody from './CreateModalBody';
 
 type Props = {
-  visible: boolean;
   onClose: () => void;
   addYourOwnPrefill?: AddYourOwnRecSource | null;
   editRexId?: string | null;
 };
 
-const CreateModal: React.FC<Props> = ({
-  visible,
-  onClose,
-  addYourOwnPrefill = null,
-  editRexId = null,
-}) => {
+const CreateScreen: React.FC<Props> = ({ onClose, addYourOwnPrefill = null, editRexId = null }) => {
   const { height: windowHeight } = useWindowDimensions();
   const flow = useCreateRecWizard();
-  const { applyAddYourOwnPrefill } = flow;
+  const { applyAddYourOwnPrefill, reset } = flow;
   const isEditMode = editRexId != null;
 
   const { sheetTranslateY, stepOpacity, handleClose } = useModalPresentation({
-    visible,
+    visible: true,
     windowHeight,
     stepIndex: flow.nav.stepIndex,
     onClose,
-    reset: flow.reset,
   });
 
-  const { isGeotagging, handleTagLocation } = useTagLocation(flow);
-  const { markPosted, abandonDraftAndClose } = useDraftDiscard({
-    visible,
-    closeModal: handleClose,
-  });
-  useCreateWizardDraftPersistence({
-    visible,
+  const draftPersistence = useCreateWizardDraftPersistence({
+    visible: true,
     isEditMode,
     hasExternalPrefill: addYourOwnPrefill != null,
     flow,
   });
+
+  const { isGeotagging, handleTagLocation } = useTagLocation(flow);
+  const { markPosted, abandonDraftAndClose } = useDraftDiscard({
+    visible: true,
+    closeModal: handleClose,
+    cancelPendingSave: draftPersistence.cancelPendingSave,
+    resetWizard: reset,
+  });
+
   const { editLoading, editLoadError, retryEdit } = useEditPrefill({
-    visible,
+    visible: true,
     editRexId,
     applyEditPrefill: flow.applyEditPrefill,
   });
-  const config = useCategoryCreateConfig({ visible, flow });
+  const config = useCategoryCreateConfig({ visible: true, flow });
 
   useLayoutEffect(() => {
-    if (!visible || !addYourOwnPrefill) return;
+    if (!addYourOwnPrefill) return;
     applyAddYourOwnPrefill(addYourOwnPrefill);
-  }, [visible, addYourOwnPrefill, applyAddYourOwnPrefill]);
+  }, [addYourOwnPrefill, applyAddYourOwnPrefill]);
 
   const { submitting, primaryDisabled, handlePrimaryFooter } = usePrimaryAction({
     flow,
@@ -76,7 +73,7 @@ const CreateModal: React.FC<Props> = ({
 
   return (
     <OverlayModal
-      visible={visible}
+      embedded
       onRequestClose={abandonDraftAndClose}
       contentTranslateY={sheetTranslateY}
     >
@@ -91,7 +88,7 @@ const CreateModal: React.FC<Props> = ({
         />
 
         <CreateModalBody
-          visible={visible}
+          visible
           flow={flow}
           config={config}
           stepOpacity={stepOpacity}
@@ -116,4 +113,4 @@ const CreateModal: React.FC<Props> = ({
   );
 };
 
-export default CreateModal;
+export default CreateScreen;
