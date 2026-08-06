@@ -38,20 +38,6 @@
       }
     }
   },
-  "update": {
-    "development": {
-      "channel": "development",
-      "environment": "development"
-    },
-    "preview": {
-      "channel": "preview",
-      "environment": "development"
-    },
-    "production": {
-      "channel": "production",
-      "environment": "production"
-    }
-  },
   "submit": {
     "development": {
       "ios": {
