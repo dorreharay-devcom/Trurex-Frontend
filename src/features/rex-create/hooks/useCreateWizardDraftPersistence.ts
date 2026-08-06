@@ -1,11 +1,13 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
 import {
   buildCreateWizardDraft,
   clearCreateWizardDraft,
+  createWizardDraftIsMeaningful,
   loadCreateWizardDraft,
   saveCreateWizardDraft,
 } from '~/features/rex-create/lib/createWizardDraft';
+import { STEP_ID } from '~/features/rex-create/types/create';
 
 const SAVE_DEBOUNCE_MS = 700;
 
@@ -22,115 +24,149 @@ export function useCreateWizardDraftPersistence({
   hasExternalPrefill,
   flow,
 }: Args) {
-  const restoredRef = useRef(false);
+  const [restoreReady, setRestoreReady] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { place, category, scorecard, circles, photos } = flow;
+  const flowRef = useRef(flow);
+  flowRef.current = flow;
+
+  const cancelPendingSave = () => {
+    if (saveTimer.current) {
+      clearTimeout(saveTimer.current);
+      saveTimer.current = null;
+    }
+  };
 
   useEffect(() => {
     if (!visible) {
-      restoredRef.current = false;
+      setRestoreReady(false);
+      cancelPendingSave();
       return;
     }
-    if (isEditMode || hasExternalPrefill || restoredRef.current) return;
-    restoredRef.current = true;
+
+    if (isEditMode || hasExternalPrefill) {
+      void clearCreateWizardDraft();
+      setRestoreReady(true);
+      return;
+    }
+
     let cancelled = false;
+    setRestoreReady(false);
+
     void (async () => {
       const draft = await loadCreateWizardDraft();
-      if (cancelled || !draft) return;
-      place.hydrateFromDraft({
-        searchMode: draft.searchMode,
-        searchQuery: draft.searchQuery,
-        selectedSearchPlace: draft.selectedSearchPlace,
-        manual: draft.manual,
-        online: draft.online,
-      });
-      category.hydrateFromDraft({
-        selectedCategoryId: draft.selectedCategoryId,
-        selectedSubcategoryCode: draft.selectedSubcategoryCode,
-      });
-      scorecard.hydrateFromDraft({
-        categoryRatings: draft.categoryRatings,
-        questionAnswers: draft.questionAnswers,
-        selectedTagSlugs: draft.selectedTagSlugs,
-        scoreQuickTip: draft.scoreQuickTip,
-        scoreValueForMoney: draft.scoreValueForMoney,
-        scoreReview: draft.scoreReview,
-      });
-      circles.hydrateFromDraft({
-        selectedCircleIds: draft.selectedCircleIds,
-        privateRex: draft.privateRex,
-      });
-      photos.setPaths(draft.photoStoragePaths);
+      if (cancelled) return;
+
+      const { place, category, scorecard, circles, photos, nav } = flowRef.current;
+
+      if (draft && createWizardDraftIsMeaningful(draft)) {
+        place.hydrateFromDraft({
+          searchMode: draft.searchMode,
+          searchQuery: draft.searchQuery,
+          selectedSearchPlace: draft.selectedSearchPlace,
+          manual: draft.manual,
+          online: draft.online,
+        });
+        category.hydrateFromDraft({
+          selectedCategoryId: draft.selectedCategoryId,
+          selectedSubcategoryCode: draft.selectedSubcategoryCode,
+        });
+        scorecard.hydrateFromDraft({
+          categoryRatings: draft.categoryRatings,
+          questionAnswers: draft.questionAnswers,
+          selectedTagSlugs: draft.selectedTagSlugs,
+          scoreQuickTip: draft.scoreQuickTip,
+          scoreValueForMoney: draft.scoreValueForMoney,
+          scoreReview: draft.scoreReview,
+        });
+        circles.hydrateFromDraft({
+          selectedCircleIds: draft.selectedCircleIds,
+          privateRex: draft.privateRex,
+        });
+        photos.setPaths(draft.photoStoragePaths);
+      } else {
+        await clearCreateWizardDraft();
+        if (nav.stepId !== STEP_ID.search) {
+          nav.reset();
+        }
+      }
+
+      if (!cancelled) setRestoreReady(true);
     })();
+
     return () => {
       cancelled = true;
     };
-  }, [visible, isEditMode, hasExternalPrefill, place, category, scorecard, circles, photos]);
+  }, [visible, isEditMode, hasExternalPrefill]);
 
   useEffect(() => {
-    if (!visible || isEditMode || hasExternalPrefill) return;
-    if (saveTimer.current) clearTimeout(saveTimer.current);
+    if (!visible || isEditMode || hasExternalPrefill || !restoreReady) return;
+
+    cancelPendingSave();
     saveTimer.current = setTimeout(() => {
+      const f = flowRef.current;
       const draft = buildCreateWizardDraft({
-        searchMode: place.searchMode,
-        searchQuery: place.searchQuery,
-        selectedSearchPlace: place.selectedSearchPlace,
+        searchMode: f.place.searchMode,
+        searchQuery: f.place.searchQuery,
+        selectedSearchPlace: f.place.selectedSearchPlace,
         manual: {
-          name: place.manualName,
-          address: place.manualAddress,
-          geotag: place.manualGeotag,
+          name: f.place.manualName,
+          address: f.place.manualAddress,
+          geotag: f.place.manualGeotag,
         },
         online: {
-          name: place.onlineName,
-          websiteUrl: place.onlineWebsiteUrl,
-          locationText: place.onlineLocationText,
-          geotag: place.onlineGeotag,
+          name: f.place.onlineName,
+          websiteUrl: f.place.onlineWebsiteUrl,
+          locationText: f.place.onlineLocationText,
+          geotag: f.place.onlineGeotag,
         },
-        selectedCategoryId: category.selectedCategoryId,
-        selectedSubcategoryCode: category.selectedSubcategoryCode,
-        scoreQuickTip: scorecard.scoreQuickTip,
-        scoreReview: scorecard.scoreReview,
-        scoreValueForMoney: scorecard.scoreValueForMoney,
-        categoryRatings: scorecard.categoryRatings,
-        questionAnswers: scorecard.questionAnswers,
-        selectedTagSlugs: scorecard.selectedTagSlugs,
-        photoStoragePaths: photos.paths,
-        selectedCircleIds: [...circles.selectedCircleIds],
-        privateRex: circles.privateRex,
+        selectedCategoryId: f.category.selectedCategoryId,
+        selectedSubcategoryCode: f.category.selectedSubcategoryCode,
+        scoreQuickTip: f.scorecard.scoreQuickTip,
+        scoreReview: f.scorecard.scoreReview,
+        scoreValueForMoney: f.scorecard.scoreValueForMoney,
+        categoryRatings: f.scorecard.categoryRatings,
+        questionAnswers: f.scorecard.questionAnswers,
+        selectedTagSlugs: f.scorecard.selectedTagSlugs,
+        photoStoragePaths: f.photos.paths,
+        selectedCircleIds: [...f.circles.selectedCircleIds],
+        privateRex: f.circles.privateRex,
       });
       void saveCreateWizardDraft(draft);
     }, SAVE_DEBOUNCE_MS);
+
     return () => {
-      if (saveTimer.current) clearTimeout(saveTimer.current);
+      cancelPendingSave();
     };
   }, [
     visible,
     isEditMode,
     hasExternalPrefill,
-    place.searchMode,
-    place.searchQuery,
-    place.selectedSearchPlace,
-    place.manualName,
-    place.manualAddress,
-    place.manualGeotag,
-    place.onlineName,
-    place.onlineWebsiteUrl,
-    place.onlineLocationText,
-    place.onlineGeotag,
-    category.selectedCategoryId,
-    category.selectedSubcategoryCode,
-    scorecard.scoreQuickTip,
-    scorecard.scoreReview,
-    scorecard.scoreValueForMoney,
-    scorecard.categoryRatings,
-    scorecard.questionAnswers,
-    scorecard.selectedTagSlugs,
-    photos.paths,
-    circles.selectedCircleIds,
-    circles.privateRex,
+    restoreReady,
+    flow.place.searchMode,
+    flow.place.searchQuery,
+    flow.place.selectedSearchPlace,
+    flow.place.manualName,
+    flow.place.manualAddress,
+    flow.place.manualGeotag,
+    flow.place.onlineName,
+    flow.place.onlineWebsiteUrl,
+    flow.place.onlineLocationText,
+    flow.place.onlineGeotag,
+    flow.category.selectedCategoryId,
+    flow.category.selectedSubcategoryCode,
+    flow.scorecard.scoreQuickTip,
+    flow.scorecard.scoreReview,
+    flow.scorecard.scoreValueForMoney,
+    flow.scorecard.categoryRatings,
+    flow.scorecard.questionAnswers,
+    flow.scorecard.selectedTagSlugs,
+    flow.photos.paths,
+    flow.circles.selectedCircleIds,
+    flow.circles.privateRex,
   ]);
 
   return {
     clearDraft: clearCreateWizardDraft,
+    cancelPendingSave,
   };
 }

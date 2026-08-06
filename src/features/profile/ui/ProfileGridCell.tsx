@@ -2,9 +2,11 @@ import React from 'react';
 import { View, type ViewStyle } from 'react-native';
 
 const GRID_GAP = 12;
+const OUTER_PAD = 16;
+const INNER_PAD = 16;
 
 export function profileGridLayout(windowWidth: number) {
-  const gridWidth = Math.min(windowWidth, 1280) - 66;
+  const gridWidth = Math.min(windowWidth, 1280) - OUTER_PAD * 2 - INNER_PAD * 2;
   const numColumns = gridWidth < 700 ? 2 : 4;
   const cellWidth = Math.floor((gridWidth - GRID_GAP * (numColumns - 1)) / numColumns);
   return { numColumns, cellWidth, gap: GRID_GAP };

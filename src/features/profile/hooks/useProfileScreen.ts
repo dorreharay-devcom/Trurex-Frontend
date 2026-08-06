@@ -1,12 +1,18 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAuth } from '~/features/auth/providers';
 import { useMyCollections } from '~/features/collections/hooks/data/useCollectionQueries';
-import { PROFILE_TAB, type ProfileTab } from '~/features/profile/config/tabs';
+import {
+  isProfileTab,
+  parseProfileTabParam,
+  PROFILE_TAB,
+  type ProfileTab,
+} from '~/features/profile/config/tabs';
 import { useMyRexes } from '~/features/profile/hooks/data/useMyRexes';
 import { useProfileData } from '~/features/profile/hooks/data/useProfileData';
 import { useProfileAvatarUpload } from '~/features/profile/hooks/useProfileAvatarUpload';
-import { useProfileCollectionOverlay } from '~/features/profile/hooks/useProfileCollectionOverlay';
 import { useProfileSocial } from '~/features/profile/hooks/useProfileSocial';
+import { firstRouteParam } from '~/shared/lib/navigation/routeIds';
 import type { Recommendation } from '~/shared/types/recommendation';
 
 type Params = {
@@ -15,6 +21,8 @@ type Params = {
   onAvatarUpdated?: () => void;
   onBack?: () => void;
   onRexPress?: (rec: Recommendation) => void;
+  onEditProfile?: () => void;
+  onOpenCollection?: (collectionId: string) => void;
 };
 
 export function useProfileScreen({
@@ -23,10 +31,25 @@ export function useProfileScreen({
   onAvatarUpdated,
   onBack,
   onRexPress,
+  onEditProfile,
+  onOpenCollection,
 }: Params) {
+  const router = useRouter();
+  const rawParams = useLocalSearchParams<{ tab?: string | string[] }>();
   const { user: authUser, signOut } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
-  const [activeTab, setActiveTab] = useState<ProfileTab>(PROFILE_TAB.recs);
+
+  const activeTab = useMemo(
+    () => parseProfileTabParam(firstRouteParam(rawParams.tab)),
+    [rawParams.tab],
+  );
+
+  const setActiveTab = useCallback(
+    (tab: ProfileTab) => {
+      if (!isProfileTab(tab)) return;
+      router.setParams({ tab });
+    },
+    [router],
+  );
 
   const profileData = useProfileData({
     propUserId,
@@ -57,7 +80,6 @@ export function useProfileScreen({
   const collectionsList = collectionsData ?? [];
   const { beginLoading, fetchProfile } = profileData;
 
-  const collectionOverlay = useProfileCollectionOverlay({ onRexPress });
   const avatar = useProfileAvatarUpload({
     userId: authUser?.id,
     onUploaded: fetchProfile,
@@ -78,17 +100,19 @@ export function useProfileScreen({
     void fetchNextCollectionsPage();
   }, [fetchNextCollectionsPage]);
 
-  const closeEdit = useCallback(() => {
-    setIsEditing(false);
-    beginLoading();
-    void fetchProfile();
-    onAvatarUpdated?.();
-  }, [beginLoading, fetchProfile, onAvatarUpdated]);
+  const openEdit = useCallback(() => {
+    onEditProfile?.();
+  }, [onEditProfile]);
+
+  const openCollection = useCallback(
+    (collectionId: string) => {
+      onOpenCollection?.(collectionId);
+    },
+    [onOpenCollection],
+  );
 
   return {
-    isEditing,
-    openEdit: () => setIsEditing(true),
-    closeEdit,
+    openEdit,
     profile: profileData.profile,
     loading: profileData.loading,
     notFound: profileData.notFound,
@@ -103,6 +127,7 @@ export function useProfileScreen({
     avatar,
     onRexPress,
     onBack,
+    openCollection,
     content: {
       activeTab,
       setActiveTab,
@@ -124,6 +149,5 @@ export function useProfileScreen({
       retryCollections: () => void refetchCollections(),
     },
     social,
-    collectionOverlay,
   };
 }

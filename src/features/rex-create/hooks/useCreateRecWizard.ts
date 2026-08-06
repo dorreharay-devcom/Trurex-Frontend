@@ -134,17 +134,21 @@ export function useCreateRecWizard() {
     [selectedCategoryId, syncToConfig],
   );
 
-  const reset = useCallback(() => {
+  const resetForms = useCallback(() => {
     categoryCodePrefillRef.current = null;
     editPrefillRef.current = null;
     editSessionRef.current = false;
-    resetNav();
     resetPlace();
     resetCategory();
     clearScorecard();
     resetCircles();
     setPhotoStoragePaths([]);
-  }, [resetNav, resetPlace, resetCategory, clearScorecard, resetCircles]);
+  }, [resetPlace, resetCategory, clearScorecard, resetCircles]);
+
+  const reset = useCallback(() => {
+    resetForms();
+    resetNav();
+  }, [resetForms, resetNav]);
 
   const applyAddYourOwnPrefill = useCallback(
     (source: AddYourOwnRecSource) => {
@@ -188,6 +192,7 @@ export function useCreateRecWizard() {
       isLastStep,
       goNext,
       goBack,
+      reset: resetNav,
       canProceed,
     },
     place,
@@ -197,6 +202,7 @@ export function useCreateRecWizard() {
     photos: { paths: photoStoragePaths, setPaths: setPhotoStoragePaths },
     syncFormToConfig,
     reset,
+    resetForms,
     applyAddYourOwnPrefill,
     applyEditPrefill,
   };

@@ -21,11 +21,18 @@ type Props = {
   onBack?: () => void;
 };
 
+const GRID_PAD = 16;
+
 const LIST_CONTENT_STYLE = {
-  paddingHorizontal: 12,
-  paddingBottom: 24,
+  paddingHorizontal: GRID_PAD,
+  paddingBottom: 96,
   paddingTop: 0,
 };
+
+const LIST_HEADER_STYLE = {
+  marginHorizontal: -GRID_PAD,
+};
+
 const idKey = (item: { id: string }) => item.id;
 
 function EmptyBlock({
@@ -66,7 +73,7 @@ function EmptyBlock({
 const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
   const { width: windowWidth } = useWindowDimensions();
   const { numColumns, cellWidth, gap } = profileGridLayout(windowWidth);
-  const { content, collectionOverlay } = flow;
+  const { content } = flow;
   const isRecs = content.activeTab === PROFILE_TAB.recs;
 
   const header = (
@@ -79,9 +86,11 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
       keyExtractor={idKey}
       numColumns={numColumns}
       showsVerticalScrollIndicator={false}
+      contentInsetAdjustmentBehavior="never"
       onEndReached={content.loadMoreRexes}
       onEndReachedThreshold={0.45}
       ListHeaderComponent={header}
+      ListHeaderComponentStyle={LIST_HEADER_STYLE}
       ListEmptyComponent={
         <EmptyBlock
           loading={content.rexesLoading}
@@ -112,9 +121,11 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
       keyExtractor={idKey}
       numColumns={numColumns}
       showsVerticalScrollIndicator={false}
+      contentInsetAdjustmentBehavior="never"
       onEndReached={content.loadMoreCollections}
       onEndReachedThreshold={0.45}
       ListHeaderComponent={header}
+      ListHeaderComponentStyle={LIST_HEADER_STYLE}
       ListEmptyComponent={
         <EmptyBlock
           loading={content.collectionsLoading}
@@ -138,7 +149,7 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
           <CollectionCard
             collection={item}
             width={cellWidth}
-            onPress={() => collectionOverlay.openCollection(item.id)}
+            onPress={() => flow.openCollection(item.id)}
           />
         </ProfileGridCell>
       )}
@@ -146,7 +157,7 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
   );
 
   return (
-    <View className="min-h-0 w-full flex-1 px-4 pb-4 pt-4" style={webContainerStyle}>
+    <View className="min-h-0 w-full flex-1 p-4" style={webContainerStyle}>
       <View className="min-h-0 flex-1 overflow-hidden rounded-xl border border-border bg-card shadow-card">
         {list}
       </View>

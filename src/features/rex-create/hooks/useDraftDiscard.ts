@@ -5,27 +5,40 @@ import { clearCreateWizardDraft } from '~/features/rex-create/lib/createWizardDr
 type UseDraftDiscardArgs = {
   visible: boolean;
   closeModal: () => void;
+  cancelPendingSave?: () => void;
+  resetWizard?: () => void;
 };
 
-export function useDraftDiscard({ visible, closeModal }: UseDraftDiscardArgs) {
+export function useDraftDiscard({
+  visible,
+  closeModal,
+  cancelPendingSave,
+  resetWizard,
+}: UseDraftDiscardArgs) {
   const postedSuccessfullyRef = useRef(false);
 
   useEffect(() => {
     if (visible) postedSuccessfullyRef.current = false;
   }, [visible]);
 
+  const wipeLocalDraft = useCallback(() => {
+    cancelPendingSave?.();
+    void clearCreateWizardDraft();
+    resetWizard?.();
+  }, [cancelPendingSave, resetWizard]);
+
   const markPosted = useCallback(() => {
     postedSuccessfullyRef.current = true;
-    void clearCreateWizardDraft();
-  }, []);
+    wipeLocalDraft();
+  }, [wipeLocalDraft]);
 
   const abandonDraftAndClose = useCallback(() => {
-    closeModal();
     if (!postedSuccessfullyRef.current) {
       void discardDraftRexData().catch(() => {});
-      void clearCreateWizardDraft();
+      wipeLocalDraft();
     }
-  }, [closeModal]);
+    closeModal();
+  }, [closeModal, wipeLocalDraft]);
 
   return { markPosted, abandonDraftAndClose };
 }

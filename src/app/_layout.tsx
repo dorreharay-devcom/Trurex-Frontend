@@ -66,7 +66,16 @@ export default function RootLayout() {
                 headerShown: false,
                 contentStyle: { flex: 1, backgroundColor: Theme.colors.background },
               }}
-            />
+            >
+              <Stack.Screen
+                name="create"
+                options={{
+                  presentation: 'transparentModal',
+                  animation: 'none',
+                  contentStyle: { flex: 1, backgroundColor: 'transparent' },
+                }}
+              />
+            </Stack>
             <AuthBootGate />
             <AppToast />
           </AuthProvider>

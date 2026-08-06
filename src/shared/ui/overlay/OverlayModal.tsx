@@ -31,7 +31,8 @@ const styles = StyleSheet.create({
 });
 
 export function OverlayModal({
-  visible,
+  visible = true,
+  embedded = false,
   onRequestClose,
   onDismiss,
   contentTranslateY,
@@ -39,6 +40,40 @@ export function OverlayModal({
   children,
 }: OverlayModalProps) {
   const insets = useSafeAreaInsets();
+
+  const body = (
+    <View style={styles.root}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Close dialog"
+        onPress={onRequestClose}
+        style={[styles.backdrop, { backgroundColor: backdropBackground }]}
+        className={cn(isWeb && 'backdrop-blur-sm')}
+      />
+
+      <KeyboardAvoidingView
+        behavior={KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT}
+        pointerEvents="box-none"
+        style={styles.sheetLayer}
+      >
+        <Animated.View
+          style={[styles.sheetMotion, { transform: [{ translateY: contentTranslateY }] }]}
+        >
+          <View
+            className="absolute inset-0 flex-col overflow-hidden bg-card sm:inset-4 sm:top-8 sm:rounded-2xl sm:shadow-elevated"
+            style={[{ paddingTop: insets.top, paddingBottom: insets.bottom }, androidElevation(12)]}
+          >
+            {children}
+          </View>
+        </Animated.View>
+      </KeyboardAvoidingView>
+      <ModalToastLayer />
+    </View>
+  );
+
+  if (embedded) {
+    return body;
+  }
 
   return (
     <Modal
@@ -49,36 +84,7 @@ export function OverlayModal({
       onRequestClose={onRequestClose}
       onDismiss={onDismiss}
     >
-      <View style={styles.root}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Close dialog"
-          onPress={onRequestClose}
-          style={[styles.backdrop, { backgroundColor: backdropBackground }]}
-          className={cn(isWeb && 'backdrop-blur-sm')}
-        />
-
-        <KeyboardAvoidingView
-          behavior={KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT}
-          pointerEvents="box-none"
-          style={styles.sheetLayer}
-        >
-          <Animated.View
-            style={[styles.sheetMotion, { transform: [{ translateY: contentTranslateY }] }]}
-          >
-            <View
-              className="absolute inset-0 flex-col overflow-hidden bg-card sm:inset-4 sm:top-8 sm:rounded-2xl sm:shadow-elevated"
-              style={[
-                { paddingTop: insets.top, paddingBottom: insets.bottom },
-                androidElevation(12),
-              ]}
-            >
-              {children}
-            </View>
-          </Animated.View>
-        </KeyboardAvoidingView>
-      </View>
-      <ModalToastLayer />
+      {body}
     </Modal>
   );
 }

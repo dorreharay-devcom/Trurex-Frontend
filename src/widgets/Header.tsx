@@ -19,7 +19,6 @@ type Props = {
   onUserPress?: (userId: string) => void;
   onRexPress?: (rexId: string, options?: RecommendationOpenOptions) => void;
   isProfileActive?: boolean;
-  avatarRefreshKey?: number;
   showSearch?: boolean;
 };
 
@@ -41,14 +40,13 @@ const Header = ({
   onUserPress,
   onRexPress,
   isProfileActive,
-  avatarRefreshKey = 0,
   showSearch = true,
 }: Props) => {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const compact = !isWeb || width < COMPACT_MAX_WIDTH;
-  const avatarPath = useHeaderAvatar(user?.id, avatarRefreshKey);
+  const avatarPath = useHeaderAvatar(user?.id);
   const searchVisible = showSearch && !!onSearchChange;
 
   return (
@@ -81,7 +79,6 @@ const Header = ({
           profileActive={isProfileActive}
           profileName={profileDisplayName(user)}
           avatarPath={avatarPath}
-          avatarRefreshKey={avatarRefreshKey}
           onAddPress={onAddPress}
           onProfilePress={onProfilePress}
           onUserPress={onUserPress}

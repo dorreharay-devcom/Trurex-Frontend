@@ -26,5 +26,5 @@ export function useRexPageNav() {
     [router],
   );
 
-  return { goToDiscover, openUser, openRex };
+  return { router, goToDiscover, openUser, openRex };
 }

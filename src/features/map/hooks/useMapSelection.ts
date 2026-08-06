@@ -1,17 +1,34 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { DEFAULT_PIN_VISIBILITY } from '~/features/map/config/pins';
 import type { PinVisibility } from '~/features/map/types/mapPin';
 import type { Recommendation } from '~/shared/types/recommendation';
+import { firstRouteParam } from '~/shared/lib/navigation/routeIds';
 
 type Params = {
   recenterOn: (latitude: number, longitude: number) => void;
   onRecommendationPress?: (rec: Recommendation) => void;
 };
 
+const MAP_VIEW = {
+  map: 'map',
+  list: 'list',
+} as const;
+
 export function useMapSelection({ recenterOn, onRecommendationPress }: Params) {
+  const router = useRouter();
+  const raw = useLocalSearchParams<{ view?: string | string[] }>();
+  const listView = useMemo(() => firstRouteParam(raw.view) === MAP_VIEW.list, [raw.view]);
+
   const [layers, setLayers] = useState<PinVisibility>(DEFAULT_PIN_VISIBILITY);
   const [selectedRecId, setSelectedRecId] = useState<string | null>(null);
-  const [listView, setListView] = useState(false);
+
+  const setListView = useCallback(
+    (value: boolean) => {
+      router.setParams({ view: value ? MAP_VIEW.list : MAP_VIEW.map });
+    },
+    [router],
+  );
 
   const selectMarker = useCallback((id: string) => setSelectedRecId(id), []);
   const clearSelection = useCallback(() => setSelectedRecId(null), []);
@@ -31,7 +48,7 @@ export function useMapSelection({ recenterOn, onRecommendationPress }: Params) {
         recenterOn(rec.latitude, rec.longitude);
       }
     },
-    [recenterOn],
+    [recenterOn, setListView],
   );
 
   return {

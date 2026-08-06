@@ -8,6 +8,7 @@ import {
 import type { CollectionDetailRow } from '~/features/collections/types/collection';
 import { toastError, toastSuccessAfterDismiss } from '~/shared/lib/appToast';
 import { buildShareUrl, shareMobileLink } from '~/shared/lib/share';
+import { toCollectionRoute } from '~/shared/lib/navigation/openCollection';
 import { isWeb } from '~/shared/lib/ui/platform';
 
 type Params = {
@@ -30,7 +31,7 @@ export function useCollectionActions({ collectionId, detail, onBack }: Params) {
 
   const shareCollection = useCallback(async () => {
     if (!detail) return;
-    const url = buildShareUrl(`/collection/${collectionId}`);
+    const url = buildShareUrl(toCollectionRoute(collectionId));
     if (isWeb) {
       await Clipboard.setStringAsync(url);
       toastSuccessAfterDismiss(() => setShowMenu(false), 'Link copied!');

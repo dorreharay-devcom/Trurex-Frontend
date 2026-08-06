@@ -1,10 +1,11 @@
-import { Redirect, Stack } from 'expo-router';
+import { Redirect, Slot } from 'expo-router';
 import { useAuth } from '~/features/auth/providers';
+import { useEndAuthBoot } from '~/features/auth/hooks/useEndAuthBoot';
 import { Routes } from '~/shared/config/routes';
-import { Theme } from '~/shared/theme/Theme';
 
 export default function MainLayout() {
   const { session, booting, mfaPending } = useAuth();
+  useEndAuthBoot();
 
   if (!session) {
     if (booting) return null;
@@ -16,12 +17,5 @@ export default function MainLayout() {
     return <Redirect href={Routes.Mfa} />;
   }
 
-  return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        contentStyle: { flex: 1, backgroundColor: Theme.colors.background },
-      }}
-    />
-  );
+  return <Slot />;
 }
