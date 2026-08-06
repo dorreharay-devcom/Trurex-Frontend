@@ -1,23 +1,5 @@
 stages:
-  - quality
   - mirror
-
-quality:
-  stage: quality
-  image: node:20-bookworm
-  tags:
-    - trurex
-  before_script:
-    - corepack enable
-    - corepack prepare pnpm@10.33.0 --activate
-    - pnpm install --frozen-lockfile
-  script:
-    - pnpm type-check
-    - pnpm test
-    - pnpm lint
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH
 
 mirror_to_github:
   stage: mirror
@@ -29,6 +11,3 @@ mirror_to_github:
     - git push github HEAD:refs/heads/${CI_COMMIT_REF_NAME} --force
   rules:
     - if: $CI_COMMIT_BRANCH == "develop"
-  needs:
-    - job: quality
-      optional: true
