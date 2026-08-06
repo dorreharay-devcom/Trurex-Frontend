@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, useWindowDimensions } from 'react-native';
+import { Text, useWindowDimensions, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import CollectionCard from '~/features/collections/ui/CollectionCard';
 import { PROFILE_TAB } from '~/features/profile/config/tabs';
@@ -21,7 +21,11 @@ type Props = {
   onBack?: () => void;
 };
 
-const LIST_CONTENT_STYLE = [webContainerStyle, { padding: 16, paddingBottom: 96 }];
+const LIST_CONTENT_STYLE = {
+  paddingHorizontal: 12,
+  paddingBottom: 24,
+  paddingTop: 0,
+};
 const idKey = (item: { id: string }) => item.id;
 
 function EmptyBlock({
@@ -69,44 +73,40 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
     <ProfileBodyChrome flow={flow} avatarRefreshKey={avatarRefreshKey} onBack={onBack} />
   );
 
-  if (isRecs) {
-    return (
-      <FlashList
-        data={content.rexesLoading ? [] : content.myRexes}
-        keyExtractor={idKey}
-        numColumns={numColumns}
-        showsVerticalScrollIndicator={false}
-        onEndReached={content.loadMoreRexes}
-        onEndReachedThreshold={0.45}
-        ListHeaderComponent={header}
-        ListEmptyComponent={
-          <EmptyBlock
-            loading={content.rexesLoading}
-            isError={content.rexesError}
-            isRecs
-            windowWidth={windowWidth}
-            onRetry={content.retryRexes}
-          />
-        }
-        ListFooterComponent={
-          <QueryListFooter
-            loading={content.isFetchingNextRexesPage}
-            isError={content.isFetchNextRexesError}
-            onRetry={content.loadMoreRexes}
-          />
-        }
-        contentContainerStyle={LIST_CONTENT_STYLE}
-        drawDistance={400}
-        renderItem={({ item, index }) => (
-          <ProfileGridCell index={index} numColumns={numColumns} cellWidth={cellWidth} gap={gap}>
-            <ProfileRexCard rec={item} width={cellWidth} onPress={() => flow.onRexPress?.(item)} />
-          </ProfileGridCell>
-        )}
-      />
-    );
-  }
-
-  return (
+  const list = isRecs ? (
+    <FlashList
+      data={content.rexesLoading ? [] : content.myRexes}
+      keyExtractor={idKey}
+      numColumns={numColumns}
+      showsVerticalScrollIndicator={false}
+      onEndReached={content.loadMoreRexes}
+      onEndReachedThreshold={0.45}
+      ListHeaderComponent={header}
+      ListEmptyComponent={
+        <EmptyBlock
+          loading={content.rexesLoading}
+          isError={content.rexesError}
+          isRecs
+          windowWidth={windowWidth}
+          onRetry={content.retryRexes}
+        />
+      }
+      ListFooterComponent={
+        <QueryListFooter
+          loading={content.isFetchingNextRexesPage}
+          isError={content.isFetchNextRexesError}
+          onRetry={content.loadMoreRexes}
+        />
+      }
+      contentContainerStyle={LIST_CONTENT_STYLE}
+      drawDistance={400}
+      renderItem={({ item, index }) => (
+        <ProfileGridCell index={index} numColumns={numColumns} cellWidth={cellWidth} gap={gap}>
+          <ProfileRexCard rec={item} width={cellWidth} onPress={() => flow.onRexPress?.(item)} />
+        </ProfileGridCell>
+      )}
+    />
+  ) : (
     <FlashList
       data={content.collectionsLoading ? [] : content.myCollections}
       keyExtractor={idKey}
@@ -143,6 +143,14 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
         </ProfileGridCell>
       )}
     />
+  );
+
+  return (
+    <View className="min-h-0 w-full flex-1 px-4 pb-4 pt-4" style={webContainerStyle}>
+      <View className="min-h-0 flex-1 overflow-hidden rounded-xl border border-border bg-card shadow-card">
+        {list}
+      </View>
+    </View>
   );
 };
 

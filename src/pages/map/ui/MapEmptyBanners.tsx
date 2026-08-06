@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { MAP_ACTION_INSET, MAP_LOCATION_PROMPT_TOP } from '~/features/map/config/mapUi';
 import MapSearchRow from '~/features/map/ui/search/MapSearchRow';
 import { androidElevation } from '~/shared/lib/ui/styles';
@@ -7,6 +7,8 @@ import { androidElevation } from '~/shared/lib/ui/styles';
 type Props = {
   showEmptyArea: boolean;
   showNoSearchMatch: boolean;
+  showLoadError: boolean;
+  onRetry?: () => void | Promise<void>;
 };
 
 const bannerShellStyle = [
@@ -20,42 +22,78 @@ const bannerShellStyle = [
   androidElevation(14),
 ];
 
-const MapEmptyBanners = ({ showEmptyArea, showNoSearchMatch }: Props) => {
-  if (!showEmptyArea && !showNoSearchMatch) return null;
+function BannerCard({
+  title,
+  subtitle,
+  action,
+}: {
+  title: string;
+  subtitle?: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
+      <Text className="text-sm font-medium text-foreground">{title}</Text>
+      {subtitle ? <Text className="mt-1 text-xs text-muted-foreground">{subtitle}</Text> : null}
+      {action}
+    </View>
+  );
+}
+
+const MapEmptyBanners = ({ showEmptyArea, showNoSearchMatch, showLoadError, onRetry }: Props) => {
+  if (!showEmptyArea && !showNoSearchMatch && !showLoadError) return null;
 
   return (
     <>
-      {showEmptyArea && (
+      {showLoadError && (
         <View pointerEvents="box-none" style={bannerShellStyle}>
           <MapSearchRow
             preserveTrailingWidth
             field={
-              <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
-                <Text className="text-sm font-medium text-foreground">
-                  Nothing in this area yet
-                </Text>
-                <Text className="mt-1 text-xs text-muted-foreground">
-                  Pan the map or zoom out to load more Rex.
-                </Text>
-              </View>
+              <BannerCard
+                title="Couldn't load map data"
+                subtitle="Check your connection, then try again."
+                action={
+                  onRetry ? (
+                    <Pressable
+                      onPress={() => void onRetry()}
+                      className="mt-3 self-center rounded-xl bg-primary px-4 py-2"
+                      accessibilityRole="button"
+                      accessibilityLabel="Retry loading map data"
+                    >
+                      <Text className="text-xs font-medium text-primary-foreground">Retry</Text>
+                    </Pressable>
+                  ) : null
+                }
+              />
             }
           />
         </View>
       )}
 
-      {showNoSearchMatch && (
+      {!showLoadError && showEmptyArea && (
         <View pointerEvents="box-none" style={bannerShellStyle}>
           <MapSearchRow
             preserveTrailingWidth
             field={
-              <View className="rounded-2xl border border-border bg-card/95 p-4 text-center shadow-md">
-                <Text className="text-sm font-medium text-foreground">
-                  Looks like this business is waiting for its first Rex.
-                </Text>
-                <Text className="mt-1 text-xs text-muted-foreground">
-                  Been here? Any insider tips? Help your network discover it. Add your Rex now.
-                </Text>
-              </View>
+              <BannerCard
+                title="Nothing in this area yet"
+                subtitle="Pan the map or zoom out to load more Rex."
+              />
+            }
+          />
+        </View>
+      )}
+
+      {!showLoadError && showNoSearchMatch && (
+        <View pointerEvents="box-none" style={bannerShellStyle}>
+          <MapSearchRow
+            preserveTrailingWidth
+            field={
+              <BannerCard
+                title="Looks like this business is waiting for its first Rex."
+                subtitle="Been here? Any insider tips? Help your network discover it. Add your Rex now."
+              />
             }
           />
         </View>

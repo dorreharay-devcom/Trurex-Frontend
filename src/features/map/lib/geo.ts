@@ -74,6 +74,19 @@ export function isViewportCoveredBy(view: LatLngBounds, coverage: LatLngBounds):
   );
 }
 
+export function isLatLngInBounds(
+  latitude: number,
+  longitude: number,
+  bounds: LatLngBounds,
+): boolean {
+  return (
+    latitude >= bounds.min_lat &&
+    latitude <= bounds.max_lat &&
+    longitude >= bounds.min_lng &&
+    longitude <= bounds.max_lng
+  );
+}
+
 export function regionForMarkers(markers: MapMarkerItem[]): Region {
   if (markers.length === 0) return EMPTY_REGION;
   const lats = markers.map((m) => m.latitude);

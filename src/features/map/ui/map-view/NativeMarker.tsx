@@ -96,7 +96,7 @@ const NativeMarkerComponent = ({ marker: m, active, onPress }: Props) => {
       if (trackGenRef.current === gen) setTracksViewChanges(false);
     }, MARKER_TRACK_HOLD_MS);
     return () => clearTimeout(timeout);
-  }, [m.glyph, m.pinColor, m.pinType, m.latitude, m.longitude, active, m.clusterCount]);
+  }, [m.glyph, m.pinColor, m.pinType, active, m.clusterCount]);
 
   return (
     <Marker

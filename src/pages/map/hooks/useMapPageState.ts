@@ -21,6 +21,7 @@ type Flow = {
   listView: boolean;
   isLoading: boolean;
   isError: boolean;
+  isPinsError: boolean;
   searchQuery: string;
   mapMarkers: readonly unknown[];
   clearSelection: () => void;
@@ -59,6 +60,7 @@ export function useMapPageState({ flow, onRexSheetOpenChange }: Params) {
     listView,
     isLoading,
     isError,
+    isPinsError,
     searchQuery,
     mapMarkers,
     clearSelection,
@@ -95,7 +97,7 @@ export function useMapPageState({ flow, onRexSheetOpenChange }: Params) {
   );
 
   const mapViewVisible = !listView;
-  const mapDataReady = !isLoading && !isError;
+  const mapDataReady = !isLoading && !isPinsError;
   const hasSearchQuery = searchQuery.trim().length > 0;
 
   const onViewFullRex = useCallback(() => {
@@ -126,9 +128,11 @@ export function useMapPageState({ flow, onRexSheetOpenChange }: Params) {
   return {
     sortedList,
     mapViewVisible,
+    showMapLoadError: mapViewVisible && isPinsError,
     showEmptyMapAreaBanner:
       mapViewVisible && mapDataReady && mapMarkers.length === 0 && !hasSearchQuery,
-    showNoSearchMatchBanner: mapViewVisible && mapMarkers.length === 0 && hasSearchQuery,
+    showNoSearchMatchBanner:
+      mapViewVisible && mapDataReady && mapMarkers.length === 0 && hasSearchQuery,
     toggleListView,
     onMarkerPress,
     selectedRec,

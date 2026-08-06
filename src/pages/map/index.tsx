@@ -45,8 +45,6 @@ const MapPage = ({ onRecommendationPress, onRexSheetOpenChange }: Props) => {
             layers={flow.layers}
             onLayersChange={flow.setLayers}
             onLocateMe={flow.locateMe}
-            isError={flow.isError}
-            onRetry={flow.refetch}
           />
 
           <MapPinOverlays
@@ -76,6 +74,8 @@ const MapPage = ({ onRecommendationPress, onRexSheetOpenChange }: Props) => {
         <MapEmptyBanners
           showEmptyArea={page.showEmptyMapAreaBanner}
           showNoSearchMatch={page.showNoSearchMatchBanner}
+          showLoadError={page.showMapLoadError}
+          onRetry={flow.refetch}
         />
 
         <MapLocationPromptBanner
