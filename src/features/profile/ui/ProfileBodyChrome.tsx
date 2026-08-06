@@ -18,37 +18,35 @@ function ProfileBodyChrome({ flow, avatarRefreshKey, onBack }: Props) {
   const { profile, content, social, avatar } = flow;
 
   return (
-    <View className="mb-3">
+    <View className="pb-3">
       {onBack ? <ProfileBackButton onPress={onBack} className="mb-3" /> : null}
-      <View className="rounded-xl border border-border bg-card shadow-card">
-        {profile ? (
-          <ProfileHeader
-            profile={profile}
-            isOwnProfile={flow.isOwnProfile}
-            onEditProfile={flow.openEdit}
-            onSignOut={flow.signOut}
-            onAvatarPress={avatar.handleAvatarPress}
-            avatarUploading={avatar.avatarUploading}
-            avatarRefreshKey={avatarRefreshKey}
-            onFollow={social.onFollow}
-            onUnfollow={social.onUnfollow}
-            followLoading={social.followLoading}
-            isBlocked={social.isBlocked}
-            onBlockPress={social.openBlockConfirm}
-            onUnblockPress={social.onUnblock}
-            blockLoading={social.blockPending}
-          />
-        ) : null}
-
-        {profile?.currently ? <CurrentlySection currently={profile.currently} /> : null}
-
-        <ProfileTabs
-          activeTab={content.activeTab}
-          onChange={content.setActiveTab}
-          rexCount={content.rexTabCount}
-          collectionsCount={content.collectionsTabCount}
+      {profile ? (
+        <ProfileHeader
+          profile={profile}
+          isOwnProfile={flow.isOwnProfile}
+          onEditProfile={flow.openEdit}
+          onSignOut={flow.signOut}
+          onAvatarPress={avatar.handleAvatarPress}
+          avatarUploading={avatar.avatarUploading}
+          avatarRefreshKey={avatarRefreshKey}
+          onFollow={social.onFollow}
+          onUnfollow={social.onUnfollow}
+          followLoading={social.followLoading}
+          isBlocked={social.isBlocked}
+          onBlockPress={social.openBlockConfirm}
+          onUnblockPress={social.onUnblock}
+          blockLoading={social.blockPending}
         />
-      </View>
+      ) : null}
+
+      {profile?.currently ? <CurrentlySection currently={profile.currently} /> : null}
+
+      <ProfileTabs
+        activeTab={content.activeTab}
+        onChange={content.setActiveTab}
+        rexCount={content.rexTabCount}
+        collectionsCount={content.collectionsTabCount}
+      />
     </View>
   );
 }

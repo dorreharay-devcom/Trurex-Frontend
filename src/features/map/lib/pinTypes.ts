@@ -85,6 +85,38 @@ export function mapPinRowToMapMarkerItem(row: MapPinRow): MapMarkerItem {
   };
 }
 
+export function recommendationToMapMarkerItem(
+  rec: Recommendation,
+  pinTypeByRecId: ReadonlyMap<string, MapPinType>,
+  currentUserId: string | null | undefined,
+): MapMarkerItem | null {
+  if (rec.latitude == null || rec.longitude == null) return null;
+  if (!Number.isFinite(rec.latitude) || !Number.isFinite(rec.longitude)) return null;
+  const pinType = mapPinTypeForRecommendation(rec, pinTypeByRecId, currentUserId);
+  return {
+    id: rec.id,
+    latitude: rec.latitude,
+    longitude: rec.longitude,
+    title: rec.title || 'Place',
+    subtitle: rec.location ?? rec.title,
+    pinType,
+    glyph: MAP_PIN_GLYPH[pinType],
+    pinColor: MAP_PIN_COLOR[pinType],
+  };
+}
+
+export function mergeMapMarkerSources(
+  pinMarkers: MapMarkerItem[],
+  recMarkers: MapMarkerItem[],
+): MapMarkerItem[] {
+  const byId = new Map<string, MapMarkerItem>();
+  for (const marker of pinMarkers) byId.set(marker.id, marker);
+  for (const marker of recMarkers) {
+    if (!byId.has(marker.id)) byId.set(marker.id, marker);
+  }
+  return Array.from(byId.values());
+}
+
 export function mapPinRowFromOptimisticRec(rec: Recommendation): MapPinRow | null {
   if (rec.latitude == null || rec.longitude == null) return null;
   if (!Number.isFinite(rec.latitude) || !Number.isFinite(rec.longitude)) return null;

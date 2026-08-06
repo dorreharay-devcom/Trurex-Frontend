@@ -48,7 +48,11 @@ export function useMapBoundsData({ bounds, searchTerm, needCardRows }: Params) {
     queryKey: [...REX_QUERY_KEYS.mapRexPins, ...queryKeyBase],
     queryFn: async ({ signal }) => {
       const rows = await MapApi.mapRexPins(boundsParams!);
-      signal.throwIfAborted();
+      if (signal.aborted) {
+        const err = new Error('Aborted');
+        err.name = 'AbortError';
+        throw err;
+      }
       return rows;
     },
     enabled: hasBounds && boundsParams != null,
@@ -65,7 +69,11 @@ export function useMapBoundsData({ bounds, searchTerm, needCardRows }: Params) {
     queryKey: [...REX_QUERY_KEYS.mapRexesInBounds, ...queryKeyBase],
     queryFn: async ({ signal }) => {
       const rows = await MapApi.mapRexesInBounds(boundsParams!);
-      signal.throwIfAborted();
+      if (signal.aborted) {
+        const err = new Error('Aborted');
+        err.name = 'AbortError';
+        throw err;
+      }
       return rows;
     },
     enabled: hasBounds && boundsParams != null && needCardRows,
@@ -98,6 +106,7 @@ export function useMapBoundsData({ bounds, searchTerm, needCardRows }: Params) {
     pinRows,
     isLoading,
     isError: pinsError || (needCardRows && rexesError),
+    isPinsError: pinsError,
     refetch,
   };
 }
