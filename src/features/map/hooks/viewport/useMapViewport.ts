@@ -16,13 +16,15 @@ function toQueryBounds(view: LatLngBounds): LatLngBounds {
   return expandBounds(roundBounds(view), MAP_QUERY_BOUNDS_PAD_FACTOR);
 }
 
+const INITIAL_QUERY_BOUNDS = toQueryBounds(DEFAULT_MAP_BOUNDS);
+
 export function useMapViewport() {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebouncedValue(searchQuery.trim(), DEFAULT_SEARCH_DEBOUNCE_MS);
   const debouncedSearchSuggest = useDebouncedValue(searchQuery, DEFAULT_SEARCH_DEBOUNCE_MS);
 
-  const [queryBounds, setQueryBounds] = useState<LatLngBounds | null>(null);
-  const coverageRef = useRef<LatLngBounds | null>(null);
+  const [queryBounds, setQueryBounds] = useState<LatLngBounds | null>(INITIAL_QUERY_BOUNDS);
+  const coverageRef = useRef<LatLngBounds | null>(INITIAL_QUERY_BOUNDS);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [mapRegion] = useState<Region>(() => boundsToRegion(DEFAULT_MAP_BOUNDS));

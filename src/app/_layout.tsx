@@ -13,6 +13,7 @@ import AppErrorBoundary from '~/shared/ui/shell/AppErrorBoundary';
 import { setupQueryNetwork } from '~/shared/lib/query/setupQueryNetwork';
 import { queryClient, queryPersister } from '~/shared/lib/query/queryClient';
 import { track, AnalyticsEvent } from '~/shared/lib/analytics/track';
+import { checkForOtaUpdate } from '~/shared/lib/updates/checkForOtaUpdate';
 import { Theme } from '~/shared/theme/Theme';
 
 setupQueryNetwork();
@@ -28,6 +29,7 @@ function AuthBootGate() {
 function BootstrapEffects() {
   useEffect(() => {
     track(AnalyticsEvent.AppOpened);
+    void checkForOtaUpdate();
   }, []);
   return null;
 }

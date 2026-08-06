@@ -7,6 +7,7 @@ import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
 import { isPlainObject, unknownErrorMessage } from '~/shared/lib/data/guards';
 import { invalidateActiveRexSurfaces } from '~/shared/lib/query/invalidateActiveRexSurfaces';
 import { isOfflineMutationBlocked, withOnlineMutation } from '~/shared/lib/network/assertOnline';
+import { NOTIFICATIONS_QUERY_KEY } from '~/shared/config/queryKeys';
 
 export const blockedUsersQueryKey = (viewerId: string) => ['blocked-users', viewerId] as const;
 
@@ -48,7 +49,10 @@ export function useBlockUser(params: {
       void queryClient.invalidateQueries({ queryKey: blockedUsersQueryKey(viewerId) });
     }
     invalidateActiveRexSurfaces(queryClient, { includeCollections: false });
-    void queryClient.invalidateQueries({ queryKey: ['notifications'], refetchType: 'active' });
+    void queryClient.invalidateQueries({
+      queryKey: NOTIFICATIONS_QUERY_KEY,
+      refetchType: 'active',
+    });
   }, [queryClient, viewerId]);
 
   const blockFn = withOnlineMutation('Blocking', (_: void) => blockUser(targetUserId));

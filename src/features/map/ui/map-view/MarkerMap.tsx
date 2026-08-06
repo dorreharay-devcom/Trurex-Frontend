@@ -32,6 +32,7 @@ const MarkerMap = ({
   const markersInitialRegion = useMemo(() => regionForMarkers(markers), [markers]);
   const initialRegion = initialRegionProp ?? markersInitialRegion;
   const regionRef = useRef<Region>(initialRegion);
+  const reportedInitialBoundsRef = useRef(false);
   const [mapReady, setMapReady] = useState(false);
   const {
     mapLayoutReady,
@@ -55,6 +56,7 @@ const MarkerMap = ({
   const handleRegionComplete = useCallback(
     (region: Region) => {
       regionRef.current = region;
+      reportedInitialBoundsRef.current = true;
       onRegionChangeComplete?.(regionToBounds(region), region);
     },
     [onRegionChangeComplete],
@@ -63,7 +65,12 @@ const MarkerMap = ({
   const handleMapReady = useCallback(() => {
     setMapReady(true);
     handleAndroidMapReady();
-  }, [handleAndroidMapReady]);
+    if (!reportedInitialBoundsRef.current) {
+      const region = regionRef.current;
+      onRegionChangeComplete?.(regionToBounds(region), region);
+      reportedInitialBoundsRef.current = true;
+    }
+  }, [handleAndroidMapReady, onRegionChangeComplete]);
 
   const zoomByFactor = useCallback((factor: number) => {
     const region = regionRef.current;
