@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { isAndroid } from '~/shared/lib/ui/platform';
 import { Theme } from '~/shared/theme/Theme';
 
 export const nativeMarkerStyles = StyleSheet.create({
@@ -8,13 +9,17 @@ export const nativeMarkerStyles = StyleSheet.create({
     width: 72,
     height: 72,
     padding: 12,
-    overflow: 'visible',
+    overflow: 'hidden',
   },
   androidMarkerHit: {
     width: 52,
     height: 52,
     padding: 8,
-    overflow: 'hidden',
+  },
+  iosMarkerHit: {
+    width: 48,
+    height: 48,
+    padding: 2,
   },
   tooltipImage: {
     width: 300,
@@ -74,9 +79,15 @@ export const nativeMarkerStyles = StyleSheet.create({
     shadowRadius: 0,
     elevation: 0,
   },
+  iosPin: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
   glyph: {
-    fontSize: 15,
-    lineHeight: 18,
+    fontSize: isAndroid ? 13 : 16,
+    lineHeight: isAndroid ? 16 : 20,
+    fontWeight: '700',
     textAlign: 'center',
     textAlignVertical: 'center',
     includeFontPadding: false,

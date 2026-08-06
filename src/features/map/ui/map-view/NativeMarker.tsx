@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Diamond, Star, User, Users } from 'lucide-react-native';
 import { Marker } from 'react-native-maps';
-import { View, Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { MAP_PIN_GLYPH_COLOR, MAP_PIN_TYPE } from '~/features/map/config/pins';
 import { Theme } from '~/shared/theme/Theme';
-import { isAndroid, isWeb } from '~/shared/lib/ui/platform';
+import { isAndroid, isIos } from '~/shared/lib/ui/platform';
 import { nativeMarkerStyles as styles } from '~/features/map/ui/map-view/nativeMarkerStyles';
 import type { MapMarkerItem } from '~/features/map/types/mapMarker';
 import type { MapPinType } from '~/features/map/types/mapPin';
@@ -15,7 +15,7 @@ type Props = {
   onPress: (id: string) => void;
 };
 
-const MARKER_TRACK_MS = isAndroid ? 400 : 250;
+const MARKER_TRACK_HOLD_MS = isAndroid ? 450 : 1200;
 
 const markerAnchor = isAndroid ? { x: 0.5, y: 0.5 } : { x: 0.5, y: 0.91 };
 
@@ -46,7 +46,11 @@ const MarkerContent = React.memo(
     return (
       <View
         collapsable={false}
-        style={[styles.markerHit, isAndroid && styles.androidMarkerHit]}
+        style={[
+          styles.markerHit,
+          isAndroid && styles.androidMarkerHit,
+          isIos && styles.iosMarkerHit,
+        ]}
         accessibilityLabel={m.title}
       >
         <View
@@ -54,6 +58,7 @@ const MarkerContent = React.memo(
           style={[
             styles.pin,
             isAndroid && styles.androidPin,
+            isIos && styles.iosPin,
             {
               backgroundColor: m.pinColor,
               borderColor: Theme.colors.card,
@@ -75,7 +80,8 @@ const MarkerContent = React.memo(
 );
 
 const NativeMarkerComponent = ({ marker: m, active, onPress }: Props) => {
-  const [tracksViewChanges, setTracksViewChanges] = useState(!isWeb);
+  const [tracksViewChanges, setTracksViewChanges] = useState(true);
+  const trackGenRef = useRef(0);
 
   const coordinate = useMemo(
     () => ({ latitude: m.latitude, longitude: m.longitude }),
@@ -83,11 +89,14 @@ const NativeMarkerComponent = ({ marker: m, active, onPress }: Props) => {
   );
 
   useEffect(() => {
-    if (isWeb) return;
+    trackGenRef.current += 1;
+    const gen = trackGenRef.current;
     setTracksViewChanges(true);
-    const timeout = setTimeout(() => setTracksViewChanges(false), MARKER_TRACK_MS);
+    const timeout = setTimeout(() => {
+      if (trackGenRef.current === gen) setTracksViewChanges(false);
+    }, MARKER_TRACK_HOLD_MS);
     return () => clearTimeout(timeout);
-  }, [m.glyph, m.pinColor, m.pinType, m.latitude, m.longitude, active]);
+  }, [m.glyph, m.pinColor, m.pinType, m.latitude, m.longitude, active, m.clusterCount]);
 
   return (
     <Marker
@@ -111,7 +120,8 @@ function areMarkerVisualPropsEqual(prev: MapMarkerItem, next: MapMarkerItem): bo
     prev.title === next.title &&
     prev.glyph === next.glyph &&
     prev.pinColor === next.pinColor &&
-    prev.pinType === next.pinType
+    prev.pinType === next.pinType &&
+    prev.clusterCount === next.clusterCount
   );
 }
 

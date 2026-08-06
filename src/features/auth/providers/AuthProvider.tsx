@@ -5,8 +5,15 @@ import { clearMfaRequirementCache } from '~/features/auth/lib/mfa';
 import { useAuthSession } from '~/features/auth/hooks/useAuthSession';
 import { useMfaSessionGate } from '~/features/auth/hooks/useMfaSessionGate';
 import type { AuthState } from '~/features/auth/types/authState';
+import { useNotificationsRealtime } from '~/shared/hooks/useNotificationsRealtime';
 
 const AuthContext = createContext<AuthState | null>(null);
+
+function NotificationsRealtimeBridge() {
+  const { user, mfaPending, booting } = useAuth();
+  useNotificationsRealtime(!booting && !mfaPending ? user?.id : null);
+  return null;
+}
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const {
@@ -53,7 +60,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     [session, loading, mfaPending, setMfaPending, mfaChecking, setMfaChecking, signOut],
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      <NotificationsRealtimeBridge />
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export function useAuth(): AuthState {

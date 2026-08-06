@@ -13,11 +13,19 @@ module.exports = {
     name: isProduction ? 'truRex' : 'truRex Dev',
     slug: 'trurex',
     scheme: appScheme,
-    version: '1.0.6',
+    version: '1.0.7',
     orientation: 'portrait',
     icon: './assets/truRexIcon.png',
     userInterfaceStyle: 'light',
     newArchEnabled: true,
+    runtimeVersion: {
+      policy: 'appVersion',
+    },
+    updates: {
+      url: `https://u.expo.dev/${easProjectId}`,
+      checkAutomatically: 'ON_LOAD',
+      fallbackToCacheTimeout: 0,
+    },
     splash: {
       image: './assets/splash-icon.png',
       resizeMode: 'contain',
@@ -56,6 +64,7 @@ module.exports = {
       'expo-web-browser',
       ['expo-router', { sitemap: false }],
       'expo-secure-store',
+      'expo-updates',
       [
         'expo-image-picker',
         {

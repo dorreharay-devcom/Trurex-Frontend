@@ -17,7 +17,18 @@ Public vars:
 - `EXPO_PUBLIC_APP_SCHEME`
 - `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY`
 
-Native rebuild is required after changing MMKV, SecureStore, or NetInfo native deps.
+Native rebuild is required after changing MMKV, SecureStore, NetInfo, expo-updates, or other native deps.
+
+## EAS Update (OTA)
+
+JS/asset-only fixes can ship over-the-air. Native changes still need a store/dev-client rebuild.
+
+- `runtimeVersion` policy: `appVersion` (OTA targets the same marketing version as the installed binary, e.g. `1.0.7`)
+- Channels: `development` / `preview` / `production` (wired on each EAS build profile)
+- Publish: `pnpm eas:update:dev` | `eas:update:preview` | `eas:update:prod`  
+  (pass a message: `pnpm eas:update:prod -- --message "fix map pins"`)
+
+You need a **new native build once** after adding `expo-updates` so devices can receive OTAs. Existing binaries without the module cannot update over-the-air.
 
 ## Scripts
 
@@ -27,6 +38,7 @@ pnpm type-check
 pnpm test
 pnpm lint
 pnpm eas:build:ios:prod
+pnpm eas:update:prod
 ```
 
 ## Platform notes
@@ -39,6 +51,7 @@ pnpm eas:build:ios:prod
 | Online signal          | NetInfo → RQ `onlineManager` + offline banner                        |
 | Timeouts / 429         | `fetchWithTimeout` + `network.ts` mapping                            |
 | Analytics shell        | `track()` / `setAnalyticsSink()` — plug Segment/PostHog later        |
+| OTA updates            | `expo-updates` + EAS channels; `checkForOtaUpdate` on boot           |
 | CI gates               | `.gitlab-ci.yml` quality stage: type-check, test, lint               |
 
 ## Structure

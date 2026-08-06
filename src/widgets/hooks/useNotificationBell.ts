@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { followUser } from '~/features/profile/api/followApi';
 import { withOnlineMutation } from '~/shared/lib/network/assertOnline';
 import { useNotifications } from '~/shared/hooks/useNotifications';
+import { NOTIFICATIONS_QUERY_KEY } from '~/shared/config/queryKeys';
 import {
   isFollowableNotificationType,
   notificationOpenTarget,
@@ -58,7 +59,7 @@ export function useNotificationBell({ onUserPress, onRexPress }: Params) {
     onSuccess: (_data, actorId) => {
       setFollowedIds((prev) => new Set(prev).add(actorId));
       queryClient.setQueryData<AppNotification[]>(
-        ['notifications'],
+        NOTIFICATIONS_QUERY_KEY,
         (prev) =>
           prev?.map((n) =>
             isFollowableNotificationType(n.type) && n.actor_id === actorId

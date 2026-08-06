@@ -10,3 +10,5 @@ export const REX_QUERY_KEYS = {
 export const CIRCLE_QUERY_KEYS = {
   myCircles: ['myCircles'],
 } as const;
+
+export const NOTIFICATIONS_QUERY_KEY = ['notifications'] as const;

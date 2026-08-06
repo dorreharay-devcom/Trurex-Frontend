@@ -45,9 +45,9 @@ export const MAP_PIN_GLYPH: Record<MapPinType, string> = {
 export const MAP_PIN_COLOR: Record<MapPinType, string> = {
   [MAP_PIN_TYPE.network]: Brand.color,
   [MAP_PIN_TYPE.rex]: MAP_PIN_REX_COLOR,
-  [MAP_PIN_TYPE.saved]: 'hsl(37, 92%, 50%)',
-  [MAP_PIN_TYPE.beenHere]: 'hsl(168, 60%, 35%)',
-  [MAP_PIN_TYPE.overlap]: 'hsl(270, 50%, 50%)',
+  [MAP_PIN_TYPE.saved]: '#F5A623',
+  [MAP_PIN_TYPE.beenHere]: '#249E8B',
+  [MAP_PIN_TYPE.overlap]: '#8B5CBF',
 };
 
 export const MAP_PIN_GLYPH_COLOR: Record<MapPinType, string> = {

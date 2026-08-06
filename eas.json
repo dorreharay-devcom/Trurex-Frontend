@@ -5,6 +5,7 @@
   },
   "build": {
     "development": {
+      "channel": "development",
       "environment": "development",
       "autoIncrement": true,
       "env": {
@@ -15,6 +16,7 @@
       }
     },
     "preview": {
+      "channel": "preview",
       "environment": "development",
       "autoIncrement": true,
       "env": {
@@ -25,6 +27,7 @@
       }
     },
     "production": {
+      "channel": "production",
       "environment": "production",
       "autoIncrement": true,
       "env": {
@@ -33,6 +36,20 @@
         "EXPO_PUBLIC_APP_SCHEME": "trurex",
         "EXPO_PUBLIC_SUPABASE_URL": "https://auth.trurex.com"
       }
+    }
+  },
+  "update": {
+    "development": {
+      "channel": "development",
+      "environment": "development"
+    },
+    "preview": {
+      "channel": "preview",
+      "environment": "development"
+    },
+    "production": {
+      "channel": "production",
+      "environment": "production"
     }
   },
   "submit": {
