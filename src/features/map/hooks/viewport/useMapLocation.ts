@@ -47,5 +47,16 @@ export function useMapLocation() {
     setRecenterTo({ latitude: 0, longitude: 0, nonce: Date.now(), fitMarkers: true });
   }, []);
 
-  return { userCoords, recenterTo, locateMe, recenterOn, fitMarkers };
+  const fitCoords = useCallback((coords: { latitude: number; longitude: number }[]) => {
+    if (coords.length === 0) return;
+    const first = coords[0]!;
+    setRecenterTo({
+      latitude: first.latitude,
+      longitude: first.longitude,
+      nonce: Date.now(),
+      fitCoords: coords,
+    });
+  }, []);
+
+  return { userCoords, recenterTo, locateMe, recenterOn, fitMarkers, fitCoords };
 }

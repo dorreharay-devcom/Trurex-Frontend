@@ -56,8 +56,11 @@ export function useConnectionSearch(
     active,
     rows,
     isFetching: result.isFetching,
+    isError: result.isError && rows.length === 0,
     hasNextPage: Boolean(result.hasNextPage),
     isFetchingNextPage: result.isFetchingNextPage,
+    isFetchNextPageError: result.isFetchNextPageError,
     fetchNextPage,
+    retry: () => void result.refetch(),
   };
 }

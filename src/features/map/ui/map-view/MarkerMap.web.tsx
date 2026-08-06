@@ -52,7 +52,7 @@ const MarkerMapWithLoader = ({
     [markers],
   );
 
-  const googleMap = useWebGoogleMap({
+  const { resizeForLayout, onMapLoad, onIdle, mapOptions, zoomBy } = useWebGoogleMap({
     onRegionChangeComplete,
     recenterTo,
     validMarkers,
@@ -60,8 +60,8 @@ const MarkerMapWithLoader = ({
   });
 
   useEffect(() => {
-    googleMap.resizeForLayout();
-  }, [pixelHeight, mapBox.w, windowWidth, googleMap.resizeForLayout]);
+    resizeForLayout();
+  }, [pixelHeight, mapBox.w, windowWidth, resizeForLayout]);
 
   if (loadError) return <WebMapMessage message={LOAD_ERROR_MESSAGE} onLayout={onMapLayout} />;
   if (!isLoaded) return <WebMapLoading pixelHeight={pixelHeight} onLayout={onMapLayout} />;
@@ -74,9 +74,9 @@ const MarkerMapWithLoader = ({
     >
       <GoogleMap
         mapContainerStyle={containerStyle}
-        onLoad={googleMap.onMapLoad}
-        onIdle={googleMap.onIdle}
-        options={googleMap.mapOptions}
+        onLoad={onMapLoad}
+        onIdle={onIdle}
+        options={mapOptions}
       >
         {validMarkers.map((marker) => (
           <WebMapMarker
@@ -88,10 +88,7 @@ const MarkerMapWithLoader = ({
         ))}
       </GoogleMap>
 
-      <MapZoomControls
-        onZoomIn={() => googleMap.zoomBy(1)}
-        onZoomOut={() => googleMap.zoomBy(-1)}
-      />
+      <MapZoomControls onZoomIn={() => zoomBy(1)} onZoomOut={() => zoomBy(-1)} />
     </View>
   );
 };

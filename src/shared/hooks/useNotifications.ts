@@ -1,7 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useMemo } from 'react';
+import { AppState, type AppStateStatus } from 'react-native';
 import { Backend, unwrap } from '~/shared/api/client';
 import { throwRpcIfFailed } from '~/shared/lib/errors/restriction';
 import type { AppNotification } from '~/shared/types/appNotification';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { withOnlineMutation } from '~/shared/lib/network/assertOnline';
 
 async function fetchNotifications(): Promise<AppNotification[]> {
   const raw = unwrap(
@@ -22,17 +26,36 @@ export function useNotifications() {
   const {
     data: notifications = [],
     isLoading: loading,
+    isError,
     refetch,
   } = useQuery<AppNotification[]>({
     queryKey: ['notifications'],
     queryFn: fetchNotifications,
-    staleTime: 30_000,
+    staleTime: 60_000,
+    refetchOnWindowFocus: true,
   });
 
-  const unreadCount = notifications.filter((n) => !n.is_read).length;
+  useEffect(() => {
+    if (isWeb) return;
+    const onChange = (status: AppStateStatus) => {
+      if (status === 'active') void refetch();
+    };
+    const sub = AppState.addEventListener('change', onChange);
+    return () => sub.remove();
+  }, [refetch]);
+
+  const unreadCount = useMemo(
+    () => notifications.filter((n) => !n.is_read).length,
+    [notifications],
+  );
+
+  const markAllAsReadFn = withOnlineMutation('Notifications', (_: void) => markNotificationsRead());
+  const markOneAsReadFn = withOnlineMutation('Notifications', (id: string) =>
+    markNotificationsRead([id]),
+  );
 
   const markAllAsRead = useMutation({
-    mutationFn: () => markNotificationsRead(),
+    mutationFn: markAllAsReadFn,
     onSuccess: () => {
       queryClient.setQueryData<AppNotification[]>(
         ['notifications'],
@@ -42,7 +65,7 @@ export function useNotifications() {
   });
 
   const markOneAsRead = useMutation({
-    mutationFn: (id: string) => markNotificationsRead([id]),
+    mutationFn: markOneAsReadFn,
     onSuccess: (_data, id) => {
       queryClient.setQueryData<AppNotification[]>(
         ['notifications'],
@@ -55,7 +78,8 @@ export function useNotifications() {
     notifications,
     unreadCount,
     loading,
-    markAllAsRead: () => markAllAsRead.mutate(),
+    isError: isError && notifications.length === 0,
+    markAllAsRead: () => markAllAsRead.mutate(undefined),
     markOneAsRead: (id: string) => markOneAsRead.mutate(id),
     refetch,
   };

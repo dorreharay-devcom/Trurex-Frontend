@@ -1,4 +1,3 @@
-import React from 'react';
 import { useOAuthCallback } from '~/features/auth/hooks/useOAuthCallback';
 
 function AuthCallbackPage() {

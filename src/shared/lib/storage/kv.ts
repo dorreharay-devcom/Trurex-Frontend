@@ -1,26 +1,23 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { isWeb } from '~/shared/lib/ui/platform';
+import type { KeyValueStorage } from '~/shared/lib/storage/kvTypes';
 
-type KeyValueStorage = {
-  getItem: (key: string) => Promise<string | null>;
-  setItem: (key: string, value: string) => Promise<void>;
-  removeItem: (key: string) => Promise<void>;
-};
+export type { KeyValueStorage } from '~/shared/lib/storage/kvTypes';
 
-const webStorage: KeyValueStorage = {
-  getItem: async (key) => localStorage.getItem(key),
+export const StorageService: KeyValueStorage = {
+  getItem: async (key) => {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
   setItem: async (key, value) => {
-    localStorage.setItem(key, value);
+    try {
+      localStorage.setItem(key, value);
+    } catch {}
   },
   removeItem: async (key) => {
-    localStorage.removeItem(key);
+    try {
+      localStorage.removeItem(key);
+    } catch {}
   },
 };
-
-const nativeStorage: KeyValueStorage = {
-  getItem: (key) => AsyncStorage.getItem(key),
-  setItem: (key, value) => AsyncStorage.setItem(key, value),
-  removeItem: (key) => AsyncStorage.removeItem(key),
-};
-
-export const StorageService: KeyValueStorage = isWeb ? webStorage : nativeStorage;

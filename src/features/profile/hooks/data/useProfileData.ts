@@ -9,10 +9,16 @@ type Params = {
   authUserId?: string | null;
 };
 
+function isNotFoundError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error ?? '');
+  return /not found/i.test(message);
+}
+
 export function useProfileData({ propUserId, propHandle, authUserId }: Params) {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   const viewingByHandle = Boolean(propHandle);
   const viewingByUserId = Boolean(propUserId);
@@ -23,18 +29,27 @@ export function useProfileData({ propUserId, propHandle, authUserId }: Params) {
       setLoading(false);
       return;
     }
+    setIsError(false);
     try {
       const data = await ProfileApi.getProfile(
         propHandle ? { handle: propHandle } : { userId: targetId! },
       );
       if (!data.userId) {
         setNotFound(true);
+        setProfile(null);
         return;
       }
       setProfile(data);
       setNotFound(false);
-    } catch {
-      setNotFound(true);
+    } catch (error) {
+      setProfile(null);
+      if (isNotFoundError(error)) {
+        setNotFound(true);
+        setIsError(false);
+      } else {
+        setNotFound(false);
+        setIsError(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -43,6 +58,7 @@ export function useProfileData({ propUserId, propHandle, authUserId }: Params) {
   useEffect(() => {
     setLoading(true);
     setNotFound(false);
+    setIsError(false);
     setProfile(null);
   }, [propUserId, propHandle]);
 
@@ -64,12 +80,13 @@ export function useProfileData({ propUserId, propHandle, authUserId }: Params) {
     authUserId,
   });
 
-  const awaitingHandleProfile = viewingByHandle && profile == null && !notFound;
+  const awaitingHandleProfile = viewingByHandle && profile == null && !notFound && !isError;
 
   return {
     profile,
     loading,
     notFound,
+    isError,
     awaitingHandleProfile,
     isOwnProfile,
     profileContentUserId,

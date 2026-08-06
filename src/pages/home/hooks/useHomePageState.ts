@@ -15,30 +15,34 @@ export function useHomePageState({ tabs, create, preview }: Args) {
   const [avatarRefreshKey, setAvatarRefreshKey] = useState(0);
   const [mapRexSheetOpen, setMapRexSheetOpen] = useState(false);
 
+  const { close: closePreview } = preview;
+  const { openUserProfile: openProfileTab } = tabs;
+  const { openWithPrefill, openForEdit } = create;
+
   const bumpAvatarRefresh = useCallback(() => setAvatarRefreshKey((k) => k + 1), []);
 
   const openUserProfile = useCallback(
     (userId: string) => {
-      preview.close();
-      tabs.openUserProfile(userId);
+      closePreview();
+      openProfileTab(userId);
     },
-    [preview.close, tabs.openUserProfile],
+    [closePreview, openProfileTab],
   );
 
   const addYourOwn = useCallback(
     (source: AddYourOwnRecSource) => {
-      preview.close();
-      create.openWithPrefill(source);
+      closePreview();
+      openWithPrefill(source);
     },
-    [preview.close, create.openWithPrefill],
+    [closePreview, openWithPrefill],
   );
 
   const editRex = useCallback(
     (rexId: string) => {
-      preview.close();
-      create.openForEdit(rexId);
+      closePreview();
+      openForEdit(rexId);
     },
-    [preview.close, create.openForEdit],
+    [closePreview, openForEdit],
   );
 
   return {

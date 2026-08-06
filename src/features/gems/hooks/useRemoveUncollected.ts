@@ -7,6 +7,7 @@ import type { Recommendation } from '~/shared/types/recommendation';
 import { toastError } from '~/shared/lib/appToast';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
+import { assertOnlineForMutation } from '~/shared/lib/network/assertOnline';
 
 export function useRemoveUncollected() {
   const { user } = useAuth();
@@ -16,11 +17,18 @@ export function useRemoveUncollected() {
 
   const confirm = useCallback(async () => {
     if (!user || !target) return;
+    if (!assertOnlineForMutation('Removing gems')) return;
     setPending(true);
     try {
       await CollectionsApi.unsaveRex(user.id, target.id);
-      queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.mySavedRexes });
-      queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.discoverFeed });
+      void queryClient.invalidateQueries({
+        queryKey: REX_QUERY_KEYS.mySavedRexes,
+        refetchType: 'active',
+      });
+      void queryClient.invalidateQueries({
+        queryKey: REX_QUERY_KEYS.discoverFeed,
+        refetchType: 'active',
+      });
       setTarget(null);
     } catch (e) {
       if (didAccountFrozenMutationToast(e)) return;

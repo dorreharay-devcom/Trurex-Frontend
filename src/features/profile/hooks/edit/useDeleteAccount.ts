@@ -4,6 +4,7 @@ import { AuthApi } from '~/shared/api/authApi';
 import { Routes } from '~/shared/config/routes';
 import { toastError } from '~/shared/lib/appToast';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
+import { assertOnlineForMutation } from '~/shared/lib/network/assertOnline';
 
 type Params = {
   signOut: () => Promise<unknown>;
@@ -23,6 +24,7 @@ export function useDeleteAccount({ signOut, onDeleted }: Params) {
   }, [pending]);
 
   const confirm = useCallback(async () => {
+    if (!assertOnlineForMutation('Deleting account')) return;
     setPending(true);
     try {
       await AuthApi.deleteAccount();

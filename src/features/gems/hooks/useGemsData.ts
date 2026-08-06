@@ -9,45 +9,47 @@ import { useAuth } from '~/features/auth/providers';
 export function useGemsData(searchQuery: string) {
   const { user } = useAuth();
 
-  const {
-    data: myCollections = [],
-    isLoading: loadingMine,
-    hasNextPage: hasNextCollectionsPage,
-    isFetchingNextPage: isFetchingNextCollectionsPage,
-    fetchNextPage: fetchNextCollectionsPage,
-  } = useMyCollections(user?.id);
-  const { data: savedCollections = [], isLoading: loadingSavedCollections } =
-    useMySavedCollections();
-
-  const {
-    data: uncollectedRexes = [],
-    isLoading: loadingUncollected,
-    hasNextPage: hasNextUncollectedPage,
-    isFetchingNextPage: isFetchingNextUncollectedPage,
-    fetchNextPage: fetchNextUncollectedPage,
-  } = useSavedRexes({ uncollected: true, search_term: searchQuery.trim() || null });
+  const mine = useMyCollections(user?.id);
+  const saved = useMySavedCollections();
+  const uncollectedQuery = useSavedRexes({
+    uncollected: true,
+    search_term: searchQuery.trim() || null,
+  });
 
   const collections = useMemo(() => {
-    const all = [...myCollections, ...savedCollections];
+    const all = [...(mine.data ?? []), ...(saved.data ?? [])];
     if (!searchQuery.trim()) return all;
     const q = searchQuery.toLowerCase();
     return all.filter((c) => c.display_name.toLowerCase().includes(q));
-  }, [myCollections, savedCollections, searchQuery]);
+  }, [mine.data, saved.data, searchQuery]);
+
+  const uncollectedItems = uncollectedQuery.data ?? [];
+  const uncollectedLoading = uncollectedQuery.isLoading;
+  const collectionsLoading = mine.isLoading || saved.isLoading;
 
   return {
     collections: {
       items: collections,
-      loading: loadingMine || loadingSavedCollections,
-      hasNextPage: hasNextCollectionsPage,
-      isFetchingNextPage: isFetchingNextCollectionsPage,
-      fetchNextPage: fetchNextCollectionsPage,
+      loading: collectionsLoading,
+      isError: (mine.isError || saved.isError) && collections.length === 0 && !collectionsLoading,
+      hasNextPage: mine.hasNextPage,
+      isFetchingNextPage: mine.isFetchingNextPage,
+      isFetchNextPageError: mine.isFetchNextPageError,
+      fetchNextPage: mine.fetchNextPage,
+      retry: () => {
+        void mine.refetch();
+        void saved.refetch();
+      },
     },
     uncollected: {
-      items: loadingUncollected ? [] : uncollectedRexes,
-      loading: loadingUncollected,
-      hasNextPage: hasNextUncollectedPage,
-      isFetchingNextPage: isFetchingNextUncollectedPage,
-      fetchNextPage: fetchNextUncollectedPage,
+      items: uncollectedLoading ? [] : uncollectedItems,
+      loading: uncollectedLoading,
+      isError: uncollectedQuery.isError && uncollectedItems.length === 0,
+      hasNextPage: uncollectedQuery.hasNextPage,
+      isFetchingNextPage: uncollectedQuery.isFetchingNextPage,
+      isFetchNextPageError: uncollectedQuery.isFetchNextPageError,
+      fetchNextPage: uncollectedQuery.fetchNextPage,
+      retry: () => void uncollectedQuery.refetch(),
     },
   };
 }

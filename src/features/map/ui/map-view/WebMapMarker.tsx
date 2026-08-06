@@ -10,20 +10,18 @@ type Props = {
 };
 
 function WebMapMarkerComponent({ marker, selected, onPress }: Props) {
-  const position = useMemo(
-    () => ({ lat: marker.latitude, lng: marker.longitude }),
-    [marker.latitude, marker.longitude],
+  const { id, latitude, longitude, pinType, pinColor, glyph } = marker;
+
+  const position = useMemo(() => ({ lat: latitude, lng: longitude }), [latitude, longitude]);
+
+  const icon = useMemo(
+    () => ({ url: createWebMapPinIconUrl({ pinType, pinColor, glyph }) }),
+    [pinType, pinColor, glyph],
   );
 
-  const icon = useMemo(() => ({ url: createWebMapPinIconUrl(marker) }), [
-    marker.pinType,
-    marker.pinColor,
-    marker.glyph,
-  ]);
-
   const handleClick = useCallback(() => {
-    onPress(marker.id);
-  }, [onPress, marker.id]);
+    onPress(id);
+  }, [onPress, id]);
 
   return (
     <Marker

@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, type TextStyle } from 'react-native';
 import { Link2, Star, MapPin, DollarSign, type LucideIcon } from 'lucide-react-native';
-import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
-import { RexPhotoPlaceholder } from '~/shared/ui/RexPhotoPlaceholder';
+import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
+import { RexPhotoPlaceholder } from '~/shared/ui/media/RexPhotoPlaceholder';
 import { REX_IMAGES_BUCKET } from '~/shared/config/app';
 import { Theme } from '~/shared/theme/Theme';
 import {

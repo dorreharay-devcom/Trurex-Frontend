@@ -2,8 +2,8 @@ import React from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import SelectableSheetRow from '~/features/collections/ui/common/SelectableSheetRow';
 import type { useSavedRexes } from '~/features/collections/hooks/data/useSavedRexes';
-import { RexCoverThumbnail } from '~/shared/ui/RexCoverThumbnail';
-import { LoadMoreButton } from '~/shared/ui/LoadMoreButton';
+import { RexCoverThumbnail } from '~/shared/ui/media/RexCoverThumbnail';
+import { LoadMoreButton } from '~/shared/ui/primitives/LoadMoreButton';
 import { Theme } from '~/shared/theme/Theme';
 
 type SavedRexesState = ReturnType<typeof useSavedRexes>;

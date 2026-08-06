@@ -2,7 +2,7 @@ import React, { type ReactNode } from 'react';
 import { Text, View } from 'react-native';
 import { Trash2 } from 'lucide-react-native';
 import { ConfirmModalActions } from '~/shared/ui/destructive-confirm/ConfirmModalActions';
-import SheetHandle from '~/shared/ui/SheetHandle';
+import SheetHandle from '~/shared/ui/overlay/SheetHandle';
 import { Theme } from '~/shared/theme/Theme';
 import { isWeb } from '~/shared/lib/ui/platform';
 import { cn } from '~/shared/lib/ui/styles';

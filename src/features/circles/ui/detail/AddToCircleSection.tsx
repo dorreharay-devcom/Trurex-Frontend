@@ -8,7 +8,9 @@ import CircleConnectionRow from '~/features/circles/ui/common/rows/CircleConnect
 import ConnectionEmptyState from '~/features/circles/ui/connections/ConnectionEmptyState';
 import ConnectionScopeTabs from '~/features/circles/ui/connections/ConnectionScopeTabs';
 import ConnectionSearchField from '~/features/circles/ui/connections/ConnectionSearchField';
-import { LoadMoreButton } from '~/shared/ui/LoadMoreButton';
+import { LoadMoreButton } from '~/shared/ui/primitives/LoadMoreButton';
+import QueryErrorState from '~/shared/ui/query/QueryErrorState';
+import QueryListFooter from '~/shared/ui/query/QueryListFooter';
 
 const TAB_ORDER: readonly ConnectionScopeTab[] = [
   CONNECTION_TAB.trusted,
@@ -51,6 +53,10 @@ const AddToCircleSection = ({
         <SectionSpinner className="mb-8 items-center py-4" />
       )}
 
+      {scoped.phase === CONNECTION_PHASE.error && (
+        <QueryErrorState title="Couldn't load people" onRetry={scoped.retry} />
+      )}
+
       {scoped.phase === CONNECTION_PHASE.rows && (
         <View className="mb-8 gap-2">
           {scoped.rows.map((row) => (
@@ -63,11 +69,15 @@ const AddToCircleSection = ({
               onUserPress={onUserPress}
             />
           ))}
-          <LoadMoreButton
-            visible={scoped.hasNextPage}
-            loading={scoped.isFetchingNextPage}
-            onPress={scoped.fetchNextPage}
-          />
+          {scoped.isFetchNextPageError ? (
+            <QueryListFooter isError onRetry={scoped.fetchNextPage} />
+          ) : (
+            <LoadMoreButton
+              visible={scoped.hasNextPage}
+              loading={scoped.isFetchingNextPage}
+              onPress={scoped.fetchNextPage}
+            />
+          )}
         </View>
       )}
 

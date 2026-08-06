@@ -1,8 +1,7 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { Recommendation } from '~/shared/types/recommendation';
 import { useSearchRexes } from '~/features/discover/hooks/useSearchRexes';
 import type { SearchFiltersState } from '~/features/discover/hooks/useSearchFilters';
-import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/shared/hooks/useDebouncedValue';
 
 type UseSearchArgs = {
   searchQuery: string;
@@ -12,19 +11,22 @@ type UseSearchArgs = {
 
 export function useSearch({ searchQuery, activeCategory, filters }: UseSearchArgs) {
   const hasSearch = searchQuery.trim().length > 0;
-  const debouncedSearchQuery = useDebouncedValue(searchQuery, DEFAULT_SEARCH_DEBOUNCE_MS);
-  const hasDebouncedSearch = debouncedSearchQuery.trim().length > 0;
 
-  const { data, isLoading } = useSearchRexes(
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch: refetchQuery,
+  } = useSearchRexes(
     {
-      searchTerm: debouncedSearchQuery,
+      searchTerm: searchQuery,
       categoryId: activeCategory,
       searchCategoryFilter: filters.searchCategoryFilter,
       valueForMoneyFilters: filters.vfmFilter,
       qualityFilter: filters.qualityFilter,
       recencyFilterDays: filters.recencyFilterDays,
     },
-    { enabled: hasDebouncedSearch },
+    { enabled: hasSearch },
   );
 
   const rows = useMemo((): Recommendation[] => {
@@ -36,5 +38,15 @@ export function useSearch({ searchQuery, activeCategory, filters }: UseSearchArg
     return list;
   }, [data, filters.searchCategoryFilter]);
 
-  return { hasSearch, rows, isLoading };
+  const refetch = useCallback(() => {
+    void refetchQuery();
+  }, [refetchQuery]);
+
+  return {
+    hasSearch,
+    rows,
+    isLoading,
+    isError: isError && rows.length === 0,
+    refetch,
+  };
 }

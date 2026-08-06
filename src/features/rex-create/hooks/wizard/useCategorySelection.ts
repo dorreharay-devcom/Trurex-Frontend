@@ -22,6 +22,14 @@ export function useCategorySelection() {
     setHasSubcategoryStep(false);
   }, []);
 
+  const hydrateFromDraft = useCallback(
+    (draft: { selectedCategoryId: string | null; selectedSubcategoryCode: string | null }) => {
+      setSelectedCategoryId(draft.selectedCategoryId);
+      setSelectedSubcategoryCode(draft.selectedSubcategoryCode);
+    },
+    [],
+  );
+
   return {
     selectedCategoryId,
     setSelectedCategoryId,
@@ -30,6 +38,7 @@ export function useCategorySelection() {
     setHasSubcategoryStep,
     syncCategoryCreateShape,
     activeSteps,
+    hydrateFromDraft,
     reset,
   };
 }

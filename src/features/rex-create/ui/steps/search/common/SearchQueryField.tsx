@@ -8,7 +8,7 @@ import {
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
 import { INPUT_FOCUS_RING_CLASS } from '~/shared/config/inputFocus';
-import { ClearableSearchInput } from '~/shared/ui/ClearableSearchInput';
+import { ClearableSearchInput } from '~/shared/ui/primitives/ClearableSearchInput';
 import { webDisabledCursor, webNoOutline, cn } from '~/shared/lib/ui/styles';
 
 type Props = {

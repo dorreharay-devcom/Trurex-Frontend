@@ -4,7 +4,7 @@ import { Camera, X } from 'lucide-react-native';
 import type { PendingAvatar } from '~/features/profile/types/profile';
 import { USER_AVATARS_BUCKET } from '~/shared/config/app';
 import { Theme } from '~/shared/theme/Theme';
-import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
+import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
 import { avatarImageTransform } from '~/shared/lib/media/imageTransform';
 
 const EDIT_AVATAR_TRANSFORM = avatarImageTransform(112);

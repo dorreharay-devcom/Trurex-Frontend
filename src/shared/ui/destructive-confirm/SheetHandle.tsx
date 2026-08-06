@@ -1,1 +1,1 @@
-export { default, SheetHandle } from '~/shared/ui/SheetHandle';
+export { default, SheetHandle } from '~/shared/ui/overlay/SheetHandle';

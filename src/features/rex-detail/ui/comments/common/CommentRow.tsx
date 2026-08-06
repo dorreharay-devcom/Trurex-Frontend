@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Pressable } from 'react-native';
 import { Flag } from 'lucide-react-native';
-import { SignedUserAvatar } from '~/shared/ui/SignedUserAvatar';
+import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 import { canDeleteRexComment } from '~/features/rex-detail/api/rexCommentsApi';
 import type { RexComment } from '~/features/rex-detail/types/rexComment';
 import { formatCompactRelativeTime } from '~/shared/lib/data/date';

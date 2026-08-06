@@ -3,6 +3,7 @@ import Header from '~/widgets/Header';
 import TabBar from '~/widgets/TabBar';
 import { TAB, type Tab } from '~/shared/config/mainTabs';
 import FrozenAccountBanner from '~/pages/home/ui/FrozenAccountBanner';
+import OfflineBanner from '~/pages/home/ui/OfflineBanner';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 
 type Props = {
@@ -39,6 +40,7 @@ function HomeTopChrome({
         showSearch={currentTab === TAB.discover}
       />
       <TabBar currentTab={currentTab} onTabChange={onTabChange} />
+      <OfflineBanner />
       <FrozenAccountBanner />
     </>
   );

@@ -1,32 +1,34 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CollectionsApi } from '~/features/collections/api/collectionsApi';
-import type {
-  CollectionDetailRow,
-  CollectionRexRef,
-} from '~/features/collections/types/collection';
+import type { CollectionDetailRow } from '~/features/collections/types/collection';
 import { COLLECTIONS_QUERY_KEYS } from '~/features/collections/config/queryKeys';
 import { mutationErrorToast } from '~/shared/lib/errors/restriction';
+import { withOnlineMutation } from '~/shared/lib/network/assertOnline';
 import { toastSuccess } from '~/shared/lib/appToast';
 
 export const useAddRexToCollection = () => {
   const queryClient = useQueryClient();
+  const mutationFn = withOnlineMutation('Saving to collections', CollectionsApi.addRexToCollection);
 
   return useMutation({
-    mutationFn: (params: CollectionRexRef) => CollectionsApi.addRexToCollection(params),
+    mutationFn,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: [...COLLECTIONS_QUERY_KEYS.collectionDetail, variables.collection_id],
       });
     },
+    onError: mutationErrorToast('Failed to add to collection'),
   });
 };
 
 export const useRemoveRexFromCollection = (collectionId: string) => {
   const queryClient = useQueryClient();
+  const mutationFn = withOnlineMutation('Updating collections', (rexId: string) =>
+    CollectionsApi.removeRexFromCollection({ collection_id: collectionId, rex_id: rexId }),
+  );
 
   return useMutation({
-    mutationFn: (rexId: string) =>
-      CollectionsApi.removeRexFromCollection({ collection_id: collectionId, rex_id: rexId }),
+    mutationFn,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [...COLLECTIONS_QUERY_KEYS.collectionDetail, collectionId],
@@ -41,10 +43,14 @@ export const useRemoveRexFromCollection = (collectionId: string) => {
 
 export const useUpdateCollectionRexNote = (collectionId: string) => {
   const queryClient = useQueryClient();
+  const mutationFn = withOnlineMutation(
+    'Saving notes',
+    (params: { rex_id: string; note: string | null }) =>
+      CollectionsApi.updateRexNote({ collection_id: collectionId, ...params }),
+  );
 
   return useMutation({
-    mutationFn: (params: { rex_id: string; note: string | null }) =>
-      CollectionsApi.updateRexNote({ collection_id: collectionId, ...params }),
+    mutationFn,
     onSuccess: (_data, variables) => {
       queryClient.setQueryData<CollectionDetailRow>(
         [...COLLECTIONS_QUERY_KEYS.collectionDetail, collectionId],

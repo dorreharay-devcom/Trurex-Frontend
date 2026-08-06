@@ -17,19 +17,20 @@ type PhaseArgs = {
   searchActive: boolean;
   searchRows: NetworkUserRow[];
   searchFetching: boolean;
-  fallback: Pick<ConnectionListState, 'rows' | 'isInitialLoading'>;
+  searchError: boolean;
+  fallback: Pick<ConnectionListState, 'rows' | 'isInitialLoading' | 'isError'>;
 };
 
 export function connectionListPhase(args: PhaseArgs): ConnectionListPhase {
-  const { tab, searchActive, searchRows, searchFetching, fallback } = args;
+  const { tab, searchActive, searchRows, searchFetching, searchError, fallback } = args;
 
-  if (searchActive) {
-    if (searchFetching && searchRows.length === 0) return CONNECTION_PHASE.loading;
-    if (searchRows.length === 0) return CONNECTION_PHASE.noMatch;
-    return CONNECTION_PHASE.rows;
-  }
+  if (searchActive && searchFetching && searchRows.length === 0) return CONNECTION_PHASE.loading;
+  if (searchActive && searchError && searchRows.length === 0) return CONNECTION_PHASE.error;
+  if (searchActive && searchRows.length === 0) return CONNECTION_PHASE.noMatch;
+  if (searchActive) return CONNECTION_PHASE.rows;
 
   if (fallback.isInitialLoading) return CONNECTION_PHASE.loading;
+  if (fallback.isError && fallback.rows.length === 0) return CONNECTION_PHASE.error;
   if (fallback.rows.length === 0) return EMPTY_PHASE_BY_TAB[tab];
   return CONNECTION_PHASE.rows;
 }

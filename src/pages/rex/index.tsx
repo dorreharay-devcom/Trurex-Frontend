@@ -1,7 +1,7 @@
 import React from 'react';
 import DeepLinkShell from '~/widgets/DeepLinkShell';
 import ProtectedRoute from '~/features/auth/ui/ProtectedRoute';
-import RecommendationDetailModal from '~/features/rex-detail/ui/RecommendationDetailModal';
+import RexDetailHost from '~/features/rex-detail/ui/RexDetailHost';
 import { useRexPage } from '~/pages/rex/hooks/useRexPage';
 import { useRexPageNav } from '~/pages/rex/hooks/useRexPageNav';
 import RexPageBody from '~/pages/rex/ui/RexPageBody';
@@ -20,7 +20,7 @@ function RexPage() {
       >
         <RexPageBody page={page} onGoToDiscover={nav.goToDiscover} />
       </DeepLinkShell>
-      <RecommendationDetailModal
+      <RexDetailHost
         visible={page.recommendation != null}
         recommendation={page.recommendation}
         onClose={nav.goToDiscover}

@@ -3,6 +3,7 @@ const appEnv = process.env.APP_ENV ?? 'production';
 const isProduction = appEnv === 'production';
 const appScheme = process.env.EXPO_PUBLIC_APP_SCHEME ?? (isProduction ? 'trurex' : 'trurex-dev');
 const nativeApplicationId = isProduction ? 'com.app.trurex' : 'com.app.trurex.dev';
+const easProjectId = 'f032cbbd-67b0-4ced-8cfb-a196c47e0a1b';
 
 const PHOTO_LIBRARY_USAGE_DESCRIPTION =
   'TruRex uses your photo library so you can choose images for your profile photo, recommendations, and collection covers. For example, when you create a recommendation, you can select a photo of the restaurant or place you are sharing.';
@@ -75,6 +76,9 @@ module.exports = {
           android: {
             enableMinifyInReleaseBuilds: true,
             enableShrinkResourcesInReleaseBuilds: true,
+            packagingOptions: {
+              pickFirst: ['lib/*/libNitroModules.so'],
+            },
           },
         },
       ],
@@ -83,7 +87,7 @@ module.exports = {
       appEnv,
       appTarget: process.env.APP_TARGET ?? 'native',
       eas: {
-        projectId: 'f032cbbd-67b0-4ced-8cfb-a196c47e0a1b',
+        projectId: easProjectId,
       },
     },
   },

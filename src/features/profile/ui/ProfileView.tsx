@@ -5,6 +5,7 @@ import EditProfile from '~/features/profile/ui/EditProfile';
 import ProfileBlockConfirm from '~/features/profile/ui/ProfileBlockConfirm';
 import ProfileMainBody from '~/features/profile/ui/ProfileMainBody';
 import ProfileNotFound from '~/features/profile/ui/ProfileNotFound';
+import ProfileLoadError from '~/features/profile/ui/ProfileLoadError';
 import ProfileCollectionOverlays from '~/features/profile/ui/collections/ProfileCollectionOverlays';
 import { ProfileCardSkeleton } from '~/features/profile/ui/skeleton';
 import { KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT } from '~/shared/config/keyboard';
@@ -45,6 +46,10 @@ const ProfileView = ({
 
   if (flow.notFound) {
     return <ProfileNotFound onBack={onBack} />;
+  }
+
+  if (flow.isError) {
+    return <ProfileLoadError onBack={onBack} onRetry={flow.retryProfile} />;
   }
 
   if (flow.isEditing) {

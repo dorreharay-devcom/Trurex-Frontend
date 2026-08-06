@@ -55,13 +55,7 @@ export function useSignedStorageUrl(
     setLoading(true);
     let active = true;
     void (async () => {
-      const resolved = await resolveSignedUrlOnce(
-        cacheKey,
-        bucket,
-        path,
-        expiresInSec,
-        transform,
-      );
+      const resolved = await resolveSignedUrlOnce(cacheKey, bucket, path, expiresInSec, transform);
       if (!active) return;
       if (resolved) cacheSignedUrl(cacheKey, resolved);
       setUri(resolved?.url ?? null);

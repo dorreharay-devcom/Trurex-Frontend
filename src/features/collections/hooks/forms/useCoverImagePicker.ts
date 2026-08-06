@@ -8,6 +8,7 @@ import {
   preparePickerImageForUpload,
   uploadBlobToStorageBucket,
 } from '~/shared/lib/media/photos/storageUpload';
+import { assertOnlineForMutation } from '~/shared/lib/network/assertOnline';
 
 const COVER_MAX_DIMENSION = 800;
 
@@ -19,6 +20,7 @@ export function useCoverImagePicker() {
 
   const pick = useCallback(async () => {
     if (!user) return;
+    if (!assertOnlineForMutation('Uploading cover')) return;
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) {
       toastError('Photos', 'Please allow photo library access to add a cover image.');

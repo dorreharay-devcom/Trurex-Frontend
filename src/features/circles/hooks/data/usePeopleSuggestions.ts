@@ -9,6 +9,7 @@ import {
   CONNECTION_DEPENDENT_QUERY_KEYS,
 } from '~/features/circles/config/queryKeys';
 import { mutationErrorToast } from '~/shared/lib/errors/restriction';
+import { withOnlineMutation } from '~/shared/lib/network/assertOnline';
 import { toastSuccess } from '~/shared/lib/appToast';
 
 const SUGGESTIONS_LIMIT = 20;
@@ -21,6 +22,7 @@ export function usePeopleSuggestions(enabled: boolean) {
     data: suggestions = [],
     isLoading,
     isError,
+    refetch,
   } = useQuery({
     queryKey: CIRCLES_QUERY_KEYS.peopleSuggestions,
     queryFn: () => fetchPeopleSuggestions({ input_limit: SUGGESTIONS_LIMIT, input_offset: 0 }),
@@ -32,14 +34,17 @@ export function usePeopleSuggestions(enabled: boolean) {
     void queryClient.invalidateQueries({ queryKey: CIRCLES_QUERY_KEYS.peopleSuggestions });
   };
 
+  const dismissFn = withOnlineMutation('People suggestions', dismissPeopleSuggestion);
+  const followFn = withOnlineMutation('Following', followUserFromPeopleSuggestion);
+
   const dismissMutation = useMutation({
-    mutationFn: dismissPeopleSuggestion,
+    mutationFn: dismissFn,
     onSuccess: invalidateSuggestions,
     onError: mutationErrorToast('Could not dismiss'),
   });
 
   const followMutation = useMutation({
-    mutationFn: followUserFromPeopleSuggestion,
+    mutationFn: followFn,
     onSuccess: () => {
       toastSuccess('Following');
       invalidateSuggestions();
@@ -54,6 +59,7 @@ export function usePeopleSuggestions(enabled: boolean) {
     suggestions,
     isLoading,
     isError,
+    refetch,
     dismiss: (userId: string) => dismissMutation.mutate(userId),
     follow: (userId: string) => followMutation.mutate(userId),
     isDismissing: (userId: string) =>

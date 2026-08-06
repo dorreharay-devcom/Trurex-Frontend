@@ -10,7 +10,7 @@ import {
   notificationRelativeTime,
 } from '~/shared/lib/notification/helpers';
 import { cn } from '~/shared/lib/ui/styles';
-import { SignedUserAvatar } from '~/shared/ui/SignedUserAvatar';
+import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 import type { AppNotification } from '~/shared/types/appNotification';
 
 type Props = {

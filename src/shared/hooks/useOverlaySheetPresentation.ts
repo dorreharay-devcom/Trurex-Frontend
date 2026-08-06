@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Animated as RNAnimated, Dimensions, Easing as RNEasing } from 'react-native';
 import { modalConfig } from '~/shared/config/overlaySheet';
-import { isWeb } from '~/shared/lib/ui/platform';
 
 const { sheetOpenMs, sheetCloseMs } = modalConfig.timing;
 
@@ -24,7 +23,7 @@ export function useOverlaySheetPresentation({ visible, windowHeight, onClose }: 
       toValue: 0,
       duration: sheetOpenMs,
       easing: RNEasing.out(RNEasing.cubic),
-      useNativeDriver: !isWeb,
+      useNativeDriver: true,
     }).start();
   }, [visible, windowHeight, sheetTranslateY]);
 
@@ -34,7 +33,7 @@ export function useOverlaySheetPresentation({ visible, windowHeight, onClose }: 
       toValue: h,
       duration: sheetCloseMs,
       easing: RNEasing.in(RNEasing.cubic),
-      useNativeDriver: !isWeb,
+      useNativeDriver: true,
     }).start(({ finished }) => {
       if (finished) onClose();
     });

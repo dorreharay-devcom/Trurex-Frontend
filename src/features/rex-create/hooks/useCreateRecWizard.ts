@@ -24,26 +24,46 @@ export function useCreateRecWizard() {
   const nav = useStepNavigation(category.activeSteps);
   const [photoStoragePaths, setPhotoStoragePaths] = useState<string[]>([]);
 
-  const { selectedCategoryId, setSelectedCategoryId, setSelectedSubcategoryCode } = category;
-  const { clearLinkedPlace } = place;
-  const { clear: clearScorecard } = scorecard;
-  const { stepId } = nav;
+  const {
+    selectedCategoryId,
+    setSelectedCategoryId,
+    setSelectedSubcategoryCode,
+    setHasSubcategoryStep,
+    reset: resetCategory,
+    selectedSubcategoryCode,
+    activeSteps,
+  } = category;
+  const {
+    clearLinkedPlace,
+    searchMode,
+    selectedSearchPlace,
+    manualName,
+    manualAddress,
+    manualGeotag,
+    onlineName,
+    reset: resetPlace,
+    prefillFromAddYourOwn,
+    prefillFromEditRow: prefillPlaceFromEditRow,
+  } = place;
+  const { clear: clearScorecard, syncToConfig, setScoreQuickTip, setScoreReview } = scorecard;
+  const {
+    selectedCircleIds,
+    privateRex,
+    reset: resetCircles,
+    prefillFromEditRow: prefillCirclesFromEditRow,
+  } = circles;
+  const { stepId, reset: resetNav, stepIndex, isFirstStep, isLastStep, goNext, goBack } = nav;
 
   useEffect(() => {
     if (editPrefillRef.current?.category_code === selectedCategoryId) {
-      category.setHasSubcategoryStep(false);
+      setHasSubcategoryStep(false);
       return;
     }
     editPrefillRef.current = null;
     setSelectedSubcategoryCode(null);
-    category.setHasSubcategoryStep(false);
+    setHasSubcategoryStep(false);
     clearScorecard();
-  }, [
-    selectedCategoryId,
-    setSelectedSubcategoryCode,
-    category.setHasSubcategoryStep,
-    clearScorecard,
-  ]);
+  }, [selectedCategoryId, setSelectedSubcategoryCode, setHasSubcategoryStep, clearScorecard]);
 
   useEffect(() => {
     clearLinkedPlace();
@@ -64,47 +84,41 @@ export function useCreateRecWizard() {
       categoryCodePrefillRef.current = null;
       return;
     }
-    const sug = suggestedCategoryFromSearch(place.searchMode, place.selectedSearchPlace);
+    const sug = suggestedCategoryFromSearch(searchMode, selectedSearchPlace);
     if (sug) setSelectedCategoryId(sug);
-  }, [
-    stepId,
-    selectedCategoryId,
-    setSelectedCategoryId,
-    place.searchMode,
-    place.selectedSearchPlace,
-  ]);
+  }, [stepId, selectedCategoryId, setSelectedCategoryId, searchMode, selectedSearchPlace]);
 
   const autoSuggestedCategoryId = useMemo(
-    () => suggestedCategoryFromSearch(place.searchMode, place.selectedSearchPlace),
-    [place.searchMode, place.selectedSearchPlace],
+    () => suggestedCategoryFromSearch(searchMode, selectedSearchPlace),
+    [searchMode, selectedSearchPlace],
   );
 
   const canProceed = useMemo(
     () =>
       canProceedForStep(stepId, {
-        searchMode: place.searchMode,
-        manualName: place.manualName,
-        manualAddress: place.manualAddress,
-        manualGeotag: place.manualGeotag,
-        onlineName: place.onlineName,
-        selectedSearchPlace: place.selectedSearchPlace,
+        searchMode,
+        manualName,
+        manualAddress,
+        manualGeotag,
+        onlineName,
+        selectedSearchPlace,
         selectedCategoryId,
-        selectedCircleIds: circles.selectedCircleIds,
-        privateRex: circles.privateRex,
-        selectedSubcategoryCode: category.selectedSubcategoryCode,
+        selectedCircleIds,
+        privateRex,
+        selectedSubcategoryCode,
       }),
     [
       stepId,
-      place.searchMode,
-      place.manualName,
-      place.manualAddress,
-      place.manualGeotag,
-      place.onlineName,
-      place.selectedSearchPlace,
+      searchMode,
+      manualName,
+      manualAddress,
+      manualGeotag,
+      onlineName,
+      selectedSearchPlace,
       selectedCategoryId,
-      circles.selectedCircleIds,
-      circles.privateRex,
-      category.selectedSubcategoryCode,
+      selectedCircleIds,
+      privateRex,
+      selectedSubcategoryCode,
     ],
   );
 
@@ -114,31 +128,31 @@ export function useCreateRecWizard() {
         editPrefillRef.current?.category_code === selectedCategoryId
           ? editPrefillRef.current
           : null;
-      scorecard.syncToConfig(dimensions, edit);
+      syncToConfig(dimensions, edit);
       if (edit) editPrefillRef.current = null;
     },
-    [selectedCategoryId, scorecard.syncToConfig],
+    [selectedCategoryId, syncToConfig],
   );
 
   const reset = useCallback(() => {
     categoryCodePrefillRef.current = null;
     editPrefillRef.current = null;
     editSessionRef.current = false;
-    nav.reset();
-    place.reset();
-    category.reset();
-    scorecard.clear();
-    circles.reset();
+    resetNav();
+    resetPlace();
+    resetCategory();
+    clearScorecard();
+    resetCircles();
     setPhotoStoragePaths([]);
-  }, [nav.reset, place.reset, category.reset, scorecard.clear, circles.reset]);
+  }, [resetNav, resetPlace, resetCategory, clearScorecard, resetCircles]);
 
   const applyAddYourOwnPrefill = useCallback(
     (source: AddYourOwnRecSource) => {
       reset();
-      place.prefillFromAddYourOwn(source);
+      prefillFromAddYourOwn(source);
       categoryCodePrefillRef.current = source.categoryCode;
     },
-    [reset, place.prefillFromAddYourOwn],
+    [reset, prefillFromAddYourOwn],
   );
 
   const applyEditPrefill = useCallback(
@@ -146,34 +160,34 @@ export function useCreateRecWizard() {
       reset();
       editSessionRef.current = true;
       editPrefillRef.current = row;
-      place.prefillFromEditRow(row);
+      prefillPlaceFromEditRow(row);
       setSelectedCategoryId(row.category_code);
       setSelectedSubcategoryCode(row.subcategory_code || null);
       setPhotoStoragePaths(row.photo_paths ?? []);
-      scorecard.setScoreQuickTip(row.must_know ?? '');
-      scorecard.setScoreReview(row.review ?? '');
-      circles.prefillFromEditRow(row);
+      setScoreQuickTip(row.must_know ?? '');
+      setScoreReview(row.review ?? '');
+      prefillCirclesFromEditRow(row);
     },
     [
       reset,
-      place.prefillFromEditRow,
+      prefillPlaceFromEditRow,
       setSelectedCategoryId,
       setSelectedSubcategoryCode,
-      scorecard.setScoreQuickTip,
-      scorecard.setScoreReview,
-      circles.prefillFromEditRow,
+      setScoreQuickTip,
+      setScoreReview,
+      prefillCirclesFromEditRow,
     ],
   );
 
   return {
     nav: {
-      stepId: nav.stepId,
-      stepIndex: nav.stepIndex,
-      activeSteps: category.activeSteps,
-      isFirstStep: nav.isFirstStep,
-      isLastStep: nav.isLastStep,
-      goNext: nav.goNext,
-      goBack: nav.goBack,
+      stepId,
+      stepIndex,
+      activeSteps,
+      isFirstStep,
+      isLastStep,
+      goNext,
+      goBack,
       canProceed,
     },
     place,

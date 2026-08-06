@@ -26,8 +26,10 @@ export function useMapViewport() {
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [mapRegion] = useState<Region>(() => boundsToRegion(DEFAULT_MAP_BOUNDS));
+  const [viewRegion, setViewRegion] = useState<Region>(() => boundsToRegion(DEFAULT_MAP_BOUNDS));
 
-  const onBoundsChange = useCallback((next: LatLngBounds, _region?: Region) => {
+  const onBoundsChange = useCallback((next: LatLngBounds, region?: Region) => {
+    if (region) setViewRegion(region);
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     debounceTimerRef.current = setTimeout(() => {
       const coverage = coverageRef.current;
@@ -56,6 +58,7 @@ export function useMapViewport() {
     suggestQuery,
     queryBounds,
     mapRegion,
+    viewRegion,
     onBoundsChange,
   };
 }

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { FlatList, View } from 'react-native';
-import { LoadMoreButton } from '~/shared/ui/LoadMoreButton';
+import { View } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { LoadMoreButton } from '~/shared/ui/primitives/LoadMoreButton';
+import QueryListFooter from '~/shared/ui/query/QueryListFooter';
 import { useGemsData } from '~/features/gems/hooks/useGemsData';
 import { useGemsPageState } from '~/features/gems/hooks/useGemsPageState';
 import { useRemoveUncollected } from '~/features/gems/hooks/useRemoveUncollected';
@@ -34,12 +36,11 @@ function GemsPage({ onRecommendationPress }: GemsPageProps) {
 
   return (
     <>
-      <FlatList
+      <FlashList
         data={uncollected.items}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={webContainerStyle}
-        contentContainerClassName="pb-24"
+        contentContainerStyle={[webContainerStyle, { paddingBottom: 96 }]}
         ListHeaderComponent={
           <GemsHeader
             searchQuery={searchQuery}
@@ -59,17 +60,27 @@ function GemsPage({ onRecommendationPress }: GemsPageProps) {
           />
         )}
         ListEmptyComponent={
-          <UncollectedEmpty loading={uncollected.loading} hasSearch={Boolean(searchQuery.trim())} />
+          <UncollectedEmpty
+            loading={uncollected.loading}
+            isError={uncollected.isError}
+            hasSearch={Boolean(searchQuery.trim())}
+            onRetry={uncollected.retry}
+          />
         }
         ListFooterComponent={
           <View className="px-4">
-            <LoadMoreButton
-              visible={!uncollected.loading && uncollected.hasNextPage}
-              loading={uncollected.isFetchingNextPage}
-              onPress={uncollected.fetchNextPage}
-            />
+            {uncollected.isFetchNextPageError ? (
+              <QueryListFooter isError onRetry={uncollected.fetchNextPage} />
+            ) : (
+              <LoadMoreButton
+                visible={!uncollected.loading && uncollected.hasNextPage}
+                loading={uncollected.isFetchingNextPage}
+                onPress={uncollected.fetchNextPage}
+              />
+            )}
           </View>
         }
+        drawDistance={400}
       />
 
       <GemsOverlays page={page} removeUncollected={removeUncollected} />

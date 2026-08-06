@@ -11,6 +11,7 @@ import { isWeb } from '~/shared/lib/ui/platform';
 import { toastError } from '~/shared/lib/appToast';
 import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
 import { photoUploadErrorMessage } from '~/shared/lib/media/photos/storageUpload';
+import { assertOnlineForMutation } from '~/shared/lib/network/assertOnline';
 
 type Params = {
   onClose: () => void;
@@ -27,6 +28,7 @@ export function useEditProfile({ onClose }: Params) {
     userId: user?.id,
     setCurrentAvatarUrl: fields.setCurrentAvatarUrl,
   });
+  const { persist: persistAvatar } = avatar;
   const deleteAccount = useDeleteAccount({
     signOut,
     onDeleted: onClose,
@@ -34,11 +36,12 @@ export function useEditProfile({ onClose }: Params) {
 
   const save = useCallback(async () => {
     if (!user) return;
+    if (!assertOnlineForMutation('Saving profile')) return;
     if (!isWeb) Keyboard.dismiss();
 
     setSaving(true);
     try {
-      await avatar.persist();
+      await persistAvatar();
       await ProfileApi.update(
         user.id,
         toUpdateProfileInput({
@@ -58,7 +61,7 @@ export function useEditProfile({ onClose }: Params) {
     }
   }, [
     user,
-    avatar.persist,
+    persistAvatar,
     fields.displayName,
     fields.handle,
     fields.bio,

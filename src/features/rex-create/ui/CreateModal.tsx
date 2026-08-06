@@ -1,6 +1,6 @@
 import React, { useLayoutEffect } from 'react';
 import { View, useWindowDimensions } from 'react-native';
-import { OverlayModal } from '~/shared/ui/OverlayModal';
+import { OverlayModal } from '~/shared/ui/overlay/OverlayModal';
 import { useCreateRecWizard } from '~/features/rex-create/hooks/useCreateRecWizard';
 import { useModalPresentation } from '~/features/rex-create/hooks/useModalPresentation';
 import { useCategoryCreateConfig } from '~/features/rex-create/hooks/useCategoryCreateConfig';
@@ -8,6 +8,7 @@ import { usePrimaryAction } from '~/features/rex-create/hooks/usePrimaryAction';
 import { useEditPrefill } from '~/features/rex-create/hooks/useEditPrefill';
 import { useTagLocation } from '~/features/rex-create/hooks/useTagLocation';
 import { useDraftDiscard } from '~/features/rex-create/hooks/useDraftDiscard';
+import { useCreateWizardDraftPersistence } from '~/features/rex-create/hooks/useCreateWizardDraftPersistence';
 import type { AddYourOwnRecSource } from '~/features/rex-create/lib/addYourOwn';
 import CreateModalHeader from './CreateModalHeader';
 import CreateModalFooter from './CreateModalFooter';
@@ -44,7 +45,13 @@ const CreateModal: React.FC<Props> = ({
     visible,
     closeModal: handleClose,
   });
-  const { editLoading } = useEditPrefill({
+  useCreateWizardDraftPersistence({
+    visible,
+    isEditMode,
+    hasExternalPrefill: addYourOwnPrefill != null,
+    flow,
+  });
+  const { editLoading, editLoadError, retryEdit } = useEditPrefill({
     visible,
     editRexId,
     applyEditPrefill: flow.applyEditPrefill,
@@ -91,12 +98,14 @@ const CreateModal: React.FC<Props> = ({
           onTagLocation={handleTagLocation}
           tagLocationLoading={isGeotagging}
           initialLoading={editLoading}
+          loadError={editLoadError}
+          onRetryLoad={retryEdit}
         />
 
         <CreateModalFooter
           isLastStep={flow.nav.isLastStep}
           isEditMode={isEditMode}
-          disabled={primaryDisabled}
+          disabled={primaryDisabled || editLoadError}
           submitting={submitting}
           onPress={() => {
             void handlePrimaryFooter();

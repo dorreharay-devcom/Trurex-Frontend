@@ -51,6 +51,8 @@ const NotificationBell = ({ onUserPress, onRexPress }: Props) => {
       >
         <NotificationList
           loading={bell.loading}
+          isError={bell.isError}
+          onRetry={bell.retry}
           notifications={bell.notifications}
           followedIds={bell.followedIds}
           followPending={bell.followPending}

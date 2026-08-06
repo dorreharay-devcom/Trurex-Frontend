@@ -17,7 +17,7 @@ import DetailToolbar from '~/features/circles/ui/detail/DetailToolbar';
 import EditCircleModal from '~/features/circles/ui/detail/EditCircleModal';
 import MembersSection from '~/features/circles/ui/detail/MembersSection';
 import { webContainerStyle } from '~/shared/lib/ui/styles';
-import { DestructiveActionConfirmModal } from '~/shared/ui/DestructiveActionConfirmModal';
+import DestructiveActionConfirmModal from '~/shared/ui/destructive-confirm/DestructiveActionConfirmModal';
 
 type Props = {
   circleId: string;

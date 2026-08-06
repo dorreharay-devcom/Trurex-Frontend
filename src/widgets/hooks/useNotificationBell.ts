@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, useWindowDimensions, type View } from 'react-native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { followUser } from '~/features/profile/api/followApi';
+import { withOnlineMutation } from '~/shared/lib/network/assertOnline';
 import { useNotifications } from '~/shared/hooks/useNotifications';
 import {
   isFollowableNotificationType,
@@ -19,7 +20,8 @@ type Params = {
 };
 
 export function useNotificationBell({ onUserPress, onRexPress }: Params) {
-  const { notifications, unreadCount, loading, markAllAsRead, markOneAsRead } = useNotifications();
+  const { notifications, unreadCount, loading, isError, markAllAsRead, markOneAsRead, refetch } =
+    useNotifications();
   const queryClient = useQueryClient();
   const { width, height } = useWindowDimensions();
   const compact = !isWeb || width < COMPACT_BP;
@@ -50,8 +52,9 @@ export function useNotificationBell({ onUserPress, onRexPress }: Params) {
     };
   }, [open]);
 
+  const followMutationFn = withOnlineMutation('Following', followUser);
   const followMutation = useMutation({
-    mutationFn: followUser,
+    mutationFn: followMutationFn,
     onSuccess: (_data, actorId) => {
       setFollowedIds((prev) => new Set(prev).add(actorId));
       queryClient.setQueryData<AppNotification[]>(
@@ -115,6 +118,8 @@ export function useNotificationBell({ onUserPress, onRexPress }: Params) {
     bellRef,
     unreadCount,
     loading,
+    isError,
+    retry: () => void refetch(),
     notifications,
     followedIds,
     followPending: followMutation.isPending,

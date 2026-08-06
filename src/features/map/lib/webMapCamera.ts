@@ -9,22 +9,26 @@ export function isValidMapCoordinate(lat: number, lng: number): boolean {
 
 const webPinIconUrlCache = new Map<string, string>();
 
-export function createWebMapPinIconUrl(marker: MapMarkerItem, size = 36): string {
-  const cacheKey = `${marker.pinType}|${marker.pinColor}|${marker.glyph}|${size}`;
+export function createWebMapPinIconUrl(
+  marker: Pick<MapMarkerItem, 'pinType' | 'pinColor' | 'glyph'>,
+  size = 36,
+): string {
+  const { pinType, pinColor, glyph } = marker;
+  const cacheKey = `${pinType}|${pinColor}|${glyph}|${size}`;
   const cached = webPinIconUrlCache.get(cacheKey);
   if (cached) return cached;
 
   const topPad = 4;
   const h = size + 10 + topPad;
-  const glyphFill = MAP_PIN_GLYPH_COLOR[marker.pinType];
+  const glyphFill = MAP_PIN_GLYPH_COLOR[pinType];
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${h}" viewBox="0 0 ${size} ${h}">
       <path d="M${size / 2} ${size + 8 + topPad} C${size / 2} ${size + 8 + topPad} ${size - 2} ${size * 0.6 + topPad} ${size - 2} ${size * 0.42 + topPad}
         A${size * 0.42} ${size * 0.42} 0 0 0 2 ${size * 0.42 + topPad}
         C2 ${size * 0.6 + topPad} ${size / 2} ${size + 8 + topPad} ${size / 2} ${size + 8 + topPad}Z"
-        fill="${marker.pinColor}" stroke="white" stroke-width="2"/>
+        fill="${pinColor}" stroke="white" stroke-width="2"/>
       <text x="${size / 2}" y="${size * 0.45 + topPad}" text-anchor="middle" dominant-baseline="central"
-        fill="${glyphFill}" font-size="${size * 0.35}" font-family="system-ui">${marker.glyph}</text>
+        fill="${glyphFill}" font-size="${size * 0.35}" font-family="system-ui">${glyph}</text>
     </svg>`;
   const url = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
   webPinIconUrlCache.set(cacheKey, url);

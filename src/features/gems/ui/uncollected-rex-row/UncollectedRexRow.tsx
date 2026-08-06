@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import { RexCoverThumbnail } from '~/shared/ui/RexCoverThumbnail';
+import { RexCoverThumbnail } from '~/shared/ui/media/RexCoverThumbnail';
 import RexRowActions from '~/features/gems/ui/uncollected-rex-row/RexRowActions';
 import RexRowDetails from '~/features/gems/ui/uncollected-rex-row/RexRowDetails';
 import type { Recommendation } from '~/shared/types/recommendation';

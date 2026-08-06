@@ -11,7 +11,7 @@ import {
 import { SEARCH_MODE } from '~/features/rex-create/types/create';
 import { REX_VISIBILITY } from '~/features/rex-create/lib/sharing';
 import type { CategoryQuestion } from '~/features/rex-create/types/categoryCreateConfig';
-import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
+import { invalidateAfterRexWrite } from '~/shared/lib/query/invalidateAfterRexWrite';
 
 export function createRexErrorMessage(
   rawMessage: string,
@@ -140,14 +140,5 @@ export function buildCreateRexParams(
 }
 
 export function invalidateRexQueries(queryClient: QueryClient, editRexId: string | null) {
-  queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.discoverFeed });
-  queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.searchRexes });
-  queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.myRexes });
-  queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.mySavedRexes });
-  queryClient.invalidateQueries({ queryKey: ['collection-detail'] });
-  queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.mapRexesInBounds });
-  queryClient.invalidateQueries({ queryKey: REX_QUERY_KEYS.mapRexPins });
-  if (editRexId == null) return;
-  queryClient.invalidateQueries({ queryKey: ['rexDetail', editRexId] });
-  queryClient.invalidateQueries({ queryKey: ['rexForEdit', editRexId] });
+  invalidateAfterRexWrite(queryClient, { editRexId });
 }

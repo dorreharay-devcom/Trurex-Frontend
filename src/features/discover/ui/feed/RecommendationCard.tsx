@@ -32,7 +32,7 @@ const RecommendationCard = memo(function RecommendationCard({
         {rec.description ?? ''}
       </Text>
       <CardTags tags={rec.tags} />
-      <CardActions rec={rec} onTap={onTap} onSave={onSave} />
+      <CardActions key={rec.id} rec={rec} onTap={onTap} onSave={onSave} />
     </Wrapper>
   );
 });

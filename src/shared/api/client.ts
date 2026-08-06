@@ -1,7 +1,6 @@
-import 'react-native-url-polyfill/auto';
 import { processLock } from '@supabase/auth-js';
 import { createClient } from '@supabase/supabase-js';
-import { StorageService } from '~/shared/lib/storage/kv';
+import { AuthStorage } from '~/shared/lib/storage/authStorage';
 import { isFatalAuthSessionErrorCode } from '~/shared/lib/errors/authSession';
 import {
   terminateIfAccountSuspendedRpcError,
@@ -9,7 +8,9 @@ import {
   terminateSessionForUnauthorizedRequest,
   toastIfAccountFrozenMutationError,
 } from '~/shared/lib/errors/restriction';
+import { fetchWithTimeout } from '~/shared/api/fetchWithTimeout';
 import { isWeb } from '~/shared/lib/ui/platform';
+import '~/shared/api/urlPolyfill';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const BACKEND_KEY =
@@ -18,7 +19,7 @@ const BACKEND_KEY =
   '';
 
 const supabaseFetch: typeof fetch = async (input, init) => {
-  const response = await fetch(input, init);
+  const response = await fetchWithTimeout(input, init);
   if (response.status === 401) {
     terminateSessionForUnauthorizedRequest();
   }
@@ -27,7 +28,7 @@ const supabaseFetch: typeof fetch = async (input, init) => {
 
 const client = createClient(BACKEND_URL, BACKEND_KEY, {
   auth: {
-    storage: StorageService,
+    storage: AuthStorage,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: isWeb,
@@ -44,7 +45,6 @@ export const Backend = client;
 export function unwrap<T>(response: { data: unknown; error: unknown }): T {
   if (response.error) {
     const err = response.error as { code?: unknown };
-    console.error('Supabase Error:', err);
     if (isFatalAuthSessionErrorCode(err?.code)) {
       Auth.signOut().catch(() => {});
     }

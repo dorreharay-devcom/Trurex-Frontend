@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, FlatList, useWindowDimensions } from 'react-native';
-import { SignedStorageImage } from '~/shared/ui/SignedStorageImage';
-import { Skeleton } from '~/shared/ui/Skeleton';
+import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
+import { Skeleton } from '~/shared/ui/primitives/Skeleton';
 import { CREATE_REC_MODAL_MAX_W } from '~/features/rex-create/config/layout';
 import { REX_IMAGES_BUCKET } from '~/shared/config/app';
 import { useInfiniteHorizontalCarousel } from '~/features/rex-detail/hooks/useInfiniteHorizontalCarousel';

@@ -20,6 +20,14 @@ export function useNativeMapRecenter({ mapRef, mapReady, recenterTo, markers }: 
   useEffect(() => {
     if (!mapReady || !recenterTo) return;
 
+    if (recenterTo.fitCoords?.length) {
+      mapRef.current?.fitToCoordinates(recenterTo.fitCoords, {
+        edgePadding: FIT_EDGE_PADDING,
+        animated: true,
+      });
+      return;
+    }
+
     if (recenterTo.fitMarkers) {
       const current = markersRef.current;
       if (current.length === 0) return;

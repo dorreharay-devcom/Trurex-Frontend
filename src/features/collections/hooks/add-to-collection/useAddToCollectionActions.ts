@@ -7,6 +7,8 @@ import type { RecSummary } from '~/features/collections/types/recSummary';
 import { toastError, toastSuccessAfterDismiss } from '~/shared/lib/appToast';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
+import { collectionMembershipDiff } from '~/features/collections/lib/mappers';
+import { assertOnlineForMutation } from '~/shared/lib/network/assertOnline';
 
 const TOAST_AFTER_SHEET_CLOSE_DELAY_MS = modalConfig.timing.sheetCloseMs + 180;
 
@@ -54,12 +56,12 @@ export function useAddToCollectionActions({
       onClose();
       return;
     }
-    const toAdd = [...selected].filter((id) => !original.has(id));
-    const toRemove = [...original].filter((id) => !selected.has(id));
+    const { toAdd, toRemove } = collectionMembershipDiff(selected, original);
     if (toAdd.length === 0 && toRemove.length === 0) {
       onClose();
       return;
     }
+    if (!assertOnlineForMutation('Updating collections')) return;
 
     setSaving(true);
     if (toAdd.length > 0) {
@@ -109,6 +111,7 @@ export function useAddToCollectionActions({
   const createAndAdd = useCallback(
     async (name: string) => {
       if (!rec || !name.trim()) return;
+      if (!assertOnlineForMutation('Creating collections')) return;
       setCreating(true);
       setError(null);
       try {
@@ -128,6 +131,10 @@ export function useAddToCollectionActions({
           `Added to ${collection.display_name}`,
         );
       } catch (e: unknown) {
+        if (didAccountFrozenMutationToast(e)) {
+          setCreating(false);
+          return;
+        }
         setError(unknownErrorMessage(e, 'Failed to create collection'));
         setCreating(false);
       }

@@ -1,9 +1,11 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import CollectionCard from '~/features/collections/ui/CollectionCard';
-import { LoadMoreButton } from '~/shared/ui/LoadMoreButton';
+import { LoadMoreButton } from '~/shared/ui/primitives/LoadMoreButton';
 import EmptyCollectionsCard from '~/features/gems/ui/EmptyCollectionsCard';
 import type { GemsCollectionsState } from '~/features/gems/hooks/useGemsData';
+import QueryErrorState from '~/shared/ui/query/QueryErrorState';
+import QueryListFooter from '~/shared/ui/query/QueryListFooter';
 
 const SKELETON_COUNT = 3;
 
@@ -31,6 +33,15 @@ type Props = {
 
 function CollectionsRail({ collections, onOpenCollection, onCreateCollection }: Props) {
   if (collections.loading) return <RailSkeleton />;
+
+  if (collections.isError) {
+    return (
+      <View className="mb-6">
+        <QueryErrorState compact title="Couldn't load collections" onRetry={collections.retry} />
+      </View>
+    );
+  }
+
   if (collections.items.length === 0) return <EmptyCollectionsCard onCreate={onCreateCollection} />;
 
   return (
@@ -45,11 +56,15 @@ function CollectionsRail({ collections, onOpenCollection, onCreateCollection }: 
         ))}
       </ScrollView>
       <View className="mb-6">
-        <LoadMoreButton
-          visible={collections.hasNextPage}
-          loading={collections.isFetchingNextPage}
-          onPress={collections.fetchNextPage}
-        />
+        {collections.isFetchNextPageError ? (
+          <QueryListFooter isError onRetry={collections.fetchNextPage} />
+        ) : (
+          <LoadMoreButton
+            visible={collections.hasNextPage}
+            loading={collections.isFetchingNextPage}
+            onPress={collections.fetchNextPage}
+          />
+        )}
       </View>
     </>
   );

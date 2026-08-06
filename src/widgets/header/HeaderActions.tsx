@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Image } from 'react-native';
 import { PlusCircle } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
 import NotificationBell from '~/widgets/NotificationBell';
-import { SignedUserAvatar } from '~/shared/ui/SignedUserAvatar';
+import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 import { cn } from '~/shared/lib/ui/styles';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 

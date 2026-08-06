@@ -3,6 +3,7 @@ import { useCallback, useMemo } from 'react';
 import { fetchUserConfig } from '~/shared/api/userConfigApi';
 import { useAuth } from '~/features/auth/providers';
 import { pinCategory, unpinCategory } from '~/features/discover/api/pinnedCategoriesApi';
+import { withOnlineMutation } from '~/shared/lib/network/assertOnline';
 
 const queryKey = (userId: string) => ['user_config', 'pinned_category_ids', userId] as const;
 
@@ -26,12 +27,15 @@ export function usePinnedCategoryIds() {
     [queryClient, userId],
   );
 
+  const pinMutFn = withOnlineMutation('Pinning categories', pinCategory);
+  const unpinMutFn = withOnlineMutation('Pinning categories', unpinCategory);
+
   const pinMut = useMutation({
-    mutationFn: pinCategory,
+    mutationFn: pinMutFn,
     onSuccess: setPinned,
   });
   const unpinMut = useMutation({
-    mutationFn: unpinCategory,
+    mutationFn: unpinMutFn,
     onSuccess: setPinned,
   });
 

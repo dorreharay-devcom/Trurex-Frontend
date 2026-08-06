@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import { MAP_LOCATION_PROMPT_DISMISSED_KEY } from '~/features/map/config/mapUi';
+import { StorageService } from '~/shared/lib/storage/kv';
 
 type Params = {
   locateMe: () => void | Promise<void>;
@@ -15,7 +15,7 @@ export function useMapLocationPrompt({ locateMe, mapViewVisible }: Params) {
     let cancelled = false;
     (async () => {
       try {
-        const dismissed = await AsyncStorage.getItem(MAP_LOCATION_PROMPT_DISMISSED_KEY);
+        const dismissed = await StorageService.getItem(MAP_LOCATION_PROMPT_DISMISSED_KEY);
         if (cancelled || dismissed === '1') return;
         const { status } = await Location.getForegroundPermissionsAsync();
         if (cancelled || status === 'granted') return;
@@ -30,7 +30,7 @@ export function useMapLocationPrompt({ locateMe, mapViewVisible }: Params) {
   }, []);
 
   const onNotNow = useCallback(async () => {
-    await AsyncStorage.setItem(MAP_LOCATION_PROMPT_DISMISSED_KEY, '1');
+    await StorageService.setItem(MAP_LOCATION_PROMPT_DISMISSED_KEY, '1');
     setPromptVisible(false);
   }, []);
 

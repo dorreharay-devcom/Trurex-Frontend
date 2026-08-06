@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
+import { isFatalAuthSessionErrorCode, isSameAuthSession } from '~/shared/lib/errors/authSession';
 import { Auth } from '~/shared/api/client';
-import { isFatalAuthSessionErrorCode } from '~/shared/lib/errors/authSession';
 
 type Params = {
   onSessionCleared: () => void;
@@ -15,6 +15,10 @@ export function useAuthSession({ onSessionCleared, onSessionLoaded }: Params) {
   useEffect(() => {
     let active = true;
 
+    const applySession = (next: Session | null) => {
+      setSession((prev) => (isSameAuthSession(prev, next) ? prev : next));
+    };
+
     async function bootstrap() {
       try {
         const { data, error } = await Auth.getSession();
@@ -27,9 +31,8 @@ export function useAuthSession({ onSessionCleared, onSessionLoaded }: Params) {
           }
         }
 
-        const nextSession = data.session;
-        setSession(nextSession);
-        await onSessionLoaded(Boolean(nextSession));
+        applySession(data.session);
+        await onSessionLoaded(Boolean(data.session));
       } catch (error) {
         console.warn('[Auth] getSession failed', error);
       } finally {
@@ -42,7 +45,7 @@ export function useAuthSession({ onSessionCleared, onSessionLoaded }: Params) {
     const {
       data: { subscription },
     } = Auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
+      applySession(nextSession);
       if (!nextSession) onSessionCleared();
       setLoading(false);
     });

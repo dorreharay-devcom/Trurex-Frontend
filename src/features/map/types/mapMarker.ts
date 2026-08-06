@@ -11,6 +11,8 @@ export type MapMarkerItem = {
   pinColor: string;
   imageUrl?: string;
   imageStoragePath?: string;
+  clusterCount?: number;
+  memberCoords?: { latitude: number; longitude: number }[];
 };
 
 export type MapRecenterTarget = {
@@ -18,4 +20,5 @@ export type MapRecenterTarget = {
   longitude: number;
   nonce: number;
   fitMarkers?: boolean;
+  fitCoords?: { latitude: number; longitude: number }[];
 };

@@ -1,5 +1,8 @@
 import { toastError, toastInfo } from '~/shared/lib/appToast';
 import { isPlainObject, unknownErrorMessage } from '~/shared/lib/data/guards';
+import { userFacingNetworkErrorMessage } from '~/shared/lib/errors/network';
+import { isOfflineMutationBlocked } from '~/shared/lib/network/assertOnline';
+import { onlineManager } from '@tanstack/react-query';
 
 export const ACCOUNT_SUSPENDED_RPC_CODE = 'CSUS1';
 export const ACCOUNT_SUSPENDED_STATUS = 'suspended';
@@ -169,7 +172,15 @@ export function notifyReadOnlyRestriction(apiError?: unknown): void {
 
 export function mutationErrorToast(title: string) {
   return (error: unknown) => {
+    if (isOfflineMutationBlocked(error)) return;
     if (didAccountFrozenMutationToast(error)) return;
-    toastError(title, unknownErrorMessage(error, 'Try again.'));
+    if (!onlineManager.isOnline()) {
+      toastError('You are offline', 'Reconnect to complete this action.');
+      return;
+    }
+    toastError(
+      title,
+      userFacingNetworkErrorMessage(error, unknownErrorMessage(error, 'Try again.')),
+    );
   };
 }

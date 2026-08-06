@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { clusterMapMarkers } from '~/features/map/lib/clusterMarkers';
 import { filterLocatedRecommendations } from '~/features/map/lib/filters';
 import { mapSearchTitleSuggestions } from '~/features/map/lib/mapSearchSuggestions';
 import {
@@ -21,6 +22,7 @@ type Params = {
   withSavedOverride: (rec: Recommendation) => Recommendation;
   selectedRecId: string | null;
   suggestQuery: string;
+  latitudeDelta: number;
 };
 
 export function useMapDerivedData({
@@ -31,6 +33,7 @@ export function useMapDerivedData({
   withSavedOverride,
   selectedRecId,
   suggestQuery,
+  latitudeDelta,
 }: Params) {
   const locatedRecs = useMemo(() => filterLocatedRecommendations(fetchedRecs), [fetchedRecs]);
 
@@ -50,12 +53,17 @@ export function useMapDerivedData({
     [locatedRecs, layers, userId, pinTypeByRecId, withSavedOverride],
   );
 
-  const mapMarkers: MapMarkerItem[] = useMemo(
+  const rawMarkers: MapMarkerItem[] = useMemo(
     () =>
       pinRows
         .filter((row) => pinRowPassesLayerVisibility(row, layers))
         .map(mapPinRowToMapMarkerItem),
     [pinRows, layers],
+  );
+
+  const mapMarkers = useMemo(
+    () => clusterMapMarkers(rawMarkers, latitudeDelta),
+    [rawMarkers, latitudeDelta],
   );
 
   const suggestions = useMemo(

@@ -9,6 +9,7 @@ import { useAuth } from '~/features/auth/providers';
 import { Theme } from '~/shared/theme/Theme';
 import CommentComposer from './common/CommentComposer';
 import CommentThread from './common/CommentThread';
+import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 import { totalRexCommentCount } from '~/features/rex-detail/lib/rexCommentTree';
 import type { RexComment } from '~/features/rex-detail/types/rexComment';
 
@@ -26,16 +27,27 @@ export type RexCommentsSectionProps = {
 
 type CommentsListProps = {
   loading: boolean;
+  loadError: boolean;
+  onRetry: () => void;
   comments: RexComment[];
 } & Omit<React.ComponentProps<typeof CommentThread>, 'root'>;
 
-function CommentsList({ loading, comments, ...threadProps }: CommentsListProps) {
+function CommentsList({
+  loading,
+  loadError,
+  onRetry,
+  comments,
+  ...threadProps
+}: CommentsListProps) {
   if (loading) {
     return (
       <View className="items-center py-6">
         <ActivityIndicator color={Theme.colors.primary} />
       </View>
     );
+  }
+  if (loadError) {
+    return <QueryErrorState title="Couldn't load comments" onRetry={onRetry} />;
   }
   if (comments.length === 0) {
     return (
@@ -65,7 +77,8 @@ const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
   onComposerFocus,
 }) => {
   const { user } = useAuth();
-  const { comments, loading, addComment, deleteComment, toggleCommentLike } = useRexComments(rexId);
+  const { comments, loading, loadError, refetch, addComment, deleteComment, toggleCommentLike } =
+    useRexComments(rexId);
 
   const composer = useCommentComposer({
     rexId,
@@ -96,6 +109,8 @@ const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
 
       <CommentsList
         loading={loading}
+        loadError={loadError}
+        onRetry={() => void refetch()}
         comments={comments}
         currentUserId={user?.id}
         onReply={composer.startReply}
