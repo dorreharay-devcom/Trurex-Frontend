@@ -61,6 +61,7 @@ module.exports = {
       name: 'TruRex',
     },
     plugins: [
+      'expo-dev-client',
       'expo-web-browser',
       ['expo-router', { sitemap: false }],
       'expo-secure-store',
