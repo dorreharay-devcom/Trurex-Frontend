@@ -2,7 +2,6 @@ import React from 'react';
 import { View } from 'react-native';
 import type { useProfileScreen } from '~/features/profile/hooks/useProfileScreen';
 import CurrentlySection from '~/features/profile/ui/CurrentlySection';
-import ProfileBackButton from '~/features/profile/ui/ProfileBackButton';
 import ProfileHeader from '~/features/profile/ui/ProfileHeader';
 import ProfileTabs from '~/features/profile/ui/ProfileTabs';
 
@@ -11,15 +10,13 @@ type Flow = ReturnType<typeof useProfileScreen>;
 type Props = {
   flow: Flow;
   avatarRefreshKey: number;
-  onBack?: () => void;
 };
 
-function ProfileBodyChrome({ flow, avatarRefreshKey, onBack }: Props) {
+function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
   const { profile, content, social, avatar } = flow;
 
   return (
     <View className="pb-3">
-      {onBack ? <ProfileBackButton onPress={onBack} className="mb-3" /> : null}
       {profile ? (
         <ProfileHeader
           profile={profile}
