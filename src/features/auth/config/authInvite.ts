@@ -1,5 +1,5 @@
 export const AUTH_INVITE_CODE_ENABLED = true;
-export const AUTH_INVITE_CODE = '110626';
+export const AUTH_INVITE_CODE = '080811';
 export const AUTH_INVITE_CODE_LENGTH = 6;
 
 export function normalizeInviteCode(value: string): string {
