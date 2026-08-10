@@ -1,5 +1,5 @@
-import { Platform } from 'react-native';
 import * as Location from 'expo-location';
+import { isWeb } from '~/shared/lib/ui/platform';
 
 export type LatLng = { lat: number; lng: number };
 
@@ -137,10 +137,15 @@ async function getCurrentLocationCoordsWeb(): Promise<LatLng> {
   throw new Error('Geolocation is not available in this environment.');
 }
 
-async function getCurrentLocationCoordsNative(): Promise<LatLng> {
+async function getCurrentLocationCoordsNative(
+  requestPermission: boolean,
+): Promise<LatLng> {
   const googlePromise = fetchGoogleGeolocateConsiderIp();
 
-  const { status } = await Location.requestForegroundPermissionsAsync();
+  const { status } = requestPermission
+    ? await Location.requestForegroundPermissionsAsync()
+    : await Location.getForegroundPermissionsAsync();
+
   if (status !== 'granted') {
     const google = await resolveGoogleGeolocateFallback(googlePromise);
     if (google) {
@@ -166,11 +171,26 @@ async function getCurrentLocationCoordsNative(): Promise<LatLng> {
   }
 }
 
-export async function getCurrentLocationCoords(): Promise<LatLng> {
-  if (Platform.OS === 'web') {
+export type GetCurrentLocationCoordsOptions = {
+  requestPermission?: boolean;
+};
+
+export async function getForegroundLocationPermission(): Promise<Location.PermissionStatus> {
+  if (isWeb) {
+    return Location.PermissionStatus.UNDETERMINED;
+  }
+  const { status } = await Location.getForegroundPermissionsAsync();
+  return status;
+}
+
+export async function getCurrentLocationCoords(
+  options?: GetCurrentLocationCoordsOptions,
+): Promise<LatLng> {
+  const requestPermission = options?.requestPermission !== false;
+  if (isWeb) {
     return getCurrentLocationCoordsWeb();
   }
-  return getCurrentLocationCoordsNative();
+  return getCurrentLocationCoordsNative(requestPermission);
 }
 
 export async function reverseGeocodeLatLng(lat: number, lng: number): Promise<string | null> {

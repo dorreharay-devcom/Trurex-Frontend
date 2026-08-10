@@ -7,13 +7,23 @@ type Props = {
 };
 
 export function ProfileCollectionsSkeleton({ windowWidth }: Props) {
-  const { numColumns, cellWidth, gap } = profileGridLayout(windowWidth);
-  const height = Math.round(cellWidth * (224 / 176));
+  const { numColumns, gap } = profileGridLayout(windowWidth);
+  const halfGap = gap / 2;
+  const aspect = 176 / 224;
 
   return (
-    <View className="flex-row flex-wrap" style={{ gap }}>
+    <View className="w-full flex-row flex-wrap" style={{ marginHorizontal: -halfGap }}>
       {Array.from({ length: numColumns * 2 }, (_, i) => (
-        <View key={i} style={{ width: cellWidth, height }} className="rounded-xl bg-border/40" />
+        <View
+          key={i}
+          style={{
+            width: `${100 / numColumns}%`,
+            paddingHorizontal: halfGap,
+            marginBottom: gap,
+          }}
+        >
+          <View style={{ width: '100%', aspectRatio: aspect }} className="rounded-xl bg-border/40" />
+        </View>
       ))}
     </View>
   );

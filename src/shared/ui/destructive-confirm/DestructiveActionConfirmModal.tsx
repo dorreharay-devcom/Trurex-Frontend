@@ -27,7 +27,9 @@ function DestructiveActionConfirmModal({
   };
 
   const sheet = (
-    <Animated.View style={{ width: '100%', transform: [{ translateY: sheetTranslateY }] }}>
+    <Animated.View
+      style={[styles.sheet, isWeb && styles.sheetWeb, { transform: [{ translateY: sheetTranslateY }] }]}
+    >
       <ConfirmModalCard
         title={title}
         message={message}
@@ -94,6 +96,12 @@ const styles = StyleSheet.create({
     justifyContent: isWeb ? 'center' : 'flex-end',
     alignItems: 'center',
     paddingHorizontal: isWeb ? 16 : 0,
+  },
+  sheet: {
+    width: '100%',
+  },
+  sheetWeb: {
+    maxWidth: 400,
   },
   inlineRoot: {
     ...StyleSheet.absoluteFillObject,

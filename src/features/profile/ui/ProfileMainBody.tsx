@@ -1,5 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
+  LayoutChangeEvent,
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
@@ -29,25 +30,26 @@ type Props = {
 };
 
 const NEAR_END_PX = 320;
+const GRID_PAD = 16;
 
 function EmptyBlock({
   loading,
   isError,
   isRecs,
-  windowWidth,
+  contentWidth,
   onRetry,
 }: {
   loading: boolean;
   isError: boolean;
   isRecs: boolean;
-  windowWidth: number;
+  contentWidth: number;
   onRetry: () => void;
 }) {
   if (loading) {
     return isRecs ? (
-      <ProfileRexGridSkeleton windowWidth={windowWidth} />
+      <ProfileRexGridSkeleton windowWidth={contentWidth} />
     ) : (
-      <ProfileCollectionsSkeleton windowWidth={windowWidth} />
+      <ProfileCollectionsSkeleton windowWidth={contentWidth} />
     );
   }
   if (isError) {
@@ -67,7 +69,10 @@ function EmptyBlock({
 
 const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
   const { width: windowWidth } = useWindowDimensions();
-  const { numColumns, cellWidth, gap } = profileGridLayout(windowWidth);
+  const [gridContentWidth, setGridContentWidth] = useState(() =>
+    Math.max(windowWidth - GRID_PAD * 4, 1),
+  );
+  const { numColumns, cellWidth, gap } = profileGridLayout(gridContentWidth);
   const { content } = flow;
   const isRecs = content.activeTab === PROFILE_TAB.recs;
   const items = isRecs ? content.myRexes : content.myCollections;
@@ -76,6 +81,12 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
   const hasItems = items.length > 0;
 
   const loadMore = isRecs ? content.loadMoreRexes : content.loadMoreCollections;
+
+  const onGridLayout = useCallback((event: LayoutChangeEvent) => {
+    const next = Math.floor(event.nativeEvent.layout.width);
+    if (next <= 0) return;
+    setGridContentWidth((prev) => (prev === next ? prev : next));
+  }, []);
 
   const onScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -86,6 +97,8 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
     },
     [hasItems, loadMore],
   );
+
+  const halfGap = gap / 2;
 
   return (
     <ScrollView
@@ -98,7 +111,7 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
         webContainerStyle,
         {
           flexGrow: 0,
-          padding: 16,
+          padding: GRID_PAD,
           paddingBottom: 96,
         },
       ]}
@@ -110,54 +123,50 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
 
         {hasItems ? (
           <>
-            <View className="flex-row flex-wrap px-4 pb-4">
-              {isRecs
-                ? content.myRexes.map((item, index) => (
-                    <ProfileGridCell
-                      key={item.id}
-                      index={index}
-                      numColumns={numColumns}
-                      cellWidth={cellWidth}
-                      gap={gap}
-                    >
-                      <ProfileRexCard
-                        rec={item}
-                        width={cellWidth}
-                        onPress={() => flow.onRexPress?.(item)}
-                      />
-                    </ProfileGridCell>
-                  ))
-                : content.myCollections.map((item, index) => (
-                    <ProfileGridCell
-                      key={item.id}
-                      index={index}
-                      numColumns={numColumns}
-                      cellWidth={cellWidth}
-                      gap={gap}
-                    >
-                      <CollectionCard
-                        collection={item}
-                        width={cellWidth}
-                        onPress={() => flow.openCollection(item.id)}
-                      />
-                    </ProfileGridCell>
-                  ))}
+            <View className="px-4 pb-4">
+              <View className="w-full" onLayout={onGridLayout}>
+                <View className="w-full flex-row flex-wrap" style={{ marginHorizontal: -halfGap }}>
+                  {isRecs
+                    ? content.myRexes.map((item) => (
+                        <ProfileGridCell key={item.id} numColumns={numColumns} gap={gap}>
+                          <ProfileRexCard
+                            rec={item}
+                            width={cellWidth}
+                            onPress={() => flow.onRexPress?.(item)}
+                          />
+                        </ProfileGridCell>
+                      ))
+                    : content.myCollections.map((item) => (
+                        <ProfileGridCell key={item.id} numColumns={numColumns} gap={gap}>
+                          <CollectionCard
+                            collection={item}
+                            fill
+                            onPress={() => flow.openCollection(item.id)}
+                          />
+                        </ProfileGridCell>
+                      ))}
+                </View>
+              </View>
             </View>
             <QueryListFooter
-              loading={isRecs ? content.isFetchingNextRexesPage : content.isFetchingNextCollectionsPage}
+              loading={
+                isRecs ? content.isFetchingNextRexesPage : content.isFetchingNextCollectionsPage
+              }
               isError={isRecs ? content.isFetchNextRexesError : content.isFetchNextCollectionsError}
               onRetry={loadMore}
             />
           </>
         ) : (
           <View className="px-4 pb-2">
-            <EmptyBlock
-              loading={loading}
-              isError={isError}
-              isRecs={isRecs}
-              windowWidth={windowWidth}
-              onRetry={isRecs ? content.retryRexes : content.retryCollections}
-            />
+            <View className="w-full" onLayout={onGridLayout}>
+              <EmptyBlock
+                loading={loading}
+                isError={isError}
+                isRecs={isRecs}
+                contentWidth={gridContentWidth}
+                onRetry={isRecs ? content.retryRexes : content.retryCollections}
+              />
+            </View>
           </View>
         )}
       </View>

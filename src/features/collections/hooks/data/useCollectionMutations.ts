@@ -30,7 +30,6 @@ export const useUpdateCollection = () => {
       queryClient.invalidateQueries({
         queryKey: [...COLLECTIONS_QUERY_KEYS.collectionDetail, variables.collection_id],
       });
-      toastSuccess('Collection updated!');
     },
     onError: mutationErrorToast('Failed to update collection'),
   });
@@ -58,6 +57,7 @@ export const useSaveCollection = () => {
     mutationFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [...COLLECTIONS_QUERY_KEYS.mySavedCollections] });
+      toastSuccess('Saved to your collections');
     },
     onError: mutationErrorToast('Failed to save collection'),
   });

@@ -64,12 +64,13 @@ export function useCollectionActions({ collectionId, detail, onBack }: Params) {
   const confirmUnsave = useCallback(() => {
     unsave(collectionId, {
       onSuccess: () => {
-        setShowUnsaveConfirm(false);
-        setSavedOverride(false);
-        onBack();
+        toastSuccessAfterDismiss(() => {
+          setShowUnsaveConfirm(false);
+          setSavedOverride(false);
+        }, 'Removed from saved');
       },
     });
-  }, [unsave, collectionId, onBack]);
+  }, [unsave, collectionId]);
 
   return {
     showMenu,

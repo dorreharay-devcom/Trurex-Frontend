@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import * as Location from 'expo-location';
 import type { MapRecenterTarget } from '~/features/map/types/mapMarker';
-import { getCurrentLocationCoords } from '~/features/map/lib/location';
+import {
+  getCurrentLocationCoords,
+  getForegroundLocationPermission,
+} from '~/features/map/lib/location';
 
 export type UserCoords = { latitude: number; longitude: number };
 
@@ -14,9 +18,12 @@ export function useMapLocation() {
     let cancelled = false;
     (async () => {
       try {
-        const coords = await getCurrentLocationCoords();
+        const status = await getForegroundLocationPermission();
+        if (cancelled || status !== Location.PermissionStatus.GRANTED) return;
+        const coords = await getCurrentLocationCoords({ requestPermission: false });
         if (!cancelled) setUserCoords({ latitude: coords.lat, longitude: coords.lng });
-      } catch {}
+      } catch {
+      }
     })();
     return () => {
       cancelled = true;
@@ -30,7 +37,7 @@ export function useMapLocation() {
 
   const locateMe = useCallback(async () => {
     try {
-      const coords = await getCurrentLocationCoords();
+      const coords = await getCurrentLocationCoords({ requestPermission: true });
       applyLocatedCoords(coords.lat, coords.lng);
       return;
     } catch {

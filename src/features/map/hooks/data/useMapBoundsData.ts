@@ -17,17 +17,10 @@ type Params = {
   needCardRows: boolean;
 };
 
-function filterPinRowsByPlaceName(rows: MapPinRow[], rawQuery: string): MapPinRow[] {
-  const q = rawQuery.trim().toLowerCase();
-  if (!q) return rows;
-  return rows.filter((r) => r.place_name.toLowerCase().includes(q));
-}
-
 export function useMapBoundsData({ bounds, searchTerm, needCardRows }: Params) {
   const hasBounds = bounds != null;
-  const queryKeyBase = hasBounds
-    ? ([bounds.min_lat, bounds.max_lat, bounds.min_lng, bounds.max_lng] as const)
-    : (['idle'] as const);
+  const trimmedSearch = searchTerm.trim();
+  const searchForQuery = trimmedSearch.length > 0 ? trimmedSearch : null;
 
   const boundsParams = useMemo(() => {
     if (!bounds) return null;
@@ -36,8 +29,19 @@ export function useMapBoundsData({ bounds, searchTerm, needCardRows }: Params) {
       max_lat: bounds.max_lat,
       min_lng: bounds.min_lng,
       max_lng: bounds.max_lng,
+      search_term: searchForQuery,
     };
-  }, [bounds]);
+  }, [bounds, searchForQuery]);
+
+  const queryKeyBase = hasBounds && boundsParams
+    ? ([
+        boundsParams.min_lat,
+        boundsParams.max_lat,
+        boundsParams.min_lng,
+        boundsParams.max_lng,
+        boundsParams.search_term ?? '',
+      ] as const)
+    : (['idle'] as const);
 
   const {
     data: serverPins,
@@ -85,14 +89,11 @@ export function useMapBoundsData({ bounds, searchTerm, needCardRows }: Params) {
   const recSource = serverRecs ?? EMPTY_RECS;
 
   const fetchedRecs = useMemo(
-    () => (searchTerm.trim() ? filterRecommendationsByRexTitle(recSource, searchTerm) : recSource),
-    [recSource, searchTerm],
+    () => (searchForQuery ? filterRecommendationsByRexTitle(recSource, searchForQuery) : recSource),
+    [recSource, searchForQuery],
   );
 
-  const pinRows = useMemo(
-    () => (searchTerm.trim() ? filterPinRowsByPlaceName(pinSource, searchTerm) : pinSource),
-    [pinSource, searchTerm],
-  );
+  const pinRows = pinSource;
 
   const refetch = useCallback(() => {
     void refetchPins();

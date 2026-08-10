@@ -18,6 +18,7 @@ function toQueryBounds(view: LatLngBounds): LatLngBounds {
 
 const INITIAL_QUERY_BOUNDS = toQueryBounds(DEFAULT_MAP_BOUNDS);
 
+
 export function useMapViewport() {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebouncedValue(searchQuery.trim(), DEFAULT_SEARCH_DEBOUNCE_MS);
@@ -28,10 +29,8 @@ export function useMapViewport() {
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [mapRegion] = useState<Region>(() => boundsToRegion(DEFAULT_MAP_BOUNDS));
-  const [viewRegion, setViewRegion] = useState<Region>(() => boundsToRegion(DEFAULT_MAP_BOUNDS));
 
-  const onBoundsChange = useCallback((next: LatLngBounds, region?: Region) => {
-    if (region) setViewRegion(region);
+  const onBoundsChange = useCallback((next: LatLngBounds, _region?: Region) => {
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     debounceTimerRef.current = setTimeout(() => {
       const coverage = coverageRef.current;
@@ -60,7 +59,6 @@ export function useMapViewport() {
     suggestQuery,
     queryBounds,
     mapRegion,
-    viewRegion,
     onBoundsChange,
   };
 }

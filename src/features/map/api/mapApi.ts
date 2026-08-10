@@ -49,45 +49,54 @@ function parseMapPinRow(row: Record<string, unknown>): MapPinRow | null {
   };
 }
 
-function rpcBoundsPayload(params: MapBoundsParams, defaultLimit: number) {
+function normalizeSearchTerm(term: string | null | undefined): string | null {
+  const t = term?.trim() ?? '';
+  return t.length > 0 ? t : null;
+}
+
+function mapPinsRpcPayload(params: MapBoundsParams) {
   return {
     min_lat: params.min_lat,
     max_lat: params.max_lat,
     min_lng: params.min_lng,
     max_lng: params.max_lng,
     category_filter: params.category_filter ?? null,
-    result_limit: params.result_limit ?? defaultLimit,
+    search_term: normalizeSearchTerm(params.search_term),
+    result_limit: params.result_limit ?? 500,
     result_offset: params.result_offset ?? 0,
   };
 }
 
-function filterPinRowsByRexName(rows: MapPinRow[], rawQuery: string): MapPinRow[] {
-  const q = rawQuery.trim().toLowerCase();
-  if (!q) return rows;
-  return rows.filter((r) => r.place_name.toLowerCase().includes(q));
+function mapRexesRpcPayload(params: MapBoundsParams) {
+  return {
+    min_lat: params.min_lat,
+    max_lat: params.max_lat,
+    min_lng: params.min_lng,
+    max_lng: params.max_lng,
+    category_filter: params.category_filter ?? null,
+    result_limit: params.result_limit ?? 100,
+    result_offset: params.result_offset ?? 0,
+  };
 }
 
 export const MapApi = {
   mapRexesInBounds: async (params: MapBoundsParams): Promise<Recommendation[]> => {
-    const raw = unwrap(await Backend.rpc('map_rexes_in_bounds', rpcBoundsPayload(params, 100)));
+    const raw = unwrap(await Backend.rpc('map_rexes_in_bounds', mapRexesRpcPayload(params)));
     if (!Array.isArray(raw)) return [];
     const recs = raw.flatMap((row) => {
       const rec = mapApiRowToRecommendation(row);
       return rec ? [rec] : [];
     });
-    const term = params.search_term?.trim();
+    const term = normalizeSearchTerm(params.search_term);
     if (term) return filterRecommendationsByRexTitle(recs, term);
     return recs;
   },
 
   mapRexPins: async (params: MapBoundsParams): Promise<MapPinRow[]> => {
-    const raw = unwrap(await Backend.rpc('map_rex_pins', rpcBoundsPayload(params, 500)));
+    const raw = unwrap(await Backend.rpc('map_rex_pins', mapPinsRpcPayload(params)));
     if (!Array.isArray(raw)) return [];
-    const pins = (raw as Record<string, unknown>[])
+    return (raw as Record<string, unknown>[])
       .map((row) => parseMapPinRow(row))
       .filter((r): r is MapPinRow => r != null);
-    const term = params.search_term?.trim();
-    if (term) return filterPinRowsByRexName(pins, term);
-    return pins;
   },
 };

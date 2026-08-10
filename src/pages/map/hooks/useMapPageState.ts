@@ -19,6 +19,7 @@ type Flow = {
   userCoords: { latitude: number; longitude: number } | null;
   userId: string | null;
   locatedRecsForList: Recommendation[];
+  locatedRexCount: number;
   listView: boolean;
   isLoading: boolean;
   isError: boolean;
@@ -58,6 +59,7 @@ export function useMapPageState({ flow, onRexSheetOpenChange }: Params) {
     userCoords,
     userId,
     locatedRecsForList,
+    locatedRexCount,
     listView,
     isLoading,
     isPinsError,
@@ -132,9 +134,9 @@ export function useMapPageState({ flow, onRexSheetOpenChange }: Params) {
     mapViewVisible,
     showMapLoadError: mapViewVisible && isPinsError,
     showEmptyMapAreaBanner:
-      mapViewVisible && mapDataReady && mapMarkers.length === 0 && !hasSearchQuery,
+      mapViewVisible && mapDataReady && locatedRexCount === 0 && !hasSearchQuery,
     showNoSearchMatchBanner:
-      mapViewVisible && mapDataReady && mapMarkers.length === 0 && hasSearchQuery,
+      mapViewVisible && mapMarkers.length === 0 && hasSearchQuery,
     toggleListView,
     onMarkerPress,
     selectedRec,
