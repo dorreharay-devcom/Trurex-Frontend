@@ -7,8 +7,13 @@ export default function ProfileStackLayout() {
       screenOptions={{
         headerShown: false,
         contentStyle: { flex: 1, backgroundColor: Theme.colors.background },
-        animation: 'fade',
+        animation: 'none',
       }}
-    />
+    >
+      <Stack.Screen name="index" />
+      <Stack.Screen name="edit" />
+      <Stack.Screen name="blocked" />
+      <Stack.Screen name="[collectionId]" />
+    </Stack>
   );
 }

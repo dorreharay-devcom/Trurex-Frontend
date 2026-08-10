@@ -19,7 +19,6 @@ function DetailOverlays({ report, del, save }: Props) {
   return (
     <>
       <ReportContentDialog
-        inline
         open={report.reportTarget != null}
         onOpenChange={(o) => {
           if (!o) report.clearReportTarget();
@@ -27,7 +26,6 @@ function DetailOverlays({ report, del, save }: Props) {
         target={report.reportTarget}
       />
       <DestructiveActionConfirmModal
-        inline
         visible={del.confirmOpen}
         title="Delete recommendation?"
         message={DELETE_REX_MESSAGE}

@@ -67,13 +67,17 @@ const ProfileHeader = ({
 
         {isOwnProfile ? (
           <View className="mb-2 mt-4 flex-row gap-2">
-            <TouchableOpacity
-              onPress={onEditProfile}
-              activeOpacity={0.7}
-              className="flex-1 items-center rounded-lg border border-border py-2.5"
-            >
-              <Text className="text-sm font-medium text-foreground">Edit Profile</Text>
-            </TouchableOpacity>
+            {onEditProfile ? (
+              <TouchableOpacity
+                onPress={onEditProfile}
+                activeOpacity={0.7}
+                className="flex-1 items-center rounded-lg border border-border py-2.5"
+                accessibilityRole="button"
+                accessibilityLabel="Edit Profile"
+              >
+                <Text className="text-sm font-medium text-foreground">Edit Profile</Text>
+              </TouchableOpacity>
+            ) : null}
             <TouchableOpacity
               onPress={onShare}
               activeOpacity={0.7}

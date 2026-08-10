@@ -16,6 +16,8 @@ export function useSheetSpringAnimation(open: boolean) {
   useEffect(() => {
     if (open) {
       setVisible(true);
+      backdropOpacity.setValue(0);
+      sheetTranslateY.setValue(HIDDEN_OFFSET);
       Animated.parallel([
         Animated.timing(backdropOpacity, {
           toValue: 1,
@@ -42,7 +44,9 @@ export function useSheetSpringAnimation(open: boolean) {
         duration: SHEET_OUT_MS,
         useNativeDriver: true,
       }),
-    ]).start(() => setVisible(false));
+    ]).start(({ finished }) => {
+      if (finished) setVisible(false);
+    });
   }, [open, backdropOpacity, sheetTranslateY]);
 
   return { visible, backdropOpacity, sheetTranslateY };

@@ -1,5 +1,6 @@
+import { useCallback, useMemo, useState } from 'react';
 import { Keyboard } from 'react-native';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import type { RecSummary } from '~/features/collections/types/recSummary';
 import { MAP_PIN_TYPE } from '~/features/map/config/pins';
 import {
@@ -18,6 +19,7 @@ type Flow = {
   userCoords: { latitude: number; longitude: number } | null;
   userId: string | null;
   locatedRecsForList: Recommendation[];
+  locatedRexCount: number;
   listView: boolean;
   isLoading: boolean;
   isError: boolean;
@@ -57,6 +59,7 @@ export function useMapPageState({ flow, onRexSheetOpenChange }: Params) {
     userCoords,
     userId,
     locatedRecsForList,
+    locatedRexCount,
     listView,
     isLoading,
     isPinsError,
@@ -71,10 +74,12 @@ export function useMapPageState({ flow, onRexSheetOpenChange }: Params) {
     setListView,
   } = flow;
 
-  useEffect(() => {
-    onRexSheetOpenChange?.(Boolean(selectedRec));
-    return () => onRexSheetOpenChange?.(false);
-  }, [selectedRec, onRexSheetOpenChange]);
+  useFocusEffect(
+    useCallback(() => {
+      onRexSheetOpenChange?.(Boolean(selectedRec));
+      return () => onRexSheetOpenChange?.(false);
+    }, [selectedRec, onRexSheetOpenChange]),
+  );
 
   const distanceLabel = useMemo(() => {
     if (!selectedRec?.latitude || selectedRec.longitude == null || !userCoords) {
@@ -129,9 +134,9 @@ export function useMapPageState({ flow, onRexSheetOpenChange }: Params) {
     mapViewVisible,
     showMapLoadError: mapViewVisible && isPinsError,
     showEmptyMapAreaBanner:
-      mapViewVisible && mapDataReady && mapMarkers.length === 0 && !hasSearchQuery,
+      mapViewVisible && mapDataReady && locatedRexCount === 0 && !hasSearchQuery,
     showNoSearchMatchBanner:
-      mapViewVisible && mapDataReady && mapMarkers.length === 0 && hasSearchQuery,
+      mapViewVisible && mapMarkers.length === 0 && hasSearchQuery,
     toggleListView,
     onMarkerPress,
     selectedRec,

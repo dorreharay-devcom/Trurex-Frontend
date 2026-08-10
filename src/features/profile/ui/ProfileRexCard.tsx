@@ -25,7 +25,7 @@ function ProfileRexCard({ rec, width, onPress }: Props) {
   const transform = gridCoverImageTransform(width);
 
   return (
-    <View style={{ width }}>
+    <View style={{ width: '100%' }}>
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={onPress}

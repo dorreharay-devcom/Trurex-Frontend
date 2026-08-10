@@ -5,6 +5,7 @@ import type {
   CollectionVisibility,
   EditableCollection,
 } from '~/features/collections/types/collection';
+import { toastSuccessAfterDismiss } from '~/shared/lib/appToast';
 import { useSignedStorageUrl } from '~/shared/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/shared/config/app';
 
@@ -71,7 +72,7 @@ export function useEditCollectionForm({ open, collection, onUpdated }: Params) {
         cover_image_path: coverChanged ? (cover.storagePath ?? null) : undefined,
         visibility,
       },
-      { onSuccess: onUpdated },
+      { onSuccess: () => toastSuccessAfterDismiss(onUpdated, 'Collection updated!') },
     );
   }, [
     name,

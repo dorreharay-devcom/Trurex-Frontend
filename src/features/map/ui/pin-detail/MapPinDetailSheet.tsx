@@ -26,7 +26,10 @@ const MapPinDetailSheet = ({
   onSave,
 }: Props) => {
   return (
-    <View className="absolute bottom-0 left-0 right-0 z-[1200] max-h-[50vh] rounded-t-2xl border-t border-border bg-card shadow-lg">
+    <View
+      className="absolute bottom-0 left-0 right-0 max-h-[50vh] rounded-t-2xl border-t border-border bg-card shadow-lg"
+      style={{ zIndex: 1200, elevation: 1200 }}
+    >
       <View className="items-center pt-2 pb-1">
         <View className="h-1 w-10 rounded-full bg-muted opacity-50" />
       </View>

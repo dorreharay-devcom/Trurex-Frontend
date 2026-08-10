@@ -152,11 +152,11 @@ export function useCreateRecWizard() {
 
   const applyAddYourOwnPrefill = useCallback(
     (source: AddYourOwnRecSource) => {
-      reset();
+      resetForms();
       prefillFromAddYourOwn(source);
       categoryCodePrefillRef.current = source.categoryCode;
     },
-    [reset, prefillFromAddYourOwn],
+    [resetForms, prefillFromAddYourOwn],
   );
 
   const applyEditPrefill = useCallback(

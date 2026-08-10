@@ -5,6 +5,7 @@ import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/r
 
 type Props = {
   visible: boolean;
+  embedded?: boolean;
   recommendation: Recommendation | null;
   onClose: () => void;
   onDismiss?: () => void;
@@ -17,12 +18,20 @@ type Props = {
   onEditRex?: (rexId: string) => void;
 };
 
-function RexDetailHost({ visible, recommendation, onClose, onDismiss, ...rest }: Props) {
+function RexDetailHost({
+  visible,
+  embedded = false,
+  recommendation,
+  onClose,
+  onDismiss,
+  ...rest
+}: Props) {
   if (!recommendation) return null;
 
   return (
     <RecommendationDetailModal
       visible={visible}
+      embedded={embedded}
       recommendation={recommendation}
       onClose={onClose}
       onDismiss={onDismiss}

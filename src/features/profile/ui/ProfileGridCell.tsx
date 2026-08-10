@@ -2,30 +2,27 @@ import React from 'react';
 import { View, type ViewStyle } from 'react-native';
 
 const GRID_GAP = 12;
-const OUTER_PAD = 16;
-const INNER_PAD = 16;
+const NARROW_BREAKPOINT = 700;
 
-export function profileGridLayout(windowWidth: number) {
-  const gridWidth = Math.min(windowWidth, 1280) - OUTER_PAD * 2 - INNER_PAD * 2;
-  const numColumns = gridWidth < 700 ? 2 : 4;
-  const cellWidth = Math.floor((gridWidth - GRID_GAP * (numColumns - 1)) / numColumns);
+export function profileGridLayout(contentWidth: number) {
+  const width = Math.max(Math.floor(contentWidth), 1);
+  const numColumns = width < NARROW_BREAKPOINT ? 2 : 4;
+  const cellWidth = Math.max(Math.floor(width / numColumns - GRID_GAP), 1);
   return { numColumns, cellWidth, gap: GRID_GAP };
 }
 
 type Props = {
-  index: number;
   numColumns: number;
-  cellWidth: number;
   gap: number;
   children: React.ReactNode;
 };
 
-function ProfileGridCell({ index, numColumns, cellWidth, gap, children }: Props) {
-  const lastInRow = (index + 1) % numColumns === 0;
+function ProfileGridCell({ numColumns, gap, children }: Props) {
+  const halfGap = gap / 2;
   const style: ViewStyle = {
-    width: cellWidth,
+    width: `${100 / numColumns}%`,
+    paddingHorizontal: halfGap,
     marginBottom: gap,
-    marginRight: lastInRow ? 0 : gap,
   };
   return <View style={style}>{children}</View>;
 }

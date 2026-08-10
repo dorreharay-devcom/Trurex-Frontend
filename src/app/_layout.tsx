@@ -65,6 +65,7 @@ export default function RootLayout() {
               screenOptions={{
                 headerShown: false,
                 contentStyle: { flex: 1, backgroundColor: Theme.colors.background },
+                animation: 'none',
               }}
             >
               <Stack.Screen
@@ -73,6 +74,14 @@ export default function RootLayout() {
                   presentation: 'transparentModal',
                   animation: 'none',
                   contentStyle: { flex: 1, backgroundColor: 'transparent' },
+                  gestureEnabled: false,
+                }}
+              />
+              <Stack.Screen
+                name="rex/[rexId]"
+                options={{
+                  animation: 'none',
+                  contentStyle: { flex: 1, backgroundColor: Theme.colors.background },
                 }}
               />
             </Stack>

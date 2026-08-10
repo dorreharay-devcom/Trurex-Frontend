@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
-import { Animated as RNAnimated, Dimensions, Easing as RNEasing } from 'react-native';
+import { useLayoutEffect, useRef } from 'react';
+import { Animated as RNAnimated } from 'react-native';
 import { modalConfig } from '~/shared/config/overlaySheet';
+import { useOverlaySheetPresentation } from '~/shared/hooks/useOverlaySheetPresentation';
 
 const { timing } = modalConfig;
 
@@ -13,28 +14,16 @@ type Params = {
 
 export function useModalPresentation({ visible, windowHeight, stepIndex, onClose }: Params) {
   const prevStepIndex = useRef(-1);
-  const windowHeightRef = useRef(windowHeight);
-  windowHeightRef.current = windowHeight;
-  const sheetTranslateY = useRef(
-    new RNAnimated.Value(Math.max(Dimensions.get('window').height, 1)),
-  ).current;
+  const { sheetTranslateY, handleClose } = useOverlaySheetPresentation({
+    visible,
+    windowHeight,
+    onClose,
+  });
   const stepOpacity = useRef(new RNAnimated.Value(1)).current;
 
   useLayoutEffect(() => {
     if (visible) prevStepIndex.current = -1;
   }, [visible]);
-
-  useEffect(() => {
-    if (!visible) return;
-    const h = Math.max(windowHeightRef.current, Dimensions.get('window').height, 1);
-    sheetTranslateY.setValue(h);
-    RNAnimated.timing(sheetTranslateY, {
-      toValue: 0,
-      duration: timing.sheetOpenMs,
-      easing: RNEasing.out(RNEasing.cubic),
-      useNativeDriver: true,
-    }).start();
-  }, [visible, sheetTranslateY]);
 
   useLayoutEffect(() => {
     if (stepIndex !== prevStepIndex.current && prevStepIndex.current !== -1) {
@@ -47,20 +36,6 @@ export function useModalPresentation({ visible, windowHeight, stepIndex, onClose
     }
     prevStepIndex.current = stepIndex;
   }, [stepIndex, stepOpacity]);
-
-  const handleClose = useCallback(() => {
-    const h = Math.max(windowHeightRef.current, Dimensions.get('window').height, 1);
-    RNAnimated.timing(sheetTranslateY, {
-      toValue: h,
-      duration: timing.sheetCloseMs,
-      easing: RNEasing.in(RNEasing.cubic),
-      useNativeDriver: true,
-    }).start(({ finished }) => {
-      if (finished) {
-        onClose();
-      }
-    });
-  }, [sheetTranslateY, onClose]);
 
   return {
     sheetTranslateY,

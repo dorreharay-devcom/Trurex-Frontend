@@ -7,7 +7,7 @@ export default function CirclesStackLayout() {
       screenOptions={{
         headerShown: false,
         contentStyle: { flex: 1, backgroundColor: Theme.colors.background },
-        animation: 'fade',
+        animation: 'none',
       }}
     />
   );

@@ -7,16 +7,22 @@ type Props = {
 };
 
 export function ProfileRexGridSkeleton({ windowWidth }: Props) {
-  const { numColumns, cellWidth, gap } = profileGridLayout(windowWidth);
+  const { numColumns, gap } = profileGridLayout(windowWidth);
+  const halfGap = gap / 2;
 
   return (
-    <View className="flex-row flex-wrap" style={{ gap }}>
+    <View className="w-full flex-row flex-wrap" style={{ marginHorizontal: -halfGap }}>
       {Array.from({ length: numColumns * 2 }, (_, i) => (
         <View
           key={i}
-          style={{ width: cellWidth, aspectRatio: 1 }}
-          className="rounded-xl bg-border/40"
-        />
+          style={{
+            width: `${100 / numColumns}%`,
+            paddingHorizontal: halfGap,
+            marginBottom: gap,
+          }}
+        >
+          <View style={{ width: '100%', aspectRatio: 1 }} className="rounded-xl bg-border/40" />
+        </View>
       ))}
     </View>
   );

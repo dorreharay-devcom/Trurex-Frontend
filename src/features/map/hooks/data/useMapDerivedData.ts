@@ -1,20 +1,13 @@
 import { useMemo } from 'react';
-import {
-  filterLocatedRecommendations,
-  filterRecommendationsInBounds,
-} from '~/features/map/lib/filters';
-import { isLatLngInBounds, type LatLngBounds } from '~/features/map/lib/geo';
+import { filterLocatedRecommendations } from '~/features/map/lib/filters';
 import { mapSearchTitleSuggestions } from '~/features/map/lib/mapSearchSuggestions';
 import {
   apiPinTypeToMapPinType,
   filterRecommendationsByPinLayers,
   mapPinRowToMapMarkerItem,
   mapPinTypeForRecommendation,
-  mergeMapMarkerSources,
   pinRowPassesLayerVisibility,
-  recommendationToMapMarkerItem,
 } from '~/features/map/lib/pinTypes';
-import { stabilizeCoincidentMarkers } from '~/features/map/lib/stabilizeCoincidentMarkers';
 import type { MapMarkerItem } from '~/features/map/types/mapMarker';
 import type { MapPinType, PinVisibility } from '~/features/map/types/mapPin';
 import type { MapPinRow } from '~/features/map/types/mapPinRow';
@@ -28,7 +21,6 @@ type Params = {
   withSavedOverride: (rec: Recommendation) => Recommendation;
   selectedRecId: string | null;
   suggestQuery: string;
-  viewBounds: LatLngBounds;
 };
 
 export function useMapDerivedData({
@@ -39,7 +31,6 @@ export function useMapDerivedData({
   withSavedOverride,
   selectedRecId,
   suggestQuery,
-  viewBounds,
 }: Params) {
   const locatedRecs = useMemo(() => filterLocatedRecommendations(fetchedRecs), [fetchedRecs]);
 
@@ -59,29 +50,10 @@ export function useMapDerivedData({
     [locatedRecs, layers, userId, pinTypeByRecId, withSavedOverride],
   );
 
-  const inViewRecs = useMemo(
-    () => filterRecommendationsInBounds(layerFiltered, viewBounds),
-    [layerFiltered, viewBounds],
-  );
-
-  const mapMarkers = useMemo(() => {
-    const fromPins: MapMarkerItem[] = pinRows
-      .filter(
-        (row) =>
-          pinRowPassesLayerVisibility(row, layers) &&
-          isLatLngInBounds(row.latitude, row.longitude, viewBounds),
-      )
-      .map(mapPinRowToMapMarkerItem);
-
-    const fromRecs: MapMarkerItem[] = [];
-    for (const rec of inViewRecs) {
-      const marker = recommendationToMapMarkerItem(rec, pinTypeByRecId, userId);
-      if (marker) fromRecs.push(marker);
-    }
-
-    const merged = mergeMapMarkerSources(fromPins, fromRecs);
-    return stabilizeCoincidentMarkers(merged);
-  }, [pinRows, layers, inViewRecs, pinTypeByRecId, userId, viewBounds]);
+  const mapMarkers: MapMarkerItem[] = useMemo(() => {
+    const filteredPins = pinRows.filter((row) => pinRowPassesLayerVisibility(row, layers));
+    return filteredPins.map(mapPinRowToMapMarkerItem);
+  }, [pinRows, layers]);
 
   const suggestions = useMemo(
     () => mapSearchTitleSuggestions(layerFiltered, suggestQuery),
@@ -100,7 +72,7 @@ export function useMapDerivedData({
 
   return {
     locatedRexCount: locatedRecs.length,
-    layerFiltered: inViewRecs,
+    layerFiltered,
     mapMarkers,
     suggestions,
     selectedRec,

@@ -19,6 +19,7 @@ function AddRexFab({ visible, onPress }: Props) {
       className="absolute bottom-6 w-14 h-14 rounded-full bg-primary items-center justify-center hover:opacity-90 active:opacity-75 cursor-pointer"
       style={{
         right: 24,
+        zIndex: 900,
         elevation: 4,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '~/features/auth/providers';
 import { useMapBoundsData } from '~/features/map/hooks/data/useMapBoundsData';
 import { useMapDerivedData } from '~/features/map/hooks/data/useMapDerivedData';
@@ -6,7 +6,6 @@ import { useSavedRexOverrides } from '~/features/map/hooks/data/useSavedRexOverr
 import { useMapSelection } from '~/features/map/hooks/useMapSelection';
 import { useMapLocation } from '~/features/map/hooks/viewport/useMapLocation';
 import { useMapViewport } from '~/features/map/hooks/viewport/useMapViewport';
-import { regionToBounds } from '~/features/map/lib/geo';
 import type { Recommendation } from '~/shared/types/recommendation';
 
 type Params = {
@@ -21,7 +20,6 @@ export function useMapScreen({ onRecommendationPress }: Params) {
   const saved = useSavedRexOverrides();
   const selection = useMapSelection({ recenterOn, onRecommendationPress });
   const viewport = useMapViewport();
-  const viewBounds = useMemo(() => regionToBounds(viewport.viewRegion), [viewport.viewRegion]);
   const data = useMapBoundsData({
     bounds: viewport.queryBounds,
     searchTerm: viewport.debouncedSearch,
@@ -35,7 +33,6 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     withSavedOverride: saved.withSavedOverride,
     selectedRecId: selection.selectedRecId,
     suggestQuery: viewport.suggestQuery,
-    viewBounds,
   });
 
   const fittedForSearchRef = useRef<string | null>(null);
@@ -91,6 +88,7 @@ export function useMapScreen({ onRecommendationPress }: Params) {
     locateMe,
     focusOnRecommendation: selection.focusOnRecommendation,
     locatedRecsForList: derived.layerFiltered,
+    locatedRexCount: derived.locatedRexCount,
     markRecSaved: saved.markRecSaved,
     markRecUnsaved: saved.markRecUnsaved,
     clearRecSavedOverride: saved.clearRecSavedOverride,

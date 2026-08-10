@@ -35,10 +35,11 @@ export function useDraftDiscard({
   const abandonDraftAndClose = useCallback(() => {
     if (!postedSuccessfullyRef.current) {
       void discardDraftRexData().catch(() => {});
-      wipeLocalDraft();
+      cancelPendingSave?.();
+      void clearCreateWizardDraft();
     }
     closeModal();
-  }, [closeModal, wipeLocalDraft]);
+  }, [cancelPendingSave, closeModal]);
 
   return { markPosted, abandonDraftAndClose };
 }

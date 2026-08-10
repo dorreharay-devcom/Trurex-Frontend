@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { View } from 'react-native';
 import DeepLinkShell from '~/widgets/DeepLinkShell';
 import ProtectedRoute from '~/features/auth/ui/ProtectedRoute';
 import RexDetailHost from '~/features/rex-detail/ui/RexDetailHost';
@@ -28,18 +29,19 @@ function RexPage() {
   );
 
   return (
-    <>
+    <View className="flex-1">
       <DeepLinkShell
         currentTab={TAB.discover}
-        onTabChange={nav.goToDiscover}
+        onTabChange={nav.changeTab}
         onRexPress={nav.openRex}
       >
         <RexPageBody page={page} onGoToDiscover={nav.goToDiscover} />
       </DeepLinkShell>
       <RexDetailHost
+        embedded
         visible={page.recommendation != null}
         recommendation={page.recommendation}
-        onClose={nav.goToDiscover}
+        onClose={nav.closeRex}
         onAuthorPress={nav.openUser}
         onUserPress={nav.openUser}
         onAddYourOwn={onAddYourOwn}
@@ -47,7 +49,7 @@ function RexPage() {
         scrollToComments={page.scrollToComments}
         scrollToCommentId={page.scrollToCommentId}
       />
-    </>
+    </View>
   );
 }
 
