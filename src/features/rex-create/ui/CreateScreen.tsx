@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useEffect } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { OverlayModal } from '~/shared/ui/overlay/OverlayModal';
 import { useCreateRecWizard } from '~/features/rex-create/hooks/useCreateRecWizard';
@@ -41,6 +41,7 @@ const CreateScreen: React.FC<Props> = ({ onClose, addYourOwnPrefill = null, edit
   });
 
   const { isGeotagging, handleTagLocation } = useTagLocation(flow);
+
   const { markPosted, abandonDraftAndClose } = useDraftDiscard({
     visible: true,
     closeModal: handleClose,
@@ -55,10 +56,10 @@ const CreateScreen: React.FC<Props> = ({ onClose, addYourOwnPrefill = null, edit
   });
   const config = useCategoryCreateConfig({ visible: true, flow });
 
-  useLayoutEffect(() => {
-    if (!addYourOwnPrefill) return;
-    applyAddYourOwnPrefill(addYourOwnPrefill);
-  }, [addYourOwnPrefill, applyAddYourOwnPrefill]);
+  useEffect(() => {
+    if (addYourOwnPrefill) applyAddYourOwnPrefill(addYourOwnPrefill);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const { submitting, primaryDisabled, handlePrimaryFooter } = usePrimaryAction({
     flow,
@@ -77,7 +78,7 @@ const CreateScreen: React.FC<Props> = ({ onClose, addYourOwnPrefill = null, edit
       onRequestClose={abandonDraftAndClose}
       contentTranslateY={sheetTranslateY}
     >
-      <View className="flex-1 min-h-0 flex-col">
+      <View className="min-h-0 flex-1 flex-col">
         <CreateModalHeader
           isFirstStep={flow.nav.isFirstStep}
           isEditMode={isEditMode}

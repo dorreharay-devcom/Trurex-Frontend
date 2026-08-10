@@ -17,6 +17,7 @@ import DetailOverlays from './common/DetailOverlays';
 
 type Props = {
   visible: boolean;
+  embedded?: boolean;
   recommendation: Recommendation | null;
   onClose: () => void;
   onDismiss?: () => void;
@@ -31,6 +32,7 @@ type Props = {
 
 const RecommendationDetailModal: React.FC<Props> = ({
   visible,
+  embedded = false,
   recommendation,
   onClose,
   onDismiss,
@@ -87,6 +89,7 @@ const RecommendationDetailModal: React.FC<Props> = ({
 
   return (
     <OverlayModal
+      embedded={embedded}
       visible={visible}
       onRequestClose={handleClose}
       onDismiss={onDismiss}

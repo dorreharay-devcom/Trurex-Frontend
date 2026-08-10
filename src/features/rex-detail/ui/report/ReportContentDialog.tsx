@@ -20,10 +20,9 @@ type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   target: ContentReportTarget | null;
-  inline?: boolean;
 };
 
-const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, target, inline = false }) => {
+const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, target }) => {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const { height: windowHeight } = useWindowDimensions();
@@ -58,7 +57,7 @@ const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, target, inli
       <ScrollView
         className="px-5"
         keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={true}
+        showsVerticalScrollIndicator
         bounces
         style={{
           maxHeight: formScrollMaxHeight,
@@ -83,14 +82,6 @@ const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, target, inli
     </ReportDialogShell>
   );
 
-  if (inline) {
-    return (
-      <View style={styles.inlineRoot} pointerEvents="box-none">
-        {content}
-      </View>
-    );
-  }
-
   return (
     <Modal
       visible={open}
@@ -99,17 +90,15 @@ const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, target, inli
       {...OVERLAY_MODAL_PLATFORM_PROPS}
       onRequestClose={onRequestClose}
     >
-      {content}
+      <View style={styles.modalRoot}>{content}</View>
       <ModalToastLayer />
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  inlineRoot: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 2000,
-    elevation: 2000,
+  modalRoot: {
+    flex: 1,
   },
 });
 

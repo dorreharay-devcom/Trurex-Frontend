@@ -12,15 +12,20 @@ import TabBar from '~/widgets/TabBar';
 import FrozenAccountBanner from '~/pages/home/ui/FrozenAccountBanner';
 import OfflineBanner from '~/pages/home/ui/OfflineBanner';
 import AddRexFab from '~/pages/home/ui/AddRexFab';
+import {
+  AddRexFabChromeProvider,
+  useAddRexFabVisible,
+} from '~/pages/home/ui/addRexFabChrome';
 import { StickyTopChromeLayout } from '~/pages/home/ui/StickyTopChromeLayout';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 
-export default function MainTabsLayout() {
+function MainTabsChrome() {
   const router = useRouter();
   const pathname = usePathname();
   const params = useGlobalSearchParams<{ q?: string | string[] }>();
   const currentTab = tabFromPathname(pathname);
   const searchQuery = firstRouteParam(params.q) ?? '';
+  const fabVisible = useAddRexFabVisible();
 
   const changeTab = useCallback(
     (tab: typeof currentTab) => {
@@ -96,7 +101,15 @@ export default function MainTabsLayout() {
         </Tabs>
       </StickyTopChromeLayout>
 
-      <AddRexFab visible onPress={onAddPress} />
+      <AddRexFab visible={fabVisible} onPress={onAddPress} />
     </View>
+  );
+}
+
+export default function MainTabsLayout() {
+  return (
+    <AddRexFabChromeProvider>
+      <MainTabsChrome />
+    </AddRexFabChromeProvider>
   );
 }

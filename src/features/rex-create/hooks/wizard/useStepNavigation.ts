@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRootNavigationState, useRouter } from 'expo-router';
 import { STEP_ID, type CreateRecStepId } from '~/features/rex-create/types/create';
 import {
   isCreateRecStepId,
@@ -8,15 +8,10 @@ import {
 } from '~/features/rex-create/lib/steps';
 import { firstRouteParam } from '~/shared/lib/navigation/routeIds';
 
-function setCreateStepParam(
-  router: { setParams: (p: Record<string, string | undefined>) => void },
-  step: CreateRecStepId,
-) {
-  router.setParams({ step });
-}
-
 export function useStepNavigation(activeSteps: CreateRecStepId[]) {
   const router = useRouter();
+  const rootNavigation = useRootNavigationState();
+  const navigationReady = rootNavigation?.key != null;
   const raw = useLocalSearchParams<{ step?: string | string[] }>();
   const stepFromUrl = parseCreateStepParam(firstRouteParam(raw.step));
 
@@ -31,23 +26,32 @@ export function useStepNavigation(activeSteps: CreateRecStepId[]) {
   const isFirstStep = stepId === STEP_ID.search;
   const isLastStep = activeSteps.length > 0 && stepId === activeSteps[activeSteps.length - 1];
 
+  const writeStep = useCallback(
+    (step: CreateRecStepId) => {
+      if (!navigationReady) return;
+      if (stepFromUrl === step) return;
+      router.setParams({ step });
+    },
+    [navigationReady, router, stepFromUrl],
+  );
+
   const goNext = useCallback(() => {
     const idx = activeSteps.indexOf(stepId);
     if (idx < 0 || idx >= activeSteps.length - 1) return;
     const next = activeSteps[idx + 1];
-    if (isCreateRecStepId(next)) setCreateStepParam(router, next);
-  }, [activeSteps, stepId, router]);
+    if (isCreateRecStepId(next)) writeStep(next);
+  }, [activeSteps, stepId, writeStep]);
 
   const goBack = useCallback(() => {
     const idx = activeSteps.indexOf(stepId);
     if (idx <= 0) return;
     const prev = activeSteps[idx - 1];
-    if (isCreateRecStepId(prev)) setCreateStepParam(router, prev);
-  }, [activeSteps, stepId, router]);
+    if (isCreateRecStepId(prev)) writeStep(prev);
+  }, [activeSteps, stepId, writeStep]);
 
   const reset = useCallback(() => {
-    setCreateStepParam(router, STEP_ID.search);
-  }, [router]);
+    writeStep(STEP_ID.search);
+  }, [writeStep]);
 
   return { stepId, stepIndex, isFirstStep, isLastStep, goNext, goBack, reset };
 }

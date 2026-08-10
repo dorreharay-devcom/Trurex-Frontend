@@ -1,11 +1,11 @@
 import React from 'react';
-import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import { Animated, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/overlaySheet';
+import { useSheetSpringAnimation } from '~/shared/hooks/useSheetSpringAnimation';
 import { isWeb } from '~/shared/lib/ui/platform';
 import type { DestructiveActionConfirmModalProps } from '~/shared/types/destructiveActionConfirmModal';
 import { ConfirmModalCard } from '~/shared/ui/destructive-confirm/ConfirmModalCard';
 import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
-import { cn } from '~/shared/lib/ui/styles';
 
 function DestructiveActionConfirmModal({
   visible,
@@ -19,17 +19,15 @@ function DestructiveActionConfirmModal({
   onCancel,
   onConfirm,
 }: DestructiveActionConfirmModalProps) {
-  if (!visible) return null;
+  const { visible: modalVisible, backdropOpacity, sheetTranslateY } =
+    useSheetSpringAnimation(visible);
 
-  const content = (
-    <View className={cn('flex-1', isWeb ? 'items-center justify-center px-4' : 'justify-end')}>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Dismiss"
-        disabled={pending}
-        className="absolute bottom-0 left-0 right-0 top-0 bg-black/50"
-        onPress={onCancel}
-      />
+  const dismiss = () => {
+    if (!pending) onCancel();
+  };
+
+  const sheet = (
+    <Animated.View style={{ width: '100%', transform: [{ translateY: sheetTranslateY }] }}>
       <ConfirmModalCard
         title={title}
         message={message}
@@ -40,31 +38,63 @@ function DestructiveActionConfirmModal({
         onCancel={onCancel}
         onConfirm={onConfirm}
       />
-      <ModalToastLayer />
-    </View>
+    </Animated.View>
+  );
+
+  const backdrop = (
+    <Animated.View
+      style={[StyleSheet.absoluteFill, styles.backdrop, { opacity: backdropOpacity }]}
+      pointerEvents="box-none"
+    >
+      <Pressable
+        style={StyleSheet.absoluteFill}
+        disabled={pending}
+        onPress={dismiss}
+        accessibilityRole="button"
+        accessibilityLabel="Dismiss"
+      />
+    </Animated.View>
   );
 
   if (inline) {
-    return <View style={styles.inlineRoot}>{content}</View>;
+    if (!visible && !modalVisible) return null;
+    return (
+      <View style={styles.inlineRoot} pointerEvents="box-none">
+        {backdrop}
+        <View style={styles.overlay} pointerEvents="box-none">
+          {sheet}
+        </View>
+        <ModalToastLayer />
+      </View>
+    );
   }
 
   return (
     <Modal
-      visible
+      visible={modalVisible}
       transparent
-      animationType={isWeb ? 'fade' : 'slide'}
+      animationType="none"
       {...OVERLAY_MODAL_PLATFORM_PROPS}
-      onRequestClose={() => {
-        if (!pending) onCancel();
-      }}
+      onRequestClose={dismiss}
       accessibilityViewIsModal
     >
-      {content}
+      {backdrop}
+      <View style={styles.overlay} pointerEvents="box-none">
+        {sheet}
+      </View>
+      <ModalToastLayer />
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
+  backdrop: { backgroundColor: 'rgba(0,0,0,0.5)' },
+  overlay: {
+    flex: 1,
+    justifyContent: isWeb ? 'center' : 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: isWeb ? 16 : 0,
+  },
   inlineRoot: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 2000,
