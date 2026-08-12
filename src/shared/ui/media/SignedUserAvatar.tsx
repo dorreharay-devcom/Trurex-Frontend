@@ -31,7 +31,7 @@ export function SignedUserAvatar({ name, avatar, className, cacheVersion, sizePt
   const http = userAvatarHttpUrl(avatar);
   const base = 'rounded-full border-2 border-border';
   const transform = useMemo(() => avatarImageTransform(sizePt), [sizePt]);
-  const recyclingKey = path || http || name;
+  const recyclingKey = `${path || http || name}:${cacheVersion ?? ''}`;
 
   if (!path && !http) {
     return (

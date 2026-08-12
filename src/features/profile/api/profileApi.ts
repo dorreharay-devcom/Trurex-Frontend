@@ -73,18 +73,17 @@ export const ProfileApi = {
   ): Promise<string> => {
     const name = fileName ?? `avatar-${Date.now()}.jpg`;
     const prepared = await preparePickerImageForUpload(imageUri, name, mimeType, AVATAR_MAX_WIDTH);
-    const path = `${userId}/avatar.jpg`;
+    const path = `${userId}/avatar-${Date.now()}.jpg`;
     await uploadBlobToStorageBucket(
       USER_AVATARS_BUCKET,
       path,
       prepared.body,
       prepared.contentType,
-      { upsert: true },
     );
 
     await ProfileApi.updateAvatar(path);
 
     const { data } = Backend.storage.from(USER_AVATARS_BUCKET).getPublicUrl(path);
-    return `${data.publicUrl}?t=${Date.now()}`;
+    return data.publicUrl;
   },
 };
