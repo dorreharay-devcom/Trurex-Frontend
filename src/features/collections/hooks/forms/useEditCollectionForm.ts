@@ -51,7 +51,6 @@ export function useEditCollectionForm({ open, collection, onUpdated }: Params) {
   const canSave = Boolean(name.trim()) && !saving && !cover.uploading;
 
   const pickCover = useCallback(() => {
-    setCoverRemoved(false);
     void cover.pick();
   }, [cover]);
 

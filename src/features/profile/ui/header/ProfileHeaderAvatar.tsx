@@ -42,7 +42,7 @@ const ProfileHeaderAvatar = ({
             className="absolute inset-0"
             cacheVersion={avatarRefreshKey}
             imageTransform={PROFILE_AVATAR_TRANSFORM}
-            recyclingKey={avatarUrl}
+            recyclingKey={`${avatarUrl}:${avatarRefreshKey ?? 0}`}
             priority="low"
           />
         ) : (
