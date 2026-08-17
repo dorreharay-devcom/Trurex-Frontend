@@ -21,7 +21,7 @@ const ResetPasswordPage = () => {
     );
   }
 
-  if (!reset.hasRecoveryToken) {
+  if (!reset.isRecoveryRedirect) {
     return <Redirect href={Routes.Login} />;
   }
 

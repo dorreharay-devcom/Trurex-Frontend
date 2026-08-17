@@ -72,9 +72,12 @@ export { TERMS_OF_USE, PRIVACY_POLICY, COMMUNITY_GUIDELINES } from './config/leg
 export type { LegalDocumentContent, LegalSection } from './config/legalDocuments';
 export {
   currentUrlHasPasswordRecoveryToken,
-  initialUrlHadPasswordRecoveryToken,
-  getCurrentRecoveryLinkError,
   RecoveryLinkErrorCode,
   ResetPasswordMessage,
 } from './lib/password';
+export {
+  getCurrentRecoveryLinkError,
+  initialUrlHadPasswordRecoveryToken,
+  passwordRecoveryFromInitialUrl,
+} from './lib/passwordRecoverySnapshot';
 export type { RecoveryLinkError } from './lib/password';

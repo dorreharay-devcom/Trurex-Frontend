@@ -10,15 +10,12 @@ import {
   isFieldErrorsEmpty,
 } from '~/features/auth/lib/credentials';
 import { mapAuthError } from '~/features/auth/lib/errors';
-import { TAB } from '~/shared/config/mainTabs';
-import { openMainTab } from '~/shared/lib/mainTab';
 import { AuthEvent } from '~/features/auth/types/authEvent';
 import {
-  currentUrlHasPasswordRecoveryToken,
   getCurrentRecoveryLinkError,
-  initialUrlHadPasswordRecoveryToken,
-  ResetPasswordMessage,
-} from '~/features/auth/lib/password';
+  passwordRecoveryFromInitialUrl,
+} from '~/features/auth/lib/passwordRecoverySnapshot';
+import { ResetPasswordMessage } from '~/features/auth/lib/password';
 
 type ResetErrors = {
   password?: string;
@@ -28,19 +25,18 @@ type ResetErrors = {
 
 export function useResetPassword() {
   const router = useRouter();
-  const hasRecoveryToken =
-    initialUrlHadPasswordRecoveryToken || currentUrlHasPasswordRecoveryToken();
   const recoveryLinkError = getCurrentRecoveryLinkError();
+  const isRecoveryRedirect = passwordRecoveryFromInitialUrl;
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [checkingRecovery, setCheckingRecovery] = useState(true);
+  const [checkingRecovery, setCheckingRecovery] = useState(isRecoveryRedirect);
   const [recoveryReady, setRecoveryReady] = useState(false);
   const [errors, setErrors] = useState<ResetErrors>({});
 
   useEffect(() => {
-    if (!hasRecoveryToken) {
+    if (!isRecoveryRedirect) {
       setRecoveryReady(false);
       setCheckingRecovery(false);
       return;
@@ -64,6 +60,7 @@ export function useResetPassword() {
 
     Auth.getSession()
       .then(({ data: { session } }) => {
+        if (!mounted) return;
         if (session) markReady();
         else markFailed();
       })
@@ -77,14 +74,16 @@ export function useResetPassword() {
         else markFailed();
         return;
       }
-      if (event === AuthEvent.SignedOut) router.replace(Routes.Login);
+      if (event === AuthEvent.SignedOut) {
+        router.replace(Routes.Login);
+      }
     });
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [hasRecoveryToken, router]);
+  }, [isRecoveryRedirect, router]);
 
   function validateForm(): boolean {
     const fieldErrors = {
@@ -107,7 +106,8 @@ export function useResetPassword() {
     try {
       await AuthApi.updatePassword(password);
       Alert.alert(ResetPasswordMessage.updatedTitle, ResetPasswordMessage.updatedBody);
-      openMainTab(router, TAB.discover);
+      await AuthApi.signOut().catch(() => {});
+      router.replace(Routes.Login);
     } catch (err: unknown) {
       mapAuthError(err, (e) => setErrors({ password: e.password, general: e.general }));
     } finally {
@@ -121,11 +121,13 @@ export function useResetPassword() {
   }
 
   return {
-    hasRecoveryToken,
+    isRecoveryRedirect,
     recoveryLinkError,
     password,
     confirmPassword,
     loading,
+    checkingRecovery,
+    recoveryReady,
     errors,
     submitDisabled: loading || checkingRecovery || !recoveryReady || !password || !confirmPassword,
     onPasswordChange: (value: string) => {

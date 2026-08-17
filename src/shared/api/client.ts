@@ -11,6 +11,7 @@ import {
 import { fetchWithTimeout } from '~/shared/api/fetchWithTimeout';
 import { isWeb } from '~/shared/lib/ui/platform';
 import '~/shared/api/urlPolyfill';
+import '~/features/auth/lib/passwordRecoverySnapshot';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const BACKEND_KEY =

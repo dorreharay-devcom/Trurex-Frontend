@@ -69,6 +69,8 @@ const InviteCodeInput = forwardRef<InviteCodeInputRef, Props>(({ value, onChange
           autoComplete="one-time-code"
           maxLength={AUTH_INVITE_CODE_LENGTH}
           caretHidden
+          multiline={false}
+          scrollEnabled={false}
           className="absolute inset-0 opacity-0"
         />
       </Pressable>
