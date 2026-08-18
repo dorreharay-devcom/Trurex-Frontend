@@ -13,9 +13,10 @@ const CARD_WINDOW_MARGIN = 48;
 type Props = {
   enabled: boolean;
   onUserPress?: (userId: string) => void;
+  embedInFeed?: boolean;
 };
 
-const PeopleYouMayKnowSection = ({ enabled, onUserPress }: Props) => {
+const PeopleYouMayKnowSection = ({ enabled, onUserPress, embedInFeed = false }: Props) => {
   const people = usePeopleSuggestions(enabled);
   const { width: windowWidth } = useWindowDimensions();
   const cardWidth = Math.min(
@@ -24,9 +25,18 @@ const PeopleYouMayKnowSection = ({ enabled, onUserPress }: Props) => {
   );
 
   const showSkeleton = people.isLoading && people.suggestions.length === 0;
+  const isEmpty = !people.isError && !showSkeleton && people.suggestions.length === 0;
+
+  if (embedInFeed && isEmpty) return null;
 
   return (
-    <View className="mt-10 w-full max-w-full overflow-hidden">
+    <View
+      className={
+        embedInFeed
+          ? 'mb-4 w-full max-w-full overflow-hidden px-4'
+          : 'mt-10 w-full max-w-full overflow-hidden'
+      }
+    >
       <Text className="mb-3 text-base font-semibold text-foreground">People you might know</Text>
 
       {people.isError ? (
@@ -39,7 +49,7 @@ const PeopleYouMayKnowSection = ({ enabled, onUserPress }: Props) => {
 
       {!people.isError && showSkeleton && <RowSkeletonList count={3} className="gap-2" />}
 
-      {!people.isError && !showSkeleton && people.suggestions.length === 0 && (
+      {!people.isError && isEmpty && (
         <Text className="text-center text-sm text-muted-foreground">No suggestions right now.</Text>
       )}
 

@@ -2,9 +2,15 @@ import React, { memo, useCallback, useMemo } from 'react';
 import { View } from 'react-native';
 import { FlashList, type ListRenderItem } from '@shopify/flash-list';
 import AddToCollectionSheet from '~/features/collections/ui/AddToCollectionSheet';
+import PeopleYouMayKnowSection from '~/features/circles/ui/people/PeopleYouMayKnowSection';
 import { webContainerStyle } from '~/shared/lib/ui/styles';
 import RecommendationCard from '~/features/discover/ui/feed/RecommendationCard';
 import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
+import {
+  buildDiscoverFeedItems,
+  PEOPLE_SUGGESTIONS_AFTER_REX_COUNT,
+  type DiscoverFeedItem,
+} from '~/features/discover/lib/buildDiscoverFeedItems';
 import { useCategories } from '~/features/discover/hooks/useCategories';
 import { useCategoryTagFilter } from '~/features/discover/hooks/useCategoryTagFilter';
 import { useFeed } from '~/features/discover/hooks/useFeed';
@@ -22,6 +28,7 @@ import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 type DiscoverPageProps = {
   searchQuery?: string;
   onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
+  onUserPress?: (userId: string) => void;
   onCreateRex?: () => void;
 };
 
@@ -39,11 +46,13 @@ const FeedRow = memo(function FeedRow({ item, onTap, onSave }: FeedRowProps) {
   );
 });
 
-const keyExtractor = (item: Recommendation) => item.id;
+const keyExtractor = (item: DiscoverFeedItem) => item.id;
+const getItemType = (item: DiscoverFeedItem) => item.type;
 
 const DiscoverPage = ({
   searchQuery = '',
   onRecommendationPress,
+  onUserPress,
   onCreateRex,
 }: DiscoverPageProps) => {
   const { activeCategory, activeTag, toggleCategory, toggleTag } = useCategoryTagFilter();
@@ -53,19 +62,43 @@ const DiscoverPage = ({
   const search = useSearch({ searchQuery, activeCategory, filters });
   const feed = useFeed({ activeCategory, activeTag, enabled: !search.hasSearch });
   const save = useSaveToCollection();
-  const scroll = useScrollTop<Recommendation>();
+
+  const scrollPersistenceKey = useMemo(
+    () => `discover:${searchQuery}:${activeCategory}:${activeTag ?? ''}`,
+    [searchQuery, activeCategory, activeTag],
+  );
 
   const source = search.hasSearch ? search : feed;
   const isLoading = source.isLoading;
   const isError = source.isError;
   const rows = isLoading && source.rows.length === 0 ? [] : source.rows;
 
+  const includePeopleSuggestions =
+    !search.hasSearch && rows.length >= PEOPLE_SUGGESTIONS_AFTER_REX_COUNT;
+
+  const feedItems = useMemo(
+    () => buildDiscoverFeedItems(rows, { includePeopleSuggestions }),
+    [rows, includePeopleSuggestions],
+  );
+
+  const scroll = useScrollTop<DiscoverFeedItem>({
+    persistenceKey: scrollPersistenceKey,
+    restoreWhen: feedItems.length > 0,
+  });
+
   const onSave = save.openForRec;
   const onTap = onRecommendationPress;
 
-  const renderItem = useCallback<ListRenderItem<Recommendation>>(
-    ({ item }) => <FeedRow item={item} onTap={onTap} onSave={onSave} />,
-    [onTap, onSave],
+  const renderItem = useCallback<ListRenderItem<DiscoverFeedItem>>(
+    ({ item }) => {
+      if (item.type === 'people_suggestions') {
+        return (
+          <PeopleYouMayKnowSection enabled embedInFeed onUserPress={onUserPress} />
+        );
+      }
+      return <FeedRow item={item.recommendation} onTap={onTap} onSave={onSave} />;
+    },
+    [onTap, onSave, onUserPress],
   );
 
   const listHeader = useMemo(
@@ -121,8 +154,9 @@ const DiscoverPage = ({
     <View className="flex-1">
       <FlashList
         ref={scroll.listRef}
-        data={rows}
+        data={feedItems}
         keyExtractor={keyExtractor}
+        getItemType={getItemType}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
         onScroll={scroll.onScroll}

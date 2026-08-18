@@ -10,4 +10,5 @@ export const getRedirectUrl = () =>
     ? `${window.location.origin}/${AUTH_CALLBACK_PATH}`
     : makeRedirectUri({ scheme: APP_SCHEME, path: AUTH_CALLBACK_PATH });
 
-export const getResetPasswordRedirectUrl = () => `${TRUREX_WEB_ORIGIN}/reset-password`;
+export const getResetPasswordRedirectUrl = () =>
+  isWeb ? `${window.location.origin}/reset-password` : `${TRUREX_WEB_ORIGIN}/reset-password`;
