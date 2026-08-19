@@ -63,11 +63,6 @@ const DiscoverPage = ({
   const feed = useFeed({ activeCategory, activeTag, enabled: !search.hasSearch });
   const save = useSaveToCollection();
 
-  const scrollPersistenceKey = useMemo(
-    () => `discover:${searchQuery}:${activeCategory}:${activeTag ?? ''}`,
-    [searchQuery, activeCategory, activeTag],
-  );
-
   const source = search.hasSearch ? search : feed;
   const isLoading = source.isLoading;
   const isError = source.isError;
@@ -81,10 +76,7 @@ const DiscoverPage = ({
     [rows, includePeopleSuggestions],
   );
 
-  const scroll = useScrollTop<DiscoverFeedItem>({
-    persistenceKey: scrollPersistenceKey,
-    restoreWhen: feedItems.length > 0,
-  });
+  const scroll = useScrollTop<DiscoverFeedItem>();
 
   const onSave = save.openForRec;
   const onTap = onRecommendationPress;
