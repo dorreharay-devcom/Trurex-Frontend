@@ -80,8 +80,9 @@ export default function RootLayout() {
               <Stack.Screen
                 name="rex/[rexId]"
                 options={{
+                  presentation: 'transparentModal',
                   animation: 'none',
-                  contentStyle: { flex: 1, backgroundColor: Theme.colors.background },
+                  contentStyle: { flex: 1, backgroundColor: 'transparent' },
                 }}
               />
             </Stack>
