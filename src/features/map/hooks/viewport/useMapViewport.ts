@@ -18,7 +18,6 @@ function toQueryBounds(view: LatLngBounds): LatLngBounds {
 
 const INITIAL_QUERY_BOUNDS = toQueryBounds(DEFAULT_MAP_BOUNDS);
 
-
 export function useMapViewport() {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebouncedValue(searchQuery.trim(), DEFAULT_SEARCH_DEBOUNCE_MS);

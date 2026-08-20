@@ -11,10 +11,11 @@ type Props = {
   bio?: string | null;
   location?: string | null;
   relationshipStatus: RelationshipStatus;
+  tierBadge?: React.ReactNode;
 };
 
 function RelationshipBadge({ status }: { status: RelationshipStatus }) {
-  if (!status) return null;
+  if (!status || status === RELATIONSHIP_STATUS.blocking) return null;
   const trusted = status === RELATIONSHIP_STATUS.trusted;
   return (
     <View
@@ -41,6 +42,7 @@ const ProfileHeaderIdentity = ({
   bio,
   location,
   relationshipStatus,
+  tierBadge,
 }: Props) => (
   <View className="mt-3">
     <View className="flex-row flex-wrap items-center gap-2">
@@ -48,6 +50,7 @@ const ProfileHeaderIdentity = ({
       <RelationshipBadge status={relationshipStatus} />
     </View>
     <Text className="text-sm text-muted-foreground">{handle}</Text>
+    {tierBadge ? <View className="mt-2 self-start">{tierBadge}</View> : null}
     {bio ? <Text className="mt-2 text-sm leading-relaxed text-foreground/80">{bio}</Text> : null}
     {location ? (
       <Text className="mt-1.5 text-xs text-muted-foreground">

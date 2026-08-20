@@ -5,7 +5,6 @@ import { useMyCollections } from '~/features/collections/hooks/data/useCollectio
 import {
   isProfileTab,
   parseProfileTabParam,
-  PROFILE_TAB,
   type ProfileTab,
 } from '~/features/profile/config/tabs';
 import { useMyRexes } from '~/features/profile/hooks/data/useMyRexes';

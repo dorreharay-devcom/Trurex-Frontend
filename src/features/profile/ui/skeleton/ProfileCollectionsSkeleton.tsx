@@ -22,7 +22,10 @@ export function ProfileCollectionsSkeleton({ windowWidth }: Props) {
             marginBottom: gap,
           }}
         >
-          <View style={{ width: '100%', aspectRatio: aspect }} className="rounded-xl bg-border/40" />
+          <View
+            style={{ width: '100%', aspectRatio: aspect }}
+            className="rounded-xl bg-border/40"
+          />
         </View>
       ))}
     </View>

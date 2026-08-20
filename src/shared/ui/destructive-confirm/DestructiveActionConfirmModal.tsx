@@ -19,8 +19,11 @@ function DestructiveActionConfirmModal({
   onCancel,
   onConfirm,
 }: DestructiveActionConfirmModalProps) {
-  const { visible: modalVisible, backdropOpacity, sheetTranslateY } =
-    useSheetSpringAnimation(visible);
+  const {
+    visible: modalVisible,
+    backdropOpacity,
+    sheetTranslateY,
+  } = useSheetSpringAnimation(visible);
 
   const dismiss = () => {
     if (!pending) onCancel();
@@ -28,7 +31,11 @@ function DestructiveActionConfirmModal({
 
   const sheet = (
     <Animated.View
-      style={[styles.sheet, isWeb && styles.sheetWeb, { transform: [{ translateY: sheetTranslateY }] }]}
+      style={[
+        styles.sheet,
+        isWeb && styles.sheetWeb,
+        { transform: [{ translateY: sheetTranslateY }] },
+      ]}
     >
       <ConfirmModalCard
         title={title}

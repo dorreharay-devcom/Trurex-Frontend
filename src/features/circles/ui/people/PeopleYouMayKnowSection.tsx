@@ -5,6 +5,7 @@ import { usePeopleSuggestions } from '~/features/circles/hooks/data/usePeopleSug
 import PeopleYouMayKnowCard from '~/features/circles/ui/people/PeopleYouMayKnowCard';
 import RowSkeletonList from '~/features/circles/ui/common/RowSkeletonList';
 import QueryErrorState from '~/shared/ui/query/QueryErrorState';
+import { webCardStyle } from '~/shared/lib/ui/styles';
 
 const CARD_MAX_WIDTH = 288;
 const CARD_MIN_WIDTH = 240;
@@ -32,10 +33,9 @@ const PeopleYouMayKnowSection = ({ enabled, onUserPress, embedInFeed = false }: 
   return (
     <View
       className={
-        embedInFeed
-          ? 'mb-4 w-full max-w-full overflow-hidden px-4'
-          : 'mt-10 w-full max-w-full overflow-hidden'
+        embedInFeed ? 'mb-4 overflow-hidden px-4' : 'mt-10 w-full max-w-full overflow-hidden'
       }
+      style={embedInFeed ? webCardStyle : undefined}
     >
       <Text className="mb-3 text-base font-semibold text-foreground">People you might know</Text>
 

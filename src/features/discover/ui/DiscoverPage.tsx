@@ -63,15 +63,13 @@ const DiscoverPage = ({
   const feed = useFeed({ activeCategory, activeTag, enabled: !search.hasSearch });
   const save = useSaveToCollection();
 
-  const scrollPersistenceKey = useMemo(
-    () => `discover:${searchQuery}:${activeCategory}:${activeTag ?? ''}`,
-    [searchQuery, activeCategory, activeTag],
-  );
-
   const source = search.hasSearch ? search : feed;
   const isLoading = source.isLoading;
   const isError = source.isError;
-  const rows = isLoading && source.rows.length === 0 ? [] : source.rows;
+  const rows = useMemo(
+    () => (isLoading && source.rows.length === 0 ? [] : source.rows),
+    [isLoading, source.rows],
+  );
 
   const includePeopleSuggestions =
     !search.hasSearch && rows.length >= PEOPLE_SUGGESTIONS_AFTER_REX_COUNT;
@@ -81,10 +79,7 @@ const DiscoverPage = ({
     [rows, includePeopleSuggestions],
   );
 
-  const scroll = useScrollTop<DiscoverFeedItem>({
-    persistenceKey: scrollPersistenceKey,
-    restoreWhen: feedItems.length > 0,
-  });
+  const scroll = useScrollTop<DiscoverFeedItem>();
 
   const onSave = save.openForRec;
   const onTap = onRecommendationPress;
@@ -92,9 +87,7 @@ const DiscoverPage = ({
   const renderItem = useCallback<ListRenderItem<DiscoverFeedItem>>(
     ({ item }) => {
       if (item.type === 'people_suggestions') {
-        return (
-          <PeopleYouMayKnowSection enabled embedInFeed onUserPress={onUserPress} />
-        );
+        return <PeopleYouMayKnowSection enabled embedInFeed onUserPress={onUserPress} />;
       }
       return <FeedRow item={item.recommendation} onTap={onTap} onSave={onSave} />;
     },

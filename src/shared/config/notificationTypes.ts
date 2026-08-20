@@ -11,6 +11,8 @@ export const NOTIFICATION_TYPE = {
   follow_request: 'follow_request',
   follow_request_accepted: 'follow_request_accepted',
   message: 'message',
+  tier_upgrade: 'tier_upgrade',
+  thank: 'thank',
 } as const;
 
 export type KnownNotificationType = (typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICATION_TYPE];

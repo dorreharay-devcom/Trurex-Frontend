@@ -33,15 +33,16 @@ export function useMapBoundsData({ bounds, searchTerm, needCardRows }: Params) {
     };
   }, [bounds, searchForQuery]);
 
-  const queryKeyBase = hasBounds && boundsParams
-    ? ([
-        boundsParams.min_lat,
-        boundsParams.max_lat,
-        boundsParams.min_lng,
-        boundsParams.max_lng,
-        boundsParams.search_term ?? '',
-      ] as const)
-    : (['idle'] as const);
+  const queryKeyBase =
+    hasBounds && boundsParams
+      ? ([
+          boundsParams.min_lat,
+          boundsParams.max_lat,
+          boundsParams.min_lng,
+          boundsParams.max_lng,
+          boundsParams.search_term ?? '',
+        ] as const)
+      : (['idle'] as const);
 
   const {
     data: serverPins,

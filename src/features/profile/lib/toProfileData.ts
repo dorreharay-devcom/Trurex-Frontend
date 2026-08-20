@@ -16,6 +16,8 @@ export function toProfileData(row: ProfileUserRow): ProfileData {
     location: row.location ?? '',
     avatarUrl: row.avatar_url || null,
     trustScore: row.trust_score ?? 0,
+    rexScore: row.rex_score ?? 0,
+    rexTier: row.rex_tier ?? null,
     rexCount: row.rexes_created_count ?? 0,
     followers: row.followers_count ?? 0,
     following: row.following_count ?? 0,

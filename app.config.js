@@ -63,6 +63,7 @@ module.exports = {
     plugins: [
       'expo-dev-client',
       'expo-web-browser',
+      'expo-notifications',
       ['expo-router', { sitemap: false }],
       'expo-secure-store',
       'expo-updates',

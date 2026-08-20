@@ -137,9 +137,7 @@ async function getCurrentLocationCoordsWeb(): Promise<LatLng> {
   throw new Error('Geolocation is not available in this environment.');
 }
 
-async function getCurrentLocationCoordsNative(
-  requestPermission: boolean,
-): Promise<LatLng> {
+async function getCurrentLocationCoordsNative(requestPermission: boolean): Promise<LatLng> {
   const googlePromise = fetchGoogleGeolocateConsiderIp();
 
   const { status } = requestPermission
