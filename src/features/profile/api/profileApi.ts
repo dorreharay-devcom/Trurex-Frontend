@@ -74,12 +74,7 @@ export const ProfileApi = {
     const name = fileName ?? `avatar-${Date.now()}.jpg`;
     const prepared = await preparePickerImageForUpload(imageUri, name, mimeType, AVATAR_MAX_WIDTH);
     const path = `${userId}/avatar-${Date.now()}.jpg`;
-    await uploadBlobToStorageBucket(
-      USER_AVATARS_BUCKET,
-      path,
-      prepared.body,
-      prepared.contentType,
-    );
+    await uploadBlobToStorageBucket(USER_AVATARS_BUCKET, path, prepared.body, prepared.contentType);
 
     await ProfileApi.updateAvatar(path);
 

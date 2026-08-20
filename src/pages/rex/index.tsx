@@ -30,11 +30,7 @@ function RexPage() {
 
   return (
     <View className="flex-1">
-      <DeepLinkShell
-        currentTab={TAB.discover}
-        onTabChange={nav.changeTab}
-        onRexPress={nav.openRex}
-      >
+      <DeepLinkShell currentTab={TAB.discover} onTabChange={nav.changeTab} onRexPress={nav.openRex}>
         <RexPageBody page={page} onGoToDiscover={nav.goToDiscover} />
       </DeepLinkShell>
       <RexDetailHost

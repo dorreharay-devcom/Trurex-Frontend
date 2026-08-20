@@ -44,6 +44,7 @@ const VERB_BY_TYPE: Record<string, string> = {
   [NOTIFICATION_TYPE.follow_request_accepted]: 'accepted your follow request',
   [NOTIFICATION_TYPE.trusted]: 'is now Trusted',
   [NOTIFICATION_TYPE.message]: 'sent you a message',
+  [NOTIFICATION_TYPE.tier_upgrade]: 'reached a new RexScore tier',
 };
 
 export type NotificationRexLink = {

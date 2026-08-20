@@ -15,8 +15,11 @@ import { queryClient, queryPersister } from '~/shared/lib/query/queryClient';
 import { track, AnalyticsEvent } from '~/shared/lib/analytics/track';
 import { checkForOtaUpdate } from '~/shared/lib/updates/checkForOtaUpdate';
 import { Theme } from '~/shared/theme/Theme';
+import { setupPushNotifications } from '~/features/push-notifications/lib/setupPushNotifications';
+import PushNotificationRoutingBridge from '~/features/push-notifications/ui/PushNotificationRoutingBridge';
 
 setupQueryNetwork();
+setupPushNotifications();
 
 export { AppErrorBoundary as ErrorBoundary };
 
@@ -61,6 +64,7 @@ export default function RootLayout() {
         <SafeAreaProvider style={{ flex: 1, backgroundColor: Theme.colors.background }}>
           <AuthProvider>
             <BootstrapEffects />
+            <PushNotificationRoutingBridge />
             <Stack
               screenOptions={{
                 headerShown: false,

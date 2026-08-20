@@ -30,9 +30,7 @@ describe('discoverTagLayout', () => {
     const visibleWidths = tagWidths.slice(0, result.visibleCount);
     const trailingWidth = overflowWidthForCount(result.hiddenCount, overflowWidthByDigits);
 
-    expect(
-      fitsWithinRows(visibleWidths, rowWidth, gap, 2, trailingWidth),
-    ).toBe(true);
+    expect(fitsWithinRows(visibleWidths, rowWidth, gap, 2, trailingWidth)).toBe(true);
   });
 
   it('uses both rows before showing overflow', () => {

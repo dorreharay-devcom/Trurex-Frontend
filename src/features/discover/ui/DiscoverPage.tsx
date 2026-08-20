@@ -66,7 +66,10 @@ const DiscoverPage = ({
   const source = search.hasSearch ? search : feed;
   const isLoading = source.isLoading;
   const isError = source.isError;
-  const rows = isLoading && source.rows.length === 0 ? [] : source.rows;
+  const rows = useMemo(
+    () => (isLoading && source.rows.length === 0 ? [] : source.rows),
+    [isLoading, source.rows],
+  );
 
   const includePeopleSuggestions =
     !search.hasSearch && rows.length >= PEOPLE_SUGGESTIONS_AFTER_REX_COUNT;
@@ -84,9 +87,7 @@ const DiscoverPage = ({
   const renderItem = useCallback<ListRenderItem<DiscoverFeedItem>>(
     ({ item }) => {
       if (item.type === 'people_suggestions') {
-        return (
-          <PeopleYouMayKnowSection enabled embedInFeed onUserPress={onUserPress} />
-        );
+        return <PeopleYouMayKnowSection enabled embedInFeed onUserPress={onUserPress} />;
       }
       return <FeedRow item={item.recommendation} onTap={onTap} onSave={onSave} />;
     },

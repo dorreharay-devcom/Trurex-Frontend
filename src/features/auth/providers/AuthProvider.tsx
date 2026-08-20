@@ -6,12 +6,20 @@ import { useAuthSession } from '~/features/auth/hooks/useAuthSession';
 import { useMfaSessionGate } from '~/features/auth/hooks/useMfaSessionGate';
 import type { AuthState } from '~/features/auth/types/authState';
 import { useNotificationsRealtime } from '~/shared/hooks/useNotificationsRealtime';
+import { usePushTokenRegistration } from '~/features/push-notifications/hooks/usePushTokenRegistration';
+import { unregisterCurrentDevicePushToken } from '~/features/push-notifications/lib/unregisterCurrentDevicePushToken';
 
 const AuthContext = createContext<AuthState | null>(null);
 
 function NotificationsRealtimeBridge() {
   const { user, mfaPending, booting } = useAuth();
   useNotificationsRealtime(!booting && !mfaPending ? user?.id : null);
+  return null;
+}
+
+function PushTokenBridge() {
+  const { user, mfaPending, booting } = useAuth();
+  usePushTokenRegistration(!booting && !mfaPending ? user?.id : null);
   return null;
 }
 
@@ -33,6 +41,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = useCallback(async () => {
     setMfaChecking(false);
     clearMfaRequirementCache();
+    await unregisterCurrentDevicePushToken().catch(() => {});
     await AuthApi.signOut();
     await setMfaPending(false);
   }, [setMfaChecking, setMfaPending]);
@@ -63,6 +72,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <AuthContext.Provider value={value}>
       <NotificationsRealtimeBridge />
+      <PushTokenBridge />
       {children}
     </AuthContext.Provider>
   );

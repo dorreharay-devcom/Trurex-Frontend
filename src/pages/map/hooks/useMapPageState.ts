@@ -135,8 +135,7 @@ export function useMapPageState({ flow, onRexSheetOpenChange }: Params) {
     showMapLoadError: mapViewVisible && isPinsError,
     showEmptyMapAreaBanner:
       mapViewVisible && mapDataReady && locatedRexCount === 0 && !hasSearchQuery,
-    showNoSearchMatchBanner:
-      mapViewVisible && mapMarkers.length === 0 && hasSearchQuery,
+    showNoSearchMatchBanner: mapViewVisible && mapMarkers.length === 0 && hasSearchQuery,
     toggleListView,
     onMarkerPress,
     selectedRec,

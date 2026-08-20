@@ -33,9 +33,7 @@ const PeopleYouMayKnowSection = ({ enabled, onUserPress, embedInFeed = false }: 
   return (
     <View
       className={
-        embedInFeed
-          ? 'mb-4 overflow-hidden px-4'
-          : 'mt-10 w-full max-w-full overflow-hidden'
+        embedInFeed ? 'mb-4 overflow-hidden px-4' : 'mt-10 w-full max-w-full overflow-hidden'
       }
       style={embedInFeed ? webCardStyle : undefined}
     >

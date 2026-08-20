@@ -12,10 +12,7 @@ import TabBar from '~/widgets/TabBar';
 import FrozenAccountBanner from '~/pages/home/ui/FrozenAccountBanner';
 import OfflineBanner from '~/pages/home/ui/OfflineBanner';
 import AddRexFab from '~/pages/home/ui/AddRexFab';
-import {
-  AddRexFabChromeProvider,
-  useAddRexFabVisible,
-} from '~/pages/home/ui/addRexFabChrome';
+import { AddRexFabChromeProvider, useAddRexFabVisible } from '~/pages/home/ui/addRexFabChrome';
 import { StickyTopChromeLayout } from '~/pages/home/ui/StickyTopChromeLayout';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 

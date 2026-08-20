@@ -22,8 +22,7 @@ export function useMapLocation() {
         if (cancelled || status !== Location.PermissionStatus.GRANTED) return;
         const coords = await getCurrentLocationCoords({ requestPermission: false });
         if (!cancelled) setUserCoords({ latitude: coords.lat, longitude: coords.lng });
-      } catch {
-      }
+      } catch {}
     })();
     return () => {
       cancelled = true;

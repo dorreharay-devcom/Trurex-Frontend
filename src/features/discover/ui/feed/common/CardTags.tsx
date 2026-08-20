@@ -27,7 +27,7 @@ function TagMeasureLayer({
   tags: readonly string[];
   onMeasured: (measurements: DiscoverTagMeasurements) => void;
 }) {
-  const tagWidthsRef = useRef<Array<number | undefined>>(Array.from({ length: tags.length }));
+  const tagWidthsRef = useRef<(number | undefined)[]>(Array.from({ length: tags.length }));
   const overflowWidthsRef = useRef<Partial<Record<number, number>>>({});
   const doneRef = useRef(false);
 
@@ -89,9 +89,7 @@ function CardTagsContent({ tags }: { tags: readonly string[] }) {
 
   return (
     <View className="px-4 pt-2">
-      {!ready && rowWidth > 0 ? (
-        <TagMeasureLayer tags={tags} onMeasured={setMeasurements} />
-      ) : null}
+      {!ready && rowWidth > 0 ? <TagMeasureLayer tags={tags} onMeasured={setMeasurements} /> : null}
 
       <View
         className="flex-row flex-wrap"
@@ -106,9 +104,7 @@ function CardTagsContent({ tags }: { tags: readonly string[] }) {
               <TagChip key={`${tag}-${index}`} label={discoverTagLabel(tag)} />
             ))
           : null}
-        {ready && hiddenCount > 0 ? (
-          <TagChip label={discoverOverflowLabel(hiddenCount)} />
-        ) : null}
+        {ready && hiddenCount > 0 ? <TagChip label={discoverOverflowLabel(hiddenCount)} /> : null}
       </View>
     </View>
   );
