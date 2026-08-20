@@ -49,6 +49,8 @@ export type RexDetailRow = {
   like_count: number;
   comment_count: number;
   liked_by_me: boolean;
+  is_thanked: boolean;
+  thanks_count: number;
   is_saved: boolean;
   tag_slugs: string[];
   photo_paths: string[];

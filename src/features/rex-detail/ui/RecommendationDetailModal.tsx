@@ -110,6 +110,7 @@ const RecommendationDetailModal: React.FC<Props> = ({
           save={save}
           commentsScroll={commentsScroll}
           effectiveAuthorId={effectiveAuthorId}
+          isOwner={isOwner}
           onAuthorPress={handleAuthorPress}
           onAddYourOwn={onAddYourOwn}
           onCommentCountChange={onCommentCountChange}

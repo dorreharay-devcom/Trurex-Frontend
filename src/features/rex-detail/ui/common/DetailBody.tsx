@@ -27,6 +27,7 @@ type Props = {
   save: SaveRexState;
   commentsScroll: CommentsScrollState;
   effectiveAuthorId: string | undefined;
+  isOwner: boolean;
   onAuthorPress: () => void;
   onAddYourOwn?: (source: AddYourOwnRecSource) => void;
   onCommentCountChange?: (total: number) => void;
@@ -42,6 +43,7 @@ function DetailBody({
   save,
   commentsScroll,
   effectiveAuthorId,
+  isOwner,
   onAuthorPress,
   onAddYourOwn,
   onCommentCountChange,
@@ -75,6 +77,9 @@ function DetailBody({
           avatar={recommendation.user?.avatar ?? ''}
           authorId={effectiveAuthorId}
           onPress={onAuthorPress}
+          rexId={recommendation.id}
+          isThanked={detail.rexDetail?.is_thanked ?? false}
+          showThankButton={!isOwner}
         />
         <DetailQuote text={recommendation.description} />
         <DetailRatings ratings={detail.detailRatings} />

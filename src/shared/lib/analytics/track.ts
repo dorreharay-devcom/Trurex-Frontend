@@ -23,6 +23,7 @@ export const AnalyticsEvent = {
   AuthSignedOut: 'auth_signed_out',
   RexCreated: 'rex_created',
   RexLiked: 'rex_liked',
+  RexThanked: 'rex_thanked',
   ScreenError: 'screen_error',
   OfflineBlockedMutation: 'offline_blocked_mutation',
 } as const;
