@@ -9,6 +9,7 @@ type Props = {
   name: string;
   avatar: string;
   authorId: string | undefined | null;
+  authorTierIcon?: string | null;
   onPress: () => void;
   rexId: string;
   isThanked: boolean;
@@ -19,6 +20,7 @@ function DetailAuthorCard({
   name,
   avatar,
   authorId,
+  authorTierIcon,
   onPress,
   rexId,
   isThanked,
@@ -35,7 +37,10 @@ function DetailAuthorCard({
         <SignedUserAvatar name={name} avatar={avatar} className="h-10 w-10" />
         <View className="flex-1">
           <Text className="text-sm text-muted-foreground">Recommended by</Text>
-          <Text className="font-semibold text-foreground">{name}</Text>
+          <View className="flex-row items-center gap-1.5">
+            <Text className="font-semibold text-foreground">{name}</Text>
+            {authorTierIcon ? <Text className="text-xs">{authorTierIcon}</Text> : null}
+          </View>
         </View>
       </Pressable>
       {showThankButton && <ThankRexButton rexId={rexId} initialThanked={isThanked} />}

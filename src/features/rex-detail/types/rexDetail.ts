@@ -15,6 +15,8 @@ export type RexDetailRow = {
   author_username: string | null;
   author_profile_picture_url: string | null;
   author_relationship_status: RelationshipStatus | null;
+  author_tier_code: string | null;
+  author_tier_icon: string | null;
   category_code: string;
   category_name: string;
   category_icon: string | null;

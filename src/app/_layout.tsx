@@ -17,6 +17,9 @@ import { checkForOtaUpdate } from '~/shared/lib/updates/checkForOtaUpdate';
 import { Theme } from '~/shared/theme/Theme';
 import { setupPushNotifications } from '~/features/push-notifications/lib/setupPushNotifications';
 import PushNotificationRoutingBridge from '~/features/push-notifications/ui/PushNotificationRoutingBridge';
+import { fetchRexScoreTiers } from '~/features/rex-score/api/rexScoreTiersApi';
+import { REX_SCORE_TIERS_QUERY_KEY } from '~/shared/config/queryKeys';
+import TierUpgradeCelebrationBridge from '~/features/rex-score/ui/TierUpgradeCelebrationBridge';
 
 setupQueryNetwork();
 setupPushNotifications();
@@ -33,6 +36,11 @@ function BootstrapEffects() {
   useEffect(() => {
     track(AnalyticsEvent.AppOpened);
     void checkForOtaUpdate();
+    void queryClient.prefetchQuery({
+      queryKey: REX_SCORE_TIERS_QUERY_KEY,
+      queryFn: fetchRexScoreTiers,
+      staleTime: 24 * 60 * 60_000,
+    });
   }, []);
   return null;
 }
@@ -65,6 +73,7 @@ export default function RootLayout() {
           <AuthProvider>
             <BootstrapEffects />
             <PushNotificationRoutingBridge />
+            <TierUpgradeCelebrationBridge />
             <Stack
               screenOptions={{
                 headerShown: false,

@@ -8,6 +8,7 @@ const REX_TYPES = new Set<string>([
   NOTIFICATION_TYPE.comment_reply,
   NOTIFICATION_TYPE.reply,
   NOTIFICATION_TYPE.reaction,
+  NOTIFICATION_TYPE.thank,
 ]);
 
 const COMMENT_TYPES = new Set<string>([
@@ -45,6 +46,7 @@ const VERB_BY_TYPE: Record<string, string> = {
   [NOTIFICATION_TYPE.trusted]: 'is now Trusted',
   [NOTIFICATION_TYPE.message]: 'sent you a message',
   [NOTIFICATION_TYPE.tier_upgrade]: 'reached a new RexScore tier',
+  [NOTIFICATION_TYPE.thank]: 'thanked your Rex',
 };
 
 export type NotificationRexLink = {

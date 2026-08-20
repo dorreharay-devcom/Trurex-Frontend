@@ -23,6 +23,8 @@ export type ProfileData = {
   location?: string;
   avatarUrl: string | null;
   trustScore: number;
+  rexScore: number;
+  rexTier: string | null;
   rexCount: number;
   followers: number;
   following: number;
@@ -42,6 +44,8 @@ export type ProfileUserRow = {
   currently_listening_to: string | null;
   currently_reading: string | null;
   trust_score: number;
+  rex_score: number;
+  rex_tier: string | null;
   followers_count: number;
   following_count: number;
   rexes_created_count: number;

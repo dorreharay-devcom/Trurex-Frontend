@@ -7,6 +7,8 @@ import ProfileHeaderIdentity from '~/features/profile/ui/header/ProfileHeaderIde
 import ProfileHeaderOtherActions from '~/features/profile/ui/header/ProfileHeaderOtherActions';
 import type { ProfileData } from '~/features/profile/types/profile';
 import { Theme } from '~/shared/theme/Theme';
+import { useRexScoreTiers } from '~/features/rex-score/hooks/useRexScoreTiers';
+import ProfileTierBadge from '~/features/rex-score/ui/ProfileTierBadge';
 
 type Props = {
   profile: ProfileData;
@@ -42,6 +44,8 @@ const ProfileHeader = ({
   blockLoading = false,
 }: Props) => {
   const onShare = () => void shareProfile(profile, isOwnProfile);
+  const { getTier, isTopTier } = useRexScoreTiers();
+  const tier = getTier(profile.rexTier);
 
   return (
     <View className="overflow-hidden rounded-t-xl bg-card">
@@ -63,6 +67,15 @@ const ProfileHeader = ({
           bio={profile.bio}
           location={profile.location}
           relationshipStatus={profile.relationshipStatus}
+          tierBadge={
+            tier ? (
+              <ProfileTierBadge
+                tier={tier}
+                isTopTier={isTopTier(tier.code)}
+                tappable={isOwnProfile}
+              />
+            ) : null
+          }
         />
 
         {isOwnProfile ? (
