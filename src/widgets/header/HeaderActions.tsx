@@ -41,24 +41,15 @@ const HeaderActions = ({
         onPress={onAddPress}
         accessibilityRole="button"
         accessibilityLabel="Add Rex"
-        className={
-          compact
-            ? 'rounded-lg p-2 active:opacity-80'
-            : 'flex-row items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 active:opacity-90'
-        }
+        className="flex-row items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 active:opacity-90"
       >
-        <PlusCircle
-          size={compact ? 22 : 16}
-          color={compact ? Theme.colors.accentForeground : Theme.colors.primaryForeground}
+        <PlusCircle size={16} color={Theme.colors.primaryForeground} />
+        <Image
+          source={REX_ICON}
+          style={{ width: 18, height: 18, borderRadius: 4 }}
+          resizeMode="contain"
+          accessibilityIgnoresInvertColors
         />
-        {compact ? null : (
-          <Image
-            source={REX_ICON}
-            style={{ width: 18, height: 18, borderRadius: 4 }}
-            resizeMode="contain"
-            accessibilityIgnoresInvertColors
-          />
-        )}
       </TouchableOpacity>
     ) : null}
 

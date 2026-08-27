@@ -1,10 +1,12 @@
 export const REX_QUERY_KEYS = {
   discoverFeed: ['discover-recommendations'],
+  discoverCollectionsFeed: ['discover-collections-feed'],
   mySavedRexes: ['my-saved-rexes'],
   myRexes: ['my-rexes'],
   searchRexes: ['search-rexes'],
   mapRexesInBounds: ['mapRexesInBounds'],
   mapRexPins: ['mapRexPins'],
+  thankCopyOptions: ['thank-copy-options'],
 } as const;
 
 export const CIRCLE_QUERY_KEYS = {

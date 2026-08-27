@@ -1,0 +1,1 @@
+export const MAX_THANK_MESSAGE_LENGTH = 200;

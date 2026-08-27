@@ -1,5 +1,5 @@
-import React, { memo, useCallback, useMemo } from 'react';
-import { View } from 'react-native';
+import React, { memo, useCallback, useMemo, useState } from 'react';
+import { ScrollView, View } from 'react-native';
 import { FlashList, type ListRenderItem } from '@shopify/flash-list';
 import AddToCollectionSheet from '~/features/collections/ui/AddToCollectionSheet';
 import PeopleYouMayKnowSection from '~/features/circles/ui/people/PeopleYouMayKnowSection';
@@ -18,7 +18,14 @@ import { useSaveToCollection } from '~/features/discover/hooks/useSaveToCollecti
 import { useScrollTop } from '~/features/discover/hooks/useScrollTop';
 import { useSearch } from '~/features/discover/hooks/useSearch';
 import { useSearchFilters } from '~/features/discover/hooks/useSearchFilters';
+import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/shared/hooks/useDebouncedValue';
 import { webCardStyle } from '~/shared/lib/ui/styles';
+import { DISCOVER_TAB, type DiscoverTab } from '~/features/discover/config/tabs';
+import DiscoverTopChrome from '~/features/discover/ui/DiscoverTopChrome';
+import TabSearchRow from '~/features/discover/ui/search/TabSearchRow';
+import AudienceFilterControl from '~/features/discover/ui/filters/AudienceFilterControl';
+import RexRequestEmptyState from '~/features/discover/ui/rex-request/RexRequestEmptyState';
+import DiscoverCollectionsTab from '~/features/discover/ui/collections/DiscoverCollectionsTab';
 import EmptyState from '~/features/discover/ui/feed/EmptyState';
 import FeedFooterSpinner from '~/features/discover/ui/feed/FeedFooterSpinner';
 import FeedListHeader from '~/features/discover/ui/feed/FeedListHeader';
@@ -26,10 +33,10 @@ import ScrollTopButton from '~/features/discover/ui/feed/ScrollTopButton';
 import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 
 type DiscoverPageProps = {
-  searchQuery?: string;
   onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
   onUserPress?: (userId: string) => void;
   onCreateRex?: () => void;
+  onOpenCollection?: (collectionId: string) => void;
 };
 
 type FeedRowProps = {
@@ -50,16 +57,21 @@ const keyExtractor = (item: DiscoverFeedItem) => item.id;
 const getItemType = (item: DiscoverFeedItem) => item.type;
 
 const DiscoverPage = ({
-  searchQuery = '',
   onRecommendationPress,
   onUserPress,
   onCreateRex,
+  onOpenCollection,
 }: DiscoverPageProps) => {
+  const [activeTab, setActiveTab] = useState<DiscoverTab>(DISCOVER_TAB.latestRex);
+  const [latestRexSearch, setLatestRexSearch] = useState('');
+  const [rexRequestSearch, setRexRequestSearch] = useState('');
+  const debouncedLatestRexSearch = useDebouncedValue(latestRexSearch, DEFAULT_SEARCH_DEBOUNCE_MS);
+
   const { activeCategory, activeTag, toggleCategory, toggleTag } = useCategoryTagFilter();
 
   const categories = useCategories();
   const filters = useSearchFilters();
-  const search = useSearch({ searchQuery, activeCategory, filters });
+  const search = useSearch({ searchQuery: debouncedLatestRexSearch, activeCategory, filters });
   const feed = useFeed({ activeCategory, activeTag, enabled: !search.hasSearch });
   const save = useSaveToCollection();
 
@@ -96,28 +108,44 @@ const DiscoverPage = ({
 
   const listHeader = useMemo(
     () => (
-      <FeedListHeader
-        hasSearch={search.hasSearch}
-        searchQuery={searchQuery}
-        filters={filters}
-        categories={categories}
-        activeCategory={activeCategory}
-        activeTag={activeTag}
-        isLoading={isLoading}
-        onToggleCategory={toggleCategory}
-        onToggleTag={toggleTag}
-      />
+      <>
+        <DiscoverTopChrome
+          activeTab={activeTab}
+          onChangeTab={setActiveTab}
+          showBrowse={!search.hasSearch}
+          categories={categories}
+          activeCategory={activeCategory}
+          activeTag={activeTag}
+          onToggleCategory={toggleCategory}
+          onToggleTag={toggleTag}
+        />
+        <View className="px-4 pt-4">
+          <TabSearchRow
+            value={latestRexSearch}
+            onChangeText={setLatestRexSearch}
+            placeholder="Search rex..."
+            filterSlot={<AudienceFilterControl />}
+          />
+        </View>
+        <FeedListHeader
+          hasSearch={search.hasSearch}
+          filters={filters}
+          categories={categories}
+          isLoading={isLoading}
+        />
+      </>
     ),
     [
+      activeTab,
       search.hasSearch,
-      searchQuery,
-      filters,
       categories,
       activeCategory,
       activeTag,
-      isLoading,
       toggleCategory,
       toggleTag,
+      latestRexSearch,
+      filters,
+      isLoading,
     ],
   );
 
@@ -145,25 +173,74 @@ const DiscoverPage = ({
 
   return (
     <View className="flex-1">
-      <FlashList
-        ref={scroll.listRef}
-        data={feedItems}
-        keyExtractor={keyExtractor}
-        getItemType={getItemType}
-        renderItem={renderItem}
-        showsVerticalScrollIndicator={false}
-        onScroll={scroll.onScroll}
-        onEndReached={feed.loadMore}
-        onEndReachedThreshold={0.6}
-        scrollEventThrottle={16}
-        contentContainerStyle={contentContainerStyle}
-        ListHeaderComponent={listHeader}
-        ListEmptyComponent={listEmpty}
-        ListFooterComponent={listFooter}
-        drawDistance={500}
-      />
+      {activeTab === DISCOVER_TAB.latestRex ? (
+        <View className="flex-1">
+          <FlashList
+            ref={scroll.listRef}
+            data={feedItems}
+            keyExtractor={keyExtractor}
+            getItemType={getItemType}
+            renderItem={renderItem}
+            showsVerticalScrollIndicator={false}
+            onScroll={scroll.onScroll}
+            onEndReached={feed.loadMore}
+            onEndReachedThreshold={0.6}
+            scrollEventThrottle={16}
+            contentContainerStyle={contentContainerStyle}
+            ListHeaderComponent={listHeader}
+            ListEmptyComponent={listEmpty}
+            ListFooterComponent={listFooter}
+            drawDistance={500}
+          />
 
-      <ScrollTopButton visible={scroll.showScrollTop} onPress={scroll.scrollToTop} />
+          <ScrollTopButton visible={scroll.showScrollTop} onPress={scroll.scrollToTop} />
+        </View>
+      ) : null}
+
+      {activeTab === DISCOVER_TAB.rexRequest ? (
+        <ScrollView
+          className="flex-1"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[webContainerStyle, { paddingBottom: 96 }]}
+        >
+          <DiscoverTopChrome
+            activeTab={activeTab}
+            onChangeTab={setActiveTab}
+            showBrowse={false}
+            categories={categories}
+            activeCategory={activeCategory}
+            activeTag={activeTag}
+            onToggleCategory={toggleCategory}
+            onToggleTag={toggleTag}
+          />
+          <View className="px-4 pt-6">
+            <TabSearchRow
+              value={rexRequestSearch}
+              onChangeText={setRexRequestSearch}
+              placeholder="Search rex requests"
+            />
+          </View>
+          <RexRequestEmptyState />
+        </ScrollView>
+      ) : null}
+
+      {activeTab === DISCOVER_TAB.collections ? (
+        <DiscoverCollectionsTab
+          onOpenCollection={onOpenCollection}
+          headerSlot={
+            <DiscoverTopChrome
+              activeTab={activeTab}
+              onChangeTab={setActiveTab}
+              showBrowse={false}
+              categories={categories}
+              activeCategory={activeCategory}
+              activeTag={activeTag}
+              onToggleCategory={toggleCategory}
+              onToggleTag={toggleTag}
+            />
+          }
+        />
+      ) : null}
 
       <AddToCollectionSheet
         open={!!save.saveTarget}

@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useUpdateCollection } from '~/features/collections/hooks/data/useCollectionMutations';
 import { useCoverImagePicker } from '~/features/collections/hooks/forms/useCoverImagePicker';
+import { useShareToFeedPrompt } from '~/features/collections/hooks/forms/useShareToFeedPrompt';
 import type {
   CollectionVisibility,
   EditableCollection,
 } from '~/features/collections/types/collection';
-import { toastSuccessAfterDismiss } from '~/shared/lib/appToast';
 import { useSignedStorageUrl } from '~/shared/hooks/useSignedStorageUrl';
 import { REX_IMAGES_BUCKET } from '~/shared/config/app';
 
@@ -47,8 +47,10 @@ export function useEditCollectionForm({ open, collection, onUpdated }: Params) {
   const displayCoverUri = cover.preview ?? (coverRemoved ? null : existingCoverUri);
 
   const mutation = useUpdateCollection();
+  const sharePrompt = useShareToFeedPrompt();
   const saving = mutation.isPending;
   const canSave = Boolean(name.trim()) && !saving && !cover.uploading;
+  const wasPublic = collection.visibility === 'public';
 
   const pickCover = useCallback(() => {
     void cover.pick();
@@ -71,7 +73,13 @@ export function useEditCollectionForm({ open, collection, onUpdated }: Params) {
         cover_image_path: coverChanged ? (cover.storagePath ?? null) : undefined,
         visibility,
       },
-      { onSuccess: () => toastSuccessAfterDismiss(onUpdated, 'Collection updated!') },
+      {
+        onSuccess: () => {
+          const becamePublic = !wasPublic && sharePrompt.promptIfPublic(collection.id, visibility);
+          if (becamePublic) return;
+          onUpdated();
+        },
+      },
     );
   }, [
     name,
@@ -82,7 +90,18 @@ export function useEditCollectionForm({ open, collection, onUpdated }: Params) {
     mutation,
     collection.id,
     onUpdated,
+    wasPublic,
+    sharePrompt,
   ]);
+
+  const confirmShare = useCallback(
+    () => sharePrompt.resolve(true, onUpdated),
+    [sharePrompt, onUpdated],
+  );
+  const declineShare = useCallback(
+    () => sharePrompt.resolve(false, onUpdated),
+    [sharePrompt, onUpdated],
+  );
 
   return {
     name,
@@ -98,5 +117,11 @@ export function useEditCollectionForm({ open, collection, onUpdated }: Params) {
     saving,
     canSave,
     submit,
+    sharePrompt: {
+      open: sharePrompt.open,
+      pending: sharePrompt.pending,
+      onConfirm: confirmShare,
+      onCancel: declineShare,
+    },
   };
 }

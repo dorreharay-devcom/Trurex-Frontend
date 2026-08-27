@@ -95,6 +95,12 @@ export const CollectionsApi = {
     unwrap(await Backend.rpc('delete_collection', { input_collection_id: collectionId }));
   },
 
+  shareCollectionToFeed: async (collectionId: string): Promise<void> => {
+    throwRpcIfFailed(
+      await Backend.rpc('share_collection_to_feed', { input_collection_id: collectionId }),
+    );
+  },
+
   saveRex: async (_userId: string, rexId: string): Promise<void> => {
     throwRpcIfFailed(await Backend.rpc('save_rex', { input_rex_id: rexId }));
   },

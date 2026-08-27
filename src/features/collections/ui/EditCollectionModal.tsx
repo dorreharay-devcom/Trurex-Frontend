@@ -7,6 +7,7 @@ import EditDescriptionField from '~/features/collections/ui/edit-collection/Edit
 import EditNameField from '~/features/collections/ui/edit-collection/EditNameField';
 import SaveChangesButton from '~/features/collections/ui/edit-collection/SaveChangesButton';
 import VisibilityToggleRow from '~/features/collections/ui/edit-collection/VisibilityToggleRow';
+import ShareToFeedPrompt from '~/features/collections/ui/share-to-feed/ShareToFeedPrompt';
 import type { EditableCollection } from '~/features/collections/types/collection';
 
 const CARD_MAX_HEIGHT = 680;
@@ -25,26 +26,35 @@ function EditCollectionModal({ open, onClose, onUpdated, collection }: EditColle
   const maxHeight = height * CARD_MAX_HEIGHT_RATIO;
 
   return (
-    <CollectionModalShell
-      open={open}
-      title="Edit Collection"
-      cardStyle={{ height: Math.min(maxHeight, CARD_MAX_HEIGHT), maxHeight }}
-      footer={
-        <SaveChangesButton canSave={form.canSave} saving={form.saving} onPress={form.submit} />
-      }
-      onClose={onClose}
-    >
-      <CoverImageSection
-        coverUri={form.displayCoverUri}
-        uploading={form.uploading}
-        contentFit="contain"
-        onPick={form.pickCover}
-        onRemove={form.removeCover}
+    <>
+      <CollectionModalShell
+        open={open}
+        title="Edit Collection"
+        cardStyle={{ height: Math.min(maxHeight, CARD_MAX_HEIGHT), maxHeight }}
+        footer={
+          <SaveChangesButton canSave={form.canSave} saving={form.saving} onPress={form.submit} />
+        }
+        onClose={onClose}
+      >
+        <CoverImageSection
+          coverUri={form.displayCoverUri}
+          uploading={form.uploading}
+          contentFit="contain"
+          onPick={form.pickCover}
+          onRemove={form.removeCover}
+        />
+        <EditNameField value={form.name} onChange={form.setName} />
+        <VisibilityToggleRow value={form.visibility} onChange={form.setVisibility} />
+        <EditDescriptionField value={form.description} onChange={form.setDescription} />
+      </CollectionModalShell>
+
+      <ShareToFeedPrompt
+        open={form.sharePrompt.open}
+        pending={form.sharePrompt.pending}
+        onConfirm={form.sharePrompt.onConfirm}
+        onCancel={form.sharePrompt.onCancel}
       />
-      <EditNameField value={form.name} onChange={form.setName} />
-      <VisibilityToggleRow value={form.visibility} onChange={form.setVisibility} />
-      <EditDescriptionField value={form.description} onChange={form.setDescription} />
-    </CollectionModalShell>
+    </>
   );
 }
 

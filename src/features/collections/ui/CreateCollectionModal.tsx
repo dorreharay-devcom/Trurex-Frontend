@@ -8,6 +8,7 @@ import CollectionDescriptionField from '~/features/collections/ui/create-collect
 import CollectionNameField from '~/features/collections/ui/create-collection/CollectionNameField';
 import CreateCollectionButton from '~/features/collections/ui/create-collection/CreateCollectionButton';
 import PrivacyOptionList from '~/features/collections/ui/create-collection/PrivacyOptionList';
+import ShareToFeedPrompt from '~/features/collections/ui/share-to-feed/ShareToFeedPrompt';
 import { isWeb } from '~/shared/lib/ui/platform';
 
 const CARD_MAX_HEIGHT_RATIO = 0.9;
@@ -24,33 +25,42 @@ function CreateCollectionModal({ open, onClose, onCreated }: CreateCollectionMod
   const form = useCreateCollectionForm(onCreated);
 
   return (
-    <CollectionModalShell
-      open={open}
-      title="New Collection"
-      cardStyle={{
-        maxHeight: height * CARD_MAX_HEIGHT_RATIO,
-        ...(isWeb ? null : { height: height * NATIVE_CARD_HEIGHT_RATIO }),
-      }}
-      footer={
-        <CreateCollectionButton
-          canCreate={form.canCreate}
-          creating={form.creating}
-          onPress={form.submit}
+    <>
+      <CollectionModalShell
+        open={open}
+        title="New Collection"
+        cardStyle={{
+          maxHeight: height * CARD_MAX_HEIGHT_RATIO,
+          ...(isWeb ? null : { height: height * NATIVE_CARD_HEIGHT_RATIO }),
+        }}
+        footer={
+          <CreateCollectionButton
+            canCreate={form.canCreate}
+            creating={form.creating}
+            onPress={form.submit}
+          />
+        }
+        onClose={onClose}
+      >
+        <CoverImageSection
+          coverUri={form.cover.preview}
+          uploading={form.cover.uploading}
+          onPick={() => void form.cover.pick()}
+          onRemove={form.cover.clear}
         />
-      }
-      onClose={onClose}
-    >
-      <CoverImageSection
-        coverUri={form.cover.preview}
-        uploading={form.cover.uploading}
-        onPick={() => void form.cover.pick()}
-        onRemove={form.cover.clear}
+        <CollectionNameField value={form.name} onChange={form.setName} />
+        <CollectionDescriptionField value={form.description} onChange={form.setDescription} />
+        <CategoryTagPicker value={form.categoryTag} onChange={form.setCategoryTag} />
+        <PrivacyOptionList value={form.privacy} onChange={form.setPrivacy} />
+      </CollectionModalShell>
+
+      <ShareToFeedPrompt
+        open={form.sharePrompt.open}
+        pending={form.sharePrompt.pending}
+        onConfirm={form.sharePrompt.onConfirm}
+        onCancel={form.sharePrompt.onCancel}
       />
-      <CollectionNameField value={form.name} onChange={form.setName} />
-      <CollectionDescriptionField value={form.description} onChange={form.setDescription} />
-      <CategoryTagPicker value={form.categoryTag} onChange={form.setCategoryTag} />
-      <PrivacyOptionList value={form.privacy} onChange={form.setPrivacy} />
-    </CollectionModalShell>
+    </>
   );
 }
 

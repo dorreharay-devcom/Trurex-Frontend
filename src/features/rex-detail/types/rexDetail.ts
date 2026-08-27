@@ -8,6 +8,11 @@ export type CategoryRatingRead = {
   score: number | null;
 };
 
+export type ThankCopyOption = {
+  id: number;
+  message: string;
+};
+
 export type RexDetailRow = {
   id: string;
   author_id: string;
