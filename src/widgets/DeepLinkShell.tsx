@@ -23,7 +23,6 @@ const DeepLinkShell = ({ currentTab, onTabChange, onRexPress, children }: Props)
         onProfilePress={() => onTabChange(TAB.profile)}
         onUserPress={(userId) => router.replace(toUserRoute(userId))}
         onRexPress={onRexPress}
-        showSearch={false}
       />
       <TabBar currentTab={currentTab} onTabChange={onTabChange} />
       {children}

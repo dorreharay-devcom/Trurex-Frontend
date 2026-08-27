@@ -1,7 +1,12 @@
 import { Backend, unwrap } from '~/shared/api/client';
 import type { Recommendation } from '~/shared/types/recommendation';
 import { mapApiRowToRecommendation } from '~/shared/lib/recommendation';
-import type { DiscoverQueryParams, SearchRexesParams } from './types';
+import type {
+  DiscoverCollectionRow,
+  DiscoverCollectionsFeedParams,
+  DiscoverQueryParams,
+  SearchRexesParams,
+} from './types';
 
 export const DiscoveryApi = {
   getDiscoverRecommendations: async (
@@ -45,5 +50,18 @@ export const DiscoveryApi = {
       const rec = mapApiRowToRecommendation(row);
       return rec ? [rec] : [];
     });
+  },
+
+  discoverCollectionsFeed: async (
+    params: DiscoverCollectionsFeedParams = {},
+  ): Promise<DiscoverCollectionRow[]> => {
+    const raw = unwrap(
+      await Backend.rpc('discover_collections_feed', {
+        result_limit: params.result_limit ?? 50,
+        result_offset: params.result_offset ?? 0,
+        search_query: params.search_query ?? null,
+      }),
+    );
+    return Array.isArray(raw) ? (raw as DiscoverCollectionRow[]) : [];
   },
 };

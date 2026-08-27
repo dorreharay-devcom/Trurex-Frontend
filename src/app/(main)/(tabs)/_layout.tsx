@@ -1,11 +1,10 @@
 import React, { useCallback } from 'react';
 import { View } from 'react-native';
-import { Tabs, useGlobalSearchParams, usePathname, useRouter } from 'expo-router';
+import { Tabs, usePathname, useRouter } from 'expo-router';
 import { TAB, tabFromPathname } from '~/shared/config/mainTabs';
 import { toUserRoute } from '~/shared/config/routes';
 import { openCreateRex, openRex } from '~/shared/lib/navigation/createRex';
 import { openMainTab } from '~/shared/lib/mainTab';
-import { firstRouteParam, searchParam } from '~/shared/lib/navigation/routeIds';
 import { Theme } from '~/shared/theme/Theme';
 import Header from '~/widgets/Header';
 import TabBar from '~/widgets/TabBar';
@@ -19,21 +18,12 @@ import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 function MainTabsChrome() {
   const router = useRouter();
   const pathname = usePathname();
-  const params = useGlobalSearchParams<{ q?: string | string[] }>();
   const currentTab = tabFromPathname(pathname);
-  const searchQuery = firstRouteParam(params.q) ?? '';
   const fabVisible = useAddRexFabVisible();
 
   const changeTab = useCallback(
     (tab: typeof currentTab) => {
       openMainTab(router, tab);
-    },
-    [router],
-  );
-
-  const onSearchChange = useCallback(
-    (text: string) => {
-      router.setParams({ q: searchParam(text.trim() || null) });
     },
     [router],
   );
@@ -62,13 +52,10 @@ function MainTabsChrome() {
         topChrome={
           <>
             <Header
-              searchQuery={searchQuery}
-              onSearchChange={currentTab === TAB.discover ? onSearchChange : undefined}
               onProfilePress={() => changeTab(TAB.profile)}
               onAddPress={onAddPress}
               onUserPress={onUserPress}
               onRexPress={onRexPress}
-              showSearch={currentTab === TAB.discover}
             />
             <TabBar currentTab={currentTab} onTabChange={changeTab} />
             <OfflineBanner />

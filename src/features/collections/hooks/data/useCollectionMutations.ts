@@ -4,6 +4,7 @@ import { COLLECTIONS_QUERY_KEYS } from '~/features/collections/config/queryKeys'
 import { mutationErrorToast } from '~/shared/lib/errors/restriction';
 import { withOnlineMutation } from '~/shared/lib/network/assertOnline';
 import { toastSuccess } from '~/shared/lib/appToast';
+import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 
 export const useCreateCollection = () => {
   const queryClient = useQueryClient();
@@ -60,6 +61,22 @@ export const useSaveCollection = () => {
       toastSuccess('Saved to your collections');
     },
     onError: mutationErrorToast('Failed to save collection'),
+  });
+};
+
+export const useShareCollectionToFeed = () => {
+  const queryClient = useQueryClient();
+  const mutationFn = withOnlineMutation(
+    'Sharing collection to feed',
+    CollectionsApi.shareCollectionToFeed,
+  );
+
+  return useMutation({
+    mutationFn,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...REX_QUERY_KEYS.discoverCollectionsFeed] });
+    },
+    onError: mutationErrorToast('Failed to share to feed'),
   });
 };
 

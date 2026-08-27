@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useCreateCollection } from '~/features/collections/hooks/data/useCollectionMutations';
 import { useCoverImagePicker } from '~/features/collections/hooks/forms/useCoverImagePicker';
+import { useShareToFeedPrompt } from '~/features/collections/hooks/forms/useShareToFeedPrompt';
 import type { CollectionVisibility } from '~/features/collections/types/collection';
 
 export function useCreateCollectionForm(onCreated: (id: string) => void) {
@@ -10,6 +11,7 @@ export function useCreateCollectionForm(onCreated: (id: string) => void) {
   const [privacy, setPrivacy] = useState<CollectionVisibility>('private');
   const cover = useCoverImagePicker();
   const mutation = useCreateCollection();
+  const sharePrompt = useShareToFeedPrompt();
 
   const creating = mutation.isPending;
   const canCreate = Boolean(name.trim()) && !creating && !cover.uploading;
@@ -34,12 +36,22 @@ export function useCreateCollectionForm(onCreated: (id: string) => void) {
       },
       {
         onSuccess: (collection) => {
-          onCreated(collection.id);
           reset();
+          if (sharePrompt.promptIfPublic(collection.id, collection.visibility)) return;
+          onCreated(collection.id);
         },
       },
     );
-  }, [name, description, cover.storagePath, privacy, mutation, onCreated, reset]);
+  }, [name, description, cover.storagePath, privacy, mutation, onCreated, reset, sharePrompt]);
+
+  const confirmShare = useCallback(
+    () => sharePrompt.resolve(true, onCreated),
+    [sharePrompt, onCreated],
+  );
+  const declineShare = useCallback(
+    () => sharePrompt.resolve(false, onCreated),
+    [sharePrompt, onCreated],
+  );
 
   return {
     name,
@@ -54,6 +66,12 @@ export function useCreateCollectionForm(onCreated: (id: string) => void) {
     creating,
     canCreate,
     submit,
+    sharePrompt: {
+      open: sharePrompt.open,
+      pending: sharePrompt.pending,
+      onConfirm: confirmShare,
+      onCancel: declineShare,
+    },
   };
 }
 

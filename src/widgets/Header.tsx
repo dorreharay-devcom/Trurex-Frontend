@@ -8,18 +8,14 @@ import { cn } from '~/shared/lib/ui/styles';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 import HeaderActions from '~/widgets/header/HeaderActions';
 import HeaderLogo from '~/widgets/header/HeaderLogo';
-import HeaderSearch from '~/widgets/header/HeaderSearch';
 import { useHeaderAvatar } from '~/widgets/hooks/useHeaderAvatar';
 
 type Props = {
   onProfilePress: () => void;
-  searchQuery?: string;
-  onSearchChange?: (text: string) => void;
   onAddPress?: () => void;
   onUserPress?: (userId: string) => void;
   onRexPress?: (rexId: string, options?: RecommendationOpenOptions) => void;
   isProfileActive?: boolean;
-  showSearch?: boolean;
 };
 
 const profileDisplayName = (user: User | null | undefined) => {
@@ -33,21 +29,17 @@ const headerTopPadding = (safeTop: number) => (isWeb ? 12 : safeTop + 6);
 const COMPACT_MAX_WIDTH = 640;
 
 const Header = ({
-  searchQuery = '',
-  onSearchChange,
   onProfilePress,
   onAddPress,
   onUserPress,
   onRexPress,
   isProfileActive,
-  showSearch = true,
 }: Props) => {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const compact = !isWeb || width < COMPACT_MAX_WIDTH;
   const avatarPath = useHeaderAvatar(user?.id);
-  const searchVisible = showSearch && !!onSearchChange;
 
   return (
     <View
@@ -56,8 +48,8 @@ const Header = ({
     >
       <View
         className={cn(
-          'w-full flex-row items-center pb-2',
-          compact ? 'gap-1 pl-1 pr-2' : 'justify-between px-4 sm:px-6 lg:px-8',
+          'w-full flex-row items-center justify-between pb-2',
+          compact ? 'gap-1 pl-1 pr-2' : 'px-4 sm:px-6 lg:px-8',
         )}
       >
         {compact ? (
@@ -67,12 +59,6 @@ const Header = ({
         ) : (
           <HeaderLogo />
         )}
-
-        <View className={cn('min-w-0 flex-1', compact ? 'px-1' : 'mx-4 max-w-md sm:mx-8')}>
-          {searchVisible ? (
-            <HeaderSearch initialValue={searchQuery} onDebouncedChange={onSearchChange} />
-          ) : null}
-        </View>
 
         <HeaderActions
           compact={compact}
