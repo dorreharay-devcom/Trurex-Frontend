@@ -19,7 +19,7 @@ function FeedListHeader({ hasSearch, filters, categories, isLoading }: Props) {
   if (!hasSearch && !isLoading) return null;
 
   return (
-    <View className="px-4 pt-6 pb-2">
+    <View className="px-4 pb-2">
       {hasSearch ? <FilterBar filters={filters} allCats={categories.allCats} /> : null}
 
       {isLoading ? (

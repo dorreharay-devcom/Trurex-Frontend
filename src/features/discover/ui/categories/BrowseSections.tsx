@@ -10,6 +10,7 @@ type Props = {
   activeTag: string | null;
   onToggleCategory: (code: string) => void;
   onToggleTag: (slug: string) => void;
+  showTrending?: boolean;
 };
 
 function BrowseSections({
@@ -18,11 +19,12 @@ function BrowseSections({
   activeTag,
   onToggleCategory,
   onToggleTag,
+  showTrending = true,
 }: Props) {
   const hasPinned = categories.pinnedCats.length > 0;
   return (
     <>
-      <TrendingTags activeTag={activeTag} onToggleTag={onToggleTag} />
+      {showTrending ? <TrendingTags activeTag={activeTag} onToggleTag={onToggleTag} /> : null}
       {hasPinned ? (
         <PinnedCategoriesRow
           cats={categories.pinnedCats}

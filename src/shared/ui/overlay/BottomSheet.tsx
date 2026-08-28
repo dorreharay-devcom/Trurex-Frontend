@@ -19,11 +19,14 @@ import Animated, {
 } from 'react-native-reanimated';
 import { KEYBOARD_BEHAVIOR_NATIVE_PADDING } from '~/shared/config/keyboard';
 import { modalConfig, OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/overlaySheet';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { cn } from '~/shared/lib/ui/styles';
 import SheetHandle from '~/shared/ui/overlay/SheetHandle';
 import { ModalToastLayer } from '~/shared/ui/toast/ModalToastLayer';
 
 const DISMISS_DISTANCE = 120;
 const DISMISS_VELOCITY = 900;
+const WEB_MAX_WIDTH = 480;
 const { sheetOpenMs, sheetCloseMs } = modalConfig.timing;
 const easeOut = Easing.out(Easing.cubic);
 const easeIn = Easing.in(Easing.cubic);
@@ -125,13 +128,20 @@ const BottomSheet = ({ open, onClose, sheetStyle, children }: Props) => {
             <Animated.View style={[styles.full, sheetAnimStyle]}>
               <View
                 style={sheetStyle}
-                className="w-full rounded-t-2xl border-t border-border bg-card"
+                className={cn(
+                  'w-full bg-card',
+                  isWeb
+                    ? 'rounded-2xl border border-border shadow-elevated'
+                    : 'rounded-t-2xl border-t border-border',
+                )}
               >
-                <GestureDetector gesture={pan}>
-                  <Animated.View>
-                    <SheetHandle hideOnWeb={false} className="w-full py-3" />
-                  </Animated.View>
-                </GestureDetector>
+                {isWeb ? null : (
+                  <GestureDetector gesture={pan}>
+                    <Animated.View>
+                      <SheetHandle className="w-full py-3" />
+                    </Animated.View>
+                  </GestureDetector>
+                )}
                 {children}
               </View>
             </Animated.View>
@@ -146,8 +156,14 @@ const BottomSheet = ({ open, onClose, sheetStyle, children }: Props) => {
 const styles = StyleSheet.create({
   fullFlex: { flex: 1 },
   backdrop: { backgroundColor: 'rgba(0,0,0,0.4)' },
-  outer: { flex: 1, justifyContent: 'flex-end', alignItems: 'center' },
-  full: { width: '100%' },
+  outer: {
+    flex: 1,
+    justifyContent: isWeb ? 'center' : 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: isWeb ? 16 : 0,
+    paddingVertical: isWeb ? 24 : 0,
+  },
+  full: { width: '100%', maxWidth: WEB_MAX_WIDTH, alignSelf: 'center' },
 });
 
 export default BottomSheet;

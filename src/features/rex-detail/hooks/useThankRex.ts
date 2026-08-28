@@ -13,12 +13,14 @@ export function useThankRex(rexId: string, initialThanked: boolean) {
   const { user } = useAuth();
   const [thanked, setThanked] = useState(initialThanked);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [sentMessage, setSentMessage] = useState<string | null>(null);
   const gate = useRef<ThankGate>({ id: rexId, busy: false });
 
   useLayoutEffect(() => {
     gate.current = { id: rexId, busy: false };
     setThanked(initialThanked);
     setSheetOpen(false);
+    setSentMessage(null);
   }, [rexId, initialThanked]);
 
   const openSheet = () => {
@@ -32,6 +34,7 @@ export function useThankRex(rexId: string, initialThanked: boolean) {
   };
 
   const closeSheet = () => setSheetOpen(false);
+  const closeSuccess = () => setSentMessage(null);
 
   const sendThank = async (message?: string) => {
     if (thanked || gate.current.busy) return;
@@ -41,6 +44,7 @@ export function useThankRex(rexId: string, initialThanked: boolean) {
     const previousThanked = thanked;
     setThanked(true);
     setSheetOpen(false);
+    setSentMessage(message?.trim() || null);
 
     try {
       await thankRex(requestRexId, message);
@@ -48,6 +52,7 @@ export function useThankRex(rexId: string, initialThanked: boolean) {
     } catch (e) {
       if (gate.current.id !== requestRexId) return;
       setThanked(previousThanked);
+      setSentMessage(null);
       if (didAccountFrozenMutationToast(e)) return;
       const detail = unknownErrorMessage(e, '').trim();
       toastError(detail || "Couldn't send thank you", 'Try again.');
@@ -58,5 +63,5 @@ export function useThankRex(rexId: string, initialThanked: boolean) {
     }
   };
 
-  return { thanked, sheetOpen, openSheet, closeSheet, sendThank };
+  return { thanked, sheetOpen, openSheet, closeSheet, sendThank, sentMessage, closeSuccess };
 }

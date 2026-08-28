@@ -1,6 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { Theme } from '~/shared/theme/Theme';
+import { isWeb } from '~/shared/lib/ui/platform';
 import { cn } from '~/shared/lib/ui/styles';
 
 type Props = {
@@ -14,7 +15,13 @@ type Props = {
 function SheetHeader({ title, actionLabel, busy, onAction, className }: Props) {
   return (
     <>
-      <View className={cn('w-full flex-row items-center justify-between px-4 pb-4', className)}>
+      <View
+        className={cn(
+          'w-full flex-row items-center justify-between px-4 pb-4',
+          isWeb && 'pt-4',
+          className,
+        )}
+      >
         <Text className="text-base font-display font-medium text-foreground">{title}</Text>
         <TouchableOpacity onPress={onAction} activeOpacity={0.7} disabled={busy}>
           {busy ? (
