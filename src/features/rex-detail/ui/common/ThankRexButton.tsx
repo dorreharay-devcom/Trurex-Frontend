@@ -9,6 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useThankRex } from '~/features/rex-detail/hooks/useThankRex';
 import ThankMessageSheet from '~/features/rex-detail/ui/common/ThankMessageSheet';
+import ThankYouSuccessDialog from '~/features/rex-detail/ui/common/thank/ThankYouSuccessDialog';
 
 type Props = {
   rexId: string;
@@ -16,10 +17,8 @@ type Props = {
 };
 
 function ThankRexButton({ rexId, initialThanked }: Props) {
-  const { thanked, sheetOpen, openSheet, closeSheet, sendThank } = useThankRex(
-    rexId,
-    initialThanked,
-  );
+  const { thanked, sheetOpen, openSheet, closeSheet, sendThank, sentMessage, closeSuccess } =
+    useThankRex(rexId, initialThanked);
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -60,6 +59,11 @@ function ThankRexButton({ rexId, initialThanked }: Props) {
       </Animated.View>
 
       <ThankMessageSheet open={sheetOpen} onClose={closeSheet} onSelect={handleSelect} />
+      <ThankYouSuccessDialog
+        open={sentMessage !== null}
+        message={sentMessage}
+        onDone={closeSuccess}
+      />
     </>
   );
 }

@@ -24,6 +24,7 @@ import { DISCOVER_TAB, type DiscoverTab } from '~/features/discover/config/tabs'
 import DiscoverTopChrome from '~/features/discover/ui/DiscoverTopChrome';
 import TabSearchRow from '~/features/discover/ui/search/TabSearchRow';
 import AudienceFilterControl from '~/features/discover/ui/filters/AudienceFilterControl';
+import { AUDIENCE_FILTER_OPTIONS_NO_PRIVATE } from '~/features/discover/config/audienceFilters';
 import RexRequestEmptyState from '~/features/discover/ui/rex-request/RexRequestEmptyState';
 import DiscoverCollectionsTab from '~/features/discover/ui/collections/DiscoverCollectionsTab';
 import EmptyState from '~/features/discover/ui/feed/EmptyState';
@@ -206,7 +207,8 @@ const DiscoverPage = ({
           <DiscoverTopChrome
             activeTab={activeTab}
             onChangeTab={setActiveTab}
-            showBrowse={false}
+            showBrowse
+            showTrending={false}
             categories={categories}
             activeCategory={activeCategory}
             activeTag={activeTag}
@@ -218,6 +220,7 @@ const DiscoverPage = ({
               value={rexRequestSearch}
               onChangeText={setRexRequestSearch}
               placeholder="Search rex requests"
+              filterSlot={<AudienceFilterControl options={AUDIENCE_FILTER_OPTIONS_NO_PRIVATE} />}
             />
           </View>
           <RexRequestEmptyState />

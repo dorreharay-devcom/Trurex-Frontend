@@ -9,16 +9,21 @@ import AudienceFilterRow from '~/features/discover/ui/filters/AudienceFilterRow'
 type Props = {
   selected: Set<AudienceFilterId>;
   onToggle: (id: AudienceFilterId) => void;
+  options?: readonly { id: AudienceFilterId; label: string }[];
 };
 
-function AudienceFilterOptionsList({ selected, onToggle }: Props) {
+function AudienceFilterOptionsList({
+  selected,
+  onToggle,
+  options = AUDIENCE_FILTER_OPTIONS,
+}: Props) {
   return (
     <>
       <Text className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         Circles
       </Text>
       <View>
-        {AUDIENCE_FILTER_OPTIONS.map((option) => (
+        {options.map((option) => (
           <AudienceFilterRow
             key={option.id}
             label={option.label}

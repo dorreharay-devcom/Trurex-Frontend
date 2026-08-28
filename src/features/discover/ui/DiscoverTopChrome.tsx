@@ -9,6 +9,7 @@ type Props = {
   activeTab: DiscoverTab;
   onChangeTab: (tab: DiscoverTab) => void;
   showBrowse: boolean;
+  showTrending?: boolean;
   categories: CategoriesState;
   activeCategory: string;
   activeTag: string | null;
@@ -20,6 +21,7 @@ function DiscoverTopChrome({
   activeTab,
   onChangeTab,
   showBrowse,
+  showTrending = true,
   categories,
   activeCategory,
   activeTag,
@@ -36,10 +38,13 @@ function DiscoverTopChrome({
             activeTag={activeTag}
             onToggleCategory={onToggleCategory}
             onToggleTag={onToggleTag}
+            showTrending={showTrending}
           />
         </View>
       ) : null}
-      <DiscoverTabs activeTab={activeTab} onChange={onChangeTab} />
+      <View className="px-4">
+        <DiscoverTabs activeTab={activeTab} onChange={onChangeTab} />
+      </View>
     </>
   );
 }

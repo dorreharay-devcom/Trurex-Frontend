@@ -13,3 +13,7 @@ export const AUDIENCE_FILTER_OPTIONS = [
   { id: AUDIENCE_FILTER.inner, label: 'Inner' },
   { id: AUDIENCE_FILTER.private, label: 'Private' },
 ] as const;
+
+export const AUDIENCE_FILTER_OPTIONS_NO_PRIVATE = AUDIENCE_FILTER_OPTIONS.filter(
+  (option) => option.id !== AUDIENCE_FILTER.private,
+);

@@ -3,6 +3,7 @@ import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { Share2 } from 'lucide-react-native';
 import BottomSheet from '~/shared/ui/overlay/BottomSheet';
 import { Theme } from '~/shared/theme/Theme';
+import { isWeb } from '~/shared/lib/ui/platform';
 import { withWebContainer } from '~/shared/lib/ui/styles';
 
 type Props = {
@@ -14,7 +15,13 @@ type Props = {
 
 const ShareToFeedPrompt = ({ open, pending, onConfirm, onCancel }: Props) => (
   <BottomSheet open={open} onClose={onCancel}>
-    <View style={withWebContainer({ paddingHorizontal: 16, paddingBottom: 24 })}>
+    <View
+      style={withWebContainer({
+        paddingHorizontal: 16,
+        paddingTop: isWeb ? 24 : 0,
+        paddingBottom: 24,
+      })}
+    >
       <View className="mb-4 h-12 w-12 items-center justify-center self-center rounded-full bg-primary/10">
         <Share2 size={22} color={Theme.colors.primary} />
       </View>
