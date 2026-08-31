@@ -6,6 +6,7 @@ import DeepLinkShell from '~/widgets/DeepLinkShell';
 import { TAB } from '~/shared/config/mainTabs';
 import { Routes } from '~/shared/config/routes';
 import { COLLECTION_FROM, openCollection } from '~/shared/lib/navigation/openCollection';
+import { openRexRequest } from '~/shared/lib/navigation/rexRequest';
 
 function ProfilePage() {
   const page = useProfilePage();
@@ -25,6 +26,7 @@ function ProfilePage() {
         onOpenCollection={(collectionId) =>
           openCollection(page.router, collectionId, COLLECTION_FROM.share)
         }
+        onOpenRexRequest={(requestId) => openRexRequest(page.router, requestId)}
       />
     </DeepLinkShell>
   );

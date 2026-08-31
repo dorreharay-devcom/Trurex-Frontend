@@ -14,15 +14,21 @@ import { webDisabledCursor, webNoOutline, cn } from '~/shared/lib/ui/styles';
 type Props = {
   value: string;
   onChangeText: (q: string) => void;
+  placeholder?: string;
   editable?: boolean;
 };
 
-function SearchQueryField({ value, onChangeText, editable = true }: Props) {
+function SearchQueryField({
+  value,
+  onChangeText,
+  placeholder = 'Search by name...',
+  editable = true,
+}: Props) {
   return (
     <ClearableSearchInput
       value={value}
       onChangeText={onChangeText}
-      placeholder="Search by name..."
+      placeholder={placeholder}
       placeholderTextColor={Theme.colors.secondaryText}
       editable={editable}
       containerClassName={cn('mb-4', !editable && 'cursor-not-allowed opacity-50')}

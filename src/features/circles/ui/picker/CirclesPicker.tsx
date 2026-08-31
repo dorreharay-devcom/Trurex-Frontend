@@ -7,17 +7,17 @@ import {
   effectiveCirclesAfterLoadError,
   findRenameableCircleById,
   partitionPublicAndPrivateRings,
-} from '~/features/rex-create/lib/circles';
-import { useCircleEditor } from '~/features/rex-create/hooks/useCircleEditor';
+} from '~/features/circles/lib/circlesPicker';
+import { useCircleEditor } from '~/features/circles/hooks/useCircleEditor';
 import { Theme } from '~/shared/theme/Theme';
-import CreateStepTitle from '../../CreateStepTitle';
+import CreateStepTitle from '~/features/rex-create/ui/CreateStepTitle';
 import { cn } from '~/shared/lib/ui/styles';
-import CircleActionChips from './common/CircleActionChips';
-import CircleRenameRow from './common/CircleRenameRow';
-import CirclesRingPicker from './common/CirclesRingPicker';
-import CirclesSelectionSummary from './common/CirclesSelectionSummary';
-import CreateCircleModal from './common/CreateCircleModal';
-import PrivateRexToggle from './common/PrivateRexToggle';
+import CircleActionChips from './CircleActionChips';
+import CircleRenameRow from './CircleRenameRow';
+import CirclesRingPicker from './CirclesRingPicker';
+import CirclesSelectionSummary from './CirclesSelectionSummary';
+import CreateCircleModal from './CreateCircleModal';
+import PrivateRexToggle from './PrivateRexToggle';
 
 type Props = {
   circles: CircleDisplayRow[];
@@ -26,19 +26,23 @@ type Props = {
   onRetry: () => void;
   selectedIds: Set<string>;
   onToggle: (id: string) => void;
-  privateSelected: boolean;
-  onPrivateSelectedChange: (selected: boolean) => void;
+  showPrivateOption?: boolean;
+  privateSelected?: boolean;
+  onPrivateSelectedChange?: (selected: boolean) => void;
+  subtitle?: string;
 };
 
-const Circles: React.FC<Props> = ({
+const CirclesPicker: React.FC<Props> = ({
   circles,
   showFetchSpinner,
   loadError,
   onRetry,
   selectedIds,
   onToggle,
-  privateSelected,
+  showPrivateOption = true,
+  privateSelected = false,
   onPrivateSelectedChange,
+  subtitle = 'Tap a ring to share with that circle. Smallest = most private.',
 }) => {
   const visible = useMemo(
     () => effectiveCirclesAfterLoadError(loadError, circles),
@@ -76,12 +80,15 @@ const Circles: React.FC<Props> = ({
         <View className={cn(CREATE_REC_STEP_INNER, 'gap-6')}>
           <View className="items-center gap-2">
             <CreateStepTitle>Choose your circles</CreateStepTitle>
-            <Text className="text-center text-sm text-muted-foreground">
-              Tap a ring to share with that circle. Smallest = most private.
-            </Text>
+            <Text className="text-center text-sm text-muted-foreground">{subtitle}</Text>
           </View>
 
-          <PrivateRexToggle selected={privateSelected} onChange={onPrivateSelectedChange} />
+          {showPrivateOption ? (
+            <PrivateRexToggle
+              selected={privateSelected}
+              onChange={onPrivateSelectedChange ?? (() => {})}
+            />
+          ) : null}
 
           {loadError ? (
             <View className="items-center gap-3 py-4">
@@ -162,4 +169,4 @@ const Circles: React.FC<Props> = ({
   );
 };
 
-export default Circles;
+export default CirclesPicker;

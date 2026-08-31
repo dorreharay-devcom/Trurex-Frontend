@@ -1,6 +1,8 @@
 import React, { memo, useCallback, useMemo, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { FlashList, type ListRenderItem } from '@shopify/flash-list';
+import { Plus } from 'lucide-react-native';
+import { Theme } from '~/shared/theme/Theme';
 import AddToCollectionSheet from '~/features/collections/ui/AddToCollectionSheet';
 import PeopleYouMayKnowSection from '~/features/circles/ui/people/PeopleYouMayKnowSection';
 import { webContainerStyle } from '~/shared/lib/ui/styles';
@@ -24,7 +26,10 @@ import { DISCOVER_TAB, type DiscoverTab } from '~/features/discover/config/tabs'
 import DiscoverTopChrome from '~/features/discover/ui/DiscoverTopChrome';
 import TabSearchRow from '~/features/discover/ui/search/TabSearchRow';
 import AudienceFilterControl from '~/features/discover/ui/filters/AudienceFilterControl';
-import { AUDIENCE_FILTER_OPTIONS_NO_PRIVATE } from '~/features/discover/config/audienceFilters';
+import {
+  AUDIENCE_FILTER_OPTIONS_NO_PRIVATE,
+  type AudienceFilterId,
+} from '~/features/discover/config/audienceFilters';
 import RexRequestEmptyState from '~/features/discover/ui/rex-request/RexRequestEmptyState';
 import DiscoverCollectionsTab from '~/features/discover/ui/collections/DiscoverCollectionsTab';
 import EmptyState from '~/features/discover/ui/feed/EmptyState';
@@ -32,13 +37,35 @@ import FeedFooterSpinner from '~/features/discover/ui/feed/FeedFooterSpinner';
 import FeedListHeader from '~/features/discover/ui/feed/FeedListHeader';
 import ScrollTopButton from '~/features/discover/ui/feed/ScrollTopButton';
 import QueryErrorState from '~/shared/ui/query/QueryErrorState';
+import { useRexRequestsFeedList } from '~/features/rex-requests/hooks/useRexRequestsFeedList';
+import RexRequestCard from '~/features/rex-requests/ui/feed/RexRequestCard';
+import type { RexRequestRow } from '~/features/rex-requests/api/types';
 
 type DiscoverPageProps = {
   onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
   onUserPress?: (userId: string) => void;
   onCreateRex?: () => void;
+  onCreateRexRequest?: () => void;
+  onOpenRexRequest?: (requestId: string) => void;
   onOpenCollection?: (collectionId: string) => void;
 };
+
+const rexRequestKeyExtractor = (item: RexRequestRow) => item.id;
+
+function NewRexRequestButton({ onPress }: { onPress?: () => void }) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.85}
+      accessibilityRole="button"
+      accessibilityLabel="Create Rex Request"
+      className="h-10 flex-row items-center gap-1.5 rounded-xl bg-primary px-3"
+    >
+      <Plus size={16} color={Theme.colors.primaryForeground} />
+      <Text className="text-sm font-semibold text-primary-foreground">New</Text>
+    </TouchableOpacity>
+  );
+}
 
 type FeedRowProps = {
   item: Recommendation;
@@ -61,19 +88,22 @@ const DiscoverPage = ({
   onRecommendationPress,
   onUserPress,
   onCreateRex,
+  onCreateRexRequest,
+  onOpenRexRequest,
   onOpenCollection,
 }: DiscoverPageProps) => {
   const [activeTab, setActiveTab] = useState<DiscoverTab>(DISCOVER_TAB.latestRex);
   const [latestRexSearch, setLatestRexSearch] = useState('');
-  const [rexRequestSearch, setRexRequestSearch] = useState('');
+  const [circleFilter, setCircleFilter] = useState<AudienceFilterId | null>(null);
   const debouncedLatestRexSearch = useDebouncedValue(latestRexSearch, DEFAULT_SEARCH_DEBOUNCE_MS);
+  const rexRequests = useRexRequestsFeedList({ enabled: activeTab === DISCOVER_TAB.rexRequest });
 
   const { activeCategory, activeTag, toggleCategory, toggleTag } = useCategoryTagFilter();
 
   const categories = useCategories();
   const filters = useSearchFilters();
   const search = useSearch({ searchQuery: debouncedLatestRexSearch, activeCategory, filters });
-  const feed = useFeed({ activeCategory, activeTag, enabled: !search.hasSearch });
+  const feed = useFeed({ activeCategory, activeTag, circleFilter, enabled: !search.hasSearch });
   const save = useSaveToCollection();
 
   const source = search.hasSearch ? search : feed;
@@ -125,7 +155,7 @@ const DiscoverPage = ({
             value={latestRexSearch}
             onChangeText={setLatestRexSearch}
             placeholder="Search rex..."
-            filterSlot={<AudienceFilterControl />}
+            filterSlot={<AudienceFilterControl selected={circleFilter} onApply={setCircleFilter} />}
           />
         </View>
         <FeedListHeader
@@ -145,6 +175,7 @@ const DiscoverPage = ({
       toggleCategory,
       toggleTag,
       latestRexSearch,
+      circleFilter,
       filters,
       isLoading,
     ],
@@ -171,6 +202,85 @@ const DiscoverPage = ({
   }, [search.hasSearch, feed.isFetchNextPageError, feed.retryNextPage, feed.isFetchingNextPage]);
 
   const contentContainerStyle = useMemo(() => [webContainerStyle, { paddingBottom: 96 }], []);
+
+  const rexRequestRenderItem = useCallback<ListRenderItem<RexRequestRow>>(
+    ({ item }) => (
+      <View className="px-4 mb-4" style={webCardStyle}>
+        <RexRequestCard request={item} onPress={() => onOpenRexRequest?.(item.id)} />
+      </View>
+    ),
+    [onOpenRexRequest],
+  );
+
+  const rexRequestListHeader = useMemo(
+    () => (
+      <>
+        <DiscoverTopChrome
+          activeTab={activeTab}
+          onChangeTab={setActiveTab}
+          showBrowse
+          showTrending={false}
+          categories={categories}
+          activeCategory={activeCategory}
+          activeTag={activeTag}
+          onToggleCategory={toggleCategory}
+          onToggleTag={toggleTag}
+        />
+        <View className="px-4 pt-6">
+          <TabSearchRow
+            value={rexRequests.searchQuery}
+            onChangeText={rexRequests.setSearchQuery}
+            placeholder="Search rex requests"
+            filterSlot={<AudienceFilterControl options={AUDIENCE_FILTER_OPTIONS_NO_PRIVATE} />}
+            trailingSlot={<NewRexRequestButton onPress={onCreateRexRequest} />}
+          />
+        </View>
+      </>
+    ),
+    [
+      activeTab,
+      categories,
+      activeCategory,
+      activeTag,
+      toggleCategory,
+      toggleTag,
+      rexRequests.searchQuery,
+      rexRequests.setSearchQuery,
+      onCreateRexRequest,
+    ],
+  );
+
+  const rexRequestListEmpty = useMemo(() => {
+    if (rexRequests.feed.isError) {
+      return (
+        <QueryErrorState title="Couldn't load Rex Requests" onRetry={rexRequests.feed.refetch} />
+      );
+    }
+    if (rexRequests.feed.isLoading) return null;
+    return <RexRequestEmptyState onCreatePress={onCreateRexRequest} />;
+  }, [
+    rexRequests.feed.isError,
+    rexRequests.feed.isLoading,
+    rexRequests.feed.refetch,
+    onCreateRexRequest,
+  ]);
+
+  const rexRequestListFooter = useMemo(() => {
+    if (rexRequests.feed.isFetchNextPageError) {
+      return (
+        <QueryErrorState
+          compact
+          title="Couldn't load more"
+          onRetry={rexRequests.feed.retryNextPage}
+        />
+      );
+    }
+    return <FeedFooterSpinner visible={rexRequests.feed.isFetchingNextPage} />;
+  }, [
+    rexRequests.feed.isFetchNextPageError,
+    rexRequests.feed.retryNextPage,
+    rexRequests.feed.isFetchingNextPage,
+  ]);
 
   return (
     <View className="flex-1">
@@ -199,32 +309,21 @@ const DiscoverPage = ({
       ) : null}
 
       {activeTab === DISCOVER_TAB.rexRequest ? (
-        <ScrollView
-          className="flex-1"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[webContainerStyle, { paddingBottom: 96 }]}
-        >
-          <DiscoverTopChrome
-            activeTab={activeTab}
-            onChangeTab={setActiveTab}
-            showBrowse
-            showTrending={false}
-            categories={categories}
-            activeCategory={activeCategory}
-            activeTag={activeTag}
-            onToggleCategory={toggleCategory}
-            onToggleTag={toggleTag}
+        <View className="flex-1">
+          <FlashList
+            data={rexRequests.rows}
+            keyExtractor={rexRequestKeyExtractor}
+            renderItem={rexRequestRenderItem}
+            showsVerticalScrollIndicator={false}
+            onEndReached={rexRequests.feed.loadMore}
+            onEndReachedThreshold={0.6}
+            contentContainerStyle={contentContainerStyle}
+            ListHeaderComponent={rexRequestListHeader}
+            ListEmptyComponent={rexRequestListEmpty}
+            ListFooterComponent={rexRequestListFooter}
+            drawDistance={500}
           />
-          <View className="px-4 pt-6">
-            <TabSearchRow
-              value={rexRequestSearch}
-              onChangeText={setRexRequestSearch}
-              placeholder="Search rex requests"
-              filterSlot={<AudienceFilterControl options={AUDIENCE_FILTER_OPTIONS_NO_PRIVATE} />}
-            />
-          </View>
-          <RexRequestEmptyState />
-        </ScrollView>
+        </View>
       ) : null}
 
       {activeTab === DISCOVER_TAB.collections ? (

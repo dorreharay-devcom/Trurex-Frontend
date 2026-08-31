@@ -91,7 +91,24 @@ export default function RootLayout() {
                 }}
               />
               <Stack.Screen
+                name="create-rex-request"
+                options={{
+                  presentation: 'transparentModal',
+                  animation: 'none',
+                  contentStyle: { flex: 1, backgroundColor: 'transparent' },
+                  gestureEnabled: false,
+                }}
+              />
+              <Stack.Screen
                 name="rex/[rexId]"
+                options={{
+                  presentation: 'transparentModal',
+                  animation: 'none',
+                  contentStyle: { flex: 1, backgroundColor: 'transparent' },
+                }}
+              />
+              <Stack.Screen
+                name="rex-request/[id]"
                 options={{
                   presentation: 'transparentModal',
                   animation: 'none',

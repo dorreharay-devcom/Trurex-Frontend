@@ -12,21 +12,26 @@ import AudienceFilterOptionsList from '~/features/discover/ui/filters/AudienceFi
 
 type Props = {
   options?: readonly { id: AudienceFilterId; label: string }[];
+  selected?: AudienceFilterId | null;
+  onApply?: (selected: AudienceFilterId | null) => void;
 };
 
-const AudienceFilterControl = ({ options = AUDIENCE_FILTER_OPTIONS }: Props) => {
+const AudienceFilterControl = ({
+  options = AUDIENCE_FILTER_OPTIONS,
+  selected: controlledSelected,
+  onApply,
+}: Props) => {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<Set<AudienceFilterId>>(new Set());
+  const [localSelected, setLocalSelected] = useState<AudienceFilterId | null>(null);
+  const isControlled = controlledSelected !== undefined;
+  const selected = isControlled ? controlledSelected : localSelected;
 
   const close = () => setOpen(false);
 
-  const toggle = (id: AudienceFilterId) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  const select = (id: AudienceFilterId) => {
+    const next = selected === id ? null : id;
+    if (isControlled) onApply?.(next);
+    else setLocalSelected(next);
   };
 
   return (
@@ -45,7 +50,7 @@ const AudienceFilterControl = ({ options = AUDIENCE_FILTER_OPTIONS }: Props) => 
       <BottomSheet open={open} onClose={close}>
         <SheetHeader title="Filters" actionLabel="Done" busy={false} onAction={close} />
         <View className="px-4 pt-3">
-          <AudienceFilterOptionsList selected={selected} onToggle={toggle} options={options} />
+          <AudienceFilterOptionsList selected={selected} onSelect={select} options={options} />
         </View>
         <View className="mt-4 border-t border-border p-4">
           <TouchableOpacity

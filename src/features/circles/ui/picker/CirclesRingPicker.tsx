@@ -11,7 +11,7 @@ import {
   ringDiameterFns,
   ringPaintOrderBackToFront,
   selectionAnnuliLargestFirst,
-} from '~/features/rex-create/lib/circles';
+} from '~/features/circles/lib/circlesPicker';
 import { CircleGlyph } from '~/features/circles/ui/CircleGlyph';
 
 const CHIP_ICON = 12;

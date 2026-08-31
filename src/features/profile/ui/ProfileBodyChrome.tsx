@@ -43,6 +43,7 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
         onChange={content.setActiveTab}
         rexCount={content.rexTabCount}
         collectionsCount={content.collectionsTabCount}
+        rexRequestsCount={content.rexRequestsTabCount}
       />
     </View>
   );

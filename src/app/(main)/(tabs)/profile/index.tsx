@@ -6,6 +6,7 @@ import { useAuth } from '~/features/auth/providers';
 import { Routes } from '~/shared/config/routes';
 import { openRecommendation } from '~/shared/lib/navigation/createRex';
 import { COLLECTION_FROM, openCollection } from '~/shared/lib/navigation/openCollection';
+import { openRexRequest } from '~/shared/lib/navigation/rexRequest';
 import { shellAvatarQueryKey } from '~/widgets/hooks/useHeaderAvatar';
 
 export default function ProfileScreen() {
@@ -30,6 +31,7 @@ export default function ProfileScreen() {
       onOpenCollection={(collectionId) =>
         openCollection(router, collectionId, COLLECTION_FROM.profile)
       }
+      onOpenRexRequest={(requestId) => openRexRequest(router, requestId)}
     />
   );
 }

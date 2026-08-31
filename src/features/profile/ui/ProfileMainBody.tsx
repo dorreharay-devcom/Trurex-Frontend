@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import {
+  ActivityIndicator,
   LayoutChangeEvent,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -9,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import CollectionCard from '~/features/collections/ui/CollectionCard';
-import { PROFILE_TAB } from '~/features/profile/config/tabs';
+import { PROFILE_TAB, type ProfileTab } from '~/features/profile/config/tabs';
 import { profileGridLayout } from '~/features/profile/ui/ProfileGridCell';
 import type { useProfileScreen } from '~/features/profile/hooks/useProfileScreen';
 import ProfileBackButton from '~/features/profile/ui/ProfileBackButton';
@@ -17,8 +18,10 @@ import ProfileBodyChrome from '~/features/profile/ui/ProfileBodyChrome';
 import ProfileGridCell from '~/features/profile/ui/ProfileGridCell';
 import ProfileRexCard from '~/features/profile/ui/ProfileRexCard';
 import { ProfileCollectionsSkeleton, ProfileRexGridSkeleton } from '~/features/profile/ui/skeleton';
+import RexRequestCard from '~/features/rex-requests/ui/feed/RexRequestCard';
 import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 import QueryListFooter from '~/shared/ui/query/QueryListFooter';
+import { Theme } from '~/shared/theme/Theme';
 import { webContainerStyle } from '~/shared/lib/ui/styles';
 
 type Flow = ReturnType<typeof useProfileScreen>;
@@ -32,38 +35,48 @@ type Props = {
 const NEAR_END_PX = 320;
 const GRID_PAD = 16;
 
+function emptyLabel(activeTab: ProfileTab): string {
+  if (activeTab === PROFILE_TAB.recs) return 'No rexes yet';
+  if (activeTab === PROFILE_TAB.collections) return 'No collections yet';
+  return 'No rex requests yet';
+}
+
+function errorTitle(activeTab: ProfileTab): string {
+  if (activeTab === PROFILE_TAB.recs) return "Couldn't load rexes";
+  if (activeTab === PROFILE_TAB.collections) return "Couldn't load collections";
+  return "Couldn't load requests";
+}
+
 function EmptyBlock({
   loading,
   isError,
-  isRecs,
+  activeTab,
   contentWidth,
   onRetry,
 }: {
   loading: boolean;
   isError: boolean;
-  isRecs: boolean;
+  activeTab: ProfileTab;
   contentWidth: number;
   onRetry: () => void;
 }) {
   if (loading) {
-    return isRecs ? (
-      <ProfileRexGridSkeleton windowWidth={contentWidth} />
-    ) : (
-      <ProfileCollectionsSkeleton windowWidth={contentWidth} />
+    if (activeTab === PROFILE_TAB.recs)
+      return <ProfileRexGridSkeleton windowWidth={contentWidth} />;
+    if (activeTab === PROFILE_TAB.collections) {
+      return <ProfileCollectionsSkeleton windowWidth={contentWidth} />;
+    }
+    return (
+      <View className="items-center py-8">
+        <ActivityIndicator color={Theme.colors.muted} />
+      </View>
     );
   }
   if (isError) {
-    return (
-      <QueryErrorState
-        title={isRecs ? "Couldn't load rexes" : "Couldn't load collections"}
-        onRetry={onRetry}
-      />
-    );
+    return <QueryErrorState title={errorTitle(activeTab)} onRetry={onRetry} />;
   }
   return (
-    <Text className="py-8 text-center text-sm text-muted-foreground">
-      {isRecs ? 'No rexes yet' : 'No collections yet'}
-    </Text>
+    <Text className="py-8 text-center text-sm text-muted-foreground">{emptyLabel(activeTab)}</Text>
   );
 }
 
@@ -75,12 +88,31 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
   const { numColumns, cellWidth, gap } = profileGridLayout(gridContentWidth);
   const { content } = flow;
   const isRecs = content.activeTab === PROFILE_TAB.recs;
-  const items = isRecs ? content.myRexes : content.myCollections;
-  const loading = isRecs ? content.rexesLoading : content.collectionsLoading;
-  const isError = isRecs ? content.rexesError : content.collectionsError;
+  const isCollections = content.activeTab === PROFILE_TAB.collections;
+  const isRexRequests = content.activeTab === PROFILE_TAB.rexRequests;
+
+  const items = isRecs
+    ? content.myRexes
+    : isCollections
+      ? content.myCollections
+      : content.myRexRequests;
+  const loading = isRecs
+    ? content.rexesLoading
+    : isCollections
+      ? content.collectionsLoading
+      : content.rexRequestsLoading;
+  const isError = isRecs
+    ? content.rexesError
+    : isCollections
+      ? content.collectionsError
+      : content.rexRequestsError;
   const hasItems = items.length > 0;
 
-  const loadMore = isRecs ? content.loadMoreRexes : content.loadMoreCollections;
+  const loadMore = isRecs
+    ? content.loadMoreRexes
+    : isCollections
+      ? content.loadMoreCollections
+      : content.loadMoreRexRequests;
 
   const onGridLayout = useCallback((event: LayoutChangeEvent) => {
     const next = Math.floor(event.nativeEvent.layout.width);
@@ -124,35 +156,60 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
         {hasItems ? (
           <>
             <View className="px-4 pb-4">
-              <View className="w-full" onLayout={onGridLayout}>
-                <View className="w-full flex-row flex-wrap" style={{ marginHorizontal: -halfGap }}>
-                  {isRecs
-                    ? content.myRexes.map((item) => (
-                        <ProfileGridCell key={item.id} numColumns={numColumns} gap={gap}>
-                          <ProfileRexCard
-                            rec={item}
-                            width={cellWidth}
-                            onPress={() => flow.onRexPress?.(item)}
-                          />
-                        </ProfileGridCell>
-                      ))
-                    : content.myCollections.map((item) => (
-                        <ProfileGridCell key={item.id} numColumns={numColumns} gap={gap}>
-                          <CollectionCard
-                            collection={item}
-                            fill
-                            onPress={() => flow.openCollection(item.id)}
-                          />
-                        </ProfileGridCell>
-                      ))}
+              {isRexRequests ? (
+                <View className="w-full gap-3" onLayout={onGridLayout}>
+                  {content.myRexRequests.map((item) => (
+                    <RexRequestCard
+                      key={item.id}
+                      request={item}
+                      onPress={() => flow.openRexRequest(item.id)}
+                    />
+                  ))}
                 </View>
-              </View>
+              ) : (
+                <View className="w-full" onLayout={onGridLayout}>
+                  <View
+                    className="w-full flex-row flex-wrap"
+                    style={{ marginHorizontal: -halfGap }}
+                  >
+                    {isRecs
+                      ? content.myRexes.map((item) => (
+                          <ProfileGridCell key={item.id} numColumns={numColumns} gap={gap}>
+                            <ProfileRexCard
+                              rec={item}
+                              width={cellWidth}
+                              onPress={() => flow.onRexPress?.(item)}
+                            />
+                          </ProfileGridCell>
+                        ))
+                      : content.myCollections.map((item) => (
+                          <ProfileGridCell key={item.id} numColumns={numColumns} gap={gap}>
+                            <CollectionCard
+                              collection={item}
+                              fill
+                              onPress={() => flow.openCollection(item.id)}
+                            />
+                          </ProfileGridCell>
+                        ))}
+                  </View>
+                </View>
+              )}
             </View>
             <QueryListFooter
               loading={
-                isRecs ? content.isFetchingNextRexesPage : content.isFetchingNextCollectionsPage
+                isRecs
+                  ? content.isFetchingNextRexesPage
+                  : isCollections
+                    ? content.isFetchingNextCollectionsPage
+                    : content.isFetchingNextRexRequestsPage
               }
-              isError={isRecs ? content.isFetchNextRexesError : content.isFetchNextCollectionsError}
+              isError={
+                isRecs
+                  ? content.isFetchNextRexesError
+                  : isCollections
+                    ? content.isFetchNextCollectionsError
+                    : content.isFetchNextRexRequestsError
+              }
               onRetry={loadMore}
             />
           </>
@@ -162,9 +219,15 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
               <EmptyBlock
                 loading={loading}
                 isError={isError}
-                isRecs={isRecs}
+                activeTab={content.activeTab}
                 contentWidth={gridContentWidth}
-                onRetry={isRecs ? content.retryRexes : content.retryCollections}
+                onRetry={
+                  isRecs
+                    ? content.retryRexes
+                    : isCollections
+                      ? content.retryCollections
+                      : content.retryRexRequests
+                }
               />
             </View>
           </View>

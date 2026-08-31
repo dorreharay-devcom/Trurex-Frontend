@@ -40,6 +40,17 @@ export function toCreateRoute(options?: { editRexId?: string; step?: string }): 
   return `/create?${params.toString()}`;
 }
 
+export function toCreateRexRequestRoute(options?: { editRequestId?: string }): Href {
+  const params = new URLSearchParams();
+  if (options?.editRequestId) params.set('edit', options.editRequestId);
+  const qs = params.toString();
+  return `/create-rex-request${qs ? `?${qs}` : ''}`;
+}
+
+export function toRexRequestRoute(requestId: string): Href {
+  return `/rex-request/${requestId}`;
+}
+
 export function toCircleRoute(circleId: string): Href {
   return `/circles/${circleId}`;
 }
