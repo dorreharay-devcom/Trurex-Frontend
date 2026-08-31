@@ -20,9 +20,11 @@ import PushNotificationRoutingBridge from '~/features/push-notifications/ui/Push
 import { fetchRexScoreTiers } from '~/features/rex-score/api/rexScoreTiersApi';
 import { REX_SCORE_TIERS_QUERY_KEY } from '~/shared/config/queryKeys';
 import TierUpgradeCelebrationBridge from '~/features/rex-score/ui/TierUpgradeCelebrationBridge';
+import { disableMobileSafariInputZoom } from '~/shared/lib/ui/viewport';
 
 setupQueryNetwork();
 setupPushNotifications();
+disableMobileSafariInputZoom();
 
 export { AppErrorBoundary as ErrorBoundary };
 
