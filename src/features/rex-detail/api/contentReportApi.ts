@@ -31,6 +31,12 @@ function optionalDetailsPayload(details?: string | null): Record<string, unknown
   return { input_details: trimmed };
 }
 
+function optionalPDetailsPayload(details?: string | null): Record<string, unknown> {
+  const trimmed = details?.trim();
+  if (!trimmed) return {};
+  return { p_details: trimmed };
+}
+
 export async function fetchFlagReasons(): Promise<FlagReasonRow[]> {
   const data = unwrap<unknown>(await Backend.rpc('get_flag_reasons'));
   return normalizeFlagReasonRows(data);
@@ -60,6 +66,34 @@ export async function flagComment(params: {
       input_comment_id: params.commentId,
       input_reason_code: params.reasonCode,
       ...optionalDetailsPayload(params.details),
+    }),
+  );
+}
+
+export async function flagRexRequest(params: {
+  rexRequestId: string;
+  reasonCode: string;
+  details?: string | null;
+}): Promise<void> {
+  unwrap(
+    await Backend.rpc('flag_rex_request', {
+      p_request_id: params.rexRequestId,
+      p_reason_code: params.reasonCode,
+      ...optionalPDetailsPayload(params.details),
+    }),
+  );
+}
+
+export async function flagRexRequestComment(params: {
+  commentId: string;
+  reasonCode: string;
+  details?: string | null;
+}): Promise<void> {
+  unwrap(
+    await Backend.rpc('flag_rex_request_comment', {
+      p_comment_id: params.commentId,
+      p_reason_code: params.reasonCode,
+      ...optionalPDetailsPayload(params.details),
     }),
   );
 }

@@ -17,3 +17,16 @@ export const AUDIENCE_FILTER_OPTIONS = [
 export const AUDIENCE_FILTER_OPTIONS_NO_PRIVATE = AUDIENCE_FILTER_OPTIONS.filter(
   (option) => option.id !== AUDIENCE_FILTER.private,
 );
+
+// recommendation_feed's `circle_filter` param uses its own value vocabulary,
+// distinct from the app's circle `system_kind` strings (e.g. 'inner' here vs 'inner_circle' there).
+const AUDIENCE_FILTER_TO_CIRCLE_PARAM: Record<AudienceFilterId, string> = {
+  [AUDIENCE_FILTER.broaderNetwork]: 'broader_network',
+  [AUDIENCE_FILTER.trusted]: 'trusted',
+  [AUDIENCE_FILTER.inner]: 'inner',
+  [AUDIENCE_FILTER.private]: 'private',
+};
+
+export function audienceFilterToCircleParam(id: AudienceFilterId | null): string | null {
+  return id ? AUDIENCE_FILTER_TO_CIRCLE_PARAM[id] : null;
+}

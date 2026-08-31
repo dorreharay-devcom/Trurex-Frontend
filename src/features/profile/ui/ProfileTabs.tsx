@@ -7,15 +7,28 @@ type Props = {
   onChange: (tab: ProfileTab) => void;
   rexCount: number;
   collectionsCount: number;
+  rexRequestsCount: number;
 };
 
-function tabLabel(tabId: ProfileTab, rexCount: number, collectionsCount: number): string {
+function tabLabel(
+  tabId: ProfileTab,
+  rexCount: number,
+  collectionsCount: number,
+  rexRequestsCount: number,
+): string {
   if (tabId === PROFILE_TAB.recs) return `Rex (${rexCount})`;
   if (tabId === PROFILE_TAB.collections) return `Collections (${collectionsCount})`;
+  if (tabId === PROFILE_TAB.rexRequests) return `Requests (${rexRequestsCount})`;
   return tabId;
 }
 
-const ProfileTabs = ({ activeTab, onChange, rexCount, collectionsCount }: Props) => (
+const ProfileTabs = ({
+  activeTab,
+  onChange,
+  rexCount,
+  collectionsCount,
+  rexRequestsCount,
+}: Props) => (
   <View className="flex-row border-b border-border">
     {PROFILE_TABS.map((tab) => {
       const selected = activeTab === tab.id;
@@ -29,7 +42,7 @@ const ProfileTabs = ({ activeTab, onChange, rexCount, collectionsCount }: Props)
           <Text
             className={`text-xs font-medium ${selected ? 'text-foreground' : 'text-muted-foreground'}`}
           >
-            {tabLabel(tab.id, rexCount, collectionsCount)}
+            {tabLabel(tab.id, rexCount, collectionsCount, rexRequestsCount)}
           </Text>
           {selected ? <View className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" /> : null}
         </TouchableOpacity>

@@ -39,7 +39,7 @@ export function circleIconKind(row: CircleApiRow): CircleIconKind {
 export function defaultCircleSubtitle(row: CircleApiRow): string {
   const description = row.description?.trim();
   if (description) return description;
-  return row.system_kind == null ? 'Private circle' : '';
+  return row.system_kind == null ? 'Your custom circle' : '';
 }
 
 export function isUserCreatedCircle(row: CircleApiRow): boolean {

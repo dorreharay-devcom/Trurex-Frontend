@@ -16,6 +16,18 @@ import { OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/overlaySheet';
 const FORM_FOOTER_EST = 100;
 const HEADER_EST = 56;
 
+function reportDialogHeading(target: ContentReportTarget | null): string {
+  switch (target?.kind) {
+    case 'comment':
+    case 'rex_request_comment':
+      return 'Report this comment';
+    case 'rex_request':
+      return 'Report this request';
+    default:
+      return 'Report this Rex';
+  }
+}
+
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -32,7 +44,7 @@ const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, target }) =>
     maxSheetHeight - HEADER_EST - FORM_FOOTER_EST - insets.bottom,
   );
   const flow = useContentReportFlow({ open, target });
-  const heading = target?.kind === 'comment' ? 'Report this comment' : 'Report this Rex';
+  const heading = reportDialogHeading(target);
 
   const onRequestClose = () => {
     onOpenChange(false);

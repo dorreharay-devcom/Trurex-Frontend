@@ -24,6 +24,7 @@ export const AnalyticsEvent = {
   RexCreated: 'rex_created',
   RexLiked: 'rex_liked',
   RexThanked: 'rex_thanked',
+  RexRequestCreated: 'rex_request_created',
   PushTokenRegistered: 'push_token_registered',
   PushNotificationTapped: 'push_notification_tapped',
   ScreenError: 'screen_error',

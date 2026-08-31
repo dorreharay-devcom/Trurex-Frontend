@@ -10,9 +10,16 @@ type Props = {
   onChangeText: (value: string) => void;
   placeholder?: string;
   filterSlot?: ReactNode;
+  trailingSlot?: ReactNode;
 };
 
-const TabSearchRow = ({ value, onChangeText, placeholder = 'Search', filterSlot }: Props) => (
+const TabSearchRow = ({
+  value,
+  onChangeText,
+  placeholder = 'Search',
+  filterSlot,
+  trailingSlot,
+}: Props) => (
   <View className="flex-row items-center gap-3 mb-4">
     <ClearableSearchInput
       value={value}
@@ -27,6 +34,7 @@ const TabSearchRow = ({ value, onChangeText, placeholder = 'Search', filterSlot 
       inputStyle={[webNoOutline, textFieldCaretStyle]}
     />
     {filterSlot}
+    {trailingSlot}
   </View>
 );
 

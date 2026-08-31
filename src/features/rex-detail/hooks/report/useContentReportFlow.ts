@@ -76,18 +76,35 @@ export function useContentReportFlow({ open, target }: Params) {
     setIsSubmitting(true);
     try {
       const detailPayload = details.trim() || null;
-      if (target.kind === 'recommendation') {
-        await ContentReportApi.flagRex({
-          rexId: target.rexId,
-          reasonCode: reason,
-          details: detailPayload,
-        });
-      } else {
-        await ContentReportApi.flagComment({
-          commentId: target.commentId,
-          reasonCode: reason,
-          details: detailPayload,
-        });
+      switch (target.kind) {
+        case 'recommendation':
+          await ContentReportApi.flagRex({
+            rexId: target.rexId,
+            reasonCode: reason,
+            details: detailPayload,
+          });
+          break;
+        case 'comment':
+          await ContentReportApi.flagComment({
+            commentId: target.commentId,
+            reasonCode: reason,
+            details: detailPayload,
+          });
+          break;
+        case 'rex_request':
+          await ContentReportApi.flagRexRequest({
+            rexRequestId: target.rexRequestId,
+            reasonCode: reason,
+            details: detailPayload,
+          });
+          break;
+        case 'rex_request_comment':
+          await ContentReportApi.flagRexRequestComment({
+            commentId: target.commentId,
+            reasonCode: reason,
+            details: detailPayload,
+          });
+          break;
       }
       toastSuccess('Report sent', 'Thanks — our team will review it.');
       reset();

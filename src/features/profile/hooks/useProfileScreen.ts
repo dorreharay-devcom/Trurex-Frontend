@@ -8,6 +8,7 @@ import {
   type ProfileTab,
 } from '~/features/profile/config/tabs';
 import { useMyRexes } from '~/features/profile/hooks/data/useMyRexes';
+import { useMyRexRequests } from '~/features/rex-requests/hooks/useMyRexRequests';
 import { useProfileData } from '~/features/profile/hooks/data/useProfileData';
 import { useProfileAvatarUpload } from '~/features/profile/hooks/useProfileAvatarUpload';
 import { useProfileSocial } from '~/features/profile/hooks/useProfileSocial';
@@ -22,6 +23,7 @@ type Params = {
   onRexPress?: (rec: Recommendation) => void;
   onEditProfile?: () => void;
   onOpenCollection?: (collectionId: string) => void;
+  onOpenRexRequest?: (requestId: string) => void;
 };
 
 export function useProfileScreen({
@@ -32,6 +34,7 @@ export function useProfileScreen({
   onRexPress,
   onEditProfile,
   onOpenCollection,
+  onOpenRexRequest,
 }: Params) {
   const router = useRouter();
   const rawParams = useLocalSearchParams<{ tab?: string | string[] }>();
@@ -58,6 +61,7 @@ export function useProfileScreen({
 
   const rexes = useMyRexes(profileData.profileContentUserId);
   const collections = useMyCollections(profileData.profileContentUserId);
+  const rexRequests = useMyRexRequests(profileData.profileContentUserId, profileData.isOwnProfile);
   const {
     fetchNextPage: fetchNextRexesPage,
     data: rexesData,
@@ -77,6 +81,15 @@ export function useProfileScreen({
     refetch: refetchCollections,
   } = collections;
   const collectionsList = collectionsData ?? [];
+  const {
+    fetchNextPage: fetchNextRexRequestsPage,
+    data: rexRequestsData,
+    isLoading: rexRequestsLoading,
+    isError: rexRequestsIsError,
+    isFetchingNextPage: isFetchingNextRexRequestsPage,
+    isFetchNextPageError: isFetchNextRexRequestsError,
+    refetch: refetchRexRequests,
+  } = rexRequests;
   const { beginLoading, fetchProfile } = profileData;
 
   const avatar = useProfileAvatarUpload({
@@ -99,6 +112,10 @@ export function useProfileScreen({
     void fetchNextCollectionsPage();
   }, [fetchNextCollectionsPage]);
 
+  const loadMoreRexRequests = useCallback(() => {
+    void fetchNextRexRequestsPage();
+  }, [fetchNextRexRequestsPage]);
+
   const openEdit = useCallback(() => {
     onEditProfile?.();
   }, [onEditProfile]);
@@ -108,6 +125,13 @@ export function useProfileScreen({
       onOpenCollection?.(collectionId);
     },
     [onOpenCollection],
+  );
+
+  const openRexRequest = useCallback(
+    (requestId: string) => {
+      onOpenRexRequest?.(requestId);
+    },
+    [onOpenRexRequest],
   );
 
   return {
@@ -127,6 +151,7 @@ export function useProfileScreen({
     onRexPress,
     onBack,
     openCollection,
+    openRexRequest,
     content: {
       activeTab,
       setActiveTab,
@@ -140,12 +165,20 @@ export function useProfileScreen({
       collectionsError: collectionsIsError && collectionsList.length === 0,
       isFetchingNextCollectionsPage,
       isFetchNextCollectionsError,
+      myRexRequests: rexRequestsData,
+      rexRequestsLoading,
+      rexRequestsError: rexRequestsIsError && rexRequestsData.length === 0,
+      isFetchingNextRexRequestsPage,
+      isFetchNextRexRequestsError,
       rexTabCount: rexesData?.length ?? 0,
       collectionsTabCount: collectionsList[0]?.total_count ?? collectionsList.length,
+      rexRequestsTabCount: rexRequestsData.length,
       loadMoreRexes,
       loadMoreCollections,
+      loadMoreRexRequests,
       retryRexes: () => void refetchRexes(),
       retryCollections: () => void refetchCollections(),
+      retryRexRequests: () => void refetchRexRequests(),
     },
     social,
   };

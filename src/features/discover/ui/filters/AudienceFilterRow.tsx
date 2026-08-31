@@ -7,13 +7,13 @@ import { cn } from '~/shared/lib/ui/styles';
 type Props = {
   label: string;
   selected: boolean;
-  onToggle: () => void;
+  onPress: () => void;
 };
 
-const AudienceFilterRow = ({ label, selected, onToggle }: Props) => (
+const AudienceFilterRow = ({ label, selected, onPress }: Props) => (
   <Pressable
-    onPress={onToggle}
-    accessibilityRole="checkbox"
+    onPress={onPress}
+    accessibilityRole="radio"
     accessibilityState={{ checked: selected }}
     accessibilityLabel={label}
     className="flex-row items-center justify-between py-3.5"

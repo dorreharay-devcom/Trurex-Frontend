@@ -1,7 +1,7 @@
 import React from 'react';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
-import type { DisplayCirclesState } from '~/features/rex-create/hooks/useDisplayCircles';
-import Circles from './Circles';
+import type { DisplayCirclesState } from '~/features/circles/hooks/useDisplayCircles';
+import CirclesPicker from '~/features/circles/ui/picker/CirclesPicker';
 
 type Props = {
   flow: CreateRecFlow;
@@ -11,7 +11,7 @@ type Props = {
 function CirclesStep({ flow, circles }: Props) {
   const share = flow.circles;
   return (
-    <Circles
+    <CirclesPicker
       circles={circles.displayCircles}
       showFetchSpinner={circles.showFetchSpinner}
       loadError={circles.loadError}

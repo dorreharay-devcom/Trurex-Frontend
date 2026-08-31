@@ -3,7 +3,7 @@ import { View, Animated as RNAnimated } from 'react-native';
 import { STEP_ID } from '~/features/rex-create/types/create';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
 import type { CreateConfigState } from '~/features/rex-create/hooks/useCategoryCreateConfig';
-import { useDisplayCircles } from '~/features/rex-create/hooks/useDisplayCircles';
+import { useDisplayCircles } from '~/features/circles/hooks/useDisplayCircles';
 import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 import StepSkeleton from './StepSkeleton';
 import {

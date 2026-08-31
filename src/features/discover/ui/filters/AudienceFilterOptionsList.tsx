@@ -7,14 +7,14 @@ import {
 import AudienceFilterRow from '~/features/discover/ui/filters/AudienceFilterRow';
 
 type Props = {
-  selected: Set<AudienceFilterId>;
-  onToggle: (id: AudienceFilterId) => void;
+  selected: AudienceFilterId | null;
+  onSelect: (id: AudienceFilterId) => void;
   options?: readonly { id: AudienceFilterId; label: string }[];
 };
 
 function AudienceFilterOptionsList({
   selected,
-  onToggle,
+  onSelect,
   options = AUDIENCE_FILTER_OPTIONS,
 }: Props) {
   return (
@@ -27,8 +27,8 @@ function AudienceFilterOptionsList({
           <AudienceFilterRow
             key={option.id}
             label={option.label}
-            selected={selected.has(option.id)}
-            onToggle={() => onToggle(option.id)}
+            selected={selected === option.id}
+            onPress={() => onSelect(option.id)}
           />
         ))}
       </View>

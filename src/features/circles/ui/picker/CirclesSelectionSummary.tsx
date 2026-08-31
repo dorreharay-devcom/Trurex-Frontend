@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import type { CircleDisplayRow } from '~/shared/types/circles';
-import { circleFooterSubtitle } from '~/features/rex-create/lib/circles';
+import { circleFooterSubtitle } from '~/features/circles/lib/circlesPicker';
 
 type Props = {
   privateSelected: boolean;
