@@ -27,6 +27,7 @@ import DiscoverTopChrome from '~/features/discover/ui/DiscoverTopChrome';
 import TabSearchRow from '~/features/discover/ui/search/TabSearchRow';
 import AudienceFilterControl from '~/features/discover/ui/filters/AudienceFilterControl';
 import {
+  AUDIENCE_FILTER_OPTIONS,
   AUDIENCE_FILTER_OPTIONS_NO_PRIVATE,
   type AudienceFilterId,
 } from '~/features/discover/config/audienceFilters';
@@ -94,7 +95,7 @@ const DiscoverPage = ({
 }: DiscoverPageProps) => {
   const [activeTab, setActiveTab] = useState<DiscoverTab>(DISCOVER_TAB.latestRex);
   const [latestRexSearch, setLatestRexSearch] = useState('');
-  const [circleFilter, setCircleFilter] = useState<AudienceFilterId | null>(null);
+  const [circleFilter, setCircleFilter] = useState<AudienceFilterId[]>([]);
   const debouncedLatestRexSearch = useDebouncedValue(latestRexSearch, DEFAULT_SEARCH_DEBOUNCE_MS);
   const rexRequests = useRexRequestsFeedList({ enabled: activeTab === DISCOVER_TAB.rexRequest });
 
@@ -155,7 +156,13 @@ const DiscoverPage = ({
             value={latestRexSearch}
             onChangeText={setLatestRexSearch}
             placeholder="Search rex..."
-            filterSlot={<AudienceFilterControl selected={circleFilter} onApply={setCircleFilter} />}
+            filterSlot={
+              <AudienceFilterControl
+                options={AUDIENCE_FILTER_OPTIONS}
+                selected={circleFilter}
+                onApply={setCircleFilter}
+              />
+            }
           />
         </View>
         <FeedListHeader
@@ -231,7 +238,13 @@ const DiscoverPage = ({
             value={rexRequests.searchQuery}
             onChangeText={rexRequests.setSearchQuery}
             placeholder="Search rex requests"
-            filterSlot={<AudienceFilterControl options={AUDIENCE_FILTER_OPTIONS_NO_PRIVATE} />}
+            filterSlot={
+              <AudienceFilterControl
+                options={AUDIENCE_FILTER_OPTIONS_NO_PRIVATE}
+                selected={rexRequests.circleFilter}
+                onApply={rexRequests.setCircleFilter}
+              />
+            }
             trailingSlot={<NewRexRequestButton onPress={onCreateRexRequest} />}
           />
         </View>
@@ -246,6 +259,8 @@ const DiscoverPage = ({
       toggleTag,
       rexRequests.searchQuery,
       rexRequests.setSearchQuery,
+      rexRequests.circleFilter,
+      rexRequests.setCircleFilter,
       onCreateRexRequest,
     ],
   );

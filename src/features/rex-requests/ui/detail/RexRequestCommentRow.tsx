@@ -1,9 +1,11 @@
 import React from 'react';
-import { Pressable, Text, TouchableOpacity, View } from 'react-native';
-import { Flag } from 'lucide-react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 import { formatCompactRelativeTime } from '~/shared/lib/data/date';
-import { Theme } from '~/shared/theme/Theme';
+import {
+  DeleteAction,
+  ReportAction,
+} from '~/features/rex-detail/ui/comments/common/CommentActions';
 import type { RexRequestCommentRow as RexRequestCommentRowType } from '~/features/rex-requests/api/types';
 
 type Props = {
@@ -11,12 +13,15 @@ type Props = {
   currentUserId?: string;
   onUserPress?: (userId: string) => void;
   onReport?: (commentId: string) => void;
+  onDelete?: (commentId: string) => void;
 };
 
-function RexRequestCommentRow({ comment, currentUserId, onUserPress, onReport }: Props) {
+function RexRequestCommentRow({ comment, currentUserId, onUserPress, onReport, onDelete }: Props) {
   const name = comment.commenter_display_name?.trim() || 'Member';
   const goToProfile = () => onUserPress?.(comment.commenter_id);
-  const canReport = Boolean(onReport && currentUserId && currentUserId !== comment.commenter_id);
+  const isOwnComment = Boolean(currentUserId && currentUserId === comment.commenter_id);
+  const canReport = Boolean(onReport && currentUserId && !isOwnComment);
+  const canDelete = Boolean(onDelete && isOwnComment);
 
   return (
     <View className="flex-row gap-2.5">
@@ -38,18 +43,11 @@ function RexRequestCommentRow({ comment, currentUserId, onUserPress, onReport }:
           </Text>
         </View>
         <Text className="mt-0.5 text-sm leading-relaxed text-foreground/90">{comment.body}</Text>
-        {canReport ? (
-          <Pressable
-            onPress={() => onReport?.(comment.comment_id)}
-            className="mt-1.5 h-8 w-8 items-center justify-center rounded-md active:opacity-80"
-            hitSlop={10}
-            accessibilityLabel="Report comment"
-            accessibilityRole="button"
-          >
-            <View pointerEvents="none">
-              <Flag size={13} color={Theme.colors.foreground} strokeWidth={1.5} />
-            </View>
-          </Pressable>
+        {canDelete || canReport ? (
+          <View className="mt-1.5 flex-row flex-wrap items-center gap-3">
+            {canDelete ? <DeleteAction onPress={() => onDelete?.(comment.comment_id)} /> : null}
+            {canReport ? <ReportAction onPress={() => onReport?.(comment.comment_id)} /> : null}
+          </View>
         ) : null}
       </View>
     </View>

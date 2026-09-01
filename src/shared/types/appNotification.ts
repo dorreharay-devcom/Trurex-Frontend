@@ -19,4 +19,5 @@ export interface AppNotification {
   unread_count?: number;
   rex_id?: string | null;
   comment_id?: string | null;
+  rex_request_id?: string | null;
 }

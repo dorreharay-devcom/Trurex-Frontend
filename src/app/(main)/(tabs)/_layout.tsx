@@ -4,6 +4,7 @@ import { Tabs, usePathname, useRouter } from 'expo-router';
 import { TAB, tabFromPathname } from '~/shared/config/mainTabs';
 import { toUserRoute } from '~/shared/config/routes';
 import { openCreateRex, openRex } from '~/shared/lib/navigation/createRex';
+import { openRexRequest } from '~/shared/lib/navigation/rexRequest';
 import { openMainTab } from '~/shared/lib/mainTab';
 import { Theme } from '~/shared/theme/Theme';
 import Header from '~/widgets/Header';
@@ -42,6 +43,13 @@ function MainTabsChrome() {
     [router],
   );
 
+  const onRexRequestPress = useCallback(
+    (requestId: string) => {
+      openRexRequest(router, requestId);
+    },
+    [router],
+  );
+
   const onAddPress = useCallback(() => {
     openCreateRex(router);
   }, [router]);
@@ -56,6 +64,7 @@ function MainTabsChrome() {
               onAddPress={onAddPress}
               onUserPress={onUserPress}
               onRexPress={onRexPress}
+              onRexRequestPress={onRexRequestPress}
             />
             <TabBar currentTab={currentTab} onTabChange={changeTab} />
             <OfflineBanner />

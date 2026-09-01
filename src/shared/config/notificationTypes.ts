@@ -13,6 +13,10 @@ export const NOTIFICATION_TYPE = {
   message: 'message',
   tier_upgrade: 'tier_upgrade',
   thank: 'thank',
+  first_thank: 'first_thank',
+  milestone_thank: 'milestone_thank',
+  rex_request: 'rex_request',
+  rex_request_response: 'rex_request_response',
 } as const;
 
 export type KnownNotificationType = (typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICATION_TYPE];

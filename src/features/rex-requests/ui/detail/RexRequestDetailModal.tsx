@@ -10,6 +10,7 @@ import { Theme } from '~/shared/theme/Theme';
 import type { RexRequestRow } from '~/features/rex-requests/api/types';
 import { useDeleteRexRequest } from '~/features/rex-requests/hooks/detail/useDeleteRexRequest';
 import { useResolveRexRequest } from '~/features/rex-requests/hooks/detail/useResolveRexRequest';
+import { useUntagRexFromRequest } from '~/features/rex-requests/hooks/detail/useUntagRexFromRequest';
 import { useRexRequestReportTarget } from '~/features/rex-requests/hooks/detail/useRexRequestReportTarget';
 import { useRexRequestResponses } from '~/features/rex-requests/hooks/detail/useRexRequestResponses';
 import { useShareRexRequest } from '~/features/rex-requests/hooks/detail/useShareRexRequest';
@@ -56,6 +57,7 @@ function RexRequestDetailModal({
   const resolve = useResolveRexRequest(request.id);
   const report = useRexRequestReportTarget(request.id, request.requester_id);
   const responses = useRexRequestResponses(request.id);
+  const untagRex = useUntagRexFromRequest(request.id);
   const { shareRexRequest } = useShareRexRequest();
   const taggedRexIds = useMemo(
     () => new Set(responses.responses.map((r) => r.rex_id)),
@@ -126,6 +128,9 @@ function RexRequestDetailModal({
                       key={r.response_id}
                       response={r}
                       onPress={() => onOpenRex?.(r.rex_id)}
+                      canUntag={authUser != null && authUser.id === r.responder_id}
+                      untagging={untagRex.isPending(r.rex_id)}
+                      onUntag={() => untagRex.untag(r.rex_id)}
                     />
                   ))}
                 </View>

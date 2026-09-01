@@ -1,33 +1,31 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import {
-  AUDIENCE_FILTER_OPTIONS,
-  type AudienceFilterId,
-} from '~/features/discover/config/audienceFilters';
 import AudienceFilterRow from '~/features/discover/ui/filters/AudienceFilterRow';
 
-type Props = {
-  selected: AudienceFilterId | null;
-  onSelect: (id: AudienceFilterId) => void;
-  options?: readonly { id: AudienceFilterId; label: string }[];
+type Props<T extends string> = {
+  selected: readonly T[];
+  onSelect: (id: T) => void;
+  options: readonly { id: T; label: string }[];
+  sectionLabel?: string;
 };
 
-function AudienceFilterOptionsList({
+function AudienceFilterOptionsList<T extends string>({
   selected,
   onSelect,
-  options = AUDIENCE_FILTER_OPTIONS,
-}: Props) {
+  options,
+  sectionLabel = 'Circles',
+}: Props<T>) {
   return (
     <>
       <Text className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        Circles
+        {sectionLabel}
       </Text>
       <View>
         {options.map((option) => (
           <AudienceFilterRow
             key={option.id}
             label={option.label}
-            selected={selected === option.id}
+            selected={selected.includes(option.id)}
             onPress={() => onSelect(option.id)}
           />
         ))}

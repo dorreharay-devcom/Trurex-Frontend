@@ -9,6 +9,13 @@ const REX_TYPES = new Set<string>([
   NOTIFICATION_TYPE.reply,
   NOTIFICATION_TYPE.reaction,
   NOTIFICATION_TYPE.thank,
+  NOTIFICATION_TYPE.first_thank,
+  NOTIFICATION_TYPE.milestone_thank,
+]);
+
+const REX_REQUEST_TYPES = new Set<string>([
+  NOTIFICATION_TYPE.rex_request,
+  NOTIFICATION_TYPE.rex_request_response,
 ]);
 
 const COMMENT_TYPES = new Set<string>([
@@ -47,6 +54,10 @@ const VERB_BY_TYPE: Record<string, string> = {
   [NOTIFICATION_TYPE.message]: 'sent you a message',
   [NOTIFICATION_TYPE.tier_upgrade]: 'reached a new RexScore tier',
   [NOTIFICATION_TYPE.thank]: 'thanked your Rex',
+  [NOTIFICATION_TYPE.first_thank]: 'thanked your Rex',
+  [NOTIFICATION_TYPE.milestone_thank]: 'thanked your Rex',
+  [NOTIFICATION_TYPE.rex_request]: 'posted a Rex Request to your circle',
+  [NOTIFICATION_TYPE.rex_request_response]: 'responded to your Rex Request',
 };
 
 export type NotificationRexLink = {
@@ -56,7 +67,8 @@ export type NotificationRexLink = {
 
 export type NotificationOpenTarget =
   | ({ kind: 'rex' } & NotificationRexLink)
-  | { kind: 'user'; userId: string };
+  | { kind: 'user'; userId: string }
+  | { kind: 'rexRequest'; requestId: string };
 
 function trimOrEmpty(value: string | null | undefined): string {
   return value?.trim() ?? '';
@@ -84,7 +96,15 @@ export function notificationRexDeepLink(n: AppNotification): NotificationRexLink
   return { rexId, options: rexOpenOptions(n) };
 }
 
+export function notificationRexRequestDeepLink(n: AppNotification): string | null {
+  if (!REX_REQUEST_TYPES.has(n.type)) return null;
+  return trimOrEmpty(n.rex_request_id) || dataString(n.data, 'rex_request_id') || null;
+}
+
 export function notificationOpenTarget(n: AppNotification): NotificationOpenTarget | null {
+  const requestId = notificationRexRequestDeepLink(n);
+  if (requestId) return { kind: 'rexRequest', requestId };
+
   const rex = notificationRexDeepLink(n);
   if (rex) return { kind: 'rex', ...rex };
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
-import { ChevronRight, Star } from 'lucide-react-native';
+import { ActivityIndicator, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { ChevronRight, Star, X } from 'lucide-react-native';
 import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 import { formatCompactRelativeTime } from '~/shared/lib/data/date';
 import { Theme } from '~/shared/theme/Theme';
@@ -9,9 +9,18 @@ import type { RexRequestResponseRow } from '~/features/rex-requests/api/types';
 type Props = {
   response: RexRequestResponseRow;
   onPress: () => void;
+  canUntag?: boolean;
+  untagging?: boolean;
+  onUntag?: () => void;
 };
 
-function RexRequestResponseCard({ response, onPress }: Props) {
+function RexRequestResponseCard({
+  response,
+  onPress,
+  canUntag = false,
+  untagging = false,
+  onUntag,
+}: Props) {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -45,7 +54,27 @@ function RexRequestResponseCard({ response, onPress }: Props) {
           ) : null}
         </View>
       </View>
-      <ChevronRight size={16} color={Theme.colors.secondaryText} />
+      {canUntag ? (
+        <Pressable
+          onPress={(e) => {
+            e.stopPropagation();
+            onUntag?.();
+          }}
+          disabled={untagging}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel="Untag this Rex"
+          className="h-8 w-8 items-center justify-center rounded-full active:opacity-70"
+        >
+          {untagging ? (
+            <ActivityIndicator size="small" color={Theme.colors.secondaryText} />
+          ) : (
+            <X size={16} color={Theme.colors.secondaryText} />
+          )}
+        </Pressable>
+      ) : (
+        <ChevronRight size={16} color={Theme.colors.secondaryText} />
+      )}
     </TouchableOpacity>
   );
 }

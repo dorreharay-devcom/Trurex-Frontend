@@ -3,13 +3,15 @@ import type { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent } from 
 import { useWindowDimensions } from 'react-native';
 import { profileGridLayout } from '~/features/profile/ui/ProfileGridCell';
 import { useDiscoverCollectionsFeed } from '~/features/discover/hooks/useDiscoverCollectionsFeed';
+import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/shared/hooks/useDebouncedValue';
 
 const GRID_PAD = 16;
 const NEAR_END_PX = 320;
 
 export function useDiscoverCollectionsGrid() {
   const [searchQuery, setSearchQuery] = useState('');
-  const feed = useDiscoverCollectionsFeed({ enabled: true });
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, DEFAULT_SEARCH_DEBOUNCE_MS);
+  const feed = useDiscoverCollectionsFeed({ enabled: true, searchQuery: debouncedSearchQuery });
 
   const { width: windowWidth } = useWindowDimensions();
   const [gridContentWidth, setGridContentWidth] = useState(() =>

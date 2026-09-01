@@ -15,6 +15,7 @@ type Props = {
   onAddPress?: () => void;
   onUserPress?: (userId: string) => void;
   onRexPress?: (rexId: string, options?: RecommendationOpenOptions) => void;
+  onRexRequestPress?: (requestId: string) => void;
   isProfileActive?: boolean;
 };
 
@@ -33,6 +34,7 @@ const Header = ({
   onAddPress,
   onUserPress,
   onRexPress,
+  onRexRequestPress,
   isProfileActive,
 }: Props) => {
   const { width } = useWindowDimensions();
@@ -69,6 +71,7 @@ const Header = ({
           onProfilePress={onProfilePress}
           onUserPress={onUserPress}
           onRexPress={onRexPress}
+          onRexRequestPress={onRexRequestPress}
         />
       </View>
     </View>

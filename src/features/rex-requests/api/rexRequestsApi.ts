@@ -32,6 +32,8 @@ export async function getRexRequestsFeed(
     await Backend.rpc('get_rex_requests_feed', {
       result_limit: params.resultLimit,
       result_offset: params.resultOffset,
+      p_search: params.search ?? null,
+      circle_filter: params.circleFilter?.length ? params.circleFilter : null,
     }),
   );
   return Array.isArray(raw) ? (raw as RexRequestRow[]) : [];
@@ -94,10 +96,18 @@ export async function respondToRexRequest(requestId: string, rexId: string): Pro
   );
 }
 
+export async function untagRexFromRequest(requestId: string, rexId: string): Promise<void> {
+  unwrap(await Backend.rpc('untag_rex_from_request', { p_request_id: requestId, p_rex_id: rexId }));
+}
+
 export async function commentOnRexRequest(requestId: string, body: string): Promise<string> {
   return unwrap(
     await Backend.rpc('comment_on_rex_request', { p_request_id: requestId, p_body: body }),
   );
+}
+
+export async function deleteRexRequestComment(commentId: string): Promise<void> {
+  unwrap(await Backend.rpc('delete_rex_request_comment', { p_comment_id: commentId }));
 }
 
 export async function resolveRexRequest(requestId: string): Promise<void> {

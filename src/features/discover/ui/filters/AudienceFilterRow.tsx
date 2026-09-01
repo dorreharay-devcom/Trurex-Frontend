@@ -13,7 +13,7 @@ type Props = {
 const AudienceFilterRow = ({ label, selected, onPress }: Props) => (
   <Pressable
     onPress={onPress}
-    accessibilityRole="radio"
+    accessibilityRole="checkbox"
     accessibilityState={{ checked: selected }}
     accessibilityLabel={label}
     className="flex-row items-center justify-between py-3.5"

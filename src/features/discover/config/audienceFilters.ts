@@ -27,6 +27,9 @@ const AUDIENCE_FILTER_TO_CIRCLE_PARAM: Record<AudienceFilterId, string> = {
   [AUDIENCE_FILTER.private]: 'private',
 };
 
-export function audienceFilterToCircleParam(id: AudienceFilterId | null): string | null {
-  return id ? AUDIENCE_FILTER_TO_CIRCLE_PARAM[id] : null;
+export function audienceFiltersToCircleParams(
+  ids: readonly AudienceFilterId[] | null | undefined,
+): string[] | null {
+  if (!ids || ids.length === 0) return null;
+  return ids.map((id) => AUDIENCE_FILTER_TO_CIRCLE_PARAM[id]);
 }

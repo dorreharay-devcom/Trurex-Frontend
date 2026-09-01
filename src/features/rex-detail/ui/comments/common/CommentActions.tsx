@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, Text } from 'react-native';
-import { Heart, Reply, Trash2, type LucideIcon } from 'lucide-react-native';
+import { Flag, Heart, Reply, Trash2, type LucideIcon } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
 import { isWeb } from '~/shared/lib/ui/platform';
 import { cn } from '~/shared/lib/ui/styles';
@@ -117,6 +117,18 @@ export function DeleteAction({ onPress }: { onPress: () => void }) {
       icon={Trash2}
       label="Delete"
       accessibilityLabel="Delete comment"
+      webHoverClass="hover:text-destructive"
+      onPress={onPress}
+    />
+  );
+}
+
+export function ReportAction({ onPress }: { onPress: () => void }) {
+  return (
+    <TextAction
+      icon={Flag}
+      label="Report"
+      accessibilityLabel="Report comment"
       webHoverClass="hover:text-destructive"
       onPress={onPress}
     />
