@@ -4,7 +4,7 @@ import { DiscoveryApi } from '~/features/discover/api/DiscoveryApi';
 import { ALL_CATEGORIES } from '~/features/discover/types';
 import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 import {
-  audienceFilterToCircleParam,
+  audienceFiltersToCircleParams,
   type AudienceFilterId,
 } from '~/features/discover/config/audienceFilters';
 
@@ -15,14 +15,14 @@ const FEED_PAGE_SIZE = 20;
 type UseFeedArgs = {
   activeCategory: string;
   activeTag: string | null;
-  circleFilter?: AudienceFilterId | null;
+  circleFilter?: readonly AudienceFilterId[];
   enabled: boolean;
 };
 
-export function useFeed({ activeCategory, activeTag, circleFilter = null, enabled }: UseFeedArgs) {
+export function useFeed({ activeCategory, activeTag, circleFilter = [], enabled }: UseFeedArgs) {
   const categoryFilter = activeCategory !== ALL_CATEGORIES ? activeCategory : null;
   const tagFilters = activeTag ? [activeTag] : null;
-  const circleFilterParam = audienceFilterToCircleParam(circleFilter);
+  const circleFilterParam = audienceFiltersToCircleParams(circleFilter);
 
   const {
     data,
@@ -38,7 +38,7 @@ export function useFeed({ activeCategory, activeTag, circleFilter = null, enable
       FEED_QUERY_KEY,
       categoryFilter,
       [...(tagFilters ?? [])].sort().join(','),
-      circleFilterParam,
+      [...(circleFilterParam ?? [])].sort().join(','),
       FEED_PAGE_SIZE,
     ],
     queryFn: ({ pageParam }) =>

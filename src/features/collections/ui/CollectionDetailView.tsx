@@ -24,15 +24,15 @@ import { webContainerStyle } from '~/shared/lib/ui/styles';
 import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 import { buttonA11y } from '~/shared/lib/a11y';
 
-function EmptyCollection() {
+function EmptyCollection({ isMyCollection }: { isMyCollection: boolean }) {
   return (
     <View className="items-center py-12 gap-1 px-4">
       <Text className="text-3xl mb-1">📦</Text>
       <Text className="text-base font-semibold text-foreground text-center">
-        Your collection is ready
+        {isMyCollection ? 'Your collection is ready' : 'This collection is empty'}
       </Text>
       <Text className="text-sm text-muted-foreground text-center">
-        Start adding recommendations.
+        {isMyCollection ? 'Start adding recommendations.' : 'Check back later for updates.'}
       </Text>
     </View>
   );
@@ -139,7 +139,7 @@ function CollectionDetailView({
           ListHeaderComponent={
             <CollectionSummaryHeader detail={detail} onAddItem={() => onAddItem(collectionId)} />
           }
-          ListEmptyComponent={<EmptyCollection />}
+          ListEmptyComponent={<EmptyCollection isMyCollection={detail.is_my_collection} />}
           drawDistance={400}
           renderItem={({ item }) => (
             <CollectionRexCard

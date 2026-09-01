@@ -1,7 +1,7 @@
 export type DiscoverQueryParams = {
   category_filter?: string | null;
   tag_filters?: string[] | null;
-  circle_filter?: string | null;
+  circle_filter?: string[] | null;
   result_limit?: number;
   result_offset?: number;
 };

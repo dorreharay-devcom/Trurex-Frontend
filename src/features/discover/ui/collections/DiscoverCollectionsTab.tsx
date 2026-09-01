@@ -20,17 +20,26 @@ type Props = {
 function GridEmptyState({
   loading,
   isError,
+  hasSearch,
   gridContentWidth,
   onRetry,
 }: {
   loading: boolean;
   isError: boolean;
+  hasSearch: boolean;
   gridContentWidth: number;
   onRetry: () => void;
 }) {
   if (loading) return <ProfileCollectionsSkeleton windowWidth={gridContentWidth} />;
-  if (isError) return <QueryErrorState title="Couldn't load collections" onRetry={onRetry} />;
-  return <CollectionsFeedEmptyState />;
+  if (isError) {
+    return (
+      <QueryErrorState
+        title={hasSearch ? "Couldn't search" : "Couldn't load collections"}
+        onRetry={onRetry}
+      />
+    );
+  }
+  return <CollectionsFeedEmptyState hasSearch={hasSearch} />;
 }
 
 const DiscoverCollectionsTab = ({ onOpenCollection, headerSlot }: Props) => {
@@ -82,6 +91,7 @@ const DiscoverCollectionsTab = ({ onOpenCollection, headerSlot }: Props) => {
             <GridEmptyState
               loading={grid.feed.isLoading}
               isError={grid.feed.isError}
+              hasSearch={grid.searchQuery.trim().length > 0}
               gridContentWidth={grid.gridContentWidth}
               onRetry={grid.feed.refetch}
             />

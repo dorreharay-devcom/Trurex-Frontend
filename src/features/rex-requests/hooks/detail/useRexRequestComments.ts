@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   commentOnRexRequest,
+  deleteRexRequestComment,
   getRexRequestComments,
 } from '~/features/rex-requests/api/rexRequestsApi';
 import type { RexRequestCommentRow } from '~/features/rex-requests/api/types';
@@ -37,7 +38,13 @@ export function useRexRequestComments(requestId: string) {
     [requestId, refetch],
   );
 
-  return { comments, loading, loadError, refetch, addComment };
+  const deleteComment = useCallback(async (commentId: string) => {
+    if (!assertOnlineForMutation('Deleting')) return;
+    await deleteRexRequestComment(commentId);
+    setComments((prev) => prev.filter((c) => c.comment_id !== commentId));
+  }, []);
+
+  return { comments, loading, loadError, refetch, addComment, deleteComment };
 }
 
 export type RexRequestCommentsState = ReturnType<typeof useRexRequestComments>;

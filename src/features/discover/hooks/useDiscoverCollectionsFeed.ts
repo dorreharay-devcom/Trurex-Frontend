@@ -18,9 +18,14 @@ function nextCollectionsFeedOffset(
 
 type UseDiscoverCollectionsFeedArgs = {
   enabled: boolean;
+  searchQuery?: string;
 };
 
-export function useDiscoverCollectionsFeed({ enabled }: UseDiscoverCollectionsFeedArgs) {
+export function useDiscoverCollectionsFeed({
+  enabled,
+  searchQuery = '',
+}: UseDiscoverCollectionsFeedArgs) {
+  const trimmedSearchQuery = searchQuery.trim();
   const {
     data,
     isLoading,
@@ -31,11 +36,16 @@ export function useDiscoverCollectionsFeed({ enabled }: UseDiscoverCollectionsFe
     fetchNextPage,
     refetch: refetchQuery,
   } = useInfiniteQuery({
-    queryKey: [...REX_QUERY_KEYS.discoverCollectionsFeed, COLLECTIONS_FEED_PAGE_SIZE],
+    queryKey: [
+      ...REX_QUERY_KEYS.discoverCollectionsFeed,
+      COLLECTIONS_FEED_PAGE_SIZE,
+      trimmedSearchQuery.toLowerCase(),
+    ],
     queryFn: ({ pageParam }) =>
       DiscoveryApi.discoverCollectionsFeed({
         result_limit: COLLECTIONS_FEED_PAGE_SIZE,
         result_offset: pageParam,
+        search_query: trimmedSearchQuery || null,
       }),
     initialPageParam: 0,
     getNextPageParam: nextCollectionsFeedOffset,

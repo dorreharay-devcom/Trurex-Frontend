@@ -9,9 +9,15 @@ const REX_REQUESTS_FEED_PAGE_SIZE = 20;
 
 type UseRexRequestsFeedArgs = {
   enabled: boolean;
+  search?: string;
+  circleFilter?: readonly string[];
 };
 
-export function useRexRequestsFeed({ enabled }: UseRexRequestsFeedArgs) {
+export function useRexRequestsFeed({
+  enabled,
+  search = '',
+  circleFilter = [],
+}: UseRexRequestsFeedArgs) {
   const {
     data,
     isLoading,
@@ -22,9 +28,19 @@ export function useRexRequestsFeed({ enabled }: UseRexRequestsFeedArgs) {
     fetchNextPage,
     refetch: refetchQuery,
   } = useInfiniteQuery({
-    queryKey: [...REX_REQUEST_QUERY_KEYS.feed, REX_REQUESTS_FEED_PAGE_SIZE],
+    queryKey: [
+      ...REX_REQUEST_QUERY_KEYS.feed,
+      REX_REQUESTS_FEED_PAGE_SIZE,
+      search.trim().toLowerCase(),
+      [...circleFilter].sort().join(','),
+    ],
     queryFn: ({ pageParam }) =>
-      getRexRequestsFeed({ resultLimit: REX_REQUESTS_FEED_PAGE_SIZE, resultOffset: pageParam }),
+      getRexRequestsFeed({
+        resultLimit: REX_REQUESTS_FEED_PAGE_SIZE,
+        resultOffset: pageParam,
+        search: search.trim() || null,
+        circleFilter: circleFilter.length ? [...circleFilter] : null,
+      }),
     initialPageParam: 0,
     getNextPageParam: (lastPage: RexRequestRow[], allPages: RexRequestRow[][]) =>
       nextPageOffset(lastPage, allPages, REX_REQUESTS_FEED_PAGE_SIZE),

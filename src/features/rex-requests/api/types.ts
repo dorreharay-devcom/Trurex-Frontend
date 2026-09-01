@@ -40,6 +40,8 @@ export type CreateRexRequestParams = {
 export type GetRexRequestsFeedParams = {
   resultLimit: number;
   resultOffset: number;
+  search?: string | null;
+  circleFilter?: string[] | null;
 };
 
 export type RexRequestResponseRow = {

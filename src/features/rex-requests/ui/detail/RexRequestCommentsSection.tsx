@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { useAuth } from '~/features/auth/providers';
 import { useCommentComposer } from '~/features/rex-detail/hooks/comments/useCommentComposer';
+import { runCommentMutation } from '~/features/rex-detail/hooks/comments/useCommentActions';
 import CommentComposer from '~/features/rex-detail/ui/comments/common/CommentComposer';
 import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 import { Theme } from '~/shared/theme/Theme';
@@ -16,12 +17,20 @@ type Props = {
 
 function RexRequestCommentsSection({ requestId, onUserPress, onReportComment }: Props) {
   const { user } = useAuth();
-  const { comments, loading, loadError, refetch, addComment } = useRexRequestComments(requestId);
+  const { comments, loading, loadError, refetch, addComment, deleteComment } =
+    useRexRequestComments(requestId);
   const composer = useCommentComposer({
     rexId: requestId,
     addComment: (body) => addComment(body),
     autoFocus: false,
   });
+
+  const handleDelete = useCallback(
+    async (commentId: string) => {
+      await runCommentMutation('Delete failed', () => deleteComment(commentId));
+    },
+    [deleteComment],
+  );
 
   return (
     <View className="gap-4 pt-4">
@@ -44,6 +53,7 @@ function RexRequestCommentsSection({ requestId, onUserPress, onReportComment }: 
               currentUserId={user?.id}
               onUserPress={onUserPress}
               onReport={onReportComment}
+              onDelete={(commentId) => void handleDelete(commentId)}
             />
           ))}
         </View>
