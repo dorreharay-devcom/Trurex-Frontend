@@ -18,6 +18,7 @@ type Props = {
   onProfilePress: () => void;
   onUserPress?: (userId: string) => void;
   onRexPress?: (rexId: string, options?: RecommendationOpenOptions) => void;
+  onRexRequestPress?: (requestId: string) => void;
 };
 
 const HeaderActions = ({
@@ -29,6 +30,7 @@ const HeaderActions = ({
   onProfilePress,
   onUserPress,
   onRexPress,
+  onRexRequestPress,
 }: Props) => (
   <View
     className={cn(
@@ -53,7 +55,11 @@ const HeaderActions = ({
       </TouchableOpacity>
     ) : null}
 
-    <NotificationBell onUserPress={onUserPress} onRexPress={onRexPress} />
+    <NotificationBell
+      onUserPress={onUserPress}
+      onRexPress={onRexPress}
+      onRexRequestPress={onRexRequestPress}
+    />
 
     <TouchableOpacity
       onPress={onProfilePress}

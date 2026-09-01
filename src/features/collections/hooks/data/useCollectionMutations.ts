@@ -56,8 +56,12 @@ export const useSaveCollection = () => {
 
   return useMutation({
     mutationFn,
-    onSuccess: () => {
+    onSuccess: (_, collectionId) => {
       queryClient.invalidateQueries({ queryKey: [...COLLECTIONS_QUERY_KEYS.mySavedCollections] });
+      queryClient.invalidateQueries({
+        queryKey: [...COLLECTIONS_QUERY_KEYS.collectionDetail, collectionId],
+      });
+      queryClient.invalidateQueries({ queryKey: [...REX_QUERY_KEYS.discoverCollectionsFeed] });
       toastSuccess('Saved to your collections');
     },
     onError: mutationErrorToast('Failed to save collection'),
@@ -86,8 +90,12 @@ export const useUnsaveCollection = () => {
 
   return useMutation({
     mutationFn,
-    onSuccess: () => {
+    onSuccess: (_, collectionId) => {
       queryClient.invalidateQueries({ queryKey: [...COLLECTIONS_QUERY_KEYS.mySavedCollections] });
+      queryClient.invalidateQueries({
+        queryKey: [...COLLECTIONS_QUERY_KEYS.collectionDetail, collectionId],
+      });
+      queryClient.invalidateQueries({ queryKey: [...REX_QUERY_KEYS.discoverCollectionsFeed] });
     },
     onError: mutationErrorToast('Failed to unsave collection'),
   });

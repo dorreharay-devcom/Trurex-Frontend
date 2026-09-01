@@ -2,7 +2,7 @@ import type { Href } from 'expo-router';
 import { NOTIFICATION_TYPE } from '~/shared/config/notificationTypes';
 import { notificationOpenTarget } from '~/shared/lib/notification/helpers';
 import type { AppNotification } from '~/shared/types/appNotification';
-import { Routes, toRexRoute, toUserRoute } from '~/shared/config/routes';
+import { Routes, toRexRequestRoute, toRexRoute, toUserRoute } from '~/shared/config/routes';
 
 type PushData = Record<string, unknown> | null | undefined;
 
@@ -21,6 +21,7 @@ function toAppNotificationShape(data: PushData): AppNotification {
     created_at: '',
     rex_id: stringField(data, 'rex_id'),
     comment_id: stringField(data, 'comment_id'),
+    rex_request_id: stringField(data, 'rex_request_id'),
   };
 }
 
@@ -28,6 +29,7 @@ export function resolvePushNotificationHref(data: PushData): Href | null {
   const notification = toAppNotificationShape(data);
 
   const target = notificationOpenTarget(notification);
+  if (target?.kind === 'rexRequest') return toRexRequestRoute(target.requestId);
   if (target?.kind === 'rex') return toRexRoute(target.rexId, target.options);
   if (target?.kind === 'user') return toUserRoute(target.userId);
 

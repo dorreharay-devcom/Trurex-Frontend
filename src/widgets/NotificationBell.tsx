@@ -11,11 +11,12 @@ import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 type Props = {
   onUserPress?: (userId: string) => void;
   onRexPress?: (rexId: string, options?: RecommendationOpenOptions) => void;
+  onRexRequestPress?: (requestId: string) => void;
 };
 
-const NotificationBell = ({ onUserPress, onRexPress }: Props) => {
+const NotificationBell = ({ onUserPress, onRexPress, onRexRequestPress }: Props) => {
   const insets = useSafeAreaInsets();
-  const bell = useNotificationBell({ onUserPress, onRexPress });
+  const bell = useNotificationBell({ onUserPress, onRexPress, onRexRequestPress });
 
   return (
     <>

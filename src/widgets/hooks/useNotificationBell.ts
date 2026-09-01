@@ -18,9 +18,10 @@ const COMPACT_BP = 600;
 type Params = {
   onUserPress?: (userId: string) => void;
   onRexPress?: (rexId: string, options?: RecommendationOpenOptions) => void;
+  onRexRequestPress?: (requestId: string) => void;
 };
 
-export function useNotificationBell({ onUserPress, onRexPress }: Params) {
+export function useNotificationBell({ onUserPress, onRexPress, onRexRequestPress }: Params) {
   const { notifications, unreadCount, loading, isError, markAllAsRead, markOneAsRead, refetch } =
     useNotifications();
   const queryClient = useQueryClient();
@@ -74,6 +75,11 @@ export function useNotificationBell({ onUserPress, onRexPress }: Params) {
     (n: AppNotification) => {
       if (!n.is_read) markOneAsRead(n.id);
       const target = notificationOpenTarget(n);
+      if (target?.kind === 'rexRequest' && onRexRequestPress) {
+        close();
+        onRexRequestPress(target.requestId);
+        return;
+      }
       if (target?.kind === 'rex' && onRexPress) {
         close();
         onRexPress(target.rexId, target.options);
@@ -82,9 +88,15 @@ export function useNotificationBell({ onUserPress, onRexPress }: Params) {
       if (target?.kind === 'user' && onUserPress) {
         close();
         onUserPress(target.userId);
+        return;
+      }
+      if (__DEV__ && !target) {
+        console.warn(
+          `[notifications] no deep-link target for "${n.type}" notification ${n.id} — rex_id=${String(n.rex_id)} rex_request_id=${String(n.rex_request_id)} actor_id=${String(n.actor_id)}`,
+        );
       }
     },
-    [close, markOneAsRead, onRexPress, onUserPress],
+    [close, markOneAsRead, onRexPress, onUserPress, onRexRequestPress],
   );
 
   const openActor = useCallback(
