@@ -27,7 +27,8 @@ export type RexRequestRow = {
   created_at: string;
   response_count: number;
   comment_count: number;
-  circle_names: string[];
+  // Absent on rows returned by get_user_rex_requests (someone else's profile).
+  circle_names?: string[];
 };
 
 export type CreateRexRequestParams = {

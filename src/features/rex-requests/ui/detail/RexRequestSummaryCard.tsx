@@ -24,7 +24,7 @@ function RexRequestSummaryCard({
   resolving = false,
   onResolvePress,
 }: Props) {
-  const audience = [...(request.is_public ? ['Public'] : []), ...request.circle_names];
+  const audience = [...(request.is_public ? ['Public'] : []), ...(request.circle_names ?? [])];
 
   return (
     <View className="overflow-hidden rounded-2xl border border-border bg-card shadow-card">

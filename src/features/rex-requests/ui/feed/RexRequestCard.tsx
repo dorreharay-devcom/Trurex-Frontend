@@ -22,7 +22,7 @@ function Pill({ children }: { children: React.ReactNode }) {
 }
 
 const RexRequestCard = memo(function RexRequestCard({ request, onPress }: Props) {
-  const audience = [...(request.is_public ? ['Public'] : []), ...request.circle_names];
+  const audience = [...(request.is_public ? ['Public'] : []), ...(request.circle_names ?? [])];
   const hasRequesterInfo = Boolean(request.requester_display_name);
 
   return (
