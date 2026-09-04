@@ -44,9 +44,10 @@ function ConfirmStep({ flow }: Props) {
     [apiCircles],
   );
 
-  const categoryTile = flow.category.selectedRow
-    ? categoryRowToPickerTile(flow.category.selectedRow)
-    : null;
+  const categoryTiles = useMemo(
+    () => flow.category.selectedRows.map(categoryRowToPickerTile),
+    [flow.category.selectedRows],
+  );
 
   const sharingLabel = useMemo(() => {
     if (flow.circles.isPublic) return 'Public';
@@ -78,8 +79,7 @@ function ConfirmStep({ flow }: Props) {
 
         <ConfirmPreviewCard
           author={author}
-          categoryEmoji={categoryTile?.emoji ?? ''}
-          categoryLabel={categoryTile?.label ?? 'Category'}
+          categories={categoryTiles}
           lookingForText={flow.details.lookingForText}
           locationText={flow.details.locationQuery || null}
           needByLabel={flow.needByNote.needBy ? needByLabelFor(flow.needByNote.needBy) : '—'}

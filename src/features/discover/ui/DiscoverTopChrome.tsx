@@ -11,7 +11,7 @@ type Props = {
   showBrowse: boolean;
   showTrending?: boolean;
   categories: CategoriesState;
-  activeCategory: string;
+  activeCategory: readonly string[];
   activeTag: string | null;
   onToggleCategory: (code: string) => void;
   onToggleTag: (slug: string) => void;

@@ -41,10 +41,15 @@ export function useCreateRexRequestWizard(editRequestId?: string | null) {
   const [locationLng, setLocationLng] = useState<number | null>(null);
 
   const { data: categoryRows } = useActiveCategories(true);
-  const [selectedCategoryCode, setSelectedCategoryCode] = useState<string | null>(null);
-  const selectedCategoryRow = useMemo(
-    () => categoryRows?.find((row) => row.code === selectedCategoryCode) ?? null,
-    [categoryRows, selectedCategoryCode],
+  const [selectedCategoryCodes, setSelectedCategoryCodes] = useState<string[]>([]);
+  const toggleCategoryCode = (code: string) => {
+    setSelectedCategoryCodes((prev) =>
+      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code],
+    );
+  };
+  const selectedCategoryRows = useMemo(
+    () => categoryRows?.filter((row) => selectedCategoryCodes.includes(row.code)) ?? [],
+    [categoryRows, selectedCategoryCodes],
   );
 
   const [needBy, setNeedBy] = useState<NeedBy | null>(null);
@@ -76,7 +81,7 @@ export function useCreateRexRequestWizard(editRequestId?: string | null) {
         setLocationQueryRaw(row.location_text ?? '');
         setLocationLat(row.location_lat);
         setLocationLng(row.location_lng);
-        setSelectedCategoryCode(row.category_code);
+        setSelectedCategoryCodes(row.categories.map((c) => c.code));
         setNeedBy(row.need_by);
         setNote(row.note ?? '');
         const audience = [...(row.is_public ? ['Public'] : []), ...row.circle_names];
@@ -98,7 +103,7 @@ export function useCreateRexRequestWizard(editRequestId?: string | null) {
       case 'details':
         return lookingForText.trim().length > 0;
       case 'category':
-        return selectedCategoryRow != null;
+        return selectedCategoryRows.length > 0;
       case 'needBy':
         return needBy != null;
       case 'circles':
@@ -106,7 +111,7 @@ export function useCreateRexRequestWizard(editRequestId?: string | null) {
       case 'confirm':
         return true;
     }
-  }, [stepId, lookingForText, selectedCategoryRow, needBy, ringSelection.selectedCircleIds]);
+  }, [stepId, lookingForText, selectedCategoryRows, needBy, ringSelection.selectedCircleIds]);
 
   const isFirstStep = stepIndex === 0;
   const isLastStep = stepIndex === REX_REQUEST_STEP_ORDER.length - 1;
@@ -143,17 +148,18 @@ export function useCreateRexRequestWizard(editRequestId?: string | null) {
       toastError('Sign in required', 'Please sign in to post a Rex Request.');
       return false;
     }
-    if (!selectedCategoryRow || !needBy) return false;
+    if (selectedCategoryRows.length === 0 || !needBy) return false;
     if (!assertOnlineForMutation(isEditMode ? 'Saving your Rex Request' : 'Posting a Rex Request'))
       return false;
 
     setSubmitting(true);
     try {
       const circleIds = isPublic ? [] : Array.from(ringSelection.selectedCircleIds);
+      const categoryIds = selectedCategoryRows.map((row) => row.id);
       if (isEditMode && editRequestId) {
         await editRexRequest({
           requestId: editRequestId,
-          categoryId: selectedCategoryRow.id,
+          categoryIds,
           lookingForText: lookingForText.trim(),
           needBy,
           circleIds,
@@ -165,7 +171,7 @@ export function useCreateRexRequestWizard(editRequestId?: string | null) {
         });
       } else {
         await createRexRequest({
-          categoryId: selectedCategoryRow.id,
+          categoryIds,
           lookingForText: lookingForText.trim(),
           needBy,
           circleIds,
@@ -213,9 +219,9 @@ export function useCreateRexRequestWizard(editRequestId?: string | null) {
     },
     category: {
       rows: categoryRows,
-      selectedCode: selectedCategoryCode,
-      setSelectedCode: setSelectedCategoryCode,
-      selectedRow: selectedCategoryRow,
+      selectedCodes: selectedCategoryCodes,
+      toggleCode: toggleCategoryCode,
+      selectedRows: selectedCategoryRows,
     },
     needByNote: { needBy, setNeedBy, note, setNote },
     circles: {

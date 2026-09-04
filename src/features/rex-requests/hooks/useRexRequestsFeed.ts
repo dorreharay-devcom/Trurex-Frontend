@@ -11,12 +11,14 @@ type UseRexRequestsFeedArgs = {
   enabled: boolean;
   search?: string;
   circleFilter?: readonly string[];
+  categoryIds?: readonly string[];
 };
 
 export function useRexRequestsFeed({
   enabled,
   search = '',
   circleFilter = [],
+  categoryIds = [],
 }: UseRexRequestsFeedArgs) {
   const {
     data,
@@ -33,6 +35,7 @@ export function useRexRequestsFeed({
       REX_REQUESTS_FEED_PAGE_SIZE,
       search.trim().toLowerCase(),
       [...circleFilter].sort().join(','),
+      [...categoryIds].sort().join(','),
     ],
     queryFn: ({ pageParam }) =>
       getRexRequestsFeed({
@@ -40,6 +43,7 @@ export function useRexRequestsFeed({
         resultOffset: pageParam,
         search: search.trim() || null,
         circleFilter: circleFilter.length ? [...circleFilter] : null,
+        categoryIds: categoryIds.length ? [...categoryIds] : null,
       }),
     initialPageParam: 0,
     getNextPageParam: (lastPage: RexRequestRow[], allPages: RexRequestRow[][]) =>

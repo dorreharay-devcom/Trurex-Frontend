@@ -14,7 +14,7 @@ function gridColumnCount(screenWidth: number): number {
 
 type CategoryGridProps = {
   cats: Category[];
-  activeCategory: string;
+  activeCategory: readonly string[];
   pending: boolean;
   isPinned: (cat: Category) => boolean;
   isTogglingPin: boolean;
@@ -45,7 +45,7 @@ const CategoryGrid = ({
         <CategoryGridItem
           key={cat.id}
           cat={cat}
-          isActive={activeCategory === cat.code}
+          isActive={activeCategory.includes(cat.code)}
           pinned={isPinned(cat)}
           pinDisabled={!cat.serverId || isTogglingPin}
           itemPct={itemPct}

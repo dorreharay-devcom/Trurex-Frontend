@@ -10,7 +10,7 @@ type AllCategoriesSectionProps = {
   allCats: Category[];
   remainingCats: Category[];
   hasPinned: boolean;
-  activeCategory: string;
+  activeCategory: readonly string[];
   categoriesPending: boolean;
   isPinned: (cat: Category) => boolean;
   isTogglingPin: boolean;
@@ -35,13 +35,13 @@ const AllCategoriesSection = ({
     return null;
   }
 
-  const showGrid = !hasPinned || showAll;
+  const showGrid = showAll;
 
   return (
     <View className="mb-8 w-full">
       <View className="flex-row items-center justify-between mb-3">
-        <Text className="text-sm font-display font-semibold text-foreground">All Categories</Text>
-        {!categoriesPending && hasPinned && (
+        <Text className="text-sm font-display font-semibold text-foreground">Categories</Text>
+        {!categoriesPending && (
           <ShowAllToggle
             showAll={showAll}
             total={allCats.length}
@@ -68,7 +68,7 @@ const AllCategoriesSection = ({
         />
       )}
 
-      {!hasPinned && !categoriesPending && <PinHint />}
+      {showGrid && !hasPinned && !categoriesPending && <PinHint />}
     </View>
   );
 };

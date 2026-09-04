@@ -7,7 +7,7 @@ import type { Category } from '~/features/discover/types';
 
 type PinnedCategoriesRowProps = {
   cats: Category[];
-  activeCategory: string;
+  activeCategory: readonly string[];
   onSelectCategory: (code: string) => void;
   onUnpin: (serverId: string) => void;
 };
@@ -49,7 +49,7 @@ const PinnedCategoriesRow = ({
             <PinnedCategoryPill
               key={cat.id}
               cat={cat}
-              isActive={activeCategory === cat.code && !editing}
+              isActive={activeCategory.includes(cat.code) && !editing}
               editing={editing}
               onPress={() => handlePress(cat)}
             />

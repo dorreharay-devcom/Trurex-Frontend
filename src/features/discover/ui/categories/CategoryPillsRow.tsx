@@ -4,7 +4,7 @@ import type { Category } from '~/features/discover/types';
 
 type CategoryPillsRowProps = {
   cats: Category[];
-  activeCategory: string;
+  activeCategory: readonly string[];
   onSelectCategory: (code: string) => void;
 };
 
@@ -13,7 +13,7 @@ const CategoryPillsRow = ({ cats, activeCategory, onSelectCategory }: CategoryPi
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
       <View className="flex-row flex-nowrap gap-2 pb-1">
         {cats.map((cat) => {
-          const isActive = activeCategory === cat.code;
+          const isActive = activeCategory.includes(cat.code);
           return (
             <TouchableOpacity
               key={cat.id}

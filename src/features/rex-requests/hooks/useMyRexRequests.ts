@@ -26,10 +26,7 @@ export function useMyRexRequests(userId: string | undefined, isOwnProfile: boole
     enabled: !!userId,
   });
 
-  const rows = useMemo(
-    () => (query.data?.pages.flat() ?? []).filter((row) => row.status !== 'resolved'),
-    [query.data?.pages],
-  );
+  const rows = useMemo(() => query.data?.pages.flat() ?? [], [query.data?.pages]);
 
   const fetchNextPage = useCallback(() => {
     if (!query.hasNextPage || query.isFetchingNextPage) return;

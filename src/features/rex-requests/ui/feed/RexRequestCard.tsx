@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { Clock, MapPin, MessageCircle, Tag } from 'lucide-react-native';
+import { Check, Clock, MapPin, MessageCircle, Tag } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
 import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 import { formatCompactRelativeTime } from '~/shared/lib/data/date';
@@ -66,9 +66,13 @@ const RexRequestCard = memo(function RexRequestCard({ request, onPress }: Props)
             </View>
           </View>
         )}
-        <Pill>
-          {request.category_icon} {request.category_name}
-        </Pill>
+        <View className="flex-row flex-wrap justify-end gap-1">
+          {request.categories.map((category) => (
+            <Pill key={category.id}>
+              {category.icon} {category.name}
+            </Pill>
+          ))}
+        </View>
       </View>
 
       <Text className="text-sm text-foreground" numberOfLines={2}>
@@ -85,6 +89,12 @@ const RexRequestCard = memo(function RexRequestCard({ request, onPress }: Props)
       ) : null}
 
       <View className="mt-3 flex-row flex-wrap items-center gap-1.5">
+        {request.status === 'resolved' ? (
+          <View className="flex-row items-center gap-1 rounded-full bg-primary/25 px-2 py-0.5">
+            <Check size={11} color={Theme.colors.foreground} />
+            <Text className="text-xs font-semibold text-foreground">Resolved</Text>
+          </View>
+        ) : null}
         <Pill>Need by: {needByLabel(request.need_by)}</Pill>
         {audience.map((title) => (
           <Pill key={title}>{title}</Pill>

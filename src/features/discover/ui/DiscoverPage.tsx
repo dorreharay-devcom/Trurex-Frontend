@@ -16,6 +16,7 @@ import {
 import { useCategories } from '~/features/discover/hooks/useCategories';
 import { useCategoryTagFilter } from '~/features/discover/hooks/useCategoryTagFilter';
 import { useFeed } from '~/features/discover/hooks/useFeed';
+import { ALL_CATEGORIES } from '~/features/discover/types';
 import { useSaveToCollection } from '~/features/discover/hooks/useSaveToCollection';
 import { useScrollTop } from '~/features/discover/hooks/useScrollTop';
 import { useSearch } from '~/features/discover/hooks/useSearch';
@@ -96,15 +97,29 @@ const DiscoverPage = ({
   const [activeTab, setActiveTab] = useState<DiscoverTab>(DISCOVER_TAB.latestRex);
   const [latestRexSearch, setLatestRexSearch] = useState('');
   const [circleFilter, setCircleFilter] = useState<AudienceFilterId[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
+  const toggleCategory = useCallback((code: string) => {
+    setCategoryFilter((prev) =>
+      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code],
+    );
+  }, []);
   const debouncedLatestRexSearch = useDebouncedValue(latestRexSearch, DEFAULT_SEARCH_DEBOUNCE_MS);
-  const rexRequests = useRexRequestsFeedList({ enabled: activeTab === DISCOVER_TAB.rexRequest });
-
-  const { activeCategory, activeTag, toggleCategory, toggleTag } = useCategoryTagFilter();
-
   const categories = useCategories();
+  const rexRequests = useRexRequestsFeedList({
+    enabled: activeTab === DISCOVER_TAB.rexRequest,
+    categories,
+  });
+
+  const { activeTag, toggleTag } = useCategoryTagFilter();
+
   const filters = useSearchFilters();
-  const search = useSearch({ searchQuery: debouncedLatestRexSearch, activeCategory, filters });
-  const feed = useFeed({ activeCategory, activeTag, circleFilter, enabled: !search.hasSearch });
+  const searchCategoryId = categoryFilter.length === 1 ? categoryFilter[0]! : ALL_CATEGORIES;
+  const search = useSearch({
+    searchQuery: debouncedLatestRexSearch,
+    activeCategory: searchCategoryId,
+    filters,
+  });
+  const feed = useFeed({ categoryFilter, activeTag, circleFilter, enabled: !search.hasSearch });
   const save = useSaveToCollection();
 
   const source = search.hasSearch ? search : feed;
@@ -146,7 +161,7 @@ const DiscoverPage = ({
           onChangeTab={setActiveTab}
           showBrowse={!search.hasSearch}
           categories={categories}
-          activeCategory={activeCategory}
+          activeCategory={categoryFilter}
           activeTag={activeTag}
           onToggleCategory={toggleCategory}
           onToggleTag={toggleTag}
@@ -177,7 +192,7 @@ const DiscoverPage = ({
       activeTab,
       search.hasSearch,
       categories,
-      activeCategory,
+      categoryFilter,
       activeTag,
       toggleCategory,
       toggleTag,
@@ -228,9 +243,9 @@ const DiscoverPage = ({
           showBrowse
           showTrending={false}
           categories={categories}
-          activeCategory={activeCategory}
+          activeCategory={rexRequests.categoryFilter}
           activeTag={activeTag}
-          onToggleCategory={toggleCategory}
+          onToggleCategory={rexRequests.toggleCategory}
           onToggleTag={toggleTag}
         />
         <View className="px-4 pt-6">
@@ -253,10 +268,10 @@ const DiscoverPage = ({
     [
       activeTab,
       categories,
-      activeCategory,
       activeTag,
-      toggleCategory,
       toggleTag,
+      rexRequests.categoryFilter,
+      rexRequests.toggleCategory,
       rexRequests.searchQuery,
       rexRequests.setSearchQuery,
       rexRequests.circleFilter,
@@ -350,7 +365,7 @@ const DiscoverPage = ({
               onChangeTab={setActiveTab}
               showBrowse={false}
               categories={categories}
-              activeCategory={activeCategory}
+              activeCategory={categoryFilter}
               activeTag={activeTag}
               onToggleCategory={toggleCategory}
               onToggleTag={toggleTag}
