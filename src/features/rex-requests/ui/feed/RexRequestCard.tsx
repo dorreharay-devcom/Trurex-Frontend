@@ -1,10 +1,11 @@
 import React, { memo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { Check, Clock, MapPin, MessageCircle, Tag } from 'lucide-react-native';
+import { Clock, MapPin, MessageCircle, Tag } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
 import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 import { formatCompactRelativeTime } from '~/shared/lib/data/date';
 import { needByLabel } from '~/features/rex-requests/config/needBy';
+import { cn } from '~/shared/lib/ui/styles';
 import type { RexRequestRow } from '~/features/rex-requests/api/types';
 
 type Props = {
@@ -29,7 +30,10 @@ const RexRequestCard = memo(function RexRequestCard({ request, onPress }: Props)
       onPress={onPress}
       activeOpacity={0.85}
       disabled={!onPress}
-      className="rounded-xl border border-border bg-card p-4"
+      className={cn(
+        'rounded-xl border border-border bg-card p-4',
+        request.status === 'resolved' && 'opacity-60',
+      )}
     >
       <View className="mb-3 flex-row items-center gap-2.5">
         {hasRequesterInfo ? (
@@ -45,6 +49,9 @@ const RexRequestCard = memo(function RexRequestCard({ request, onPress }: Props)
               </Text>
               <Text className="text-xs text-muted-foreground" numberOfLines={1}>
                 @{request.requester_handle} · {formatCompactRelativeTime(request.created_at)}
+                {request.status === 'resolved' ? (
+                  <Text className="font-semibold text-foreground"> · Resolved</Text>
+                ) : null}
               </Text>
             </View>
           </>
@@ -62,17 +69,21 @@ const RexRequestCard = memo(function RexRequestCard({ request, onPress }: Props)
               </Text>
               <Text className="text-xs text-muted-foreground" numberOfLines={1}>
                 Posted {formatCompactRelativeTime(request.created_at)} ago
+                {request.status === 'resolved' ? (
+                  <Text className="font-semibold text-foreground"> · Resolved</Text>
+                ) : null}
               </Text>
             </View>
           </View>
         )}
-        <View className="flex-row flex-wrap justify-end gap-1">
-          {request.categories.map((category) => (
-            <Pill key={category.id}>
-              {category.icon} {category.name}
+        {request.categories.length > 0 ? (
+          <View className="flex-row items-center gap-1">
+            <Pill>
+              {request.categories[0]!.icon} {request.categories[0]!.name}
             </Pill>
-          ))}
-        </View>
+            {request.categories.length > 1 ? <Pill>+{request.categories.length - 1}</Pill> : null}
+          </View>
+        ) : null}
       </View>
 
       <Text className="text-sm text-foreground" numberOfLines={2}>
@@ -89,12 +100,6 @@ const RexRequestCard = memo(function RexRequestCard({ request, onPress }: Props)
       ) : null}
 
       <View className="mt-3 flex-row flex-wrap items-center gap-1.5">
-        {request.status === 'resolved' ? (
-          <View className="flex-row items-center gap-1 rounded-full bg-primary/25 px-2 py-0.5">
-            <Check size={11} color={Theme.colors.foreground} />
-            <Text className="text-xs font-semibold text-foreground">Resolved</Text>
-          </View>
-        ) : null}
         <Pill>Need by: {needByLabel(request.need_by)}</Pill>
         {audience.map((title) => (
           <Pill key={title}>{title}</Pill>

@@ -25,17 +25,19 @@ function ConfirmPreviewCard({
 }: Props) {
   return (
     <View className="overflow-hidden rounded-2xl border border-border bg-card shadow-card">
-      <View className="flex-row items-center gap-3 p-4 pb-3">
-        <View className="h-9 w-9 items-center justify-center rounded-full border-2 border-border bg-sand">
-          <Text className="text-xs font-semibold text-sand-dark">{author.initials}</Text>
+      <View className="gap-3 p-4 pb-3">
+        <View className="flex-row items-center gap-3">
+          <View className="h-9 w-9 items-center justify-center rounded-full border-2 border-border bg-sand">
+            <Text className="text-xs font-semibold text-sand-dark">{author.initials}</Text>
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="text-sm font-semibold text-foreground">{author.name}</Text>
+            <Text className="mt-0.5 text-xs text-muted-foreground">
+              {author.handle ? `${author.handle} · ` : ''}just now
+            </Text>
+          </View>
         </View>
-        <View className="min-w-0 flex-1">
-          <Text className="text-sm font-semibold text-foreground">{author.name}</Text>
-          <Text className="mt-0.5 text-xs text-muted-foreground">
-            {author.handle ? `${author.handle} · ` : ''}just now
-          </Text>
-        </View>
-        <View className="max-w-[52%] shrink-0 flex-row flex-wrap justify-end gap-1">
+        <View className="flex-row flex-wrap gap-1">
           {categories.map((category, index) => (
             <View
               key={`${category.label}-${index}`}
