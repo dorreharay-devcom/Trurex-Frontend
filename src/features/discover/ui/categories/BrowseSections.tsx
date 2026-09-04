@@ -6,7 +6,7 @@ import TrendingTags from '~/features/discover/ui/feed/TrendingTags';
 
 type Props = {
   categories: CategoriesState;
-  activeCategory: string;
+  activeCategory: readonly string[];
   activeTag: string | null;
   onToggleCategory: (code: string) => void;
   onToggleTag: (slug: string) => void;

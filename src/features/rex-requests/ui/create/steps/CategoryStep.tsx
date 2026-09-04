@@ -1,5 +1,5 @@
 import React from 'react';
-import Category from '~/features/rex-create/ui/steps/category/Category';
+import MultiCategoryGrid from '~/features/rex-requests/ui/create/steps/common/MultiCategoryGrid';
 import type { CreateRexRequestFlow } from '~/features/rex-requests/hooks/create/useCreateRexRequestWizard';
 
 type Props = {
@@ -8,10 +8,9 @@ type Props = {
 
 function CategoryStep({ flow }: Props) {
   return (
-    <Category
-      selectedCategoryId={flow.category.selectedCode}
-      onSelectCategory={flow.category.setSelectedCode}
-      autoSuggestedCategoryId={null}
+    <MultiCategoryGrid
+      selectedCategoryIds={flow.category.selectedCodes}
+      onToggleCategory={flow.category.toggleCode}
     />
   );
 }

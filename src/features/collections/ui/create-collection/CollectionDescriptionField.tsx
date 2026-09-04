@@ -1,11 +1,8 @@
 import React from 'react';
-import { TextInput } from 'react-native';
-import FieldWithCounter from '~/features/collections/ui/common/FieldWithCounter';
+import { Text, TextInput, View } from 'react-native';
 import { Theme, textFieldCaretStyle, textFieldMultilineStyle } from '~/shared/theme/Theme';
 import { INPUT_FOCUS_BORDER_CLASS } from '~/shared/config/inputFocus';
 import { webNoOutline, cn } from '~/shared/lib/ui/styles';
-
-const DESCRIPTION_MAX_LENGTH = 200;
 
 type Props = {
   value: string;
@@ -14,14 +11,13 @@ type Props = {
 
 function CollectionDescriptionField({ value, onChange }: Props) {
   return (
-    <FieldWithCounter
-      label="Description (optional)"
-      count={value.length}
-      max={DESCRIPTION_MAX_LENGTH}
-    >
+    <View>
+      <Text className="text-xs font-semibold text-muted-foreground mb-1.5">
+        Description (optional)
+      </Text>
       <TextInput
         value={value}
-        onChangeText={(v) => onChange(v.slice(0, DESCRIPTION_MAX_LENGTH))}
+        onChangeText={onChange}
         placeholder="What's this list about? Who's it for?"
         placeholderTextColor={Theme.colors.secondaryText}
         multiline
@@ -35,7 +31,7 @@ function CollectionDescriptionField({ value, onChange }: Props) {
           INPUT_FOCUS_BORDER_CLASS,
         )}
       />
-    </FieldWithCounter>
+    </View>
   );
 }
 

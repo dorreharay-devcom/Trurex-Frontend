@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { DiscoveryApi } from '~/features/discover/api/DiscoveryApi';
-import { ALL_CATEGORIES } from '~/features/discover/types';
 import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 import {
   audienceFiltersToCircleParams,
@@ -13,14 +12,18 @@ export const FEED_QUERY_KEY = REX_QUERY_KEYS.discoverFeed[0];
 const FEED_PAGE_SIZE = 20;
 
 type UseFeedArgs = {
-  activeCategory: string;
+  categoryFilter?: readonly string[];
   activeTag: string | null;
   circleFilter?: readonly AudienceFilterId[];
   enabled: boolean;
 };
 
-export function useFeed({ activeCategory, activeTag, circleFilter = [], enabled }: UseFeedArgs) {
-  const categoryFilter = activeCategory !== ALL_CATEGORIES ? activeCategory : null;
+export function useFeed({
+  categoryFilter = [],
+  activeTag,
+  circleFilter = [],
+  enabled,
+}: UseFeedArgs) {
   const tagFilters = activeTag ? [activeTag] : null;
   const circleFilterParam = audienceFiltersToCircleParams(circleFilter);
 
@@ -36,14 +39,14 @@ export function useFeed({ activeCategory, activeTag, circleFilter = [], enabled 
   } = useInfiniteQuery({
     queryKey: [
       FEED_QUERY_KEY,
-      categoryFilter,
+      [...categoryFilter].sort().join(','),
       [...(tagFilters ?? [])].sort().join(','),
       [...(circleFilterParam ?? [])].sort().join(','),
       FEED_PAGE_SIZE,
     ],
     queryFn: ({ pageParam }) =>
       DiscoveryApi.getDiscoverRecommendations({
-        category_filter: categoryFilter,
+        category_filter: categoryFilter.length ? [...categoryFilter] : null,
         tag_filters: tagFilters,
         circle_filter: circleFilterParam,
         result_limit: FEED_PAGE_SIZE,

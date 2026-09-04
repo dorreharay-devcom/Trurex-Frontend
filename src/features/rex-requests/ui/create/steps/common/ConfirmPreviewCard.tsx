@@ -6,8 +6,7 @@ import type { ConfirmAuthorPreview } from '~/features/rex-create/lib/confirmPrev
 
 type Props = {
   author: ConfirmAuthorPreview;
-  categoryEmoji: string;
-  categoryLabel: string;
+  categories: { emoji: string; label: string }[];
   lookingForText: string;
   locationText: string | null;
   needByLabel: string;
@@ -17,8 +16,7 @@ type Props = {
 
 function ConfirmPreviewCard({
   author,
-  categoryEmoji,
-  categoryLabel,
+  categories,
   lookingForText,
   locationText,
   needByLabel,
@@ -37,10 +35,17 @@ function ConfirmPreviewCard({
             {author.handle ? `${author.handle} · ` : ''}just now
           </Text>
         </View>
-        <View className="max-w-[52%] shrink-0 rounded-full border border-border bg-muted/50 px-2.5 py-1">
-          <Text className="text-xs font-medium text-black" numberOfLines={2}>
-            {categoryEmoji} {categoryLabel}
-          </Text>
+        <View className="max-w-[52%] shrink-0 flex-row flex-wrap justify-end gap-1">
+          {categories.map((category, index) => (
+            <View
+              key={`${category.label}-${index}`}
+              className="rounded-full border border-border bg-muted/50 px-2.5 py-1"
+            >
+              <Text className="text-xs font-medium text-black" numberOfLines={2}>
+                {category.emoji} {category.label}
+              </Text>
+            </View>
+          ))}
         </View>
       </View>
 

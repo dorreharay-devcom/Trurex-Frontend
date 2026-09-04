@@ -12,7 +12,7 @@ import type {
 export async function createRexRequest(params: CreateRexRequestParams): Promise<string> {
   return unwrap(
     await Backend.rpc('create_rex_request', {
-      p_category_id: params.categoryId,
+      p_category_ids: params.categoryIds,
       p_looking_for_text: params.lookingForText,
       p_need_by: params.needBy,
       p_circle_ids: params.circleIds,
@@ -34,6 +34,7 @@ export async function getRexRequestsFeed(
       result_offset: params.resultOffset,
       p_search: params.search ?? null,
       circle_filter: params.circleFilter?.length ? params.circleFilter : null,
+      p_category_ids: params.categoryIds?.length ? params.categoryIds : null,
     }),
   );
   return Array.isArray(raw) ? (raw as RexRequestRow[]) : [];
@@ -122,7 +123,7 @@ export async function editRexRequest(params: EditRexRequestParams): Promise<void
   unwrap(
     await Backend.rpc('edit_rex_request', {
       p_request_id: params.requestId,
-      ...(params.categoryId !== undefined ? { p_category_id: params.categoryId } : {}),
+      ...(params.categoryIds !== undefined ? { p_category_ids: params.categoryIds } : {}),
       ...(params.lookingForText !== undefined ? { p_looking_for_text: params.lookingForText } : {}),
       ...(params.needBy !== undefined ? { p_need_by: params.needBy } : {}),
       ...(params.circleIds !== undefined ? { p_circle_ids: params.circleIds } : {}),

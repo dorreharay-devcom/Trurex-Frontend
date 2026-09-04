@@ -83,11 +83,16 @@ function RexRequestSummaryCard({
       </View>
 
       <View className="flex-row flex-wrap items-center gap-2 px-4 pb-2">
-        <View className="rounded-full border border-border bg-muted/50 px-2.5 py-1">
-          <Text className="text-xs font-medium text-black">
-            {request.category_icon} {request.category_name}
-          </Text>
-        </View>
+        {request.categories.map((category) => (
+          <View
+            key={category.id}
+            className="rounded-full border border-border bg-muted/50 px-2.5 py-1"
+          >
+            <Text className="text-xs font-medium text-black">
+              {category.icon} {category.name}
+            </Text>
+          </View>
+        ))}
       </View>
 
       <View className="px-4 pb-2">

@@ -1,5 +1,13 @@
 import type { NeedBy } from '~/features/rex-requests/config/needBy';
 
+export type CategoryItem = {
+  id: string;
+  code: string;
+  name: string;
+  icon: string;
+  color: string;
+};
+
 export type RexRequestRow = {
   id: string;
   requester_id: string;
@@ -7,10 +15,7 @@ export type RexRequestRow = {
   requester_display_name?: string;
   requester_handle?: string;
   requester_avatar_url?: string | null;
-  category_code: string;
-  category_name: string;
-  category_icon: string;
-  category_color: string;
+  categories: CategoryItem[];
   looking_for_text: string;
   location_text: string | null;
   location_lat: number | null;
@@ -26,7 +31,7 @@ export type RexRequestRow = {
 };
 
 export type CreateRexRequestParams = {
-  categoryId: string;
+  categoryIds: string[];
   lookingForText: string;
   needBy: NeedBy;
   circleIds: string[];
@@ -42,6 +47,7 @@ export type GetRexRequestsFeedParams = {
   resultOffset: number;
   search?: string | null;
   circleFilter?: string[] | null;
+  categoryIds?: string[] | null;
 };
 
 export type RexRequestResponseRow = {
@@ -73,7 +79,7 @@ export type RexRequestCommentRow = {
 
 export type EditRexRequestParams = {
   requestId: string;
-  categoryId?: string;
+  categoryIds?: string[];
   lookingForText?: string;
   needBy?: NeedBy;
   circleIds?: string[];
