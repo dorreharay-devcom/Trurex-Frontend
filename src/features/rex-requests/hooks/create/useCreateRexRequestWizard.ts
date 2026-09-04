@@ -54,7 +54,6 @@ export function useCreateRexRequestWizard(editRequestId?: string | null) {
 
   const [needBy, setNeedBy] = useState<NeedBy | null>(null);
   const [note, setNote] = useState('');
-  const [existingAudienceLabel, setExistingAudienceLabel] = useState<string | null>(null);
 
   const ringSelection = useCirclesRingSelection();
   const isPublic =
@@ -84,8 +83,6 @@ export function useCreateRexRequestWizard(editRequestId?: string | null) {
         setSelectedCategoryCodes(row.categories.map((c) => c.code));
         setNeedBy(row.need_by);
         setNote(row.note ?? '');
-        const audience = [...(row.is_public ? ['Public'] : []), ...row.circle_names];
-        setExistingAudienceLabel(audience.length ? audience.join(', ') : 'No one yet');
       })
       .catch(() => {
         if (!cancelled) setInitialLoadError(true);
@@ -230,7 +227,6 @@ export function useCreateRexRequestWizard(editRequestId?: string | null) {
       toggleCircleId: ringSelection.toggleCircleId,
       ensureDefaultCircleSelectionFromApiOrder:
         ringSelection.ensureDefaultCircleSelectionFromApiOrder,
-      existingAudienceLabel,
     },
   };
 }

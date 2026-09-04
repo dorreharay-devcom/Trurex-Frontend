@@ -79,7 +79,9 @@ function RexRequestDetailModal({
           isOwner={isOwner}
           showReport={showReport}
           onBack={handleClose}
-          onEdit={isOwner ? () => onEditRequest?.(request.id) : undefined}
+          onEdit={
+            isOwner && request.status === 'open' ? () => onEditRequest?.(request.id) : undefined
+          }
           onDelete={del.openConfirm}
           onReport={report.openReport}
         />
@@ -108,15 +110,17 @@ function RexRequestDetailModal({
 
           {activeTab === 'responses' ? (
             <View className="gap-3">
-              <TouchableOpacity
-                onPress={() => setPickerOpen(true)}
-                accessibilityRole="button"
-                accessibilityLabel="Tag a Rex"
-                className="flex-row items-center gap-1.5 self-end rounded-full bg-primary px-3 py-1.5"
-              >
-                <Tag size={13} color={Theme.colors.primaryForeground} />
-                <Text className="text-xs font-semibold text-primary-foreground">Tag a Rex</Text>
-              </TouchableOpacity>
+              {request.status === 'open' ? (
+                <TouchableOpacity
+                  onPress={() => setPickerOpen(true)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Tag a Rex"
+                  className="flex-row items-center gap-1.5 self-end rounded-full bg-primary px-3 py-1.5"
+                >
+                  <Tag size={13} color={Theme.colors.primaryForeground} />
+                  <Text className="text-xs font-semibold text-primary-foreground">Tag a Rex</Text>
+                </TouchableOpacity>
+              ) : null}
               {responses.responses.length === 0 ? (
                 <Text className="py-2 text-center text-sm text-muted-foreground">
                   No recommended Rex&apos;s yet.
@@ -139,6 +143,7 @@ function RexRequestDetailModal({
           ) : (
             <RexRequestCommentsSection
               requestId={request.id}
+              canComment={request.status === 'open'}
               onUserPress={onUserPress}
               onReportComment={report.openCommentReport}
             />

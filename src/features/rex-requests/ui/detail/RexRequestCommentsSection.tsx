@@ -11,11 +11,12 @@ import RexRequestCommentRow from '~/features/rex-requests/ui/detail/RexRequestCo
 
 type Props = {
   requestId: string;
+  canComment: boolean;
   onUserPress?: (userId: string) => void;
   onReportComment?: (commentId: string) => void;
 };
 
-function RexRequestCommentsSection({ requestId, onUserPress, onReportComment }: Props) {
+function RexRequestCommentsSection({ requestId, canComment, onUserPress, onReportComment }: Props) {
   const { user } = useAuth();
   const { comments, loading, loadError, refetch, addComment, deleteComment } =
     useRexRequestComments(requestId);
@@ -59,7 +60,7 @@ function RexRequestCommentsSection({ requestId, onUserPress, onReportComment }: 
         </View>
       )}
 
-      {user ? <CommentComposer composer={composer} /> : null}
+      {user && canComment ? <CommentComposer composer={composer} /> : null}
     </View>
   );
 }
