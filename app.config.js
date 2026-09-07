@@ -41,6 +41,7 @@ module.exports = {
     },
     android: {
       package: nativeApplicationId,
+      googleServicesFile: isProduction ? './google-services.json' : undefined,
       adaptiveIcon: {
         foregroundImage: './assets/truRexIcon.png',
         backgroundColor: '#ffffff',
