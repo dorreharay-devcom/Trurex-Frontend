@@ -10,6 +10,10 @@ function projectId(): string | null {
   return Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId ?? null;
 }
 
+function isPushCapable(): boolean {
+  return Constants.expoConfig?.extra?.appEnv === 'production';
+}
+
 async function readToken(): Promise<string | null> {
   const id = projectId();
   if (!id) return null;
@@ -22,7 +26,7 @@ async function readToken(): Promise<string | null> {
 }
 
 export async function requestExpoPushToken(): Promise<string | null> {
-  if (isWeb || !Device.isDevice) return null;
+  if (isWeb || !Device.isDevice || !isPushCapable()) return null;
 
   const existing = await Notifications.getPermissionsAsync();
   let status = existing.status;
@@ -36,7 +40,7 @@ export async function requestExpoPushToken(): Promise<string | null> {
 }
 
 export async function readExpoPushTokenIfGranted(): Promise<string | null> {
-  if (isWeb || !Device.isDevice) return null;
+  if (isWeb || !Device.isDevice || !isPushCapable()) return null;
 
   const { status } = await Notifications.getPermissionsAsync();
   if (status !== 'granted') return null;

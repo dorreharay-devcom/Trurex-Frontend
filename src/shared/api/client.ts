@@ -20,8 +20,17 @@ const BACKEND_KEY =
   process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ||
   '';
 
+const AUTH_API_TIMEOUT_MS = 8000;
+
+function requestUrl(input: RequestInfo | URL): string {
+  if (typeof input === 'string') return input;
+  if (input instanceof URL) return input.href;
+  return input.url;
+}
+
 const supabaseFetch: typeof fetch = async (input, init) => {
-  const response = await fetchWithTimeout(input, init);
+  const timeoutMs = requestUrl(input).includes('/auth/v1/') ? AUTH_API_TIMEOUT_MS : undefined;
+  const response = await fetchWithTimeout(input, init, timeoutMs);
   if (response.status === 401) {
     terminateSessionForUnauthorizedRequest();
   }
@@ -44,8 +53,11 @@ const client = createClient(BACKEND_URL, BACKEND_KEY, {
 export const Auth = client.auth;
 export const Backend = client;
 
+let autoRefreshSetup = false;
+
 export function setupAuthAutoRefresh(): void {
-  if (isWeb) return;
+  if (isWeb || autoRefreshSetup) return;
+  autoRefreshSetup = true;
   AppState.addEventListener('change', (state) => {
     (state === 'active' ? Auth.startAutoRefresh : Auth.stopAutoRefresh)();
   });
