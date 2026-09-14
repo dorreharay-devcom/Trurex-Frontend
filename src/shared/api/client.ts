@@ -1,3 +1,4 @@
+import { AppState } from 'react-native';
 import { processLock } from '@supabase/auth-js';
 import { createClient } from '@supabase/supabase-js';
 import { AuthStorage } from '~/shared/lib/storage/authStorage';
@@ -43,11 +44,18 @@ const client = createClient(BACKEND_URL, BACKEND_KEY, {
 export const Auth = client.auth;
 export const Backend = client;
 
+export function setupAuthAutoRefresh(): void {
+  if (isWeb) return;
+  AppState.addEventListener('change', (state) => {
+    (state === 'active' ? Auth.startAutoRefresh : Auth.stopAutoRefresh)();
+  });
+}
+
 export function unwrap<T>(response: { data: unknown; error: unknown }): T {
   if (response.error) {
     const err = response.error as { code?: unknown };
     if (isFatalAuthSessionErrorCode(err?.code)) {
-      Auth.signOut().catch(() => {});
+      Auth.signOut({ scope: 'local' }).catch(() => {});
     }
     terminateIfUnauthorizedRequestError(response.error);
     terminateIfAccountSuspendedRpcError(response.error);

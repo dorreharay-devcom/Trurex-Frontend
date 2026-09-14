@@ -1,6 +1,10 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 import { AuthApi } from '~/shared/api/authApi';
-import { registerAccountSuspendedHandler } from '~/shared/lib/errors/restriction';
+import { Auth } from '~/shared/api/client';
+import {
+  registerAccountSuspendedHandler,
+  registerUnauthorizedRequestHandler,
+} from '~/shared/lib/errors/restriction';
 import { clearMfaRequirementCache } from '~/features/auth/lib/mfa';
 import { useAuthSession } from '~/features/auth/hooks/useAuthSession';
 import { useMfaSessionGate } from '~/features/auth/hooks/useMfaSessionGate';
@@ -53,7 +57,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await setMfaPending(false);
   }, [setMfaChecking, setMfaPending]);
 
+  const forceLocalSignOut = useCallback(async () => {
+    setMfaChecking(false);
+    clearMfaRequirementCache();
+    await Auth.signOut({ scope: 'local' }).catch(() => {});
+    await setMfaPending(false);
+  }, [setMfaChecking, setMfaPending]);
+
   useEffect(() => registerAccountSuspendedHandler(signOut), [signOut]);
+
+  useEffect(() => registerUnauthorizedRequestHandler(forceLocalSignOut), [forceLocalSignOut]);
 
   useEffect(() => {
     if (!mfaChecking) return;
