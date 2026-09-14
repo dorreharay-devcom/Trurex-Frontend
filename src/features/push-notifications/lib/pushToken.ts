@@ -2,6 +2,9 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import { isWeb } from '~/shared/lib/ui/platform';
+import { withTimeout } from '~/shared/lib/network/withTimeout';
+
+const PUSH_TOKEN_FETCH_TIMEOUT_MS = 6000;
 
 function projectId(): string | null {
   return Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId ?? null;
@@ -10,8 +13,12 @@ function projectId(): string | null {
 async function readToken(): Promise<string | null> {
   const id = projectId();
   if (!id) return null;
-  const { data } = await Notifications.getExpoPushTokenAsync({ projectId: id });
-  return data;
+  const result = await withTimeout(
+    Notifications.getExpoPushTokenAsync({ projectId: id }),
+    PUSH_TOKEN_FETCH_TIMEOUT_MS,
+    null,
+  );
+  return result?.data ?? null;
 }
 
 export async function requestExpoPushToken(): Promise<string | null> {

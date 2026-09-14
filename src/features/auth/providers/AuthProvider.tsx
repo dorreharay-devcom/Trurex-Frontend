@@ -8,6 +8,9 @@ import type { AuthState } from '~/features/auth/types/authState';
 import { useNotificationsRealtime } from '~/shared/hooks/useNotificationsRealtime';
 import { usePushTokenRegistration } from '~/features/push-notifications/hooks/usePushTokenRegistration';
 import { unregisterCurrentDevicePushToken } from '~/features/push-notifications/lib/unregisterCurrentDevicePushToken';
+import { withTimeout } from '~/shared/lib/network/withTimeout';
+
+const SIGN_OUT_PUSH_CLEANUP_TIMEOUT_MS = 5000;
 
 const AuthContext = createContext<AuthState | null>(null);
 
@@ -41,7 +44,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = useCallback(async () => {
     setMfaChecking(false);
     clearMfaRequirementCache();
-    await unregisterCurrentDevicePushToken().catch(() => {});
+    await withTimeout(
+      unregisterCurrentDevicePushToken().catch(() => undefined),
+      SIGN_OUT_PUSH_CLEANUP_TIMEOUT_MS,
+      undefined,
+    );
     await AuthApi.signOut();
     await setMfaPending(false);
   }, [setMfaChecking, setMfaPending]);
