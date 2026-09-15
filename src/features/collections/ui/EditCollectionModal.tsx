@@ -28,7 +28,7 @@ function EditCollectionModal({ open, onClose, onUpdated, collection }: EditColle
   return (
     <>
       <CollectionModalShell
-        open={open}
+        open={open && !form.sharePrompt.open}
         title="Edit Collection"
         cardStyle={{ height: Math.min(maxHeight, CARD_MAX_HEIGHT), maxHeight }}
         footer={
