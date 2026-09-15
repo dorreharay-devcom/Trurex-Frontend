@@ -1,6 +1,7 @@
 import React from 'react';
 import { Animated, Modal, View, KeyboardAvoidingView, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useKeyboardVisible } from '~/shared/hooks/useKeyboardVisible';
 import type { OverlayModalProps } from '~/shared/types/overlayModal';
 import { KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT } from '~/shared/config/keyboard';
 import { modalConfig, OVERLAY_MODAL_PLATFORM_PROPS } from '~/shared/config/overlaySheet';
@@ -41,6 +42,7 @@ export function OverlayModal({
   children,
 }: OverlayModalProps) {
   const insets = useSafeAreaInsets();
+  const keyboardVisible = useKeyboardVisible();
 
   const body = (
     <View style={styles.root}>
@@ -62,7 +64,10 @@ export function OverlayModal({
         >
           <View
             className="absolute inset-0 flex-col overflow-hidden bg-card sm:inset-4 sm:top-8 sm:rounded-2xl sm:shadow-elevated"
-            style={[{ paddingTop: insets.top, paddingBottom: insets.bottom }, androidElevation(12)]}
+            style={[
+              { paddingTop: insets.top, paddingBottom: keyboardVisible ? 0 : insets.bottom },
+              androidElevation(12),
+            ]}
           >
             {children}
           </View>

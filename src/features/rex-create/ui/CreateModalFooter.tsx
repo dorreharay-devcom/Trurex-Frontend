@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 import { ChevronRight } from 'lucide-react-native';
 import { CREATE_REC_MODAL_MAX_W } from '~/features/rex-create/config/layout';
 import { modalConfig } from '~/shared/config/overlaySheet';
+import { useKeyboardVisible } from '~/shared/hooks/useKeyboardVisible';
 import { Theme } from '~/shared/theme/Theme';
 import { isWeb } from '~/shared/lib/ui/platform';
 import { cn } from '~/shared/lib/ui/styles';
@@ -29,13 +30,14 @@ function accessibilityLabel(isLastStep: boolean, isEditMode: boolean): string {
 }
 
 const CreateModalFooter = ({ isLastStep, isEditMode, disabled, submitting, onPress }: Props) => {
+  const keyboardVisible = useKeyboardVisible();
   return (
     <View className="sticky bottom-0 items-center border-t border-border bg-card/95 px-4 py-4 backdrop-blur sm:px-6">
       <View
         className="w-full"
         style={{
           maxWidth: CREATE_REC_MODAL_MAX_W,
-          paddingBottom: modalConfig.layout.minSafeBottom,
+          paddingBottom: keyboardVisible ? 0 : modalConfig.layout.minSafeBottom,
         }}
       >
         <View className={cn('w-full', disabled && isWeb && 'cursor-not-allowed')}>
