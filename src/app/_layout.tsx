@@ -11,6 +11,7 @@ import { AppToast } from '~/shared/ui/toast/AppToast';
 import BrandBootLoader from '~/shared/ui/shell/BrandBootLoader';
 import AppErrorBoundary from '~/shared/ui/shell/AppErrorBoundary';
 import { setupQueryNetwork } from '~/shared/lib/query/setupQueryNetwork';
+import { setupAuthAutoRefresh } from '~/shared/api/client';
 import { queryClient, queryPersister } from '~/shared/lib/query/queryClient';
 import { track, AnalyticsEvent } from '~/shared/lib/analytics/track';
 import { checkForOtaUpdate } from '~/shared/lib/updates/checkForOtaUpdate';
@@ -24,6 +25,7 @@ import { disableMobileSafariInputZoom } from '~/shared/lib/ui/viewport';
 
 setupQueryNetwork();
 setupPushNotifications();
+setupAuthAutoRefresh();
 disableMobileSafariInputZoom();
 
 export { AppErrorBoundary as ErrorBoundary };
@@ -35,15 +37,22 @@ function AuthBootGate() {
 }
 
 function BootstrapEffects() {
+  const { user, booting } = useAuth();
+
   useEffect(() => {
     track(AnalyticsEvent.AppOpened);
     void checkForOtaUpdate();
+  }, []);
+
+  useEffect(() => {
+    if (booting || !user) return;
     void queryClient.prefetchQuery({
       queryKey: REX_SCORE_TIERS_QUERY_KEY,
       queryFn: fetchRexScoreTiers,
       staleTime: 24 * 60 * 60_000,
     });
-  }, []);
+  }, [booting, user]);
+
   return null;
 }
 

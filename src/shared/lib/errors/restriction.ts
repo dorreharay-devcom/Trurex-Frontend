@@ -18,6 +18,7 @@ const READ_ONLY_MESSAGE =
 type SessionTerminationHandler = () => Promise<void> | void;
 
 let sessionTerminationHandler: SessionTerminationHandler | null = null;
+let unauthorizedRequestHandler: SessionTerminationHandler | null = null;
 let suspensionLogoutInFlight = false;
 let unauthorizedLogoutInFlight = false;
 
@@ -83,6 +84,13 @@ export function registerAccountSuspendedHandler(handler: SessionTerminationHandl
   };
 }
 
+export function registerUnauthorizedRequestHandler(handler: SessionTerminationHandler): () => void {
+  unauthorizedRequestHandler = handler;
+  return () => {
+    if (unauthorizedRequestHandler === handler) unauthorizedRequestHandler = null;
+  };
+}
+
 export function terminateSessionForSuspendedAccount(): void {
   if (suspensionLogoutInFlight) return;
   suspensionLogoutInFlight = true;
@@ -99,7 +107,7 @@ export function terminateSessionForSuspendedAccount(): void {
 export function terminateSessionForUnauthorizedRequest(): void {
   if (unauthorizedLogoutInFlight) return;
   unauthorizedLogoutInFlight = true;
-  Promise.resolve(sessionTerminationHandler?.())
+  Promise.resolve(unauthorizedRequestHandler?.())
     .catch((error) => {
       console.warn('[Auth] unauthorized request sign out failed', error);
     })

@@ -39,6 +39,7 @@ export function useResetPassword() {
     if (!isRecoveryRedirect) {
       setRecoveryReady(false);
       setCheckingRecovery(false);
+      Auth.signOut({ scope: 'local' }).catch(() => {});
       return;
     }
 

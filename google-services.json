@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "441520265677",
+    "project_id": "trurex-26b93",
+    "storage_bucket": "trurex-26b93.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441520265677:android:0bf9fb59820e225fec4c84",
+        "android_client_info": {
+          "package_name": "com.app.trurex"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4CsU68dYImzjN1hVi_zGuZ5hXGcK4xJE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

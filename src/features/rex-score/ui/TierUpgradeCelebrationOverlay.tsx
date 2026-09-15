@@ -27,7 +27,7 @@ const TierUpgradeCelebrationOverlay = ({ tier, isTopTier, onDismiss }: Props) =>
         )}
       >
         {isTopTier ? <GoldConfetti /> : null}
-        <View className="items-center gap-4 px-8">
+        <View className="mx-6 w-full max-w-sm items-center gap-4 rounded-3xl bg-black/80 px-8 py-10">
           <Text
             className="text-xs font-bold uppercase tracking-widest"
             style={{ color: foreground }}

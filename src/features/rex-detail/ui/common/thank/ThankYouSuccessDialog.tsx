@@ -1,5 +1,6 @@
 import React from 'react';
 import { Animated, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSheetSpringAnimation } from '~/shared/hooks/useSheetSpringAnimation';
 import { isWeb } from '~/shared/lib/ui/platform';
 import { cn } from '~/shared/lib/ui/styles';
@@ -16,6 +17,7 @@ type Props = {
 
 function ThankYouSuccessDialog({ open, message, onDone }: Props) {
   const { visible, backdropOpacity, sheetTranslateY } = useSheetSpringAnimation(open);
+  const insets = useSafeAreaInsets();
 
   return (
     <Modal
@@ -45,6 +47,7 @@ function ThankYouSuccessDialog({ open, message, onDone }: Props) {
               'w-full border border-border bg-card shadow-elevated',
               isWeb ? 'rounded-2xl' : 'rounded-t-2xl',
             )}
+            style={{ paddingBottom: isWeb ? 0 : Math.max(insets.bottom, 12) }}
           >
             <View className="items-center px-5 pb-2 pt-7">
               <View className="mb-4 h-16 w-16 items-center justify-center rounded-full bg-primary/10">

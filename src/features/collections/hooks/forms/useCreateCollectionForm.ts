@@ -3,6 +3,7 @@ import { useCreateCollection } from '~/features/collections/hooks/data/useCollec
 import { useCoverImagePicker } from '~/features/collections/hooks/forms/useCoverImagePicker';
 import { useShareToFeedPrompt } from '~/features/collections/hooks/forms/useShareToFeedPrompt';
 import type { CollectionVisibility } from '~/features/collections/types/collection';
+import { toastSuccess, toastSuccessAfterDismiss } from '~/shared/lib/appToast';
 
 export function useCreateCollectionForm(onCreated: (id: string) => void) {
   const [name, setName] = useState('');
@@ -37,7 +38,8 @@ export function useCreateCollectionForm(onCreated: (id: string) => void) {
       {
         onSuccess: (collection) => {
           reset();
-          if (sharePrompt.promptIfPublic(collection.id, collection.visibility)) return;
+          if (sharePrompt.promptIfPublic(collection.id, privacy)) return;
+          toastSuccess('Collection created!');
           onCreated(collection.id);
         },
       },
@@ -49,7 +51,10 @@ export function useCreateCollectionForm(onCreated: (id: string) => void) {
     [sharePrompt, onCreated],
   );
   const declineShare = useCallback(
-    () => sharePrompt.resolve(false, onCreated),
+    () =>
+      sharePrompt.resolve(false, (id) => {
+        toastSuccessAfterDismiss(() => onCreated(id), 'Collection created!');
+      }),
     [sharePrompt, onCreated],
   );
 

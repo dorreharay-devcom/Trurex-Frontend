@@ -25,7 +25,7 @@ function SearchSelectPanel({ place, search, onTagLocationPress, tagLocationLoadi
       className="flex-1"
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="interactive"
-      automaticallyAdjustKeyboardInsets
+      automaticallyAdjustKeyboardInsets={false}
       showsVerticalScrollIndicator={false}
       contentContainerClassName="items-center pb-36"
     >

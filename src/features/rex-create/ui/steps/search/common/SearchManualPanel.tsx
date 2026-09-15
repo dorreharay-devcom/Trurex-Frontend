@@ -76,7 +76,7 @@ function SearchManualPanel({
       className="flex-1"
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="interactive"
-      automaticallyAdjustKeyboardInsets
+      automaticallyAdjustKeyboardInsets={false}
       showsVerticalScrollIndicator={false}
       contentContainerClassName={cn('items-center', SCROLL_PAD)}
     >
