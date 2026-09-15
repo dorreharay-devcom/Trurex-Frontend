@@ -14,7 +14,6 @@ export const useCreateCollection = () => {
     mutationFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [...COLLECTIONS_QUERY_KEYS.myCollections] });
-      toastSuccess('Collection created!');
     },
     onError: mutationErrorToast('Failed to create collection'),
   });

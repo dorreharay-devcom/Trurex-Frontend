@@ -37,15 +37,22 @@ function AuthBootGate() {
 }
 
 function BootstrapEffects() {
+  const { user, booting } = useAuth();
+
   useEffect(() => {
     track(AnalyticsEvent.AppOpened);
     void checkForOtaUpdate();
+  }, []);
+
+  useEffect(() => {
+    if (booting || !user) return;
     void queryClient.prefetchQuery({
       queryKey: REX_SCORE_TIERS_QUERY_KEY,
       queryFn: fetchRexScoreTiers,
       staleTime: 24 * 60 * 60_000,
     });
-  }, []);
+  }, [booting, user]);
+
   return null;
 }
 
