@@ -20,16 +20,20 @@ export function useShareToFeedPrompt() {
     (share: boolean, onDone: (collectionId: string) => void) => {
       const collectionId = pendingCollectionId;
       if (!collectionId) return;
-      setPendingCollectionId(null);
       if (!share) {
+        setPendingCollectionId(null);
         onDone(collectionId);
         return;
       }
       shareMutation.mutate(collectionId, {
         onSuccess: () => {
+          setPendingCollectionId(null);
           toastSuccessAfterDismiss(() => onDone(collectionId), 'Shared to the Discover feed');
         },
-        onError: () => onDone(collectionId),
+        onError: () => {
+          setPendingCollectionId(null);
+          onDone(collectionId);
+        },
       });
     },
     [pendingCollectionId, shareMutation],

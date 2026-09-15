@@ -27,7 +27,7 @@ function CreateCollectionModal({ open, onClose, onCreated }: CreateCollectionMod
   return (
     <>
       <CollectionModalShell
-        open={open}
+        open={open && !form.sharePrompt.open}
         title="New Collection"
         cardStyle={{
           maxHeight: height * CARD_MAX_HEIGHT_RATIO,
