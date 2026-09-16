@@ -7,14 +7,13 @@ export const AFTER_CREATE_FEED_KEYS = [
   REX_QUERY_KEYS.discoverFeed,
   REX_QUERY_KEYS.myRexes,
   REX_QUERY_KEYS.searchRexes,
+  REX_QUERY_KEYS.mySavedRexes,
 ] as const;
 
 export const AFTER_CREATE_MAP_KEYS = [
   REX_QUERY_KEYS.mapRexPins,
   REX_QUERY_KEYS.mapRexesInBounds,
 ] as const;
-
-export const CREATE_MUST_NOT_INVALIDATE = [REX_QUERY_KEYS.mySavedRexes] as const;
 
 export function invalidateAfterRexWrite(
   queryClient: QueryClient,

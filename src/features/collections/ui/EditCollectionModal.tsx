@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { useEditCollectionForm } from '~/features/collections/hooks/forms/useEditCollectionForm';
 import CollectionModalShell from '~/features/collections/ui/common/CollectionModalShell';
@@ -24,6 +24,7 @@ function EditCollectionModal({ open, onClose, onUpdated, collection }: EditColle
   const { height } = useWindowDimensions();
   const form = useEditCollectionForm({ open, collection, onUpdated });
   const maxHeight = height * CARD_MAX_HEIGHT_RATIO;
+  const [formVisible, setFormVisible] = useState(true);
 
   return (
     <>
@@ -35,6 +36,7 @@ function EditCollectionModal({ open, onClose, onUpdated, collection }: EditColle
           <SaveChangesButton canSave={form.canSave} saving={form.saving} onPress={form.submit} />
         }
         onClose={onClose}
+        onVisibleChange={setFormVisible}
       >
         <CoverImageSection
           coverUri={form.displayCoverUri}
@@ -49,7 +51,7 @@ function EditCollectionModal({ open, onClose, onUpdated, collection }: EditColle
       </CollectionModalShell>
 
       <ShareToFeedPrompt
-        open={form.sharePrompt.open}
+        open={form.sharePrompt.open && !formVisible}
         pending={form.sharePrompt.pending}
         onConfirm={form.sharePrompt.onConfirm}
         onCancel={form.sharePrompt.onCancel}

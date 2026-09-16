@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react';
+import React, { useEffect, type ReactNode } from 'react';
 import {
   Animated,
   KeyboardAvoidingView,
@@ -30,12 +30,25 @@ type Props = {
   cardStyle: StyleProp<ViewStyle>;
   footer: ReactNode;
   onClose: () => void;
+  onVisibleChange?: (visible: boolean) => void;
   children: ReactNode;
 };
 
-const CollectionModalShell = ({ open, title, cardStyle, footer, onClose, children }: Props) => {
+const CollectionModalShell = ({
+  open,
+  title,
+  cardStyle,
+  footer,
+  onClose,
+  onVisibleChange,
+  children,
+}: Props) => {
   const { width } = useWindowDimensions();
   const { visible, backdropOpacity, sheetTranslateY } = useSheetSpringAnimation(open);
+
+  useEffect(() => {
+    onVisibleChange?.(visible);
+  }, [visible, onVisibleChange]);
 
   return (
     <Modal

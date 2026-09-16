@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   AFTER_CREATE_FEED_KEYS,
   AFTER_CREATE_MAP_KEYS,
-  CREATE_MUST_NOT_INVALIDATE,
   prependRecommendationPage,
 } from '~/shared/lib/query/invalidateAfterRexWrite';
 import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
@@ -27,10 +26,8 @@ describe('invalidateAfterRexWrite surfaces', () => {
     expect(AFTER_CREATE_FEED_KEYS).toContain(REX_QUERY_KEYS.discoverFeed);
   });
 
-  it('never targets gems/saved lists', () => {
-    expect(CREATE_MUST_NOT_INVALIDATE).toContain(REX_QUERY_KEYS.mySavedRexes);
-    expect(AFTER_CREATE_FEED_KEYS).not.toContain(REX_QUERY_KEYS.mySavedRexes);
-    expect(AFTER_CREATE_MAP_KEYS).not.toContain(REX_QUERY_KEYS.mySavedRexes);
+  it('also refreshes the gems/saved-rexes list, so a new rex shows up as uncollected', () => {
+    expect(AFTER_CREATE_FEED_KEYS).toContain(REX_QUERY_KEYS.mySavedRexes);
   });
 });
 
