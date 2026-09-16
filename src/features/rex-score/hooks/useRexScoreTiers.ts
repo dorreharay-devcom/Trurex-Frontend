@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchRexScoreTiers } from '~/features/rex-score/api/rexScoreTiersApi';
 import { REX_SCORE_TIERS_QUERY_KEY } from '~/shared/config/queryKeys';
@@ -24,14 +24,20 @@ export function useRexScoreTiers() {
     return map;
   }, [tiers]);
 
-  const getTier = (code: string | null | undefined): RexScoreTier | null =>
-    code ? (byCode.get(code) ?? null) : null;
+  const getTier = useCallback(
+    (code: string | null | undefined): RexScoreTier | null =>
+      code ? (byCode.get(code) ?? null) : null,
+    [byCode],
+  );
 
-  const isTopTier = (code: string | null | undefined): boolean => {
-    const tier = getTier(code);
-    if (!tier || tiers.length === 0) return false;
-    return tier.sort_order === tiers[tiers.length - 1].sort_order;
-  };
+  const isTopTier = useCallback(
+    (code: string | null | undefined): boolean => {
+      const tier = getTier(code);
+      if (!tier || tiers.length === 0) return false;
+      return tier.sort_order === tiers[tiers.length - 1].sort_order;
+    },
+    [getTier, tiers],
+  );
 
   return { tiers, isLoading, getTier, isTopTier };
 }

@@ -6,10 +6,12 @@ const SCROLL_TOP_THRESHOLD = 600;
 
 export function useScrollTop<Item>() {
   const listRef = useRef<FlashListRef<Item>>(null);
+  const offsetRef = useRef(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   const onScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetY = event.nativeEvent.contentOffset.y;
+    offsetRef.current = offsetY;
     const shouldShow = offsetY > SCROLL_TOP_THRESHOLD;
     setShowScrollTop((visible) => (visible === shouldShow ? visible : shouldShow));
   }, []);
@@ -18,5 +20,5 @@ export function useScrollTop<Item>() {
     listRef.current?.scrollToOffset({ offset: 0, animated: true });
   }, []);
 
-  return { listRef, showScrollTop, onScroll, scrollToTop };
+  return { listRef, offsetRef, showScrollTop, onScroll, scrollToTop };
 }

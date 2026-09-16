@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { ProfileApi } from '~/features/profile/api/profileApi';
 import type { ProfileData } from '~/features/profile/types/profile';
 import { resolveIsOwnProfile, resolveProfileContentUserId } from '~/features/profile/lib/identity';
@@ -62,9 +63,11 @@ export function useProfileData({ propUserId, propHandle, authUserId }: Params) {
     setProfile(null);
   }, [propUserId, propHandle]);
 
-  useEffect(() => {
-    void fetchProfile();
-  }, [fetchProfile]);
+  useFocusEffect(
+    useCallback(() => {
+      void fetchProfile();
+    }, [fetchProfile]),
+  );
 
   const isOwnProfile = resolveIsOwnProfile({
     profile,

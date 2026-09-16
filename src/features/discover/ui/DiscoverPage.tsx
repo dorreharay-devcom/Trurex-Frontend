@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { FlashList, type ListRenderItem } from '@shopify/flash-list';
 import { Plus } from 'lucide-react-native';
@@ -98,11 +98,17 @@ const DiscoverPage = ({
   const [latestRexSearch, setLatestRexSearch] = useState('');
   const [circleFilter, setCircleFilter] = useState<AudienceFilterId[]>([]);
   const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
-  const toggleCategory = useCallback((code: string) => {
-    setCategoryFilter((prev) =>
-      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code],
-    );
-  }, []);
+  const scroll = useScrollTop<DiscoverFeedItem>();
+  const pendingScrollRestoreRef = useRef<number | null>(null);
+  const toggleCategory = useCallback(
+    (code: string) => {
+      pendingScrollRestoreRef.current = scroll.offsetRef.current;
+      setCategoryFilter((prev) =>
+        prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code],
+      );
+    },
+    [scroll.offsetRef],
+  );
   const debouncedLatestRexSearch = useDebouncedValue(latestRexSearch, DEFAULT_SEARCH_DEBOUNCE_MS);
   const categories = useCategories();
   const rexRequests = useRexRequestsFeedList({
@@ -138,7 +144,12 @@ const DiscoverPage = ({
     [rows, includePeopleSuggestions],
   );
 
-  const scroll = useScrollTop<DiscoverFeedItem>();
+  useEffect(() => {
+    const offset = pendingScrollRestoreRef.current;
+    if (offset == null) return;
+    pendingScrollRestoreRef.current = null;
+    scroll.listRef.current?.scrollToOffset({ offset, animated: false });
+  }, [feedItems, scroll.listRef]);
 
   const onSave = save.openForRec;
   const onTap = onRecommendationPress;

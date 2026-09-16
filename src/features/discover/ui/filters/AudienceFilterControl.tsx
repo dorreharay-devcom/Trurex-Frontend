@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Filter } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Theme } from '~/shared/theme/Theme';
 import { cn } from '~/shared/lib/ui/styles';
+import { isWeb } from '~/shared/lib/ui/platform';
 import BottomSheet from '~/shared/ui/overlay/BottomSheet';
 import SheetHeader from '~/features/collections/ui/common/SheetHeader';
 import AudienceFilterOptionsList from '~/features/discover/ui/filters/AudienceFilterOptionsList';
@@ -22,6 +24,7 @@ function AudienceFilterControl<T extends string>({
 }: Props<T>) {
   const [open, setOpen] = useState(false);
   const [localSelected, setLocalSelected] = useState<readonly T[]>([]);
+  const insets = useSafeAreaInsets();
   const isControlled = controlledSelected !== undefined;
   const selected = isControlled ? controlledSelected : localSelected;
   const activeCount = selected.length;
@@ -73,7 +76,10 @@ function AudienceFilterControl<T extends string>({
             sectionLabel={sectionLabel}
           />
         </View>
-        <View className="mt-4 border-t border-border p-4">
+        <View
+          className="mt-4 border-t border-border p-4"
+          style={isWeb ? undefined : { paddingBottom: Math.max(insets.bottom, 16) }}
+        >
           <TouchableOpacity
             onPress={close}
             activeOpacity={0.85}

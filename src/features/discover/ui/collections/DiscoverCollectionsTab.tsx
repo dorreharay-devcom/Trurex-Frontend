@@ -67,10 +67,7 @@ const DiscoverCollectionsTab = ({ onOpenCollection, headerSlot }: Props) => {
         <View className="mt-4 w-full" onLayout={grid.onGridLayout}>
           {grid.hasItems ? (
             <>
-              <View
-                className="w-full flex-row flex-wrap"
-                style={{ marginHorizontal: -grid.halfGap }}
-              >
+              <View className="flex-row flex-wrap" style={{ marginHorizontal: -grid.halfGap }}>
                 {grid.feed.rows.map((item: DiscoverCollectionRow) => (
                   <ProfileGridCell key={item.id} numColumns={grid.numColumns} gap={grid.gap}>
                     <CollectionCard
