@@ -1,21 +1,28 @@
 import NetInfo from '@react-native-community/netinfo';
 import { focusManager, onlineManager } from '@tanstack/react-query';
 import { AppState, Platform, type AppStateStatus } from 'react-native';
-
-function isOnlineState(state: {
-  isConnected: boolean | null;
-  isInternetReachable: boolean | null;
-}): boolean {
-  if (state.isConnected === false) return false;
-  if (state.isInternetReachable === false) return false;
-  return true;
-}
+import { isOnlineState } from '~/shared/lib/query/isOnlineState';
 
 export function setupQueryNetwork(): void {
   onlineManager.setEventListener((setOnline) => {
-    return NetInfo.addEventListener((state) => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
       setOnline(isOnlineState(state));
     });
+
+    if (Platform.OS === 'web') return unsubscribe;
+
+    const onAppStateChange = (status: AppStateStatus) => {
+      if (status !== 'active') return;
+      void NetInfo.refresh().then((state) => {
+        setOnline(isOnlineState(state));
+      });
+    };
+
+    const appStateSub = AppState.addEventListener('change', onAppStateChange);
+    return () => {
+      unsubscribe();
+      appStateSub.remove();
+    };
   });
 
   if (Platform.OS === 'web') return;

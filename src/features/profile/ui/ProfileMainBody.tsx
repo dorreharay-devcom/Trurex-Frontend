@@ -168,10 +168,7 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
                 </View>
               ) : (
                 <View className="w-full" onLayout={onGridLayout}>
-                  <View
-                    className="w-full flex-row flex-wrap"
-                    style={{ marginHorizontal: -halfGap }}
-                  >
+                  <View className="flex-row flex-wrap" style={{ marginHorizontal: -halfGap }}>
                     {isRecs
                       ? content.myRexes.map((item) => (
                           <ProfileGridCell key={item.id} numColumns={numColumns} gap={gap}>
