@@ -14,10 +14,10 @@ export function toUpdateProfileInput(fields: Fields): UpdateProfileInput {
   return {
     display_name: fields.displayName,
     handle: normalizeHandleForSave(fields.handle),
-    bio: fields.bio || null,
-    location: fields.location || null,
-    currently_binging: fields.currently.binging || null,
-    currently_listening_to: fields.currently.listening || null,
-    currently_reading: fields.currently.reading || null,
+    bio: fields.bio,
+    location: fields.location,
+    currently_binging: fields.currently.binging,
+    currently_listening_to: fields.currently.listening,
+    currently_reading: fields.currently.reading,
   };
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { useCreateCollectionForm } from '~/features/collections/hooks/forms/useCreateCollectionForm';
 import CollectionModalShell from '~/features/collections/ui/common/CollectionModalShell';
@@ -23,6 +23,7 @@ export type CreateCollectionModalProps = {
 function CreateCollectionModal({ open, onClose, onCreated }: CreateCollectionModalProps) {
   const { height } = useWindowDimensions();
   const form = useCreateCollectionForm(onCreated);
+  const [formVisible, setFormVisible] = useState(true);
 
   return (
     <>
@@ -41,6 +42,7 @@ function CreateCollectionModal({ open, onClose, onCreated }: CreateCollectionMod
           />
         }
         onClose={onClose}
+        onVisibleChange={setFormVisible}
       >
         <CoverImageSection
           coverUri={form.cover.preview}
@@ -55,7 +57,7 @@ function CreateCollectionModal({ open, onClose, onCreated }: CreateCollectionMod
       </CollectionModalShell>
 
       <ShareToFeedPrompt
-        open={form.sharePrompt.open}
+        open={form.sharePrompt.open && !formVisible}
         pending={form.sharePrompt.pending}
         onConfirm={form.sharePrompt.onConfirm}
         onCancel={form.sharePrompt.onCancel}
