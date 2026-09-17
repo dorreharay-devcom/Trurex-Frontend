@@ -1,11 +1,15 @@
 import * as Notifications from 'expo-notifications';
 import { isAndroid, isWeb } from '~/shared/lib/ui/platform';
 
-let didSetup = false;
+let setupPromise: Promise<void> | null = null;
 
-export function setupPushNotifications(): void {
-  if (isWeb || didSetup) return;
-  didSetup = true;
+export function setupPushNotifications(): Promise<void> {
+  if (setupPromise) return setupPromise;
+
+  if (isWeb) {
+    setupPromise = Promise.resolve();
+    return setupPromise;
+  }
 
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -16,10 +20,12 @@ export function setupPushNotifications(): void {
     }),
   });
 
-  if (isAndroid) {
-    void Notifications.setNotificationChannelAsync('default', {
-      name: 'Default',
-      importance: Notifications.AndroidImportance.DEFAULT,
-    });
-  }
+  setupPromise = isAndroid
+    ? Notifications.setNotificationChannelAsync('default', {
+        name: 'Default',
+        importance: Notifications.AndroidImportance.DEFAULT,
+      }).then(() => undefined)
+    : Promise.resolve();
+
+  return setupPromise;
 }

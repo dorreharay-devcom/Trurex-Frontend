@@ -53,13 +53,25 @@ const client = createClient(BACKEND_URL, BACKEND_KEY, {
 export const Auth = client.auth;
 export const Backend = client;
 
+const AUTO_REFRESH_ACTIVE_DEBOUNCE_MS = 500;
+
 let autoRefreshSetup = false;
 
 export function setupAuthAutoRefresh(): void {
   if (isWeb || autoRefreshSetup) return;
   autoRefreshSetup = true;
+  let activeTimer: ReturnType<typeof setTimeout> | undefined;
   AppState.addEventListener('change', (state) => {
-    (state === 'active' ? Auth.startAutoRefresh : Auth.stopAutoRefresh)();
+    clearTimeout(activeTimer);
+    activeTimer = undefined;
+    if (state !== 'active') {
+      Auth.stopAutoRefresh();
+      return;
+    }
+    activeTimer = setTimeout(() => {
+      activeTimer = undefined;
+      Auth.startAutoRefresh();
+    }, AUTO_REFRESH_ACTIVE_DEBOUNCE_MS);
   });
 }
 

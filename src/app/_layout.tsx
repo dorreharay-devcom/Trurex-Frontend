@@ -24,7 +24,7 @@ import TierUpgradeCelebrationBridge from '~/features/rex-score/ui/TierUpgradeCel
 import { disableMobileSafariInputZoom } from '~/shared/lib/ui/viewport';
 
 setupQueryNetwork();
-setupPushNotifications();
+void setupPushNotifications();
 setupAuthAutoRefresh();
 disableMobileSafariInputZoom();
 
