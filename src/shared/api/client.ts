@@ -1,5 +1,4 @@
 import { AppState } from 'react-native';
-import { processLock } from '@supabase/auth-js';
 import { createClient } from '@supabase/supabase-js';
 import { AuthStorage } from '~/shared/lib/storage/authStorage';
 import { isFatalAuthSessionErrorCode } from '~/shared/lib/errors/authSession';
@@ -43,7 +42,7 @@ const client = createClient(BACKEND_URL, BACKEND_KEY, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: isWeb,
-    lock: processLock,
+    lock: (_name, _acquireTimeout, fn) => fn(),
   },
   global: {
     fetch: supabaseFetch,
@@ -56,7 +55,6 @@ export const Backend = client;
 const AUTO_REFRESH_ACTIVE_DEBOUNCE_MS = 500;
 
 let autoRefreshSetup = false;
-let autoRefreshSuppressed = false;
 
 export function setupAuthAutoRefresh(): void {
   if (isWeb || autoRefreshSetup) return;
@@ -65,25 +63,15 @@ export function setupAuthAutoRefresh(): void {
   AppState.addEventListener('change', (state) => {
     clearTimeout(activeTimer);
     activeTimer = undefined;
-    if (autoRefreshSuppressed) return;
     if (state !== 'active') {
       Auth.stopAutoRefresh();
       return;
     }
     activeTimer = setTimeout(() => {
       activeTimer = undefined;
-      if (!autoRefreshSuppressed) Auth.startAutoRefresh();
+      Auth.startAutoRefresh();
     }, AUTO_REFRESH_ACTIVE_DEBOUNCE_MS);
   });
-}
-
-export async function withAutoRefreshSuppressed<T>(fn: () => Promise<T>): Promise<T> {
-  autoRefreshSuppressed = true;
-  try {
-    return await fn();
-  } finally {
-    autoRefreshSuppressed = false;
-  }
 }
 
 export function unwrap<T>(response: { data: unknown; error: unknown }): T {
