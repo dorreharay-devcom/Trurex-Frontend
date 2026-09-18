@@ -2,6 +2,7 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import { setupPushNotifications } from '~/features/push-notifications/lib/setupPushNotifications';
+import { withAutoRefreshSuppressed } from '~/shared/api/client';
 import { isWeb } from '~/shared/lib/ui/platform';
 import { withTimeout } from '~/shared/lib/network/withTimeout';
 
@@ -38,10 +39,12 @@ function getPermissionStatus(): Promise<Notifications.PermissionStatus> {
 }
 
 function requestPermissionStatus(): Promise<Notifications.PermissionStatus> {
-  return withTimeout(
-    Notifications.requestPermissionsAsync().then((result) => result.status),
-    PERMISSION_REQUEST_TIMEOUT_MS,
-    Notifications.PermissionStatus.UNDETERMINED,
+  return withAutoRefreshSuppressed(() =>
+    withTimeout(
+      Notifications.requestPermissionsAsync().then((result) => result.status),
+      PERMISSION_REQUEST_TIMEOUT_MS,
+      Notifications.PermissionStatus.UNDETERMINED,
+    ),
   );
 }
 
