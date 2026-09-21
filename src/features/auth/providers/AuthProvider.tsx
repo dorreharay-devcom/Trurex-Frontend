@@ -14,7 +14,7 @@ import { usePushTokenRegistration } from '~/features/push-notifications/hooks/us
 import { unregisterCurrentDevicePushToken } from '~/features/push-notifications/lib/unregisterCurrentDevicePushToken';
 import { withTimeout } from '~/shared/lib/network/withTimeout';
 
-const SIGN_OUT_PUSH_CLEANUP_TIMEOUT_MS = 5000;
+const SIGN_OUT_PUSH_CLEANUP_TIMEOUT_MS = 2500;
 
 const AuthContext = createContext<AuthState | null>(null);
 

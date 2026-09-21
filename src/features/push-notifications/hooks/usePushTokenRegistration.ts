@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import * as Notifications from 'expo-notifications';
 import { registerPushToken } from '~/features/push-notifications/api/pushTokensApi';
 import { requestExpoPushToken } from '~/features/push-notifications/lib/pushToken';
+import { rememberPushToken } from '~/features/push-notifications/lib/rememberedPushToken';
 import { isAndroid, isWeb } from '~/shared/lib/ui/platform';
 import { track, AnalyticsEvent } from '~/shared/lib/analytics/track';
 
@@ -10,6 +11,16 @@ const REGISTRATION_START_DELAY_MS = 4000;
 
 export function usePushTokenRegistration(userId: string | null | undefined) {
   const registeredForRef = useRef<string | null>(null);
+  const lastDeviceTokenRef = useRef<string | null>(null);
+
+  const register = useCallback(async (id: string, token: string) => {
+    const key = `${id}:${token}`;
+    if (registeredForRef.current === key) return;
+    await registerPushToken(token, platform);
+    registeredForRef.current = key;
+    await rememberPushToken(token);
+    track(AnalyticsEvent.PushTokenRegistered, { platform });
+  }, []);
 
   useEffect(() => {
     if (isWeb) return;
@@ -17,7 +28,6 @@ export function usePushTokenRegistration(userId: string | null | undefined) {
       registeredForRef.current = null;
       return;
     }
-    if (registeredForRef.current === userId) return;
 
     let cancelled = false;
 
@@ -25,11 +35,7 @@ export function usePushTokenRegistration(userId: string | null | undefined) {
       void (async () => {
         const token = await requestExpoPushToken().catch(() => null);
         if (!token || cancelled) return;
-        try {
-          await registerPushToken(token, platform);
-          registeredForRef.current = userId;
-          track(AnalyticsEvent.PushTokenRegistered, { platform });
-        } catch {}
+        await register(userId, token).catch(() => {});
       })();
     }, REGISTRATION_START_DELAY_MS);
 
@@ -37,16 +43,20 @@ export function usePushTokenRegistration(userId: string | null | undefined) {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [userId]);
+  }, [userId, register]);
 
   useEffect(() => {
-    if (isWeb) return;
-    const subscription = Notifications.addPushTokenListener(() => {
-      if (!userId) return;
-      void requestExpoPushToken()
-        .then((token) => (token ? registerPushToken(token, platform) : undefined))
-        .catch(() => {});
+    if (isWeb || !userId) return;
+    const subscription = Notifications.addPushTokenListener((devicePushToken) => {
+      const next = String(devicePushToken.data);
+      if (lastDeviceTokenRef.current === next) return;
+      lastDeviceTokenRef.current = next;
+      void (async () => {
+        const token = await requestExpoPushToken().catch(() => null);
+        if (!token) return;
+        await register(userId, token).catch(() => {});
+      })();
     });
     return () => subscription.remove();
-  }, [userId]);
+  }, [userId, register]);
 }
