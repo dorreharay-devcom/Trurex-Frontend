@@ -19,7 +19,7 @@ const BACKEND_KEY =
   process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ||
   '';
 
-const AUTH_API_TIMEOUT_MS = 8000;
+const AUTH_API_TIMEOUT_MS = 4000;
 
 function requestUrl(input: RequestInfo | URL): string {
   if (typeof input === 'string') return input;
@@ -42,7 +42,6 @@ const client = createClient(BACKEND_URL, BACKEND_KEY, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: isWeb,
-    lock: (_name, _acquireTimeout, fn) => fn(),
   },
   global: {
     fetch: supabaseFetch,

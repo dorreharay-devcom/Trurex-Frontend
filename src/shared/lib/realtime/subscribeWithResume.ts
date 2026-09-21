@@ -8,17 +8,26 @@ type Options = {
   onSoftRefresh: () => void;
 };
 
+const RESUME_DEBOUNCE_MS = 400;
+
 export function subscribeRealtimeWithResume(options: Options): () => void {
   if (!options.enabled) return () => {};
 
   let channel: RealtimeChannel | null = null;
   let disposed = false;
   let rebindTimer: ReturnType<typeof setTimeout> | null = null;
+  let resumeTimer: ReturnType<typeof setTimeout> | null = null;
 
   const clearRebind = () => {
     if (rebindTimer == null) return;
     clearTimeout(rebindTimer);
     rebindTimer = null;
+  };
+
+  const clearResume = () => {
+    if (resumeTimer == null) return;
+    clearTimeout(resumeTimer);
+    resumeTimer = null;
   };
 
   const detach = () => {
@@ -48,12 +57,20 @@ export function subscribeRealtimeWithResume(options: Options): () => void {
     });
   };
 
+  const isLive = () =>
+    channel != null && (channel.state === 'joined' || channel.state === 'joining');
+
   attach();
 
   const onAppState = (status: AppStateStatus) => {
     if (status !== 'active' || disposed) return;
-    options.onSoftRefresh();
-    attach();
+    clearResume();
+    resumeTimer = setTimeout(() => {
+      resumeTimer = null;
+      if (disposed || isLive()) return;
+      options.onSoftRefresh();
+      attach();
+    }, RESUME_DEBOUNCE_MS);
   };
 
   const appSub = AppState.addEventListener('change', onAppState);
@@ -61,6 +78,7 @@ export function subscribeRealtimeWithResume(options: Options): () => void {
   return () => {
     disposed = true;
     clearRebind();
+    clearResume();
     appSub.remove();
     detach();
   };

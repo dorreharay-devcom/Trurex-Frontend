@@ -22,12 +22,10 @@ async function setChunked(key: string, value: string): Promise<void> {
 }
 
 async function getChunked(key: string, parts: number): Promise<string | null> {
-  const chunks: string[] = [];
-  for (let i = 0; i < parts; i += 1) {
-    const part = await SecureStore.getItemAsync(`${key}__${i}`);
-    if (part == null) return null;
-    chunks.push(part);
-  }
+  const chunks = await Promise.all(
+    Array.from({ length: parts }, (_, i) => SecureStore.getItemAsync(`${key}__${i}`)),
+  );
+  if (chunks.some((part) => part == null)) return null;
   return chunks.join('');
 }
 
@@ -59,25 +57,46 @@ async function migrateFromInsecureOnce(key: string): Promise<string | null> {
   return legacy;
 }
 
+async function readSecure(key: string): Promise<string | null> {
+  const parts = await getChunkCount(key);
+  if (parts != null) {
+    const value = await getChunked(key, parts);
+    if (value != null) return value;
+  }
+  const single = await SecureStore.getItemAsync(key);
+  if (single != null) return single;
+  return migrateFromInsecureOnce(key);
+}
+
+async function deleteSecure(key: string): Promise<void> {
+  const parts = await getChunkCount(key);
+  if (parts != null) {
+    await removeChunked(key, parts);
+    return;
+  }
+  await SecureStore.deleteItemAsync(key).catch(() => undefined);
+  await StorageService.removeItem(key).catch(() => undefined);
+}
+
+const mirror = new Map<string, Promise<string | null>>();
+
 export const AuthStorage: KeyValueStorage = {
-  getItem: async (key) => {
-    const parts = await getChunkCount(key);
-    if (parts != null) {
-      const value = await getChunked(key, parts);
-      if (value != null) return value;
-    }
-    const single = await SecureStore.getItemAsync(key);
-    if (single != null) return single;
-    return migrateFromInsecureOnce(key);
+  getItem: (key) => {
+    const cached = mirror.get(key);
+    if (cached) return cached;
+    const pending = readSecure(key);
+    mirror.set(key, pending);
+    pending.catch(() => {
+      if (mirror.get(key) === pending) mirror.delete(key);
+    });
+    return pending;
   },
-  setItem: writeSecure,
+  setItem: async (key, value) => {
+    mirror.set(key, Promise.resolve(value));
+    await writeSecure(key, value);
+  },
   removeItem: async (key) => {
-    const parts = await getChunkCount(key);
-    if (parts != null) {
-      await removeChunked(key, parts);
-      return;
-    }
-    await SecureStore.deleteItemAsync(key).catch(() => undefined);
-    await StorageService.removeItem(key).catch(() => undefined);
+    mirror.set(key, Promise.resolve(null));
+    await deleteSecure(key);
   },
 };
