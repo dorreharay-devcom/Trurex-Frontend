@@ -12,11 +12,22 @@ type Props = {
   onUserPress?: (userId: string) => void;
   onRexPress?: (rexId: string, options?: RecommendationOpenOptions) => void;
   onRexRequestPress?: (requestId: string) => void;
+  onReferralsPress?: () => void;
 };
 
-const NotificationBell = ({ onUserPress, onRexPress, onRexRequestPress }: Props) => {
+const NotificationBell = ({
+  onUserPress,
+  onRexPress,
+  onRexRequestPress,
+  onReferralsPress,
+}: Props) => {
   const insets = useSafeAreaInsets();
-  const bell = useNotificationBell({ onUserPress, onRexPress, onRexRequestPress });
+  const bell = useNotificationBell({
+    onUserPress,
+    onRexPress,
+    onRexRequestPress,
+    onReferralsPress,
+  });
 
   return (
     <>

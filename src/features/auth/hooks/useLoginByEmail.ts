@@ -41,7 +41,8 @@ export function useLoginByEmail() {
       password: getPasswordValidationError(password),
     };
     setErrors(fieldErrors);
-    return isFieldErrorsEmpty(fieldErrors) && invite.validate();
+    const inviteValid = invite.validate();
+    return isFieldErrorsEmpty(fieldErrors) && inviteValid;
   }
 
   async function resetMfaGate() {

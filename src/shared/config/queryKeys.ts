@@ -16,3 +16,5 @@ export const CIRCLE_QUERY_KEYS = {
 export const NOTIFICATIONS_QUERY_KEY = ['notifications'] as const;
 
 export const REX_SCORE_TIERS_QUERY_KEY = ['rexScoreTiers'] as const;
+
+export const REFERRALS_QUERY_KEY = ['myReferralInfo'] as const;

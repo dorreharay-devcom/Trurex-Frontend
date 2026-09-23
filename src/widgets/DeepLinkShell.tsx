@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import Header from '~/widgets/Header';
 import TabBar from '~/widgets/TabBar';
 import { TAB, type Tab } from '~/shared/config/mainTabs';
-import { toUserRoute } from '~/shared/config/routes';
+import { Routes, toUserRoute } from '~/shared/config/routes';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 
 type Props = {
@@ -23,6 +23,7 @@ const DeepLinkShell = ({ currentTab, onTabChange, onRexPress, children }: Props)
         onProfilePress={() => onTabChange(TAB.profile)}
         onUserPress={(userId) => router.replace(toUserRoute(userId))}
         onRexPress={onRexPress}
+        onReferralsPress={() => router.push(Routes.Referrals)}
       />
       <TabBar currentTab={currentTab} onTabChange={onTabChange} />
       {children}

@@ -37,6 +37,11 @@ const PROFILE_TYPES = new Set<string>([
   NOTIFICATION_TYPE.trusted,
 ]);
 
+export const REFERRAL_TYPES = new Set<string>([
+  NOTIFICATION_TYPE.referral_signup,
+  NOTIFICATION_TYPE.referral_activation,
+]);
+
 const DEFAULT_VERB = 'interacted with your Rex';
 
 const VERB_BY_TYPE: Record<string, string> = {
@@ -58,6 +63,8 @@ const VERB_BY_TYPE: Record<string, string> = {
   [NOTIFICATION_TYPE.milestone_thank]: 'thanked your Rex',
   [NOTIFICATION_TYPE.rex_request]: 'posted a Rex Request to your circle',
   [NOTIFICATION_TYPE.rex_request_response]: 'responded to your Rex Request',
+  [NOTIFICATION_TYPE.referral_signup]: 'joined TruRex using your referral code',
+  [NOTIFICATION_TYPE.referral_activation]: 'posted their first Rex',
 };
 
 export type NotificationRexLink = {
@@ -68,7 +75,8 @@ export type NotificationRexLink = {
 export type NotificationOpenTarget =
   | ({ kind: 'rex' } & NotificationRexLink)
   | { kind: 'user'; userId: string }
-  | { kind: 'rexRequest'; requestId: string };
+  | { kind: 'rexRequest'; requestId: string }
+  | { kind: 'referrals' };
 
 function trimOrEmpty(value: string | null | undefined): string {
   return value?.trim() ?? '';
@@ -107,6 +115,8 @@ export function notificationOpenTarget(n: AppNotification): NotificationOpenTarg
 
   const rex = notificationRexDeepLink(n);
   if (rex) return { kind: 'rex', ...rex };
+
+  if (REFERRAL_TYPES.has(n.type)) return { kind: 'referrals' };
 
   const userId = trimOrEmpty(n.actor_id);
   if (PROFILE_TYPES.has(n.type) && userId) return { kind: 'user', userId };

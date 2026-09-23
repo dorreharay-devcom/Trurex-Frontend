@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import AuthLayout from '~/features/auth/ui/common/AuthLayout';
 import AuthGeneralError from '~/features/auth/ui/common/AuthGeneralError';
 import { Button } from '~/shared/ui/primitives/Button';
@@ -65,6 +65,15 @@ const SignupPage = () => {
             error={signup.invite.error}
           />
         )}
+
+        <Input
+          label="Referral code"
+          labelRight={<Text className="text-xs text-muted-foreground">Optional</Text>}
+          value={signup.referralCode}
+          onChangeText={signup.onReferralCodeChange}
+          placeholder="REX-XXXXX"
+          autoCapitalize="characters"
+        />
 
         <AuthTermsAcceptanceField />
 

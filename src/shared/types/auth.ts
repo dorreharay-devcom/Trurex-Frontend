@@ -5,6 +5,7 @@ export type SignUpParams = {
   password: string;
   displayName?: string;
   redirectTo?: string;
+  referralCode?: string;
 };
 
 export type SignInParams = {

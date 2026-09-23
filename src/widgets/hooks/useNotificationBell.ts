@@ -19,9 +19,15 @@ type Params = {
   onUserPress?: (userId: string) => void;
   onRexPress?: (rexId: string, options?: RecommendationOpenOptions) => void;
   onRexRequestPress?: (requestId: string) => void;
+  onReferralsPress?: () => void;
 };
 
-export function useNotificationBell({ onUserPress, onRexPress, onRexRequestPress }: Params) {
+export function useNotificationBell({
+  onUserPress,
+  onRexPress,
+  onRexRequestPress,
+  onReferralsPress,
+}: Params) {
   const { notifications, unreadCount, loading, isError, markAllAsRead, markOneAsRead, refetch } =
     useNotifications();
   const queryClient = useQueryClient();
@@ -90,13 +96,18 @@ export function useNotificationBell({ onUserPress, onRexPress, onRexRequestPress
         onUserPress(target.userId);
         return;
       }
+      if (target?.kind === 'referrals' && onReferralsPress) {
+        close();
+        onReferralsPress();
+        return;
+      }
       if (__DEV__ && !target) {
         console.warn(
           `[notifications] no deep-link target for "${n.type}" notification ${n.id} — rex_id=${String(n.rex_id)} rex_request_id=${String(n.rex_request_id)} actor_id=${String(n.actor_id)}`,
         );
       }
     },
-    [close, markOneAsRead, onRexPress, onUserPress, onRexRequestPress],
+    [close, markOneAsRead, onRexPress, onUserPress, onRexRequestPress, onReferralsPress],
   );
 
   const openActor = useCallback(

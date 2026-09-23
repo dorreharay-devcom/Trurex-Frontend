@@ -114,6 +114,13 @@ export function Button({
       )}
     >
       {body}
+      {isWeb && isDisabled ? (
+        // TouchableOpacity sets pointerEvents="box-none" when disabled, which makes its own
+        // surface pass through hover — only subviews (like the icon) stay hoverable, so the
+        // not-allowed cursor only shows there. This overlay is a plain View (pointerEvents
+        // defaults to "auto"), so it catches hover across the whole button instead.
+        <View className="absolute inset-0" style={webDisabledCursor(isDisabled)} />
+      ) : null}
     </TouchableOpacity>
   );
 }

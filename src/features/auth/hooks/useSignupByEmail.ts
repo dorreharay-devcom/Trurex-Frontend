@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { AuthApi } from '~/shared/api/authApi';
 import { Routes } from '~/shared/config/routes';
 import {
@@ -14,6 +14,7 @@ import { useAuthInviteCode } from '~/features/auth/hooks/useAuthInviteCode';
 import { persistTermsAcceptance } from '~/features/auth/lib/terms';
 import type { OAuthProvider } from '~/features/auth/lib/oauth';
 import { useOAuthSignIn } from '~/features/auth/hooks/useOAuthSignIn';
+import { firstRouteParam } from '~/shared/lib/navigation/routeIds';
 
 type SignupErrors = {
   fullName?: string;
@@ -26,10 +27,12 @@ export function useSignupByEmail() {
   const router = useRouter();
   const { signInWithOAuth, oauthPending } = useOAuthSignIn();
   const invite = useAuthInviteCode();
+  const searchParams = useLocalSearchParams<{ ref?: string | string[] }>();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [referralCode, setReferralCode] = useState(() => firstRouteParam(searchParams.ref) ?? '');
   const [errors, setErrors] = useState<SignupErrors>({});
   const [loading, setLoading] = useState(false);
 
@@ -40,7 +43,8 @@ export function useSignupByEmail() {
       password: getPasswordValidationError(password),
     };
     setErrors(fieldErrors);
-    return isFieldErrorsEmpty(fieldErrors) && invite.validate();
+    const inviteValid = invite.validate();
+    return isFieldErrorsEmpty(fieldErrors) && inviteValid;
   }
 
   async function handleSignup() {
@@ -56,6 +60,7 @@ export function useSignupByEmail() {
         password,
         redirectTo: getRedirectUrl(),
         displayName: fullName,
+        referralCode,
       });
       router.replace(Routes.Login);
     } catch (error: unknown) {
@@ -76,6 +81,7 @@ export function useSignupByEmail() {
     email,
     password,
     fullName,
+    referralCode,
     errors,
     loading,
     oauthPending,
@@ -92,6 +98,7 @@ export function useSignupByEmail() {
       setPassword(value);
       setErrors((e) => ({ ...e, password: undefined, general: undefined }));
     },
+    onReferralCodeChange: setReferralCode,
     handleOAuthSignup,
     handleSignup,
     goToLogin: () => router.replace(Routes.Login),
