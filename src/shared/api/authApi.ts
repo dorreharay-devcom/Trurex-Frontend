@@ -16,6 +16,7 @@ export type {
 
 export const AuthApi = {
   signUp: async (params: SignUpParams): Promise<AuthSessionData> => {
+    const referralCode = params.referralCode?.trim();
     return unwrap(
       await Auth.signUp({
         email: params.email,
@@ -24,6 +25,7 @@ export const AuthApi = {
           emailRedirectTo: params.redirectTo,
           data: {
             display_name: params.displayName,
+            ...(referralCode ? { referral_code: referralCode } : {}),
           },
         },
       }),

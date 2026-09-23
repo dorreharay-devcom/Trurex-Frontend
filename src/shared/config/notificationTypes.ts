@@ -17,6 +17,8 @@ export const NOTIFICATION_TYPE = {
   milestone_thank: 'milestone_thank',
   rex_request: 'rex_request',
   rex_request_response: 'rex_request_response',
+  referral_signup: 'referral_signup',
+  referral_activation: 'referral_activation',
 } as const;
 
 export type KnownNotificationType = (typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICATION_TYPE];

@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import type { useProfileScreen } from '~/features/profile/hooks/useProfileScreen';
 import CurrentlySection from '~/features/profile/ui/CurrentlySection';
 import ProfileHeader from '~/features/profile/ui/ProfileHeader';
+import ProfileReferralsSection from '~/features/profile/ui/ProfileReferralsSection';
 import ProfileTabs from '~/features/profile/ui/ProfileTabs';
 
 type Flow = ReturnType<typeof useProfileScreen>;
@@ -35,6 +36,8 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
           blockLoading={social.blockPending}
         />
       ) : null}
+
+      {flow.isOwnProfile ? <ProfileReferralsSection onPress={flow.openReferrals} /> : null}
 
       {profile?.currently ? <CurrentlySection currently={profile.currently} /> : null}
 

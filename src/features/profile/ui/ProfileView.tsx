@@ -18,6 +18,7 @@ type Props = {
   onEditProfile?: () => void;
   onOpenCollection?: (collectionId: string) => void;
   onOpenRexRequest?: (requestId: string) => void;
+  onOpenReferrals?: () => void;
 };
 
 const ProfileView = ({
@@ -30,6 +31,7 @@ const ProfileView = ({
   onEditProfile,
   onOpenCollection,
   onOpenRexRequest,
+  onOpenReferrals,
 }: Props) => {
   const { width: windowWidth } = useWindowDimensions();
   const flow = useProfileScreen({
@@ -41,6 +43,7 @@ const ProfileView = ({
     onEditProfile,
     onOpenCollection,
     onOpenRexRequest,
+    onOpenReferrals,
   });
   const { social } = flow;
 

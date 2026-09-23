@@ -24,6 +24,7 @@ type Params = {
   onEditProfile?: () => void;
   onOpenCollection?: (collectionId: string) => void;
   onOpenRexRequest?: (requestId: string) => void;
+  onOpenReferrals?: () => void;
 };
 
 export function useProfileScreen({
@@ -35,6 +36,7 @@ export function useProfileScreen({
   onEditProfile,
   onOpenCollection,
   onOpenRexRequest,
+  onOpenReferrals,
 }: Params) {
   const router = useRouter();
   const rawParams = useLocalSearchParams<{ tab?: string | string[] }>();
@@ -120,6 +122,10 @@ export function useProfileScreen({
     onEditProfile?.();
   }, [onEditProfile]);
 
+  const openReferrals = useCallback(() => {
+    onOpenReferrals?.();
+  }, [onOpenReferrals]);
+
   const openCollection = useCallback(
     (collectionId: string) => {
       onOpenCollection?.(collectionId);
@@ -136,6 +142,7 @@ export function useProfileScreen({
 
   return {
     openEdit,
+    openReferrals,
     profile: profileData.profile,
     loading: profileData.loading,
     notFound: profileData.notFound,

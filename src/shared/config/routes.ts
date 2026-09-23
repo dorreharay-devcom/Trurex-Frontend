@@ -16,6 +16,7 @@ export const Routes = {
   Terms: '/terms',
   CommunityGuidelines: '/community-guidelines',
   Privacy: '/privacy',
+  Referrals: '/referrals',
 } as const satisfies Record<string, Href>;
 
 export function toUserRoute(userId: string): Href {
@@ -53,4 +54,11 @@ export function toRexRequestRoute(requestId: string): Href {
 
 export function toCircleRoute(circleId: string): Href {
   return `/circles/${circleId}`;
+}
+
+export function toSignupRoute(options?: { referralCode?: string }): string {
+  const params = new URLSearchParams();
+  if (options?.referralCode) params.set('ref', options.referralCode);
+  const qs = params.toString();
+  return `/signup${qs ? `?${qs}` : ''}`;
 }

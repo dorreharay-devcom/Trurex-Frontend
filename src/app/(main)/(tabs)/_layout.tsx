@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { View } from 'react-native';
 import { Tabs, usePathname, useRouter } from 'expo-router';
 import { TAB, tabFromPathname } from '~/shared/config/mainTabs';
-import { toUserRoute } from '~/shared/config/routes';
+import { Routes, toUserRoute } from '~/shared/config/routes';
 import { openCreateRex, openRex } from '~/shared/lib/navigation/createRex';
 import { openRexRequest } from '~/shared/lib/navigation/rexRequest';
 import { openMainTab } from '~/shared/lib/mainTab';
@@ -54,6 +54,10 @@ function MainTabsChrome() {
     openCreateRex(router);
   }, [router]);
 
+  const onReferralsPress = useCallback(() => {
+    router.push(Routes.Referrals);
+  }, [router]);
+
   return (
     <View className="min-h-0 flex-1 bg-background">
       <StickyTopChromeLayout
@@ -65,6 +69,7 @@ function MainTabsChrome() {
               onUserPress={onUserPress}
               onRexPress={onRexPress}
               onRexRequestPress={onRexRequestPress}
+              onReferralsPress={onReferralsPress}
             />
             <TabBar currentTab={currentTab} onTabChange={changeTab} />
             <OfflineBanner />

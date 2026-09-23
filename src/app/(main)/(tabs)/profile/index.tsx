@@ -28,6 +28,7 @@ export default function ProfileScreen() {
       avatarRefreshKey={avatarRefreshKey}
       onRexPress={(rec) => openRecommendation(router, rec)}
       onEditProfile={() => router.push(Routes.ProfileEdit)}
+      onOpenReferrals={() => router.push(Routes.Referrals)}
       onOpenCollection={(collectionId) =>
         openCollection(router, collectionId, COLLECTION_FROM.profile)
       }
