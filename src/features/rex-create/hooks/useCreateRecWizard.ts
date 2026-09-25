@@ -12,8 +12,14 @@ import type { RexForEditRow } from '~/features/rex-detail/types/rexDetail';
 
 export type CreateRecFlow = ReturnType<typeof useCreateRecWizard>;
 
+type PendingSubcategoryPrefill = {
+  subcategoryCode: string | null;
+  questionAnswers: Record<string, string>;
+};
+
 export function useCreateRecWizard() {
   const categoryCodePrefillRef = useRef<string | null>(null);
+  const pendingSubcategoryPrefillRef = useRef<PendingSubcategoryPrefill | null>(null);
   const editPrefillRef = useRef<RexForEditRow | null>(null);
   const editSessionRef = useRef(false);
 
@@ -136,6 +142,7 @@ export function useCreateRecWizard() {
 
   const resetForms = useCallback(() => {
     categoryCodePrefillRef.current = null;
+    pendingSubcategoryPrefillRef.current = null;
     editPrefillRef.current = null;
     editSessionRef.current = false;
     resetPlace();
@@ -155,9 +162,22 @@ export function useCreateRecWizard() {
       resetForms();
       prefillFromAddYourOwn(source);
       categoryCodePrefillRef.current = source.categoryCode;
+      pendingSubcategoryPrefillRef.current =
+        source.subcategoryCode || source.questionAnswers
+          ? {
+              subcategoryCode: source.subcategoryCode ?? null,
+              questionAnswers: source.questionAnswers ?? {},
+            }
+          : null;
     },
     [resetForms, prefillFromAddYourOwn],
   );
+
+  const takePendingSubcategoryPrefill = useCallback(() => {
+    const pending = pendingSubcategoryPrefillRef.current;
+    pendingSubcategoryPrefillRef.current = null;
+    return pending;
+  }, []);
 
   const applyEditPrefill = useCallback(
     (row: RexForEditRow) => {
@@ -205,5 +225,6 @@ export function useCreateRecWizard() {
     resetForms,
     applyAddYourOwnPrefill,
     applyEditPrefill,
+    takePendingSubcategoryPrefill,
   };
 }

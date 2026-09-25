@@ -8,6 +8,15 @@ export type StorageImageTransform = {
   format?: 'origin';
 };
 
+export const STORAGE_IMAGE_TRANSFORMS_ENABLED = false;
+
+export function effectiveImageTransform(
+  transform?: StorageImageTransform | null,
+): StorageImageTransform | null {
+  if (!STORAGE_IMAGE_TRANSFORMS_ENABLED) return null;
+  return transform ?? null;
+}
+
 export function imageTransformCacheSuffix(transform?: StorageImageTransform | null): string {
   if (!transform) return '';
   const w = transform.width ?? '';

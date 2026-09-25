@@ -50,6 +50,7 @@ type DiscoverPageProps = {
   onCreateRexRequest?: () => void;
   onOpenRexRequest?: (requestId: string) => void;
   onOpenCollection?: (collectionId: string) => void;
+  onAddToWishList?: (rec: Recommendation) => void;
 };
 
 const rexRequestKeyExtractor = (item: RexRequestRow) => item.id;
@@ -73,12 +74,18 @@ type FeedRowProps = {
   item: Recommendation;
   onTap?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
   onSave: (rec: Recommendation) => void;
+  onAddToWishList?: (rec: Recommendation) => void;
 };
 
-const FeedRow = memo(function FeedRow({ item, onTap, onSave }: FeedRowProps) {
+const FeedRow = memo(function FeedRow({ item, onTap, onSave, onAddToWishList }: FeedRowProps) {
   return (
     <View className="px-4 mb-4" style={webCardStyle}>
-      <RecommendationCard recommendation={item} onTap={onTap} onSave={onSave} />
+      <RecommendationCard
+        recommendation={item}
+        onTap={onTap}
+        onSave={onSave}
+        onAddToWishList={onAddToWishList}
+      />
     </View>
   );
 });
@@ -93,6 +100,7 @@ const DiscoverPage = ({
   onCreateRexRequest,
   onOpenRexRequest,
   onOpenCollection,
+  onAddToWishList,
 }: DiscoverPageProps) => {
   const [activeTab, setActiveTab] = useState<DiscoverTab>(DISCOVER_TAB.latestRex);
   const [latestRexSearch, setLatestRexSearch] = useState('');
@@ -159,9 +167,16 @@ const DiscoverPage = ({
       if (item.type === 'people_suggestions') {
         return <PeopleYouMayKnowSection enabled embedInFeed onUserPress={onUserPress} />;
       }
-      return <FeedRow item={item.recommendation} onTap={onTap} onSave={onSave} />;
+      return (
+        <FeedRow
+          item={item.recommendation}
+          onTap={onTap}
+          onSave={onSave}
+          onAddToWishList={onAddToWishList}
+        />
+      );
     },
-    [onTap, onSave, onUserPress],
+    [onTap, onSave, onUserPress, onAddToWishList],
   );
 
   const listHeader = useMemo(

@@ -10,6 +10,7 @@ type Props = {
   onClose: () => void;
   onDismiss?: () => void;
   onAddYourOwn?: (source: AddYourOwnRecSource) => void;
+  onAddToWishList?: (rec: Recommendation) => void;
   onCommentCountChange?: (total: number) => void;
   scrollToComments?: boolean;
   scrollToCommentId?: string;

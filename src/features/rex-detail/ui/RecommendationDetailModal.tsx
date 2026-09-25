@@ -22,6 +22,7 @@ type Props = {
   onClose: () => void;
   onDismiss?: () => void;
   onAddYourOwn?: (source: AddYourOwnRecSource) => void;
+  onAddToWishList?: (rec: Recommendation) => void;
   onCommentCountChange?: (total: number) => void;
   scrollToComments?: boolean;
   scrollToCommentId?: string;
@@ -37,6 +38,7 @@ const RecommendationDetailModal: React.FC<Props> = ({
   onClose,
   onDismiss,
   onAddYourOwn,
+  onAddToWishList,
   onCommentCountChange,
   scrollToComments,
   scrollToCommentId,
@@ -113,6 +115,7 @@ const RecommendationDetailModal: React.FC<Props> = ({
           isOwner={isOwner}
           onAuthorPress={handleAuthorPress}
           onAddYourOwn={onAddYourOwn}
+          onAddToWishList={onAddToWishList}
           onCommentCountChange={onCommentCountChange}
           scrollToComments={scrollToComments}
           scrollToCommentId={scrollToCommentId}

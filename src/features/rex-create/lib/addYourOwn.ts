@@ -6,6 +6,8 @@ import type { RexDetailRow } from '~/features/rex-detail/types/rexDetail';
 export type AddYourOwnRecSource = {
   placeName: string;
   categoryCode: string | null;
+  subcategoryCode?: string | null;
+  questionAnswers?: Record<string, string>;
   linkedPlaceId: string | null;
   isOnlinePlace: boolean;
   placeWebsiteUrl: string | null;

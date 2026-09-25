@@ -5,6 +5,7 @@ import CurrentlySection from '~/features/profile/ui/CurrentlySection';
 import ProfileHeader from '~/features/profile/ui/ProfileHeader';
 import ProfileReferralsSection from '~/features/profile/ui/ProfileReferralsSection';
 import ProfileTabs from '~/features/profile/ui/ProfileTabs';
+import ProfileWishListSection from '~/features/wish-list/ui/profile-section/ProfileWishListSection';
 
 type Flow = ReturnType<typeof useProfileScreen>;
 
@@ -40,6 +41,14 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
       {flow.isOwnProfile ? <ProfileReferralsSection onPress={flow.openReferrals} /> : null}
 
       {profile?.currently ? <CurrentlySection currently={profile.currently} /> : null}
+
+      {profile ? (
+        <ProfileWishListSection
+          profile={profile}
+          isOwnProfile={flow.isOwnProfile}
+          onOpenWishList={flow.openWishList}
+        />
+      ) : null}
 
       <ProfileTabs
         activeTab={content.activeTab}

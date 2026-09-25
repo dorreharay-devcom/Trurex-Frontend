@@ -119,6 +119,8 @@ export function mapApiRowToRecommendation(row: unknown): Recommendation | null {
     categoryId,
     category,
     categoryIcon: firstNonEmptyString(row, 'category_icon'),
+    subcategoryCode: firstNonEmptyString(row, 'subcategory_code') ?? null,
+    productName: firstNonEmptyString(row, 'product_name') ?? null,
     location: firstNonEmptyString(row, 'place_location') ?? undefined,
     locationText: firstNonEmptyString(row, 'location_text', 'locationText') ?? null,
     placeWebsiteUrl: firstNonEmptyString(row, 'place_website_url', 'placeWebsiteUrl') ?? null,

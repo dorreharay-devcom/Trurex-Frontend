@@ -25,6 +25,7 @@ type Params = {
   onOpenCollection?: (collectionId: string) => void;
   onOpenRexRequest?: (requestId: string) => void;
   onOpenReferrals?: () => void;
+  onOpenWishList?: (userId: string) => void;
 };
 
 export function useProfileScreen({
@@ -37,6 +38,7 @@ export function useProfileScreen({
   onOpenCollection,
   onOpenRexRequest,
   onOpenReferrals,
+  onOpenWishList,
 }: Params) {
   const router = useRouter();
   const rawParams = useLocalSearchParams<{ tab?: string | string[] }>();
@@ -126,6 +128,11 @@ export function useProfileScreen({
     onOpenReferrals?.();
   }, [onOpenReferrals]);
 
+  const openWishList = useCallback(() => {
+    if (!profileData.profileContentUserId) return;
+    onOpenWishList?.(profileData.profileContentUserId);
+  }, [onOpenWishList, profileData.profileContentUserId]);
+
   const openCollection = useCallback(
     (collectionId: string) => {
       onOpenCollection?.(collectionId);
@@ -143,6 +150,7 @@ export function useProfileScreen({
   return {
     openEdit,
     openReferrals,
+    openWishList,
     profile: profileData.profile,
     loading: profileData.loading,
     notFound: profileData.notFound,

@@ -7,6 +7,7 @@ import { Routes } from '~/shared/config/routes';
 import { openRecommendation } from '~/shared/lib/navigation/createRex';
 import { COLLECTION_FROM, openCollection } from '~/shared/lib/navigation/openCollection';
 import { openRexRequest } from '~/shared/lib/navigation/rexRequest';
+import { openUserWishList } from '~/shared/lib/navigation/wishList';
 import { shellAvatarQueryKey } from '~/widgets/hooks/useHeaderAvatar';
 
 export default function ProfileScreen() {
@@ -33,6 +34,7 @@ export default function ProfileScreen() {
         openCollection(router, collectionId, COLLECTION_FROM.profile)
       }
       onOpenRexRequest={(requestId) => openRexRequest(router, requestId)}
+      onOpenWishList={(userId) => openUserWishList(router, userId)}
     />
   );
 }
