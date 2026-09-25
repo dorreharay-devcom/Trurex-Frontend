@@ -5,13 +5,15 @@ import type { Recommendation } from '~/shared/types/recommendation';
 import { authorDisplayName, categoryDisplayLabel } from '~/shared/lib/recommendation';
 import { formatRelativeTime } from '~/shared/lib/data/date';
 import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
+import CardHeaderMenuButton from './CardHeaderMenuButton';
 
 type Props = {
   rec: Recommendation;
   onRemove: (() => void) | undefined;
+  onAddToWishList?: () => void;
 };
 
-function CardHeader({ rec, onRemove }: Props) {
+function CardHeader({ rec, onRemove, onAddToWishList }: Props) {
   const name = authorDisplayName(rec.user);
   const handle = rec.user?.handle?.trim() ?? '';
   const timeAgo = formatRelativeTime(rec.createdAt);
@@ -39,6 +41,7 @@ function CardHeader({ rec, onRemove }: Props) {
           <X size={13} color="white" />
         </TouchableOpacity>
       )}
+      {onAddToWishList ? <CardHeaderMenuButton onAddToWishList={onAddToWishList} /> : null}
     </View>
   );
 }

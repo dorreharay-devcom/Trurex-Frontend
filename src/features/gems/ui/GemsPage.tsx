@@ -12,17 +12,55 @@ import UncollectedEmpty from '~/features/gems/ui/UncollectedEmpty';
 import UncollectedRexRow from '~/features/gems/ui/uncollected-rex-row/UncollectedRexRow';
 import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
 import { webContainerStyle } from '~/shared/lib/ui/styles';
+import type { AddYourOwnRecSource } from '~/features/rex-create/lib/addYourOwn';
+import type { ProductBrandRexRow, WishListItemRow } from '~/features/wish-list/api/types';
+import { useMyWishList } from '~/features/wish-list/hooks/useMyWishList';
+import { useProductBrandRexes } from '~/features/wish-list/hooks/useProductBrandRexes';
+import { useWishListPageState } from '~/features/wish-list/hooks/gems/useWishListPageState';
+import type { WishListWizardPrefill } from '~/features/wish-list/types/wizardPrefill';
 
 type GemsPageProps = {
   onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
   onOpenCollection?: (collectionId: string) => void;
+  onOpenWishListWizard?: (prefill: WishListWizardPrefill | null) => void;
+  onNavigateToCreateRex?: (source: AddYourOwnRecSource) => void;
 };
 
-function GemsPage({ onRecommendationPress, onOpenCollection }: GemsPageProps) {
+function GemsPage({
+  onRecommendationPress,
+  onOpenCollection,
+  onOpenWishListWizard,
+  onNavigateToCreateRex,
+}: GemsPageProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const { collections, uncollected } = useGemsData(searchQuery);
   const page = useGemsPageState({ onOpenCollection });
   const removeUncollected = useRemoveUncollected();
+
+  const myWishList = useMyWishList();
+  const productBrandRexes = useProductBrandRexes();
+  const wishListPage = useWishListPageState({
+    onNavigateToCreateRex: onNavigateToCreateRex ?? (() => {}),
+    onOpenWishListWizard: onOpenWishListWizard ?? (() => {}),
+  });
+
+  const wishList = {
+    ownList: myWishList,
+    explore: productBrandRexes,
+    onOpenItem: (item: WishListItemRow) => wishListPage.openItem(item),
+    onTriedThis: (item: WishListItemRow) => {
+      wishListPage.openTriedThis(item);
+      wishListPage.triedThis.open();
+    },
+    onAddProduct: () => wishListPage.openWizard(null),
+    onAddFromExplore: (row: ProductBrandRexRow) =>
+      wishListPage.openWizard({
+        kind: 'fromRex',
+        sourceRexId: row.id,
+        brandName: row.brand_name,
+        productName: row.product_name,
+      }),
+  };
 
   return (
     <>
@@ -39,6 +77,7 @@ function GemsPage({ onRecommendationPress, onOpenCollection }: GemsPageProps) {
             loadingUncollected={uncollected.loading}
             onOpenCollection={page.openCollection}
             onCreateCollection={page.openCreateCollection}
+            wishList={wishList}
           />
         }
         renderItem={({ item }) => (
@@ -73,7 +112,7 @@ function GemsPage({ onRecommendationPress, onOpenCollection }: GemsPageProps) {
         drawDistance={400}
       />
 
-      <GemsOverlays page={page} removeUncollected={removeUncollected} />
+      <GemsOverlays page={page} removeUncollected={removeUncollected} wishListPage={wishListPage} />
     </>
   );
 }

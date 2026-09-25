@@ -19,6 +19,7 @@ type Props = {
   onOpenCollection?: (collectionId: string) => void;
   onOpenRexRequest?: (requestId: string) => void;
   onOpenReferrals?: () => void;
+  onOpenWishList?: (userId: string) => void;
 };
 
 const ProfileView = ({
@@ -32,6 +33,7 @@ const ProfileView = ({
   onOpenCollection,
   onOpenRexRequest,
   onOpenReferrals,
+  onOpenWishList,
 }: Props) => {
   const { width: windowWidth } = useWindowDimensions();
   const flow = useProfileScreen({
@@ -44,6 +46,7 @@ const ProfileView = ({
     onOpenCollection,
     onOpenRexRequest,
     onOpenReferrals,
+    onOpenWishList,
   });
   const { social } = flow;
 

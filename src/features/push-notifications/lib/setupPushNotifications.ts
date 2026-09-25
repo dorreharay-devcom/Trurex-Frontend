@@ -21,9 +21,11 @@ export function setupPushNotifications(): Promise<void> {
   });
 
   setupPromise = isAndroid
-    ? Notifications.setNotificationChannelAsync('default', {
+    ? Notifications.setNotificationChannelAsync('default-v2', {
         name: 'Default',
         importance: Notifications.AndroidImportance.DEFAULT,
+        enableVibrate: true,
+        vibrationPattern: [0, 250, 250, 250],
       }).then(() => undefined)
     : Promise.resolve();
 

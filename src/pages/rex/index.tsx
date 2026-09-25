@@ -8,6 +8,9 @@ import { useRexPageNav } from '~/pages/rex/hooks/useRexPageNav';
 import RexPageBody from '~/pages/rex/ui/RexPageBody';
 import { TAB } from '~/shared/config/mainTabs';
 import { openCreateRex } from '~/shared/lib/navigation/createRex';
+import { openWishListWizard } from '~/shared/lib/navigation/wishList';
+import { placeDisplayTitle } from '~/shared/lib/recommendation';
+import type { Recommendation } from '~/shared/types/recommendation';
 import type { AddYourOwnRecSource } from '~/features/rex-create';
 
 function RexPage() {
@@ -28,6 +31,18 @@ function RexPage() {
     [nav.router],
   );
 
+  const onAddToWishList = useCallback(
+    (rec: Recommendation) => {
+      openWishListWizard(nav.router, {
+        kind: 'fromRex',
+        sourceRexId: rec.id,
+        brandName: placeDisplayTitle(rec.title),
+        productName: rec.productName ?? null,
+      });
+    },
+    [nav.router],
+  );
+
   return (
     <View className="flex-1">
       <DeepLinkShell currentTab={TAB.discover} onTabChange={nav.changeTab} onRexPress={nav.openRex}>
@@ -41,6 +56,7 @@ function RexPage() {
         onAuthorPress={nav.openUser}
         onUserPress={nav.openUser}
         onAddYourOwn={onAddYourOwn}
+        onAddToWishList={onAddToWishList}
         onEditRex={onEditRex}
         scrollToComments={page.scrollToComments}
         scrollToCommentId={page.scrollToCommentId}

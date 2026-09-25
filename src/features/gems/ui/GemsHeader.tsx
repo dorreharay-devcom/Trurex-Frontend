@@ -4,6 +4,9 @@ import { Plus } from 'lucide-react-native';
 import { ClearableSearchInput } from '~/shared/ui/primitives/ClearableSearchInput';
 import CollectionsRail from '~/features/gems/ui/CollectionsRail';
 import type { GemsCollectionsState } from '~/features/gems/hooks/useGemsData';
+import WishListSection, {
+  type WishListSectionProps,
+} from '~/features/wish-list/ui/gems-section/WishListSection';
 import {
   Theme,
   textFieldCaretStyle,
@@ -28,6 +31,7 @@ type Props = {
   loadingUncollected: boolean;
   onOpenCollection: (id: string) => void;
   onCreateCollection: () => void;
+  wishList: WishListSectionProps;
 };
 
 function GemsHeader({
@@ -37,6 +41,7 @@ function GemsHeader({
   loadingUncollected,
   onOpenCollection,
   onCreateCollection,
+  wishList,
 }: Props) {
   const count = collections.items.length;
 
@@ -81,6 +86,8 @@ function GemsHeader({
         onOpenCollection={onOpenCollection}
         onCreateCollection={onCreateCollection}
       />
+
+      <WishListSection {...wishList} />
 
       <Text className="text-base font-display font-medium text-foreground mb-1">
         Uncollected Rex

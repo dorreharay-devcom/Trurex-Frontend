@@ -23,6 +23,8 @@ export type Recommendation = {
   categoryId: string;
   category: string;
   categoryIcon?: string | null;
+  subcategoryCode?: string | null;
+  productName?: string | null;
   authorId?: string;
   authorRelationshipStatus?: RelationshipStatus | null;
   location?: string;

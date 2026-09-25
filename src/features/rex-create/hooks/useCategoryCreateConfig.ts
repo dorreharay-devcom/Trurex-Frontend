@@ -94,6 +94,20 @@ export function useCategoryCreateConfig({ visible, flow }: UseCategoryCreateConf
     syncFormToConfig(view.mergedRatingDimensions);
   }, [formSyncKey, view, syncFormToConfig]);
 
+  const appliedSubcategoryPrefillRef = useRef(false);
+  useEffect(() => {
+    if (!categoryDefinesSubcategories || !activeCreateConfig) return;
+    if (selectedSubcategoryCode !== null) return;
+    if (appliedSubcategoryPrefillRef.current) return;
+    const pending = flow.takePendingSubcategoryPrefill();
+    if (!pending) return;
+    appliedSubcategoryPrefillRef.current = true;
+    if (pending.subcategoryCode) flow.category.setSelectedSubcategoryCode(pending.subcategoryCode);
+    for (const [code, value] of Object.entries(pending.questionAnswers)) {
+      flow.scorecard.setQuestionAnswer(code, value, 'text');
+    }
+  }, [categoryDefinesSubcategories, activeCreateConfig, selectedSubcategoryCode, flow]);
+
   useEffect(() => {
     syncCategoryCreateShape(activeCreateConfig);
   }, [activeCreateConfig, syncCategoryCreateShape]);

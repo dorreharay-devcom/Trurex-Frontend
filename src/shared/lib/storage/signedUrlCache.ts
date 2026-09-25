@@ -2,6 +2,7 @@ import { Backend } from '~/shared/api/client';
 import { isNonEmptyString, isPlainObject } from '~/shared/lib/data/guards';
 import { terminateIfUnauthorizedRequestError } from '~/shared/lib/errors/restriction';
 import {
+  effectiveImageTransform,
   imageTransformCacheSuffix,
   type StorageImageTransform,
 } from '~/shared/lib/media/imageTransform';
@@ -11,7 +12,7 @@ export type ResolvedSignedUrl = { url: string; cacheUntil: number };
 
 type CacheEntry = { url: string; expiresAt: number };
 
-const STORAGE_KEY = 'trurex_signed_url_cache_v1';
+const STORAGE_KEY = 'trurex_signed_url_cache_v2';
 const EXPIRY_BUFFER_MS = 60_000;
 const PUBLIC_URL_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_CACHE_ENTRIES = 280;
@@ -85,7 +86,8 @@ export function signedUrlCacheKey(
   cacheVersion?: string | number,
 ): string {
   const version = cacheVersion == null ? '' : `:${cacheVersion}`;
-  return `${bucket}:${path}${imageTransformCacheSuffix(transform)}${version}`;
+  const suffix = imageTransformCacheSuffix(effectiveImageTransform(transform));
+  return `${bucket}:${path}${suffix}${version}`;
 }
 
 function parseSignedUrlData(data: unknown): string | null {
@@ -116,13 +118,8 @@ async function trySignedUrl(
   return { url: signedUrl, cacheUntil: Date.now() + expiresInSec * 1000 };
 }
 
-async function tryPublicUrl(
-  bucket: string,
-  path: string,
-  transform?: StorageImageTransform | null,
-): Promise<ResolvedSignedUrl | null> {
-  const options = transform ? { transform } : undefined;
-  const { data: publicData } = Backend.storage.from(bucket).getPublicUrl(path, options);
+function tryPublicUrl(bucket: string, path: string): ResolvedSignedUrl | null {
+  const { data: publicData } = Backend.storage.from(bucket).getPublicUrl(path);
   if (!publicData?.publicUrl) return null;
   return { url: publicData.publicUrl, cacheUntil: Date.now() + PUBLIC_URL_TTL_MS };
 }
@@ -133,20 +130,14 @@ async function resolveUrl(
   expiresInSec: number,
   transform?: StorageImageTransform | null,
 ): Promise<ResolvedSignedUrl | null> {
+  const effective = effectiveImageTransform(transform);
   try {
-    if (transform) {
-      return (
-        (await trySignedUrl(bucket, path, expiresInSec, transform)) ??
-        (await tryPublicUrl(bucket, path, transform)) ??
-        (await trySignedUrl(bucket, path, expiresInSec, null)) ??
-        (await tryPublicUrl(bucket, path, null))
-      );
+    if (effective) {
+      const transformed = await trySignedUrl(bucket, path, expiresInSec, effective);
+      if (transformed) return transformed;
     }
 
-    return (
-      (await trySignedUrl(bucket, path, expiresInSec, null)) ??
-      (await tryPublicUrl(bucket, path, null))
-    );
+    return (await trySignedUrl(bucket, path, expiresInSec, null)) ?? tryPublicUrl(bucket, path);
   } catch {
     return null;
   }

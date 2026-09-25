@@ -62,3 +62,11 @@ export function toSignupRoute(options?: { referralCode?: string }): string {
   const qs = params.toString();
   return `/signup${qs ? `?${qs}` : ''}`;
 }
+
+export function toCreateWishListItemRoute(): Href {
+  return '/create-wish-list-item';
+}
+
+export function toUserWishListRoute(userId: string): Href {
+  return `/wish-list/${userId}`;
+}
