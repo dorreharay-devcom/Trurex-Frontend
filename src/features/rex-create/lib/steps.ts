@@ -7,6 +7,10 @@ import {
   type SearchEntryMode,
 } from '~/features/rex-create/types/create';
 import { isStrictUuid } from '~/shared/lib/data/guards';
+import {
+  PRODUCT_BRAND_CATEGORY_CODE,
+  PRODUCT_BRAND_SUBCATEGORY_CODE,
+} from '~/features/wish-list/config/rexBridge';
 
 export function isCreateRecStepId(value: unknown): value is CreateRecStepId {
   return typeof value === 'string' && (CREATE_REC_STEP_ORDER as readonly string[]).includes(value);
@@ -20,9 +24,17 @@ export function parseCreateStepParam(value: string | undefined): CreateRecStepId
 export function getActiveCreateRecSteps(
   selectedCategoryId: string | null,
   includeSubcategoryStep: boolean,
+  selectedSubcategoryCode: string | null,
 ): CreateRecStepId[] {
   const includeType = selectedCategoryId != null && includeSubcategoryStep;
-  return CREATE_REC_STEP_ORDER.filter((id) => id !== STEP_ID.type || includeType);
+  const includeBrandProduct =
+    selectedCategoryId === PRODUCT_BRAND_CATEGORY_CODE &&
+    selectedSubcategoryCode === PRODUCT_BRAND_SUBCATEGORY_CODE;
+  return CREATE_REC_STEP_ORDER.filter((id) => {
+    if (id === STEP_ID.type) return includeType;
+    if (id === STEP_ID.brandProduct) return includeBrandProduct;
+    return true;
+  });
 }
 
 export function suggestedCategoryFromSearch(
@@ -48,6 +60,7 @@ export type CanProceedDeps = {
   selectedCircleIds: Set<string>;
   privateRex: boolean;
   selectedSubcategoryCode: string | null;
+  brandName: string;
 };
 
 function hasCompleteManualPlace(d: CanProceedDeps): boolean {
@@ -66,6 +79,7 @@ const STEP_GUARDS: Record<CreateRecStepId, (d: CanProceedDeps) => boolean> = {
   search: hasCompleteSearchPlace,
   category: (d) => d.selectedCategoryId !== null,
   type: (d) => d.selectedSubcategoryCode !== null,
+  brandProduct: (d) => d.brandName.trim().length > 0,
   scorecard: () => true,
   photos: () => true,
   circles: (d) => d.privateRex || d.selectedCircleIds.size > 0,

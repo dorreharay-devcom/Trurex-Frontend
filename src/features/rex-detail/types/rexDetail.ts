@@ -30,6 +30,8 @@ export type RexDetailRow = {
   subcategory_display_name: string;
   place_id: string | null;
   place_name: string;
+  brand_name: string | null;
+  product_name: string | null;
   is_online_place?: boolean | null;
   place_website_url?: string | null;
   location_text?: string | null;
@@ -71,6 +73,8 @@ export type RexForEditRow = {
   subcategory_code: string;
   place_id: string | null;
   place_name: string;
+  brand_name: string | null;
+  product_name: string | null;
   is_online_place: boolean;
   place_website_url: string | null;
   location_text: string | null;

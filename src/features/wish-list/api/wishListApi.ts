@@ -82,6 +82,7 @@ export const WishListApi = {
     if (!Array.isArray(data)) return [];
     return (data as ProductBrandRexRow[]).map((row) => ({
       ...row,
+      brand_name: row.brand_name?.trim() || 'Untitled item',
       photo_paths: coerceStringList(row.photo_paths),
     }));
   },

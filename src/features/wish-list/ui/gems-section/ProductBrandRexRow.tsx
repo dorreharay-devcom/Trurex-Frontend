@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { Package, User } from 'lucide-react-native';
 import CategoryBadge from '~/features/gems/ui/uncollected-rex-row/CategoryBadge';
 import IconMetaRow from '~/features/gems/ui/uncollected-rex-row/IconMetaRow';
@@ -11,6 +11,7 @@ import type { ProductBrandRexRow as ProductBrandRexRowData } from '~/features/wi
 type Props = {
   item: ProductBrandRexRowData;
   onPress: () => void;
+  onAddToWishList: () => void;
 };
 
 function authorMetaLabel(item: ProductBrandRexRowData): string {
@@ -19,11 +20,16 @@ function authorMetaLabel(item: ProductBrandRexRowData): string {
   return handle ? `${name} · @${handle}` : name;
 }
 
-function ProductBrandRexRow({ item, onPress }: Props) {
+function ProductBrandRexRow({ item, onPress, onAddToWishList }: Props) {
   const photoPath = item.photo_paths[0] ?? null;
 
   return (
-    <View className="mb-3 min-w-0 flex-row items-center gap-3 rounded-xl border border-border bg-card p-3">
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={item.brand_name}
+      className="mb-3 min-w-0 flex-row items-center gap-3 rounded-xl border border-border bg-card p-3 active:opacity-90"
+    >
       {photoPath ? (
         <View className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">
           <SignedStorageImage
@@ -49,13 +55,13 @@ function ProductBrandRexRow({ item, onPress }: Props) {
       </View>
 
       <TouchableOpacity
-        onPress={onPress}
+        onPress={onAddToWishList}
         activeOpacity={0.7}
         className="shrink-0 rounded-lg border border-border px-2.5 py-1.5"
       >
         <Text className="text-[11px] font-medium text-foreground">Add to Wish List</Text>
       </TouchableOpacity>
-    </View>
+    </Pressable>
   );
 }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter } from 'expo-router';
 import GemsPage from '~/features/gems/ui/GemsPage';
-import { openCreateRex, openRecommendation } from '~/shared/lib/navigation/createRex';
+import { openCreateRex, openRecommendation, openRex } from '~/shared/lib/navigation/createRex';
 import { COLLECTION_FROM, openCollection } from '~/shared/lib/navigation/openCollection';
 import { openWishListWizard } from '~/shared/lib/navigation/wishList';
 
@@ -15,6 +15,7 @@ export default function GemsScreen() {
       }
       onOpenWishListWizard={(prefill) => openWishListWizard(router, prefill)}
       onNavigateToCreateRex={(source) => openCreateRex(router, { prefill: source })}
+      onOpenRexId={(rexId) => openRex(router, rexId)}
     />
   );
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import { ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { OverlayModal } from '~/shared/ui/overlay/OverlayModal';
 import { useOverlaySheetPresentation } from '~/shared/hooks/useOverlaySheetPresentation';
+import { Button } from '~/shared/ui/primitives/Button';
 import DetailHeader from '~/features/rex-detail/ui/common/DetailHeader';
 import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
 import { RexPhotoPlaceholder } from '~/shared/ui/media/RexPhotoPlaceholder';
@@ -18,6 +19,7 @@ type Props = {
   onClose: () => void;
   onEdit?: () => void;
   onDelete: () => void;
+  onTriedThis?: () => void;
 };
 
 function WishListDetailModal({
@@ -28,6 +30,7 @@ function WishListDetailModal({
   onClose,
   onEdit,
   onDelete,
+  onTriedThis,
 }: Props) {
   const { height: windowHeight } = useWindowDimensions();
   const { sheetTranslateY, handleClose } = useOverlaySheetPresentation({
@@ -89,9 +92,9 @@ function WishListDetailModal({
               </View>
 
               {item.size || item.colour ? (
-                <View className="flex-row flex-wrap gap-6">
+                <View className="flex-row flex-wrap gap-3">
                   {item.size ? (
-                    <View className="gap-1">
+                    <View className="min-w-[100px] gap-1 rounded-xl border border-border p-3">
                       <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                         Size
                       </Text>
@@ -99,7 +102,7 @@ function WishListDetailModal({
                     </View>
                   ) : null}
                   {item.colour ? (
-                    <View className="gap-1">
+                    <View className="min-w-[100px] gap-1 rounded-xl border border-border p-3">
                       <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                         Colour
                       </Text>
@@ -110,8 +113,15 @@ function WishListDetailModal({
               ) : null}
 
               {item.note ? (
-                <Text className="text-base leading-relaxed text-foreground">{item.note}</Text>
+                <View className="gap-2">
+                  <Text className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Personal note
+                  </Text>
+                  <Text className="text-base leading-relaxed text-foreground">{item.note}</Text>
+                </View>
               ) : null}
+
+              <View className="h-px bg-border" />
 
               <WishListDetailTags tags={item.tags} />
 
@@ -119,6 +129,10 @@ function WishListDetailModal({
                 <Text className="text-sm text-muted-foreground">
                   Added from your review of {item.source_rex_place_name}
                 </Text>
+              ) : null}
+
+              {isOwner && onTriedThis ? (
+                <Button title="I've tried this now" onPress={onTriedThis} className="w-full" />
               ) : null}
             </View>
           </ScrollView>

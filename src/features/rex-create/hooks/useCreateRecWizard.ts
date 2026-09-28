@@ -3,6 +3,7 @@ import type { AddYourOwnRecSource } from '~/features/rex-create/lib/addYourOwn';
 import { canProceedForStep, suggestedCategoryFromSearch } from '~/features/rex-create/lib/steps';
 import { useCategorySelection } from '~/features/rex-create/hooks/wizard/useCategorySelection';
 import { usePlaceSearch } from '~/features/rex-create/hooks/wizard/usePlaceSearch';
+import { useProductBrand } from '~/features/rex-create/hooks/wizard/useProductBrand';
 import { useScorecard } from '~/features/rex-create/hooks/wizard/useScorecard';
 import { useShareCircles } from '~/features/rex-create/hooks/wizard/useShareCircles';
 import { useStepNavigation } from '~/features/rex-create/hooks/wizard/useStepNavigation';
@@ -26,6 +27,7 @@ export function useCreateRecWizard() {
   const place = usePlaceSearch();
   const category = useCategorySelection();
   const scorecard = useScorecard();
+  const productBrand = useProductBrand();
   const circles = useShareCircles();
   const nav = useStepNavigation(category.activeSteps);
   const [photoStoragePaths, setPhotoStoragePaths] = useState<string[]>([]);
@@ -53,6 +55,11 @@ export function useCreateRecWizard() {
   } = place;
   const { clear: clearScorecard, syncToConfig, setScoreQuickTip, setScoreReview } = scorecard;
   const {
+    brandName,
+    reset: resetProductBrand,
+    prefillFrom: prefillProductBrandFrom,
+  } = productBrand;
+  const {
     selectedCircleIds,
     privateRex,
     reset: resetCircles,
@@ -69,7 +76,14 @@ export function useCreateRecWizard() {
     setSelectedSubcategoryCode(null);
     setHasSubcategoryStep(false);
     clearScorecard();
-  }, [selectedCategoryId, setSelectedSubcategoryCode, setHasSubcategoryStep, clearScorecard]);
+    resetProductBrand();
+  }, [
+    selectedCategoryId,
+    setSelectedSubcategoryCode,
+    setHasSubcategoryStep,
+    clearScorecard,
+    resetProductBrand,
+  ]);
 
   useEffect(() => {
     clearLinkedPlace();
@@ -112,6 +126,7 @@ export function useCreateRecWizard() {
         selectedCircleIds,
         privateRex,
         selectedSubcategoryCode,
+        brandName,
       }),
     [
       stepId,
@@ -125,6 +140,7 @@ export function useCreateRecWizard() {
       selectedCircleIds,
       privateRex,
       selectedSubcategoryCode,
+      brandName,
     ],
   );
 
@@ -148,9 +164,10 @@ export function useCreateRecWizard() {
     resetPlace();
     resetCategory();
     clearScorecard();
+    resetProductBrand();
     resetCircles();
     setPhotoStoragePaths([]);
-  }, [resetPlace, resetCategory, clearScorecard, resetCircles]);
+  }, [resetPlace, resetCategory, clearScorecard, resetProductBrand, resetCircles]);
 
   const reset = useCallback(() => {
     resetForms();
@@ -161,6 +178,10 @@ export function useCreateRecWizard() {
     (source: AddYourOwnRecSource) => {
       resetForms();
       prefillFromAddYourOwn(source);
+      prefillProductBrandFrom({
+        brand_name: source.brandName ?? null,
+        product_name: source.productName ?? null,
+      });
       categoryCodePrefillRef.current = source.categoryCode;
       pendingSubcategoryPrefillRef.current =
         source.subcategoryCode || source.questionAnswers
@@ -170,7 +191,7 @@ export function useCreateRecWizard() {
             }
           : null;
     },
-    [resetForms, prefillFromAddYourOwn],
+    [resetForms, prefillFromAddYourOwn, prefillProductBrandFrom],
   );
 
   const takePendingSubcategoryPrefill = useCallback(() => {
@@ -190,6 +211,7 @@ export function useCreateRecWizard() {
       setPhotoStoragePaths(row.photo_paths ?? []);
       setScoreQuickTip(row.must_know ?? '');
       setScoreReview(row.review ?? '');
+      prefillProductBrandFrom(row);
       prefillCirclesFromEditRow(row);
     },
     [
@@ -199,6 +221,7 @@ export function useCreateRecWizard() {
       setSelectedSubcategoryCode,
       setScoreQuickTip,
       setScoreReview,
+      prefillProductBrandFrom,
       prefillCirclesFromEditRow,
     ],
   );
@@ -218,6 +241,7 @@ export function useCreateRecWizard() {
     place,
     category: { ...category, autoSuggestedCategoryId },
     scorecard,
+    productBrand,
     circles,
     photos: { paths: photoStoragePaths, setPaths: setPhotoStoragePaths },
     syncFormToConfig,

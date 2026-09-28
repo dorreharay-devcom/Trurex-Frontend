@@ -7,6 +7,7 @@ const LABELS: Record<CreateRecStepId, string> = {
   search: 'Search',
   category: 'Category',
   type: 'Type',
+  brandProduct: 'Brand',
   scorecard: 'Scorecard',
   photos: 'Photos',
   circles: 'Circles',

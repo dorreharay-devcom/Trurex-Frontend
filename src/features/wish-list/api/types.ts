@@ -50,7 +50,7 @@ export type ProductBrandRexRow = {
   brand_name: string;
   product_name: string | null;
   review: string | null;
-  score_overall: number | null;
+  score_value_for_money: number | null;
   question_answers: Record<string, unknown>;
   tags: string[];
   photo_paths: string[];

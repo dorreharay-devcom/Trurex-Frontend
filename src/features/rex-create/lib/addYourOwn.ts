@@ -8,6 +8,8 @@ export type AddYourOwnRecSource = {
   categoryCode: string | null;
   subcategoryCode?: string | null;
   questionAnswers?: Record<string, string>;
+  brandName?: string | null;
+  productName?: string | null;
   linkedPlaceId: string | null;
   isOnlinePlace: boolean;
   placeWebsiteUrl: string | null;
@@ -46,6 +48,8 @@ export function buildAddYourOwnRecSource(
   return {
     placeName,
     categoryCode: normalizeCategoryCode(detail?.category_code, rec.categoryId),
+    brandName: detail?.brand_name ?? null,
+    productName: detail?.product_name ?? rec.productName ?? null,
     linkedPlaceId:
       !isOnlinePlace && detail?.place_id && detail.place_id.trim() ? detail.place_id.trim() : null,
     isOnlinePlace,

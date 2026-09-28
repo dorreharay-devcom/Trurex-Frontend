@@ -57,6 +57,12 @@ function GemsOverlays({ page, removeUncollected, wishListPage }: Props) {
           wishListPage.closeItem();
           wishListPage.openWizard({ kind: 'edit', item });
         }}
+        onTriedThis={() => {
+          const item = wishListPage.selectedItem;
+          if (!item) return;
+          wishListPage.openTriedThis(item);
+          wishListPage.triedThis.open();
+        }}
       />
       <WishListDetailOverlays item={wishListPage.selectedItem} del={wishListPage.del} />
       <TriedThisConfirmDialog

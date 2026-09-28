@@ -5,8 +5,6 @@ import { toUserRoute } from '~/shared/config/routes';
 import { openCreateRex, openRecommendation } from '~/shared/lib/navigation/createRex';
 import { openCreateRexRequest, openRexRequest } from '~/shared/lib/navigation/rexRequest';
 import { openCollection } from '~/shared/lib/navigation/openCollection';
-import { openWishListWizard } from '~/shared/lib/navigation/wishList';
-import { placeDisplayTitle } from '~/shared/lib/recommendation';
 import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
 
 export default function DiscoverScreen() {
@@ -22,14 +20,6 @@ export default function DiscoverScreen() {
       onCreateRexRequest={() => openCreateRexRequest(router)}
       onOpenRexRequest={(requestId) => openRexRequest(router, requestId)}
       onOpenCollection={(collectionId) => openCollection(router, collectionId)}
-      onAddToWishList={(rec) =>
-        openWishListWizard(router, {
-          kind: 'fromRex',
-          sourceRexId: rec.id,
-          brandName: placeDisplayTitle(rec.title),
-          productName: rec.productName ?? null,
-        })
-      }
     />
   );
 }

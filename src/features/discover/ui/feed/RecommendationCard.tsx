@@ -1,7 +1,6 @@
 import React, { memo } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
-import { canOfferAddToWishList } from '~/features/wish-list/lib/feedGating';
 import CardActions from './common/CardActions';
 import CardHeader from './common/CardHeader';
 import CardMedia from './common/CardMedia';
@@ -12,7 +11,6 @@ type Props = {
   onTap?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
   onSave?: (rec: Recommendation) => void;
   onRemove?: () => void;
-  onAddToWishList?: (rec: Recommendation) => void;
 };
 
 const RecommendationCard = memo(function RecommendationCard({
@@ -20,18 +18,15 @@ const RecommendationCard = memo(function RecommendationCard({
   onTap,
   onSave,
   onRemove,
-  onAddToWishList,
 }: Props) {
   const Wrapper = onTap ? TouchableOpacity : View;
-  const showWishListMenu =
-    onAddToWishList && canOfferAddToWishList(rec) ? () => onAddToWishList(rec) : undefined;
 
   return (
     <Wrapper
       {...(onTap ? { activeOpacity: 0.95, onPress: () => onTap(rec) } : {})}
       className="bg-card border border-border rounded-xl overflow-hidden mb-4"
     >
-      <CardHeader rec={rec} onRemove={onRemove} onAddToWishList={showWishListMenu} />
+      <CardHeader rec={rec} onRemove={onRemove} />
       <CardMedia rec={rec} />
       <Text className="px-4 pt-3 text-sm text-foreground opacity-[0.85]" numberOfLines={3}>
         {rec.description ?? ''}

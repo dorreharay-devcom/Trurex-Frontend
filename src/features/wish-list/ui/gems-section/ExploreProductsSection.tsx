@@ -17,9 +17,10 @@ import {
 type Props = {
   explore: ProductBrandRexesState;
   onAddToWishList: (row: ProductBrandRexRowData) => void;
+  onOpenRex: (row: ProductBrandRexRowData) => void;
 };
 
-function ExploreProductsSection({ explore, onAddToWishList }: Props) {
+function ExploreProductsSection({ explore, onAddToWishList, onOpenRex }: Props) {
   const isInitialLoading = explore.isFetching && explore.rows.length === 0;
   const showEmpty = !isInitialLoading && !explore.isError && explore.rows.length === 0;
 
@@ -64,7 +65,12 @@ function ExploreProductsSection({ explore, onAddToWishList }: Props) {
       ) : null}
 
       {explore.rows.map((row) => (
-        <ProductBrandRexRow key={row.id} item={row} onPress={() => onAddToWishList(row)} />
+        <ProductBrandRexRow
+          key={row.id}
+          item={row}
+          onPress={() => onOpenRex(row)}
+          onAddToWishList={() => onAddToWishList(row)}
+        />
       ))}
 
       {explore.isFetchNextPageError ? (

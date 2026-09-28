@@ -53,6 +53,8 @@ export type CreateRexRpcParams = {
   p_category_code: string;
   p_subcategory_code?: string;
   p_place_name: string;
+  p_brand_name?: string | null;
+  p_product_name?: string | null;
   p_review?: string | null;
   p_description?: string | null;
   p_reason?: string | null;
