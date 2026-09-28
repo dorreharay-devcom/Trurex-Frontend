@@ -1,61 +1,31 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import { ArrowLeft, Flag, Trash2, Pencil } from 'lucide-react-native';
+import { ArrowLeft } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
 import { isWeb } from '~/shared/lib/ui/platform';
-import HeaderActionPill from './HeaderActionPill';
+import HeaderOverflowMenu from './HeaderOverflowMenu';
 
-type HeaderActionsProps = {
+type Props = {
   isOwner: boolean;
   showReport: boolean;
+  canAddToWishList?: boolean;
+  onBack: () => void;
   onEdit: (() => void) | undefined;
   onDelete: () => void;
   onReport: () => void;
+  onAddToWishList?: (() => void) | undefined;
 };
 
-function HeaderActions({ isOwner, showReport, onEdit, onDelete, onReport }: HeaderActionsProps) {
-  if (isOwner) {
-    return (
-      <View className="flex-row items-center justify-end gap-2">
-        {onEdit ? (
-          <HeaderActionPill
-            icon={Pencil}
-            label="Edit"
-            accessibilityLabel="Edit this recommendation"
-            variant="primary"
-            onPress={onEdit}
-          />
-        ) : null}
-        <HeaderActionPill
-          icon={Trash2}
-          label="Delete"
-          accessibilityLabel="Delete this recommendation"
-          variant="destructive"
-          onPress={onDelete}
-        />
-      </View>
-    );
-  }
-  if (showReport) {
-    return (
-      <HeaderActionPill
-        icon={Flag}
-        label="Report"
-        accessibilityLabel="Report this recommendation"
-        variant="destructive"
-        iconFill
-        onPress={onReport}
-      />
-    );
-  }
-  return null;
-}
-
-type Props = HeaderActionsProps & {
-  onBack: () => void;
-};
-
-function DetailHeader({ isOwner, showReport, onBack, onEdit, onDelete, onReport }: Props) {
+function DetailHeader({
+  isOwner,
+  showReport,
+  canAddToWishList = false,
+  onBack,
+  onEdit,
+  onDelete,
+  onReport,
+  onAddToWishList,
+}: Props) {
   return (
     <View
       className="sticky top-0 z-10 border-b border-border bg-card/95 px-4 py-4 backdrop-blur sm:px-6"
@@ -74,13 +44,15 @@ function DetailHeader({ isOwner, showReport, onBack, onEdit, onDelete, onReport 
           </Pressable>
         </View>
         <View className="min-w-0 flex-1" />
-        <View className="w-[152px] shrink-0 items-end justify-center">
-          <HeaderActions
+        <View className="w-[60px] shrink-0 items-end justify-center">
+          <HeaderOverflowMenu
             isOwner={isOwner}
             showReport={showReport}
+            canAddToWishList={canAddToWishList}
             onEdit={onEdit}
             onDelete={onDelete}
             onReport={onReport}
+            onAddToWishList={onAddToWishList}
           />
         </View>
       </View>

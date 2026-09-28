@@ -10,6 +10,7 @@ import {
   SearchStep,
   Category,
   SubCategory,
+  BrandProduct,
   ScorecardStep,
   Photos,
   CirclesStep,
@@ -77,6 +78,14 @@ const CreateModalBody = ({
                 subCategories={config.subcategoryOptions}
                 selected={flow.category.selectedSubcategoryCode}
                 onSelect={flow.category.setSelectedSubcategoryCode}
+              />
+            )}
+            {stepId === STEP_ID.brandProduct && (
+              <BrandProduct
+                brandName={flow.productBrand.brandName}
+                onChangeBrandName={flow.productBrand.setBrandName}
+                productName={flow.productBrand.productName}
+                onChangeProductName={flow.productBrand.setProductName}
               />
             )}
             {stepId === STEP_ID.scorecard && <ScorecardStep flow={flow} config={config} />}

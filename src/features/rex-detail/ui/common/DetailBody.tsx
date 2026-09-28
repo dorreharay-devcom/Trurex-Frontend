@@ -13,10 +13,9 @@ import type { Recommendation } from '~/shared/types/recommendation';
 import { authorDisplayName } from '~/shared/lib/recommendation';
 import { isIos, isWeb } from '~/shared/lib/ui/platform';
 import { cn } from '~/shared/lib/ui/styles';
-import { canOfferAddToWishList } from '~/features/wish-list/lib/feedGating';
-import AddToWishListButton from './AddToWishListButton';
 import AddYourOwnButton from './AddYourOwnButton';
 import DetailAuthorCard from './DetailAuthorCard';
+import DetailBrandProduct from './DetailBrandProduct';
 import DetailHero from './DetailHero';
 import DetailQuote from './DetailQuote';
 import DetailRatings from './DetailRatings';
@@ -32,7 +31,6 @@ type Props = {
   isOwner: boolean;
   onAuthorPress: () => void;
   onAddYourOwn?: (source: AddYourOwnRecSource) => void;
-  onAddToWishList?: (rec: Recommendation) => void;
   onCommentCountChange?: (total: number) => void;
   scrollToComments?: boolean;
   scrollToCommentId?: string;
@@ -49,7 +47,6 @@ function DetailBody({
   isOwner,
   onAuthorPress,
   onAddYourOwn,
-  onAddToWishList,
   onCommentCountChange,
   scrollToComments,
   scrollToCommentId,
@@ -86,6 +83,10 @@ function DetailBody({
           isThanked={detail.rexDetail?.is_thanked ?? false}
           showThankButton={!isOwner}
         />
+        <DetailBrandProduct
+          brandName={detail.rexDetail?.brand_name}
+          productName={detail.rexDetail?.product_name}
+        />
         <DetailQuote text={recommendation.description} />
         <DetailRatings ratings={detail.detailRatings} />
         <DetailTags tags={recommendation.tags} />
@@ -93,9 +94,6 @@ function DetailBody({
           <AddYourOwnButton
             onPress={() => onAddYourOwn(buildAddYourOwnRecSource(recommendation, detail.rexDetail))}
           />
-        ) : null}
-        {onAddToWishList && canOfferAddToWishList(recommendation) ? (
-          <AddToWishListButton onPress={() => onAddToWishList(recommendation)} />
         ) : null}
 
         <View ref={commentsScroll.commentsSectionWrapRef} collapsable={false}>

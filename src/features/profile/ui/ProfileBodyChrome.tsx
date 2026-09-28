@@ -40,8 +40,6 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
 
       {flow.isOwnProfile ? <ProfileReferralsSection onPress={flow.openReferrals} /> : null}
 
-      {profile?.currently ? <CurrentlySection currently={profile.currently} /> : null}
-
       {profile ? (
         <ProfileWishListSection
           profile={profile}
@@ -49,6 +47,8 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
           onOpenWishList={flow.openWishList}
         />
       ) : null}
+
+      {profile?.currently ? <CurrentlySection currently={profile.currently} /> : null}
 
       <ProfileTabs
         activeTab={content.activeTab}

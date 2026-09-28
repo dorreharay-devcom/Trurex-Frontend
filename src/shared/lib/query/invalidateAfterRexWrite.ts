@@ -1,6 +1,7 @@
 import type { InfiniteData, QueryClient } from '@tanstack/react-query';
 import type { MapPinRow } from '~/features/map/types/mapPinRow';
 import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
+import { WISH_LIST_QUERY_KEYS } from '~/features/wish-list/config/queryKeys';
 import type { Recommendation } from '~/shared/types/recommendation';
 
 export const AFTER_CREATE_FEED_KEYS = [
@@ -8,6 +9,7 @@ export const AFTER_CREATE_FEED_KEYS = [
   REX_QUERY_KEYS.myRexes,
   REX_QUERY_KEYS.searchRexes,
   REX_QUERY_KEYS.mySavedRexes,
+  WISH_LIST_QUERY_KEYS.productBrandRexesBase,
 ] as const;
 
 export const AFTER_CREATE_MAP_KEYS = [

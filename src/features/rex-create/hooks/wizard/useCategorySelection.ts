@@ -12,8 +12,8 @@ export function useCategorySelection() {
   }, []);
 
   const activeSteps = useMemo(
-    () => getActiveCreateRecSteps(selectedCategoryId, hasSubcategoryStep),
-    [selectedCategoryId, hasSubcategoryStep],
+    () => getActiveCreateRecSteps(selectedCategoryId, hasSubcategoryStep, selectedSubcategoryCode),
+    [selectedCategoryId, hasSubcategoryStep, selectedSubcategoryCode],
   );
 
   const reset = useCallback(() => {

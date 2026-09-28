@@ -12,6 +12,7 @@ import { SEARCH_MODE } from '~/features/rex-create/types/create';
 import { REX_VISIBILITY } from '~/features/rex-create/lib/sharing';
 import type { CategoryQuestion } from '~/features/rex-create/types/categoryCreateConfig';
 import { invalidateAfterRexWrite } from '~/shared/lib/query/invalidateAfterRexWrite';
+import { PRODUCT_BRAND_SUBCATEGORY_CODE } from '~/features/wish-list/config/rexBridge';
 
 export function createRexErrorMessage(
   rawMessage: string,
@@ -101,8 +102,15 @@ export function buildCreateRexParams(
   config: CreateConfigState,
   categoryApiCode: string,
 ) {
-  const { place, scorecard, circles, photos } = flow;
+  const { place, scorecard, productBrand, circles, photos } = flow;
   const isOnline = place.searchMode === SEARCH_MODE.online;
+  const isProductOrBrand = config.subcategoryCodeForMerge === PRODUCT_BRAND_SUBCATEGORY_CODE;
+  const placeName = getPlaceNameForRex(
+    place.searchMode,
+    place.selectedSearchPlace,
+    place.manualName,
+    place.onlineName,
+  );
   const p_visibility = resolveCreateRexVisibility(
     circles.selectedCircleIds,
     circles.privateRex,
@@ -110,12 +118,9 @@ export function buildCreateRexParams(
   );
   return {
     p_category_code: categoryApiCode,
-    p_place_name: getPlaceNameForRex(
-      place.searchMode,
-      place.selectedSearchPlace,
-      place.manualName,
-      place.onlineName,
-    ),
+    p_place_name: placeName,
+    p_brand_name: isProductOrBrand ? productBrand.brandName.trim() || null : null,
+    p_product_name: isProductOrBrand ? productBrand.productName.trim() || null : null,
     p_review: scorecard.scoreReview.trim() || null,
     p_must_know: config.showQuickTip ? scorecard.scoreQuickTip.trim() || null : null,
     p_visibility,

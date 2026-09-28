@@ -13,6 +13,7 @@ export type WishListSectionProps = {
   onTriedThis: (item: WishListItemRow) => void;
   onAddProduct: () => void;
   onAddFromExplore: (row: ProductBrandRexRow) => void;
+  onOpenExploreRex: (row: ProductBrandRexRow) => void;
 };
 
 // Renders the user's own Wish List first, then the "inspired by others" discovery
@@ -24,6 +25,7 @@ function WishListSection({
   onTriedThis,
   onAddProduct,
   onAddFromExplore,
+  onOpenExploreRex,
 }: WishListSectionProps) {
   return (
     <View className="mb-6">
@@ -33,7 +35,11 @@ function WishListSection({
         onTriedThis={onTriedThis}
         onAddProduct={onAddProduct}
       />
-      <ExploreProductsSection explore={explore} onAddToWishList={onAddFromExplore} />
+      <ExploreProductsSection
+        explore={explore}
+        onAddToWishList={onAddFromExplore}
+        onOpenRex={onOpenExploreRex}
+      />
     </View>
   );
 }

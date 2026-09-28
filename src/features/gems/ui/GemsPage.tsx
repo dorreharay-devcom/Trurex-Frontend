@@ -24,6 +24,7 @@ type GemsPageProps = {
   onOpenCollection?: (collectionId: string) => void;
   onOpenWishListWizard?: (prefill: WishListWizardPrefill | null) => void;
   onNavigateToCreateRex?: (source: AddYourOwnRecSource) => void;
+  onOpenRexId?: (rexId: string) => void;
 };
 
 function GemsPage({
@@ -31,6 +32,7 @@ function GemsPage({
   onOpenCollection,
   onOpenWishListWizard,
   onNavigateToCreateRex,
+  onOpenRexId,
 }: GemsPageProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const { collections, uncollected } = useGemsData(searchQuery);
@@ -60,6 +62,7 @@ function GemsPage({
         brandName: row.brand_name,
         productName: row.product_name,
       }),
+    onOpenExploreRex: (row: ProductBrandRexRow) => onOpenRexId?.(row.id),
   };
 
   return (

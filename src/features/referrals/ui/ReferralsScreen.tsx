@@ -41,10 +41,16 @@ function ReferralsScreen({ onBack, onUserPress }: Props) {
         <QueryErrorState title="Couldn't load referrals" onRetry={() => void info.refetch()} />
       ) : (
         <View className="gap-4">
+          <View className="gap-1.5">
+            <Text className="text-2xl font-bold text-foreground">Share TruRex. Get rewarded.</Text>
+            <Text className="my-2 text-sm text-muted-foreground">
+              Send your personal code to a friend. When they join, you both earn a reward.
+            </Text>
+          </View>
+
           <ReferralCodeCard
             code={info.referralCode}
             loading={info.isLoading}
-            totalReferrals={info.totalReferrals}
             onShare={() => {
               if (info.referralCode) void shareReferralCode(info.referralCode);
             }}
@@ -52,6 +58,7 @@ function ReferralsScreen({ onBack, onUserPress }: Props) {
           <ReferredUsersList
             users={info.referredUsers}
             loading={info.isLoading}
+            totalReferrals={info.totalReferrals}
             onUserPress={onUserPress}
           />
         </View>

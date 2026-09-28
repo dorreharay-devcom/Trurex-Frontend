@@ -19,13 +19,26 @@ const baseDeps = (): CanProceedDeps => ({
   selectedCircleIds: new Set(),
   privateRex: false,
   selectedSubcategoryCode: null,
+  brandName: '',
 });
 
 describe('create steps', () => {
   it('includes subcategory step when needed', () => {
-    expect(getActiveCreateRecSteps(null, true)).not.toContain(STEP_ID.type);
-    expect(getActiveCreateRecSteps('food', true)).toContain(STEP_ID.type);
-    expect(getActiveCreateRecSteps('food', false)).not.toContain(STEP_ID.type);
+    expect(getActiveCreateRecSteps(null, true, null)).not.toContain(STEP_ID.type);
+    expect(getActiveCreateRecSteps('food', true, null)).toContain(STEP_ID.type);
+    expect(getActiveCreateRecSteps('food', false, null)).not.toContain(STEP_ID.type);
+  });
+
+  it('includes brand/product step only for retail_shopping product_or_brand', () => {
+    expect(getActiveCreateRecSteps('retail_shopping', true, 'product_or_brand')).toContain(
+      STEP_ID.brandProduct,
+    );
+    expect(getActiveCreateRecSteps('retail_shopping', true, 'shop_or_store')).not.toContain(
+      STEP_ID.brandProduct,
+    );
+    expect(getActiveCreateRecSteps('food', true, 'product_or_brand')).not.toContain(
+      STEP_ID.brandProduct,
+    );
   });
 
   it('suggests category from search place', () => {
@@ -71,6 +84,9 @@ describe('create steps', () => {
     expect(canProceedForStep(STEP_ID.type, d)).toBe(false);
     d.selectedSubcategoryCode = 'cafe';
     expect(canProceedForStep(STEP_ID.type, d)).toBe(true);
+    expect(canProceedForStep(STEP_ID.brandProduct, d)).toBe(false);
+    d.brandName = 'Aesop';
+    expect(canProceedForStep(STEP_ID.brandProduct, d)).toBe(true);
     expect(canProceedForStep(STEP_ID.scorecard, d)).toBe(true);
     expect(canProceedForStep(STEP_ID.photos, d)).toBe(true);
     expect(canProceedForStep(STEP_ID.circles, d)).toBe(false);

@@ -11,6 +11,7 @@ import { useSaveRex } from '~/features/rex-detail/hooks/useSaveRex';
 import type { AddYourOwnRecSource } from '~/features/rex-create/lib/addYourOwn';
 import type { Recommendation } from '~/shared/types/recommendation';
 import { isIos } from '~/shared/lib/ui/platform';
+import { canOfferAddToWishList } from '~/features/wish-list/lib/feedGating';
 import DetailBody from './common/DetailBody';
 import DetailHeader from './common/DetailHeader';
 import DetailOverlays from './common/DetailOverlays';
@@ -101,10 +102,12 @@ const RecommendationDetailModal: React.FC<Props> = ({
         <DetailHeader
           isOwner={isOwner}
           showReport={showReport}
+          canAddToWishList={canOfferAddToWishList(recommendation)}
           onBack={handleClose}
           onEdit={onEditRex ? () => onEditRex(recommendation.id) : undefined}
           onDelete={del.openConfirm}
           onReport={report.openRexReport}
+          onAddToWishList={onAddToWishList ? () => onAddToWishList(recommendation) : undefined}
         />
         <DetailBody
           recommendation={recommendation}
@@ -115,7 +118,6 @@ const RecommendationDetailModal: React.FC<Props> = ({
           isOwner={isOwner}
           onAuthorPress={handleAuthorPress}
           onAddYourOwn={onAddYourOwn}
-          onAddToWishList={onAddToWishList}
           onCommentCountChange={onCommentCountChange}
           scrollToComments={scrollToComments}
           scrollToCommentId={scrollToCommentId}

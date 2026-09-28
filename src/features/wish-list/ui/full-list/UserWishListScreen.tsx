@@ -64,7 +64,14 @@ function UserWishListScreen({
                 key={item.id}
                 item={item}
                 onPress={() => page.openItem(item)}
-                onTriedThis={isOwnProfile ? () => page.openTriedThis(item) : undefined}
+                onTriedThis={
+                  isOwnProfile
+                    ? () => {
+                        page.openTriedThis(item);
+                        page.triedThis.open();
+                      }
+                    : undefined
+                }
               />
             ))}
           </View>
@@ -93,6 +100,16 @@ function UserWishListScreen({
                 if (!item) return;
                 page.closeItem();
                 page.openWizard({ kind: 'edit', item });
+              }
+            : undefined
+        }
+        onTriedThis={
+          isOwnProfile
+            ? () => {
+                const item = page.selectedItem;
+                if (!item) return;
+                page.openTriedThis(item);
+                page.triedThis.open();
               }
             : undefined
         }

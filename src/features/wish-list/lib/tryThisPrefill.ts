@@ -14,6 +14,8 @@ export function buildAddYourOwnRecSourceFromWishListItem(
     categoryCode: PRODUCT_BRAND_CATEGORY_CODE,
     subcategoryCode: PRODUCT_BRAND_SUBCATEGORY_CODE,
     questionAnswers: item.product_name ? { [PRODUCT_NAME_QUESTION_CODE]: item.product_name } : {},
+    brandName: item.brand_name,
+    productName: item.product_name,
     linkedPlaceId: null,
     isOnlinePlace: false,
     placeWebsiteUrl: null,
