@@ -28,6 +28,7 @@ export function useDeleteWishListItem({ itemId, visible, onDeleted }: Args) {
       setConfirmOpen(false);
       toastSuccess('Removed from Wish List');
       void queryClient.invalidateQueries({ queryKey: WISH_LIST_QUERY_KEYS.mine });
+      void queryClient.invalidateQueries({ queryKey: WISH_LIST_QUERY_KEYS.profilePreviewBase });
       onDeleted();
     },
     onError: (err: unknown) => {

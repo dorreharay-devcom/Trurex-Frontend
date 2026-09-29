@@ -93,6 +93,7 @@ export function useWishListItemWizard(prefill: WishListWizardPrefill | null) {
         });
       }
       void queryClient.invalidateQueries({ queryKey: WISH_LIST_QUERY_KEYS.mine });
+      void queryClient.invalidateQueries({ queryKey: WISH_LIST_QUERY_KEYS.profilePreviewBase });
       toastSuccess(isEditMode ? 'Wish List item updated!' : 'Added to Wish List!');
       return true;
     } catch (e) {
