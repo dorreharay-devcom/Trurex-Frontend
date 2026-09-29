@@ -25,6 +25,7 @@ export function useWishListPageState({ onNavigateToCreateRex, onOpenWishListWiza
   const triedThis = useTriedThis({
     item: triedThisTarget,
     onNavigateToCreateRex,
+    onConfirm: closeItem,
     onDeleted: () => setTriedThisTarget(null),
   });
 
