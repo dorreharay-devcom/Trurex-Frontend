@@ -16,7 +16,7 @@ const STATUS_TONE_STYLES: Record<StatusTone, { pill: string; text: string }> = {
 
 function referralStatus(user: ReferredUser): { label: string; tone: StatusTone } {
   if (user.signup_rewarded && user.activation_rewarded) {
-    return { label: 'Fully rewarded', tone: 'complete' };
+    return { label: 'Reward earned', tone: 'complete' };
   }
   if (user.activation_rewarded) {
     return { label: 'Activation reward earned', tone: 'success' };

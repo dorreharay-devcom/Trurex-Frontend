@@ -75,7 +75,7 @@ export function limitTagsToRows(
     return { visibleCount: total, hiddenCount: 0 };
   }
 
-  for (let visibleCount = total - 1; visibleCount >= 0; visibleCount -= 1) {
+  for (let visibleCount = total - 1; visibleCount >= 1; visibleCount -= 1) {
     const hiddenCount = total - visibleCount;
     const trailingWidth = overflowWidthForCount(hiddenCount, overflowWidthByDigits);
 
@@ -84,7 +84,8 @@ export function limitTagsToRows(
     }
   }
 
-  return { visibleCount: 0, hiddenCount: total };
+  // Always show at least one tag rather than an overflow badge with no context.
+  return { visibleCount: 1, hiddenCount: total - 1 };
 }
 
 export function splitDiscoverTags(
