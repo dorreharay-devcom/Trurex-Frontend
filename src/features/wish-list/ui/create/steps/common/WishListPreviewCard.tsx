@@ -4,7 +4,9 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Sparkles } from 'lucide-react-native';
 import { wishListTagLabel } from '~/features/wish-list/config/tags';
+import { PRODUCT_BRAND_CATEGORY_CODE } from '~/features/wish-list/config/rexBridge';
 import { useSignedStorageUrl } from '~/shared/hooks/useSignedStorageUrl';
+import { useCategoryIcon } from '~/shared/hooks/useActiveCategories';
 import { RexPhotoPlaceholder } from '~/shared/ui/media/RexPhotoPlaceholder';
 import { REX_IMAGES_BUCKET } from '~/shared/config/app';
 import { Theme } from '~/shared/theme/Theme';
@@ -16,11 +18,12 @@ const PLACEHOLDER_COLORS = [Theme.colors.sand, Theme.colors.sandMuted];
 
 function HeroMedia({ photoPath }: { photoPath: string | null }) {
   const { uri, loading } = useSignedStorageUrl(REX_IMAGES_BUCKET, photoPath ?? '');
+  const categoryIcon = useCategoryIcon(PRODUCT_BRAND_CATEGORY_CODE);
 
   if (!photoPath) {
     return (
       <RexPhotoPlaceholder
-        categoryIcon="🛍️"
+        categoryIcon={categoryIcon}
         colors={PLACEHOLDER_COLORS}
         style={StyleSheet.absoluteFillObject}
         emojiSize={52}

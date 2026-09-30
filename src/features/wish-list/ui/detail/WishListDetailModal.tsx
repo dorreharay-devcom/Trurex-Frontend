@@ -8,6 +8,8 @@ import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
 import { RexPhotoPlaceholder } from '~/shared/ui/media/RexPhotoPlaceholder';
 import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
 import { REX_IMAGES_BUCKET } from '~/shared/config/app';
+import { useCategoryIcon } from '~/shared/hooks/useActiveCategories';
+import { PRODUCT_BRAND_CATEGORY_CODE } from '~/features/wish-list/config/rexBridge';
 import type { WishListItemRow } from '~/features/wish-list/api/types';
 import WishListDetailTags from '~/features/wish-list/ui/detail/WishListDetailTags';
 
@@ -33,6 +35,7 @@ function WishListDetailModal({
   onTriedThis,
 }: Props) {
   const { height: windowHeight } = useWindowDimensions();
+  const categoryIcon = useCategoryIcon(PRODUCT_BRAND_CATEGORY_CODE);
   const { sheetTranslateY, handleClose } = useOverlaySheetPresentation({
     visible,
     windowHeight,
@@ -75,7 +78,7 @@ function WishListDetailModal({
                 </View>
               ) : (
                 <RexPhotoPlaceholder
-                  categoryIcon="🛍️"
+                  categoryIcon={categoryIcon}
                   className="aspect-[16/9] w-full rounded-xl"
                   emojiSize={54}
                   accessibilityLabel={item.brand_name}

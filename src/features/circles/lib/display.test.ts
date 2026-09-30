@@ -60,7 +60,7 @@ describe('circle display', () => {
     expect(ordered).toContain('orphan');
     expect(ordered.at(-1)).toBe('b');
     expect(isUserCreatedCircle(row({ system_kind: null }))).toBe(true);
-    expect(defaultCircleSubtitle(row({ system_kind: null }))).toBe('Private circle');
+    expect(defaultCircleSubtitle(row({ system_kind: null }))).toBe('Your custom circle');
     expect(defaultCircleSubtitle(row({ description: 'Desc' }))).toBe('Desc');
 
     const display = mapApiCirclesToDisplayRows(sortCirclesForRingStack(rows));
