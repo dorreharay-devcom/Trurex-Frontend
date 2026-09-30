@@ -1,11 +1,13 @@
 import React from 'react';
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';
-import { Package, User } from 'lucide-react-native';
+import { User } from 'lucide-react-native';
 import CategoryBadge from '~/features/gems/ui/uncollected-rex-row/CategoryBadge';
 import IconMetaRow from '~/features/gems/ui/uncollected-rex-row/IconMetaRow';
 import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
+import { RexPhotoPlaceholder } from '~/shared/ui/media/RexPhotoPlaceholder';
 import { REX_IMAGES_BUCKET } from '~/shared/config/app';
-import { Theme } from '~/shared/theme/Theme';
+import { useCategoryIcon } from '~/shared/hooks/useActiveCategories';
+import { PRODUCT_BRAND_CATEGORY_CODE } from '~/features/wish-list/config/rexBridge';
 import type { ProductBrandRexRow as ProductBrandRexRowData } from '~/features/wish-list/api/types';
 
 type Props = {
@@ -22,6 +24,7 @@ function authorMetaLabel(item: ProductBrandRexRowData): string {
 
 function ProductBrandRexRow({ item, onPress, onAddToWishList }: Props) {
   const photoPath = item.photo_paths[0] ?? null;
+  const categoryIcon = useCategoryIcon(PRODUCT_BRAND_CATEGORY_CODE);
 
   return (
     <Pressable
@@ -30,8 +33,8 @@ function ProductBrandRexRow({ item, onPress, onAddToWishList }: Props) {
       accessibilityLabel={item.brand_name}
       className="mb-3 min-w-0 flex-row items-center gap-3 rounded-xl border border-border bg-card p-3 active:opacity-90"
     >
-      {photoPath ? (
-        <View className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">
+      <View className="h-12 w-12 shrink-0 overflow-hidden rounded-lg">
+        {photoPath ? (
           <SignedStorageImage
             bucket={REX_IMAGES_BUCKET}
             storagePath={photoPath}
@@ -39,12 +42,15 @@ function ProductBrandRexRow({ item, onPress, onAddToWishList }: Props) {
             contentFit="cover"
             accessibilityLabel={item.brand_name}
           />
-        </View>
-      ) : (
-        <View className="h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted">
-          <Package size={18} color={Theme.colors.muted} />
-        </View>
-      )}
+        ) : (
+          <RexPhotoPlaceholder
+            categoryIcon={categoryIcon}
+            className="h-full w-full"
+            emojiSize={20}
+            accessibilityLabel={item.brand_name}
+          />
+        )}
+      </View>
 
       <View className="min-w-0 flex-1 overflow-hidden">
         <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>

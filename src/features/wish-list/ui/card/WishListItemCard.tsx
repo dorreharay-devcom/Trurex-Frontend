@@ -3,11 +3,12 @@ import { Pressable, Text, View } from 'react-native';
 import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
 import { RexPhotoPlaceholder } from '~/shared/ui/media/RexPhotoPlaceholder';
 import { REX_IMAGES_BUCKET } from '~/shared/config/app';
+import { useCategoryIcon } from '~/shared/hooks/useActiveCategories';
+import { PRODUCT_BRAND_CATEGORY_CODE } from '~/features/wish-list/config/rexBridge';
 import WishListTagRow from '~/features/wish-list/ui/card/WishListTagRow';
 import type { WishListItemRow } from '~/features/wish-list/api/types';
 
 export const WISH_LIST_CARD_WIDTH = 260;
-const RETAIL_SHOPPING_PLACEHOLDER_ICON = '🛍️';
 
 type Props = {
   item: WishListItemRow;
@@ -16,6 +17,8 @@ type Props = {
 };
 
 function WishListItemCard({ item, onPress, onTriedThis }: Props) {
+  const categoryIcon = useCategoryIcon(PRODUCT_BRAND_CATEGORY_CODE);
+
   return (
     <Pressable
       onPress={onPress}
@@ -34,7 +37,7 @@ function WishListItemCard({ item, onPress, onTriedThis }: Props) {
           />
         ) : (
           <RexPhotoPlaceholder
-            categoryIcon={RETAIL_SHOPPING_PLACEHOLDER_ICON}
+            categoryIcon={categoryIcon}
             className="h-full w-full"
             accessibilityLabel={item.brand_name}
           />
