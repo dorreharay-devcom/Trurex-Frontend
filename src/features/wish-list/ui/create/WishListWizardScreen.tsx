@@ -7,6 +7,7 @@ import WishListWizardBody from '~/features/wish-list/ui/create/WishListWizardBod
 import WishListWizardFooter from '~/features/wish-list/ui/create/WishListWizardFooter';
 import WishListWizardHeader from '~/features/wish-list/ui/create/WishListWizardHeader';
 import { OverlayModal } from '~/shared/ui/overlay/OverlayModal';
+import { toastSuccessAfterDismiss } from '~/shared/lib/appToast';
 
 type Props = {
   onClose: () => void;
@@ -31,7 +32,10 @@ const WishListWizardScreen = ({ onClose, prefill }: Props) => {
     }
     const succeeded = await flow.submit();
     if (!succeeded) return;
-    handleClose();
+    toastSuccessAfterDismiss(
+      handleClose,
+      flow.isEditMode ? 'Wish List item updated!' : 'Added to Wish List!',
+    );
   };
 
   return (
