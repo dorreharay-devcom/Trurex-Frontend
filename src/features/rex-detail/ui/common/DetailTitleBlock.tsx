@@ -75,10 +75,15 @@ function DetailTitleBlock({ recommendation, detail, isSaved, onSavePress }: Prop
         {placeDisplayTitle(recommendation.title)}
       </Text>
       {detail.placeLocationLine ? (
-        <View className="mt-1 flex-row items-center gap-1.5">
+        <Pressable
+          onPress={detail.openMaps}
+          accessibilityRole="link"
+          accessibilityLabel={`Open ${detail.placeLocationLine} in Maps`}
+          className="mt-1 flex-row items-center gap-1.5 self-start active:opacity-80"
+        >
           <MapPin size={14} color={Theme.colors.secondaryText} />
           <Text className="text-sm text-muted-foreground">{detail.placeLocationLine}</Text>
-        </View>
+        </Pressable>
       ) : null}
       <WebsiteLink website={detail.website} />
       {detail.onlineLocationText ? (
