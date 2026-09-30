@@ -4,7 +4,7 @@ import { useSelectionSet } from '~/features/collections/hooks/common/useSelectio
 import { WishListApi } from '~/features/wish-list/api/wishListApi';
 import { WISH_LIST_QUERY_KEYS } from '~/features/wish-list/config/queryKeys';
 import type { WishListWizardPrefill } from '~/features/wish-list/types/wizardPrefill';
-import { toastError, toastSuccess } from '~/shared/lib/appToast';
+import { toastError } from '~/shared/lib/appToast';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 
 export const WISH_LIST_STEP_ORDER = ['details', 'photo', 'confirm'] as const;
@@ -94,7 +94,6 @@ export function useWishListItemWizard(prefill: WishListWizardPrefill | null) {
       }
       void queryClient.invalidateQueries({ queryKey: WISH_LIST_QUERY_KEYS.mine });
       void queryClient.invalidateQueries({ queryKey: WISH_LIST_QUERY_KEYS.profilePreviewBase });
-      toastSuccess(isEditMode ? 'Wish List item updated!' : 'Added to Wish List!');
       return true;
     } catch (e) {
       toastError(

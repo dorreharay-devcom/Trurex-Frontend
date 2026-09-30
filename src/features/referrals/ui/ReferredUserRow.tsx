@@ -5,15 +5,24 @@ import { cn } from '~/shared/lib/ui/styles';
 import { formatProfileHandle } from '~/features/profile/lib/handle';
 import type { ReferredUser } from '~/features/referrals/types/referral';
 
-function referralStatus(user: ReferredUser): { label: string; tone: 'muted' | 'success' } {
+type StatusTone = 'muted' | 'success' | 'complete' | 'pending';
+
+const STATUS_TONE_STYLES: Record<StatusTone, { pill: string; text: string }> = {
+  muted: { pill: 'border-border/80 bg-border/40', text: 'text-foreground' },
+  success: { pill: 'border-primary/40 bg-primary/10', text: 'text-foreground' },
+  complete: { pill: 'border-green-500/40 bg-green-500/10', text: 'text-green-700' },
+  pending: { pill: 'border-yellow-500/40 bg-yellow-500/10', text: 'text-yellow-700' },
+};
+
+function referralStatus(user: ReferredUser): { label: string; tone: StatusTone } {
   if (user.signup_rewarded && user.activation_rewarded) {
-    return { label: 'Fully rewarded', tone: 'success' };
+    return { label: 'Fully rewarded', tone: 'complete' };
   }
   if (user.activation_rewarded) {
     return { label: 'Activation reward earned', tone: 'success' };
   }
   if (user.signup_rewarded) {
-    return { label: 'Awaiting first Rex', tone: 'muted' };
+    return { label: 'Awaiting first Rex', tone: 'pending' };
   }
   return { label: 'Joined', tone: 'muted' };
 }
@@ -25,6 +34,7 @@ type Props = {
 
 function ReferredUserRow({ user, onPress }: Props) {
   const status = referralStatus(user);
+  const toneStyle = STATUS_TONE_STYLES[status.tone];
   const handle = formatProfileHandle(user.handle);
 
   return (
@@ -45,15 +55,8 @@ function ReferredUserRow({ user, onPress }: Props) {
           </Text>
         ) : null}
       </View>
-      <View
-        className={cn(
-          'shrink-0 rounded-full border px-2.5 py-1',
-          status.tone === 'success'
-            ? 'border-primary/40 bg-primary/10'
-            : 'border-border/80 bg-border/40',
-        )}
-      >
-        <Text className="text-[10px] font-medium text-foreground">{status.label}</Text>
+      <View className={cn('shrink-0 rounded-full border px-2.5 py-1', toneStyle.pill)}>
+        <Text className={cn('text-[10px] font-medium', toneStyle.text)}>{status.label}</Text>
       </View>
     </Pressable>
   );
