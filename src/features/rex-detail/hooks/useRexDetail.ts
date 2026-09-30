@@ -10,6 +10,7 @@ import {
   rexCoverStoragePathFromRecommendation,
   rexPhotoStoragePathsFromRecommendation,
 } from '~/shared/lib/media/rexImages';
+import { mapDirectionsUrl } from '~/features/map/lib/directions';
 import { toastError } from '~/shared/lib/appToast';
 
 function normalizeGalleryPath(raw: string): string | null {
@@ -70,6 +71,14 @@ export function useRexDetail(recommendation: Recommendation | null, visible: boo
     });
   }, [websiteHref]);
 
+  const mapsQuery = placeLocationLine || recommendation?.title || '';
+  const openMaps = useCallback(() => {
+    if (!mapsQuery) return;
+    void Linking.openURL(mapDirectionsUrl(mapsQuery)).catch(() => {
+      toastError('Could not open maps', 'Try again.');
+    });
+  }, [mapsQuery]);
+
   const coverPath = useMemo(
     () => (recommendation ? rexCoverStoragePathFromRecommendation(recommendation) : null),
     [recommendation],
@@ -94,6 +103,7 @@ export function useRexDetail(recommendation: Recommendation | null, visible: boo
     placeLocationLine,
     onlineLocationText,
     website: { text: websiteText, href: websiteHref, open: openWebsite },
+    openMaps,
     coverPath,
     coverHttp,
     hasCoverImage,
