@@ -84,7 +84,7 @@ function HeaderOverflowMenu({
             style={[StyleSheet.absoluteFill, { zIndex: 10 }]}
           />
           <View
-            className="absolute right-0 top-9 z-20 rounded-lg border border-border bg-card p-1 shadow-sm"
+            className="absolute right-0 top-9 z-20 min-w-[190px] rounded-lg border border-border bg-card p-1 shadow-sm"
             style={{ elevation: 3 }}
           >
             {items.map((item) => (

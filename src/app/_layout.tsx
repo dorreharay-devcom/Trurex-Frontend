@@ -111,6 +111,15 @@ export default function RootLayout() {
                 }}
               />
               <Stack.Screen
+                name="create-wish-list-item"
+                options={{
+                  presentation: 'transparentModal',
+                  animation: 'none',
+                  contentStyle: { flex: 1, backgroundColor: 'transparent' },
+                  gestureEnabled: false,
+                }}
+              />
+              <Stack.Screen
                 name="rex/[rexId]"
                 options={{
                   presentation: 'transparentModal',
