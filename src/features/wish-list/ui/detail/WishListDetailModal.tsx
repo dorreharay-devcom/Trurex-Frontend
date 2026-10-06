@@ -4,6 +4,7 @@ import { OverlayModal } from '~/shared/ui/overlay/OverlayModal';
 import { useOverlaySheetPresentation } from '~/shared/hooks/useOverlaySheetPresentation';
 import { Button } from '~/shared/ui/primitives/Button';
 import DetailHeader from '~/features/rex-detail/ui/common/DetailHeader';
+import DestructiveActionConfirmModal from '~/shared/ui/destructive-confirm/DestructiveActionConfirmModal';
 import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
 import { RexPhotoPlaceholder } from '~/shared/ui/media/RexPhotoPlaceholder';
 import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
@@ -11,7 +12,10 @@ import { REX_IMAGES_BUCKET } from '~/shared/config/app';
 import { useCategoryIcon } from '~/shared/hooks/useActiveCategories';
 import { PRODUCT_BRAND_CATEGORY_CODE } from '~/features/wish-list/config/rexBridge';
 import type { WishListItemRow } from '~/features/wish-list/api/types';
+import type { useDeleteWishListItem } from '~/features/wish-list/hooks/detail/useDeleteWishListItem';
 import WishListDetailTags from '~/features/wish-list/ui/detail/WishListDetailTags';
+
+const DELETE_WISH_LIST_ITEM_MESSAGE = "This removes it from your Wish List. This can't be undone.";
 
 type Props = {
   visible: boolean;
@@ -22,6 +26,7 @@ type Props = {
   onEdit?: () => void;
   onDelete: () => void;
   onTriedThis?: () => void;
+  del: ReturnType<typeof useDeleteWishListItem>;
 };
 
 function WishListDetailModal({
@@ -33,6 +38,7 @@ function WishListDetailModal({
   onEdit,
   onDelete,
   onTriedThis,
+  del,
 }: Props) {
   const { height: windowHeight } = useWindowDimensions();
   const categoryIcon = useCategoryIcon(PRODUCT_BRAND_CATEGORY_CODE);
@@ -141,6 +147,16 @@ function WishListDetailModal({
           </ScrollView>
         ) : null}
       </View>
+      <DestructiveActionConfirmModal
+        inline
+        visible={del.confirmOpen}
+        title="Delete this item?"
+        message={DELETE_WISH_LIST_ITEM_MESSAGE}
+        confirmLabel="Delete"
+        pending={del.pending}
+        onCancel={del.closeConfirm}
+        onConfirm={del.confirmDelete}
+      />
     </OverlayModal>
   );
 }
