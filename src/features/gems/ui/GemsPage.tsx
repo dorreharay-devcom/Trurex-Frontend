@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { LoadMoreButton } from '~/shared/ui/primitives/LoadMoreButton';
@@ -18,6 +18,17 @@ import { useMyWishList } from '~/features/wish-list/hooks/useMyWishList';
 import { useProductBrandRexes } from '~/features/wish-list/hooks/useProductBrandRexes';
 import { useWishListPageState } from '~/features/wish-list/hooks/gems/useWishListPageState';
 import type { WishListWizardPrefill } from '~/features/wish-list/types/wizardPrefill';
+
+const ROW_KIND = {
+  HEADER: 'header',
+  EMPTY: 'empty',
+  ROW: 'row',
+} as const;
+
+type GemsListRow =
+  | { kind: typeof ROW_KIND.HEADER }
+  | { kind: typeof ROW_KIND.EMPTY }
+  | { kind: typeof ROW_KIND.ROW; item: Recommendation };
 
 type GemsPageProps = {
   onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
@@ -65,14 +76,27 @@ function GemsPage({
     onOpenExploreRex: (row: ProductBrandRexRow) => onOpenRexId?.(row.id),
   };
 
-  return (
-    <>
-      <FlashList
-        data={uncollected.items}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[webContainerStyle, { paddingBottom: 96 }]}
-        ListHeaderComponent={
+  const rows = useMemo<GemsListRow[]>(() => {
+    if (uncollected.items.length === 0) {
+      return [{ kind: ROW_KIND.HEADER }, { kind: ROW_KIND.EMPTY }];
+    }
+    return [
+      { kind: ROW_KIND.HEADER },
+      ...uncollected.items.map((item): GemsListRow => ({ kind: ROW_KIND.ROW, item })),
+    ];
+  }, [uncollected.items]);
+
+  const keyExtractor = useCallback(
+    (row: GemsListRow) => (row.kind === ROW_KIND.ROW ? row.item.id : row.kind),
+    [],
+  );
+
+  const getItemType = useCallback((row: GemsListRow) => row.kind, []);
+
+  const renderItem = useCallback(
+    ({ item: row }: { item: GemsListRow }) => {
+      if (row.kind === ROW_KIND.HEADER) {
+        return (
           <GemsHeader
             searchQuery={searchQuery}
             onChangeSearch={setSearchQuery}
@@ -81,23 +105,42 @@ function GemsPage({
             onCreateCollection={page.openCreateCollection}
             wishList={wishList}
           />
-        }
-        renderItem={({ item }) => (
-          <UncollectedRexRow
-            item={item}
-            onPress={onRecommendationPress ? () => onRecommendationPress(item) : undefined}
-            onAdd={() => page.openAddToCollection(item)}
-            onRemove={() => removeUncollected.setTarget(item)}
-          />
-        )}
-        ListEmptyComponent={
+        );
+      }
+
+      if (row.kind === ROW_KIND.EMPTY) {
+        return (
           <UncollectedEmpty
             loading={uncollected.loading}
             isError={uncollected.isError}
             hasSearch={Boolean(searchQuery.trim())}
             onRetry={uncollected.retry}
           />
-        }
+        );
+      }
+
+      return (
+        <UncollectedRexRow
+          item={row.item}
+          onPress={onRecommendationPress ? () => onRecommendationPress(row.item) : undefined}
+          onAdd={() => page.openAddToCollection(row.item)}
+          onRemove={() => removeUncollected.setTarget(row.item)}
+        />
+      );
+    },
+    [searchQuery, collections, page, wishList, uncollected, onRecommendationPress, removeUncollected],
+  );
+
+  return (
+    <>
+      <FlashList
+        data={rows}
+        keyExtractor={keyExtractor}
+        getItemType={getItemType}
+        renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={[webContainerStyle, { paddingBottom: 96 }]}
         ListFooterComponent={
           <View className="px-4">
             {uncollected.isFetchNextPageError ? (
