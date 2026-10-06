@@ -60,6 +60,7 @@ function GemsOverlays({ page, removeUncollected, wishListPage }: Props) {
         onTriedThis={() => {
           const item = wishListPage.selectedItem;
           if (!item) return;
+          wishListPage.closeItem();
           wishListPage.openTriedThis(item);
           wishListPage.triedThis.open();
         }}
