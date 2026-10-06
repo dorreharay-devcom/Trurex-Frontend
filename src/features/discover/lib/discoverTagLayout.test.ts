@@ -42,4 +42,14 @@ describe('discoverTagLayout', () => {
     expect(result.hiddenCount).toBeGreaterThan(0);
     expect(result.visibleCount).toBeGreaterThan(3);
   });
+
+  it('always shows at least one tag, even when nothing fits alongside the overflow badge', () => {
+    const tagWidths = Array.from({ length: 11 }, () => 400);
+    const rowWidth = 60;
+
+    const result = limitTagsToRows(tagWidths, rowWidth, overflowWidthByDigits);
+
+    expect(result.visibleCount).toBe(1);
+    expect(result.hiddenCount).toBe(10);
+  });
 });
