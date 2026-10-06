@@ -77,7 +77,6 @@ function GemsPage({
             searchQuery={searchQuery}
             onChangeSearch={setSearchQuery}
             collections={collections}
-            loadingUncollected={uncollected.loading}
             onOpenCollection={page.openCollection}
             onCreateCollection={page.openCreateCollection}
             wishList={wishList}

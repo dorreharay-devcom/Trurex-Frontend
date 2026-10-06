@@ -1,11 +1,18 @@
+import Constants from 'expo-constants';
 import { Share, type ShareContent } from 'react-native';
-import { TRUREX_WEB_ORIGIN } from '~/shared/config/app';
+import { TRUREX_DEV_WEB_ORIGIN, TRUREX_WEB_ORIGIN } from '~/shared/config/app';
 import { isIos, isWeb } from '~/shared/lib/ui/platform';
+
+const isProductionApp = Constants.expoConfig?.extra?.appEnv === 'production';
+
+function resolveShareOrigin(): string {
+  if (isWeb) return window.location.origin;
+  return isProductionApp ? TRUREX_WEB_ORIGIN : TRUREX_DEV_WEB_ORIGIN;
+}
 
 export function buildShareUrl(path: string): string {
   const normalized = path.startsWith('/') ? path : `/${path}`;
-  const origin = isWeb ? window.location.origin : TRUREX_WEB_ORIGIN;
-  return `${origin}${normalized}`;
+  return `${resolveShareOrigin()}${normalized}`;
 }
 
 type MobileShareLinkParams = {

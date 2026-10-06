@@ -5,7 +5,7 @@ import { WISH_LIST_QUERY_KEYS } from '~/features/wish-list/config/queryKeys';
 import { DEFAULT_SEARCH_DEBOUNCE_MS, useDebouncedValue } from '~/shared/hooks/useDebouncedValue';
 import { nextPageOffset } from '~/shared/lib/data/guards';
 
-const PRODUCT_BRAND_REXES_PAGE_LIMIT = 20;
+const PRODUCT_BRAND_REXES_PAGE_LIMIT = 10;
 
 export function useProductBrandRexes() {
   const [query, setQuery] = useState('');

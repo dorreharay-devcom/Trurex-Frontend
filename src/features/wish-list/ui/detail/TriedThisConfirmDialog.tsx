@@ -6,15 +6,23 @@ import { Theme } from '~/shared/theme/Theme';
 
 type Props = {
   visible: boolean;
+  embedded?: boolean;
   onYes: () => void;
   onNo: () => void;
   onClose: () => void;
   pending?: boolean;
 };
 
-function TriedThisConfirmDialog({ visible, onYes, onNo, onClose, pending = false }: Props) {
+function TriedThisConfirmDialog({
+  visible,
+  embedded = false,
+  onYes,
+  onNo,
+  onClose,
+  pending = false,
+}: Props) {
   return (
-    <BottomSheet open={visible} onClose={onClose}>
+    <BottomSheet open={visible} embedded={embedded} onClose={onClose}>
       <View className="gap-5 px-5 pb-8 pt-3">
         <View className="h-12 w-12 items-center justify-center self-center rounded-full bg-primary/10">
           <Star size={22} color={Theme.colors.primary} />

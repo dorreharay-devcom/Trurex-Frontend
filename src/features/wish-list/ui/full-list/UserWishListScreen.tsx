@@ -10,7 +10,6 @@ import { useWishListPageState } from '~/features/wish-list/hooks/gems/useWishLis
 import WishListItemRow from '~/features/wish-list/ui/card/WishListItemRow';
 import WishListEmpty from '~/features/wish-list/ui/gems-section/WishListEmpty';
 import WishListDetailModal from '~/features/wish-list/ui/detail/WishListDetailModal';
-import WishListDetailOverlays from '~/features/wish-list/ui/detail/WishListDetailOverlays';
 import TriedThisConfirmDialog from '~/features/wish-list/ui/detail/TriedThisConfirmDialog';
 import type { AddYourOwnRecSource } from '~/features/rex-create/lib/addYourOwn';
 import type { WishListWizardPrefill } from '~/features/wish-list/types/wizardPrefill';
@@ -93,6 +92,8 @@ function UserWishListScreen({
         isOwner={isOwnProfile}
         onClose={page.closeItem}
         onDelete={page.del.openConfirm}
+        del={page.del}
+        triedThis={page.triedThis}
         onEdit={
           isOwnProfile
             ? () => {
@@ -108,17 +109,15 @@ function UserWishListScreen({
             ? () => {
                 const item = page.selectedItem;
                 if (!item) return;
-                page.closeItem();
                 page.openTriedThis(item);
                 page.triedThis.open();
               }
             : undefined
         }
       />
-      <WishListDetailOverlays item={page.selectedItem} del={page.del} />
       {isOwnProfile ? (
         <TriedThisConfirmDialog
-          visible={page.triedThis.confirmOpen}
+          visible={page.triedThis.confirmOpen && !page.selectedItem}
           onYes={page.triedThis.confirmYes}
           onNo={page.triedThis.confirmNo}
           onClose={page.triedThis.close}

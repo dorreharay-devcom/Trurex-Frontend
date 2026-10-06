@@ -12,7 +12,15 @@ type Props = {
 };
 
 function UncollectedEmpty({ loading, isError, hasSearch, onRetry }: Props) {
-  if (loading) return null;
+  if (loading) {
+    return (
+      <View className="gap-3 px-4">
+        {[1, 2].map((i) => (
+          <View key={i} className="h-16 rounded-xl bg-border/40" />
+        ))}
+      </View>
+    );
+  }
 
   if (isError) {
     return <QueryErrorState title="Couldn't load uncollected" onRetry={onRetry} />;

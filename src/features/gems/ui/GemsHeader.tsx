@@ -14,21 +14,10 @@ import {
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
 
-function UncollectedSkeleton() {
-  return (
-    <View className="gap-3 mb-3">
-      {[1, 2].map((i) => (
-        <View key={i} className="h-16 rounded-xl bg-border/40" />
-      ))}
-    </View>
-  );
-}
-
 type Props = {
   searchQuery: string;
   onChangeSearch: (value: string) => void;
   collections: GemsCollectionsState;
-  loadingUncollected: boolean;
   onOpenCollection: (id: string) => void;
   onCreateCollection: () => void;
   wishList: WishListSectionProps;
@@ -38,7 +27,6 @@ function GemsHeader({
   searchQuery,
   onChangeSearch,
   collections,
-  loadingUncollected,
   onOpenCollection,
   onCreateCollection,
   wishList,
@@ -95,8 +83,6 @@ function GemsHeader({
       <Text className="text-xs text-muted-foreground mb-4">
         Rex you've saved but haven't added to a collection yet
       </Text>
-
-      {loadingUncollected && <UncollectedSkeleton />}
     </View>
   );
 }

@@ -35,10 +35,11 @@ type Props = {
   open: boolean;
   onClose: () => void;
   sheetStyle?: StyleProp<ViewStyle>;
+  embedded?: boolean;
   children: ReactNode;
 };
 
-const BottomSheet = ({ open, onClose, sheetStyle, children }: Props) => {
+const BottomSheet = ({ open, onClose, sheetStyle, embedded = false, children }: Props) => {
   const { height } = useWindowDimensions();
   const [visible, setVisible] = useState(false);
   const wasOpen = useRef(false);
@@ -103,6 +104,57 @@ const BottomSheet = ({ open, onClose, sheetStyle, children }: Props) => {
     return { opacity: backdrop.value * dragFactor };
   });
 
+  const body = (
+    <GestureHandlerRootView style={styles.fullFlex}>
+      <Animated.View
+        style={[StyleSheet.absoluteFill, styles.backdrop, backdropAnimStyle]}
+        pointerEvents="box-none"
+      >
+        <Pressable style={StyleSheet.absoluteFill} onPress={requestClose} />
+      </Animated.View>
+
+      <View style={styles.outer} pointerEvents="box-none">
+        <KeyboardAvoidingView
+          behavior={KEYBOARD_BEHAVIOR_NATIVE_PADDING}
+          pointerEvents="box-none"
+          style={styles.full}
+        >
+          <Animated.View style={[styles.full, sheetAnimStyle]}>
+            <View
+              style={sheetStyle}
+              className={cn(
+                'w-full bg-card',
+                isWeb
+                  ? 'rounded-2xl border border-border shadow-elevated'
+                  : 'rounded-t-2xl border-t border-border',
+              )}
+            >
+              {isWeb ? null : (
+                <GestureDetector gesture={pan}>
+                  <Animated.View>
+                    <SheetHandle className="w-full py-3" />
+                  </Animated.View>
+                </GestureDetector>
+              )}
+              {children}
+            </View>
+          </Animated.View>
+        </KeyboardAvoidingView>
+      </View>
+      <ModalToastLayer />
+    </GestureHandlerRootView>
+  );
+
+  if (embedded && !visible) return null;
+
+  if (embedded) {
+    return (
+      <View style={styles.embeddedRoot} pointerEvents="box-none">
+        {body}
+      </View>
+    );
+  }
+
   return (
     <Modal
       visible={visible}
@@ -111,44 +163,7 @@ const BottomSheet = ({ open, onClose, sheetStyle, children }: Props) => {
       {...OVERLAY_MODAL_PLATFORM_PROPS}
       onRequestClose={requestClose}
     >
-      <GestureHandlerRootView style={styles.fullFlex}>
-        <Animated.View
-          style={[StyleSheet.absoluteFill, styles.backdrop, backdropAnimStyle]}
-          pointerEvents="box-none"
-        >
-          <Pressable style={StyleSheet.absoluteFill} onPress={requestClose} />
-        </Animated.View>
-
-        <View style={styles.outer} pointerEvents="box-none">
-          <KeyboardAvoidingView
-            behavior={KEYBOARD_BEHAVIOR_NATIVE_PADDING}
-            pointerEvents="box-none"
-            style={styles.full}
-          >
-            <Animated.View style={[styles.full, sheetAnimStyle]}>
-              <View
-                style={sheetStyle}
-                className={cn(
-                  'w-full bg-card',
-                  isWeb
-                    ? 'rounded-2xl border border-border shadow-elevated'
-                    : 'rounded-t-2xl border-t border-border',
-                )}
-              >
-                {isWeb ? null : (
-                  <GestureDetector gesture={pan}>
-                    <Animated.View>
-                      <SheetHandle className="w-full py-3" />
-                    </Animated.View>
-                  </GestureDetector>
-                )}
-                {children}
-              </View>
-            </Animated.View>
-          </KeyboardAvoidingView>
-        </View>
-        <ModalToastLayer />
-      </GestureHandlerRootView>
+      {body}
     </Modal>
   );
 };
@@ -164,6 +179,7 @@ const styles = StyleSheet.create({
     paddingVertical: isWeb ? 24 : 0,
   },
   full: { width: '100%', maxWidth: WEB_MAX_WIDTH, alignSelf: 'center' },
+  embeddedRoot: { ...StyleSheet.absoluteFillObject, zIndex: 2000, elevation: 2000 },
 });
 
 export default BottomSheet;
