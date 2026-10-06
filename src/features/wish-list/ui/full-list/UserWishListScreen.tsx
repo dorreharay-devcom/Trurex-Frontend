@@ -108,6 +108,7 @@ function UserWishListScreen({
             ? () => {
                 const item = page.selectedItem;
                 if (!item) return;
+                page.closeItem();
                 page.openTriedThis(item);
                 page.triedThis.open();
               }

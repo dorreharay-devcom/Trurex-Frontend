@@ -29,6 +29,7 @@ function ProfilePage() {
         }
         onOpenRexRequest={(requestId) => openRexRequest(page.router, requestId)}
         onOpenWishList={(userId) => openUserWishList(page.router, userId)}
+        onOpenReferrals={() => page.router.push(Routes.Referrals)}
       />
     </DeepLinkShell>
   );
