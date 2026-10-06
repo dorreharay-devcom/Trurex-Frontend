@@ -51,6 +51,7 @@ function GemsOverlays({ page, removeUncollected, wishListPage }: Props) {
         onClose={wishListPage.closeItem}
         onDelete={wishListPage.del.openConfirm}
         del={wishListPage.del}
+        triedThis={wishListPage.triedThis}
         onEdit={() => {
           const item = wishListPage.selectedItem;
           if (!item) return;
@@ -60,13 +61,12 @@ function GemsOverlays({ page, removeUncollected, wishListPage }: Props) {
         onTriedThis={() => {
           const item = wishListPage.selectedItem;
           if (!item) return;
-          wishListPage.closeItem();
           wishListPage.openTriedThis(item);
           wishListPage.triedThis.open();
         }}
       />
       <TriedThisConfirmDialog
-        visible={wishListPage.triedThis.confirmOpen}
+        visible={wishListPage.triedThis.confirmOpen && !wishListPage.selectedItem}
         onYes={wishListPage.triedThis.confirmYes}
         onNo={wishListPage.triedThis.confirmNo}
         onClose={wishListPage.triedThis.close}

@@ -93,6 +93,7 @@ function UserWishListScreen({
         onClose={page.closeItem}
         onDelete={page.del.openConfirm}
         del={page.del}
+        triedThis={page.triedThis}
         onEdit={
           isOwnProfile
             ? () => {
@@ -108,7 +109,6 @@ function UserWishListScreen({
             ? () => {
                 const item = page.selectedItem;
                 if (!item) return;
-                page.closeItem();
                 page.openTriedThis(item);
                 page.triedThis.open();
               }
@@ -117,7 +117,7 @@ function UserWishListScreen({
       />
       {isOwnProfile ? (
         <TriedThisConfirmDialog
-          visible={page.triedThis.confirmOpen}
+          visible={page.triedThis.confirmOpen && !page.selectedItem}
           onYes={page.triedThis.confirmYes}
           onNo={page.triedThis.confirmNo}
           onClose={page.triedThis.close}

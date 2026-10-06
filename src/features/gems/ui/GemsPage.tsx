@@ -72,19 +72,11 @@ function GemsPage({
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[webContainerStyle, { paddingBottom: 96 }]}
-        extraData={[
-          myWishList.items.length,
-          myWishList.loading,
-          productBrandRexes.rows.length,
-          productBrandRexes.isFetching,
-          productBrandRexes.isFetchingNextPage,
-        ]}
         ListHeaderComponent={
           <GemsHeader
             searchQuery={searchQuery}
             onChangeSearch={setSearchQuery}
             collections={collections}
-            loadingUncollected={uncollected.loading}
             onOpenCollection={page.openCollection}
             onCreateCollection={page.openCreateCollection}
             wishList={wishList}

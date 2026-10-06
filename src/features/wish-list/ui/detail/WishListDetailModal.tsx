@@ -13,6 +13,8 @@ import { useCategoryIcon } from '~/shared/hooks/useActiveCategories';
 import { PRODUCT_BRAND_CATEGORY_CODE } from '~/features/wish-list/config/rexBridge';
 import type { WishListItemRow } from '~/features/wish-list/api/types';
 import type { useDeleteWishListItem } from '~/features/wish-list/hooks/detail/useDeleteWishListItem';
+import type { useTriedThis } from '~/features/wish-list/hooks/detail/useTriedThis';
+import TriedThisConfirmDialog from '~/features/wish-list/ui/detail/TriedThisConfirmDialog';
 import WishListDetailTags from '~/features/wish-list/ui/detail/WishListDetailTags';
 
 const DELETE_WISH_LIST_ITEM_MESSAGE = "This removes it from your Wish List. This can't be undone.";
@@ -27,6 +29,7 @@ type Props = {
   onDelete: () => void;
   onTriedThis?: () => void;
   del: ReturnType<typeof useDeleteWishListItem>;
+  triedThis: ReturnType<typeof useTriedThis>;
 };
 
 function WishListDetailModal({
@@ -39,6 +42,7 @@ function WishListDetailModal({
   onDelete,
   onTriedThis,
   del,
+  triedThis,
 }: Props) {
   const { height: windowHeight } = useWindowDimensions();
   const categoryIcon = useCategoryIcon(PRODUCT_BRAND_CATEGORY_CODE);
@@ -156,6 +160,14 @@ function WishListDetailModal({
         pending={del.pending}
         onCancel={del.closeConfirm}
         onConfirm={del.confirmDelete}
+      />
+      <TriedThisConfirmDialog
+        embedded
+        visible={triedThis.confirmOpen}
+        onYes={triedThis.confirmYes}
+        onNo={triedThis.confirmNo}
+        onClose={triedThis.close}
+        pending={triedThis.pending}
       />
     </OverlayModal>
   );
