@@ -1,4 +1,4 @@
-export const AUTH_INVITE_CODE_ENABLED = true;
+export const AUTH_INVITE_CODE_ENABLED = false;
 export const AUTH_INVITE_CODE = '080811';
 export const AUTH_INVITE_CODE_LENGTH = 6;
 
