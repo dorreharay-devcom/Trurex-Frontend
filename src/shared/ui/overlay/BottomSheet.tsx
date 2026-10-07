@@ -34,12 +34,20 @@ const easeIn = Easing.in(Easing.cubic);
 type Props = {
   open: boolean;
   onClose: () => void;
+  onClosed?: () => void;
   sheetStyle?: StyleProp<ViewStyle>;
   embedded?: boolean;
   children: ReactNode;
 };
 
-const BottomSheet = ({ open, onClose, sheetStyle, embedded = false, children }: Props) => {
+const BottomSheet = ({
+  open,
+  onClose,
+  onClosed,
+  sheetStyle,
+  embedded = false,
+  children,
+}: Props) => {
   const { height } = useWindowDimensions();
   const [visible, setVisible] = useState(false);
   const wasOpen = useRef(false);
@@ -50,7 +58,8 @@ const BottomSheet = ({ open, onClose, sheetStyle, embedded = false, children }: 
   const hideModal = useCallback(() => {
     setVisible(false);
     dragY.value = 0;
-  }, [dragY]);
+    onClosed?.();
+  }, [dragY, onClosed]);
 
   useEffect(() => {
     if (open) {

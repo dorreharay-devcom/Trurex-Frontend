@@ -135,6 +135,14 @@ export default function RootLayout() {
                   contentStyle: { flex: 1, backgroundColor: 'transparent' },
                 }}
               />
+              <Stack.Screen
+                name="wish-list-item/[itemId]"
+                options={{
+                  presentation: 'transparentModal',
+                  animation: 'none',
+                  contentStyle: { flex: 1, backgroundColor: 'transparent' },
+                }}
+              />
             </Stack>
             <AuthBootGate />
             <AppToast />
