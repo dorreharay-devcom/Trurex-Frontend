@@ -9,28 +9,27 @@ import { useUserWishList } from '~/features/wish-list/hooks/useUserWishList';
 import { useWishListPageState } from '~/features/wish-list/hooks/gems/useWishListPageState';
 import WishListItemRow from '~/features/wish-list/ui/card/WishListItemRow';
 import WishListEmpty from '~/features/wish-list/ui/gems-section/WishListEmpty';
-import WishListDetailModal from '~/features/wish-list/ui/detail/WishListDetailModal';
 import TriedThisConfirmDialog from '~/features/wish-list/ui/detail/TriedThisConfirmDialog';
 import type { AddYourOwnRecSource } from '~/features/rex-create/lib/addYourOwn';
-import type { WishListWizardPrefill } from '~/features/wish-list/types/wizardPrefill';
+import type { WishListItemRow as WishListItemRowData } from '~/features/wish-list/api/types';
 
 type Props = {
   userId: string;
   isOwnProfile: boolean;
   onBack: () => void;
-  onOpenWishListWizard: (prefill: WishListWizardPrefill | null) => void;
   onNavigateToCreateRex: (source: AddYourOwnRecSource) => void;
+  onOpenWishListItem: (item: WishListItemRowData, isOwner: boolean) => void;
 };
 
 function UserWishListScreen({
   userId,
   isOwnProfile,
   onBack,
-  onOpenWishListWizard,
   onNavigateToCreateRex,
+  onOpenWishListItem,
 }: Props) {
   const list = useUserWishList({ userId, isOwnProfile });
-  const page = useWishListPageState({ onNavigateToCreateRex, onOpenWishListWizard });
+  const page = useWishListPageState({ onNavigateToCreateRex, onOpenWishListWizard: () => {} });
 
   return (
     <ScrollView
@@ -62,7 +61,7 @@ function UserWishListScreen({
               <WishListItemRow
                 key={item.id}
                 item={item}
-                onPress={() => page.openItem(item)}
+                onPress={() => onOpenWishListItem(item, isOwnProfile)}
                 onTriedThis={
                   isOwnProfile
                     ? () => {
@@ -86,38 +85,9 @@ function UserWishListScreen({
         </>
       )}
 
-      <WishListDetailModal
-        visible={!!page.selectedItem}
-        item={page.selectedItem}
-        isOwner={isOwnProfile}
-        onClose={page.closeItem}
-        onDelete={page.del.openConfirm}
-        del={page.del}
-        triedThis={page.triedThis}
-        onEdit={
-          isOwnProfile
-            ? () => {
-                const item = page.selectedItem;
-                if (!item) return;
-                page.closeItem();
-                page.openWizard({ kind: 'edit', item });
-              }
-            : undefined
-        }
-        onTriedThis={
-          isOwnProfile
-            ? () => {
-                const item = page.selectedItem;
-                if (!item) return;
-                page.openTriedThis(item);
-                page.triedThis.open();
-              }
-            : undefined
-        }
-      />
       {isOwnProfile ? (
         <TriedThisConfirmDialog
-          visible={page.triedThis.confirmOpen && !page.selectedItem}
+          visible={page.triedThis.confirmOpen}
           onYes={page.triedThis.confirmYes}
           onNo={page.triedThis.confirmNo}
           onClose={page.triedThis.close}

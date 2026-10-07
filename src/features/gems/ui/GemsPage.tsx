@@ -34,6 +34,7 @@ type GemsPageProps = {
   onRecommendationPress?: (rec: Recommendation, options?: RecommendationOpenOptions) => void;
   onOpenCollection?: (collectionId: string) => void;
   onOpenWishListWizard?: (prefill: WishListWizardPrefill | null) => void;
+  onOpenWishListItem?: (item: WishListItemRow, isOwner: boolean) => void;
   onNavigateToCreateRex?: (source: AddYourOwnRecSource) => void;
   onOpenRexId?: (rexId: string) => void;
 };
@@ -42,6 +43,7 @@ function GemsPage({
   onRecommendationPress,
   onOpenCollection,
   onOpenWishListWizard,
+  onOpenWishListItem,
   onNavigateToCreateRex,
   onOpenRexId,
 }: GemsPageProps) {
@@ -60,7 +62,7 @@ function GemsPage({
   const wishList = {
     ownList: myWishList,
     explore: productBrandRexes,
-    onOpenItem: (item: WishListItemRow) => wishListPage.openItem(item),
+    onOpenItem: (item: WishListItemRow) => onOpenWishListItem?.(item, true),
     onTriedThis: (item: WishListItemRow) => {
       wishListPage.openTriedThis(item);
       wishListPage.triedThis.open();
@@ -128,7 +130,15 @@ function GemsPage({
         />
       );
     },
-    [searchQuery, collections, page, wishList, uncollected, onRecommendationPress, removeUncollected],
+    [
+      searchQuery,
+      collections,
+      page,
+      wishList,
+      uncollected,
+      onRecommendationPress,
+      removeUncollected,
+    ],
   );
 
   return (

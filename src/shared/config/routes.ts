@@ -70,3 +70,7 @@ export function toCreateWishListItemRoute(): Href {
 export function toUserWishListRoute(userId: string): Href {
   return `/wish-list/${userId}`;
 }
+
+export function toWishListItemRoute(itemId: string): Href {
+  return `/wish-list-item/${itemId}`;
+}

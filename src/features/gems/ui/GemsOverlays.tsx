@@ -6,7 +6,6 @@ import type { GemsPageState } from '~/features/gems/hooks/useGemsPageState';
 import type { RemoveUncollectedState } from '~/features/gems/hooks/useRemoveUncollected';
 import type { WishListPageState } from '~/features/wish-list/hooks/gems/useWishListPageState';
 import TriedThisConfirmDialog from '~/features/wish-list/ui/detail/TriedThisConfirmDialog';
-import WishListDetailModal from '~/features/wish-list/ui/detail/WishListDetailModal';
 
 type Props = {
   page: GemsPageState;
@@ -44,29 +43,8 @@ function GemsOverlays({ page, removeUncollected, wishListPage }: Props) {
         onClose={page.closeAddToCollection}
       />
 
-      <WishListDetailModal
-        visible={!!wishListPage.selectedItem}
-        item={wishListPage.selectedItem}
-        isOwner
-        onClose={wishListPage.closeItem}
-        onDelete={wishListPage.del.openConfirm}
-        del={wishListPage.del}
-        triedThis={wishListPage.triedThis}
-        onEdit={() => {
-          const item = wishListPage.selectedItem;
-          if (!item) return;
-          wishListPage.closeItem();
-          wishListPage.openWizard({ kind: 'edit', item });
-        }}
-        onTriedThis={() => {
-          const item = wishListPage.selectedItem;
-          if (!item) return;
-          wishListPage.openTriedThis(item);
-          wishListPage.triedThis.open();
-        }}
-      />
       <TriedThisConfirmDialog
-        visible={wishListPage.triedThis.confirmOpen && !wishListPage.selectedItem}
+        visible={wishListPage.triedThis.confirmOpen}
         onYes={wishListPage.triedThis.confirmYes}
         onNo={wishListPage.triedThis.confirmNo}
         onClose={wishListPage.triedThis.close}

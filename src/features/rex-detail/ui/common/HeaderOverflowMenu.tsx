@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Flag, Gift, MoreVertical, Pencil, Trash2, type LucideIcon } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
@@ -53,7 +53,13 @@ function buildItems({
     });
   }
   if (showReport) {
-    items.push({ key: 'report', icon: Flag, label: 'Report', destructive: true, onPress: onReport });
+    items.push({
+      key: 'report',
+      icon: Flag,
+      label: 'Report',
+      destructive: true,
+      onPress: onReport,
+    });
   }
   return items;
 }
@@ -72,7 +78,13 @@ function TriggerButton({ onPress }: { onPress: () => void }) {
   );
 }
 
-function WebDropdownMenu({ items, onSelect }: { items: MenuItem[]; onSelect: (item: MenuItem) => void }) {
+function WebDropdownMenu({
+  items,
+  onSelect,
+}: {
+  items: MenuItem[];
+  onSelect: (item: MenuItem) => void;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -105,7 +117,10 @@ function WebDropdownMenu({ items, onSelect }: { items: MenuItem[]; onSelect: (it
                 />
                 <Text
                   numberOfLines={1}
-                  className={cn('text-sm', item.destructive ? 'text-destructive' : 'text-foreground')}
+                  className={cn(
+                    'text-sm',
+                    item.destructive ? 'text-destructive' : 'text-foreground',
+                  )}
                 >
                   {item.label}
                 </Text>
@@ -118,14 +133,32 @@ function WebDropdownMenu({ items, onSelect }: { items: MenuItem[]; onSelect: (it
   );
 }
 
-function NativeSheetMenu({ items, onSelect }: { items: MenuItem[]; onSelect: (item: MenuItem) => void }) {
+function NativeSheetMenu({
+  items,
+  onSelect,
+}: {
+  items: MenuItem[];
+  onSelect: (item: MenuItem) => void;
+}) {
   const [open, setOpen] = useState(false);
+  const pendingItemRef = useRef<MenuItem | null>(null);
+
+  const handleSelect = (item: MenuItem) => {
+    pendingItemRef.current = item;
+    setOpen(false);
+  };
+
+  const handleClosed = () => {
+    const item = pendingItemRef.current;
+    pendingItemRef.current = null;
+    if (item) onSelect(item);
+  };
 
   return (
     <View>
       <TriggerButton onPress={() => setOpen(true)} />
 
-      <BottomSheet open={open} onClose={() => setOpen(false)}>
+      <BottomSheet open={open} onClose={() => setOpen(false)} onClosed={handleClosed}>
         <View className="-mt-2 pb-10">
           <Text className="px-5 pb-4 pt-1 text-xl font-display font-bold text-foreground">
             Actions
@@ -134,10 +167,7 @@ function NativeSheetMenu({ items, onSelect }: { items: MenuItem[]; onSelect: (it
           {items.map((item) => (
             <Pressable
               key={item.key}
-              onPress={() => {
-                setOpen(false);
-                onSelect(item);
-              }}
+              onPress={() => handleSelect(item)}
               className="flex-row items-center gap-3 px-5 py-3 active:bg-muted/40"
             >
               <item.icon
@@ -145,7 +175,10 @@ function NativeSheetMenu({ items, onSelect }: { items: MenuItem[]; onSelect: (it
                 color={item.destructive ? Theme.colors.destructive : Theme.colors.foreground}
               />
               <Text
-                className={cn('text-base', item.destructive ? 'text-destructive' : 'text-foreground')}
+                className={cn(
+                  'text-base',
+                  item.destructive ? 'text-destructive' : 'text-foreground',
+                )}
               >
                 {item.label}
               </Text>

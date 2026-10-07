@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Modal, ScrollView, useWindowDimensions, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { isWeb } from '~/shared/lib/ui/platform';
@@ -43,8 +43,14 @@ const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, target }) =>
     200,
     maxSheetHeight - HEADER_EST - FORM_FOOTER_EST - insets.bottom,
   );
-  const flow = useContentReportFlow({ open, target });
-  const heading = reportDialogHeading(target);
+  const [lastTarget, setLastTarget] = useState<ContentReportTarget | null>(null);
+  useEffect(() => {
+    if (target) setLastTarget(target);
+  }, [target]);
+  const effectiveTarget = target ?? lastTarget;
+
+  const flow = useContentReportFlow({ open, target: effectiveTarget });
+  const heading = reportDialogHeading(effectiveTarget);
 
   const onRequestClose = () => {
     onOpenChange(false);
@@ -61,9 +67,7 @@ const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, target }) =>
     if (ok) onRequestClose();
   };
 
-  if (!open || !target) return null;
-
-  const content = (
+  const content = effectiveTarget ? (
     <ReportDialogShell maxSheetHeight={maxSheetHeight} onDismiss={onRequestClose}>
       <ReportDialogHeader heading={heading} onClose={onRequestClose} />
       <ScrollView
@@ -92,7 +96,7 @@ const ReportContentDialog: React.FC<Props> = ({ open, onOpenChange, target }) =>
         />
       ) : null}
     </ReportDialogShell>
-  );
+  ) : null;
 
   return (
     <Modal

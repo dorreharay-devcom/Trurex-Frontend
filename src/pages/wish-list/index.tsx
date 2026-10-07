@@ -8,7 +8,7 @@ import { TAB } from '~/shared/config/mainTabs';
 import { Routes } from '~/shared/config/routes';
 import { openMainTab } from '~/shared/lib/mainTab';
 import { openCreateRex, openRex } from '~/shared/lib/navigation/createRex';
-import { openWishListWizard } from '~/shared/lib/navigation/wishList';
+import { openWishListItem } from '~/shared/lib/navigation/wishList';
 
 function WishListPage() {
   const { userId } = useLocalSearchParams<{ userId: string }>();
@@ -34,8 +34,8 @@ function WishListPage() {
         userId={userId}
         isOwnProfile={isOwnProfile}
         onBack={onBack}
-        onOpenWishListWizard={(prefill) => openWishListWizard(router, prefill)}
         onNavigateToCreateRex={(source) => openCreateRex(router, { prefill: source })}
+        onOpenWishListItem={(item, isOwner) => openWishListItem(router, item, isOwner)}
       />
     </DeepLinkShell>
   );
