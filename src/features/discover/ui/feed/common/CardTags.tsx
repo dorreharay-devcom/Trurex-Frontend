@@ -1,24 +1,23 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import {
+  cachedDiscoverTagMeasurements,
   discoverOverflowLabel,
   discoverTagLabel,
+  DISCOVER_TAG_OVERFLOW_SAMPLES,
   DISCOVER_TAG_ROW_GAP,
+  recordDiscoverTagMeasurements,
   splitDiscoverTags,
   type DiscoverTagMeasurements,
 } from '~/features/discover/lib/discoverTagLayout';
 import TagChip from '~/features/discover/ui/feed/common/TagChip';
+import TagRowSkeleton from '~/features/discover/ui/feed/common/TagRowSkeleton';
 
 type Props = {
   tags: string[] | null | undefined;
 };
 
 const HIDDEN = { position: 'absolute' as const, opacity: 0, left: -10_000 };
-const OVERFLOW_SAMPLES = [
-  { digits: 1, label: '+9' },
-  { digits: 2, label: '+99' },
-  { digits: 3, label: '+999' },
-] as const;
 
 function TagMeasureLayer({
   tags,
@@ -36,16 +35,25 @@ function TagMeasureLayer({
 
     const tagWidths = tagWidthsRef.current;
     if (tagWidths.length !== tags.length || tagWidths.some((width) => width === undefined)) return;
-    if (!OVERFLOW_SAMPLES.every(({ digits }) => overflowWidthsRef.current[digits] !== undefined)) {
+    if (
+      !DISCOVER_TAG_OVERFLOW_SAMPLES.every(
+        ({ digits }) => overflowWidthsRef.current[digits] !== undefined,
+      )
+    ) {
       return;
     }
 
     doneRef.current = true;
+    const resolvedTagWidths = tagWidths as number[];
+    const resolvedOverflowWidths = overflowWidthsRef.current as Record<number, number>;
+
+    recordDiscoverTagMeasurements(tags, resolvedTagWidths, resolvedOverflowWidths);
+
     onMeasured({
-      tagWidths: tagWidths as number[],
-      overflowWidthByDigits: overflowWidthsRef.current as Record<number, number>,
+      tagWidths: resolvedTagWidths,
+      overflowWidthByDigits: resolvedOverflowWidths,
     });
-  }, [onMeasured, tags.length]);
+  }, [onMeasured, tags]);
 
   return (
     <View pointerEvents="none" style={HIDDEN}>
@@ -60,7 +68,7 @@ function TagMeasureLayer({
         />
       ))}
 
-      {OVERFLOW_SAMPLES.map(({ digits, label }) => (
+      {DISCOVER_TAG_OVERFLOW_SAMPLES.map(({ digits, label }) => (
         <TagChip
           key={label}
           label={label}
@@ -75,8 +83,19 @@ function TagMeasureLayer({
 }
 
 function CardTagsContent({ tags }: { tags: readonly string[] }) {
+  const tagsKey = tags.join('\0');
   const [rowWidth, setRowWidth] = useState(0);
-  const [measurements, setMeasurements] = useState<DiscoverTagMeasurements | null>(null);
+  const [resolved, setResolved] = useState<{
+    tagsKey: string;
+    measurements: DiscoverTagMeasurements;
+  } | null>(null);
+
+  const measurements = useMemo(
+    () =>
+      cachedDiscoverTagMeasurements(tags) ??
+      (resolved?.tagsKey === tagsKey ? resolved.measurements : null),
+    [tags, tagsKey, resolved],
+  );
 
   const { visibleTags, hiddenCount } = useMemo(() => {
     if (rowWidth <= 0 || measurements == null) {
@@ -87,9 +106,16 @@ function CardTagsContent({ tags }: { tags: readonly string[] }) {
 
   const ready = rowWidth > 0 && measurements != null;
 
+  const handleMeasured = useCallback(
+    (next: DiscoverTagMeasurements) => setResolved({ tagsKey, measurements: next }),
+    [tagsKey],
+  );
+
   return (
     <View className="px-4 pt-2">
-      {!ready && rowWidth > 0 ? <TagMeasureLayer tags={tags} onMeasured={setMeasurements} /> : null}
+      {!ready && rowWidth > 0 ? (
+        <TagMeasureLayer key={tagsKey} tags={tags} onMeasured={handleMeasured} />
+      ) : null}
 
       <View
         className="flex-row flex-wrap"
@@ -103,7 +129,7 @@ function CardTagsContent({ tags }: { tags: readonly string[] }) {
           ? visibleTags.map((tag, index) => (
               <TagChip key={`${tag}-${index}`} label={discoverTagLabel(tag)} />
             ))
-          : null}
+          : <TagRowSkeleton />}
         {ready && hiddenCount > 0 ? <TagChip label={discoverOverflowLabel(hiddenCount)} /> : null}
       </View>
     </View>
@@ -114,7 +140,7 @@ function CardTags({ tags }: Props) {
   const items = tags ?? [];
   if (items.length === 0) return null;
 
-  return <CardTagsContent key={items.join('\0')} tags={items} />;
+  return <CardTagsContent tags={items} />;
 }
 
 export default CardTags;

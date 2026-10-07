@@ -7,17 +7,8 @@ import {
   type DiscoverTagMeasurements,
 } from '~/features/discover/lib/discoverTagLayout';
 import TagChip from '~/features/discover/ui/feed/common/TagChip';
-import { Skeleton } from '~/shared/ui/primitives/Skeleton';
+import TagRowSkeleton from '~/features/discover/ui/feed/common/TagRowSkeleton';
 import { wishListTagLabel } from '~/features/wish-list/config/tags';
-
-function TagRowSkeleton() {
-  return (
-    <View className="flex-row" style={{ gap: DISCOVER_TAG_ROW_GAP }}>
-      <Skeleton className="h-5 w-14 rounded-full" />
-      <Skeleton className="h-5 w-20 rounded-full" />
-    </View>
-  );
-}
 
 type Props = {
   tags: string[] | null | undefined;

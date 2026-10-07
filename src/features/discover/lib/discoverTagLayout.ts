@@ -104,3 +104,45 @@ export function splitDiscoverTags(
     hiddenCount,
   };
 }
+
+export const DISCOVER_TAG_OVERFLOW_SAMPLES = [
+  { digits: 1, label: '+9' },
+  { digits: 2, label: '+99' },
+  { digits: 3, label: '+999' },
+] as const;
+
+const tagWidthCache = new Map<string, number>();
+const overflowWidthCache = new Map<number, number>();
+
+export function cachedDiscoverTagMeasurements(
+  tags: readonly string[],
+): DiscoverTagMeasurements | null {
+  const tagWidths = tags.map((tag) => tagWidthCache.get(discoverTagLabel(tag)));
+  const overflowEntries = DISCOVER_TAG_OVERFLOW_SAMPLES.map(
+    ({ digits }) => [digits, overflowWidthCache.get(digits)] as const,
+  );
+
+  const isFullyCached =
+    tagWidths.every((width) => width !== undefined) &&
+    overflowEntries.every(([, width]) => width !== undefined);
+
+  if (!isFullyCached) return null;
+
+  return {
+    tagWidths: tagWidths as number[],
+    overflowWidthByDigits: Object.fromEntries(overflowEntries) as Record<number, number>,
+  };
+}
+
+export function recordDiscoverTagMeasurements(
+  tags: readonly string[],
+  tagWidths: readonly number[],
+  overflowWidthByDigits: Readonly<Record<number, number>>,
+): void {
+  for (const [index, tag] of tags.entries()) {
+    tagWidthCache.set(discoverTagLabel(tag), tagWidths[index]);
+  }
+  for (const { digits } of DISCOVER_TAG_OVERFLOW_SAMPLES) {
+    overflowWidthCache.set(digits, overflowWidthByDigits[digits]);
+  }
+}
