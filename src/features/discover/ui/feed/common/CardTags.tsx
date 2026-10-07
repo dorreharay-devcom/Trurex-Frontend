@@ -8,6 +8,7 @@ import {
   type DiscoverTagMeasurements,
 } from '~/features/discover/lib/discoverTagLayout';
 import TagChip from '~/features/discover/ui/feed/common/TagChip';
+import TagRowSkeleton from '~/features/discover/ui/feed/common/TagRowSkeleton';
 
 type Props = {
   tags: string[] | null | undefined;
@@ -103,7 +104,7 @@ function CardTagsContent({ tags }: { tags: readonly string[] }) {
           ? visibleTags.map((tag, index) => (
               <TagChip key={`${tag}-${index}`} label={discoverTagLabel(tag)} />
             ))
-          : null}
+          : <TagRowSkeleton />}
         {ready && hiddenCount > 0 ? <TagChip label={discoverOverflowLabel(hiddenCount)} /> : null}
       </View>
     </View>
