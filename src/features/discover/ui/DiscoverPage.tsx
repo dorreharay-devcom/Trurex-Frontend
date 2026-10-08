@@ -343,6 +343,7 @@ const DiscoverPage = ({
             ListEmptyComponent={listEmpty}
             ListFooterComponent={listFooter}
             drawDistance={500}
+            maintainVisibleContentPosition={{ disabled: true }}
           />
 
           <ScrollTopButton visible={scroll.showScrollTop} onPress={scroll.scrollToTop} />
