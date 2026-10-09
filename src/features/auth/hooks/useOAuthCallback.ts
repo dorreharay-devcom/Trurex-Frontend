@@ -47,6 +47,12 @@ export function useOAuthCallback() {
               router.replace(Routes.Mfa);
             }
           },
+          onRequireIdentityVerificationPrompt: () => {
+            if (active) {
+              setMfaChecking(false);
+              router.replace(Routes.VerifyIdentity);
+            }
+          },
           onReady: goMain,
         });
       } catch (error) {

@@ -18,7 +18,12 @@ export function entryToRecommendation(entry: CollectionRexEntry): Recommendation
     scoreValueForMoney: entry.score_value_for_money ?? undefined,
     user:
       entry.recommender_name || entry.recommender_handle
-        ? { name: entry.recommender_name ?? '', handle: entry.recommender_handle ?? '', avatar: '' }
+        ? {
+            name: entry.recommender_name ?? '',
+            handle: entry.recommender_handle ?? '',
+            avatar: '',
+            verified: false,
+          }
         : null,
     createdAt: null,
     likes: 0,

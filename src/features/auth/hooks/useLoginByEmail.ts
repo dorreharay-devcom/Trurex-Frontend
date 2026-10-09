@@ -81,6 +81,7 @@ export function useLoginByEmail() {
         setMfaPending,
         setMfaChecking,
         onRequireMfa: () => router.replace(Routes.Mfa),
+        onRequireIdentityVerificationPrompt: () => router.replace(Routes.VerifyIdentity),
         onReady: () => openMainTab(router, TAB.discover),
       });
     } catch (error: unknown) {

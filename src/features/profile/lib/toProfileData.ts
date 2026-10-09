@@ -22,6 +22,7 @@ export function toProfileData(row: ProfileUserRow): ProfileData {
     followers: row.followers_count ?? 0,
     following: row.following_count ?? 0,
     relationshipStatus: parseRelationshipStatus(row.relationship_status),
+    verified: Boolean(row.verified),
     currently: {
       binging: row.currently_binging || undefined,
       listening: row.currently_listening_to || undefined,

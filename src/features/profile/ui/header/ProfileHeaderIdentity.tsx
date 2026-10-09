@@ -4,6 +4,7 @@ import { CATEGORY_ICON_FALLBACK } from '~/shared/api/categories';
 import type { RelationshipStatus } from '~/features/profile/types/profile';
 import { RELATIONSHIP_STATUS } from '~/shared/config/relationshipStatus';
 import { Theme } from '~/shared/theme/Theme';
+import { VerifiedBadge } from '~/shared/ui/primitives/VerifiedBadge';
 
 type Props = {
   displayName: string;
@@ -12,6 +13,7 @@ type Props = {
   location?: string | null;
   relationshipStatus: RelationshipStatus;
   tierBadge?: React.ReactNode;
+  verified?: boolean;
 };
 
 function RelationshipBadge({ status }: { status: RelationshipStatus }) {
@@ -43,10 +45,12 @@ const ProfileHeaderIdentity = ({
   location,
   relationshipStatus,
   tierBadge,
+  verified,
 }: Props) => (
   <View className="mt-3">
     <View className="flex-row flex-wrap items-center gap-2">
       <Text className="text-xl font-bold text-foreground">{displayName}</Text>
+      {verified ? <VerifiedBadge size={16} /> : null}
       <RelationshipBadge status={relationshipStatus} />
     </View>
     <Text className="text-sm text-muted-foreground">{handle}</Text>

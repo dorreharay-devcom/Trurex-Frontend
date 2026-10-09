@@ -9,6 +9,7 @@ export type RecommendationAuthor = {
   name: string;
   handle: string;
   avatar: string;
+  verified: boolean;
 };
 
 export type Recommendation = {

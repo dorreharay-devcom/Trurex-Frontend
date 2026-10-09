@@ -31,6 +31,7 @@ export const MfaMessage = {
   verifyFailed: 'Verification failed. Please try again.',
   resendFailed: 'Could not send a new verification code. Please try again.',
   resendSuccess: 'We sent a new verification code.',
+  biometricFailed: "We couldn't confirm it's you. Please try again.",
 } as const;
 export const MFA_RESTART_NOTICES: Partial<Record<MfaErrorCodeId, string>> = {
   [MfaErrorCode.RestartGeneric]: 'We sent a new verification code. Please try again.',

@@ -58,6 +58,7 @@ const ProfileHeader = ({
             disabled={!isOwnProfile || avatarUploading}
             avatarRefreshKey={avatarRefreshKey}
             onPress={onAvatarPress}
+            verified={profile.verified}
           />
         </View>
 
@@ -67,6 +68,7 @@ const ProfileHeader = ({
           bio={profile.bio}
           location={profile.location}
           relationshipStatus={profile.relationshipStatus}
+          verified={profile.verified}
           tierBadge={
             tier ? (
               <ProfileTierBadge

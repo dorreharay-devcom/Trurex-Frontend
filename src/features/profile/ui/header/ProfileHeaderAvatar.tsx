@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { Camera } from 'lucide-react-native';
 import { USER_AVATARS_BUCKET } from '~/shared/config/app';
 import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
+import { VerifiedBadge } from '~/shared/ui/primitives/VerifiedBadge';
 import { avatarImageTransform } from '~/shared/lib/media/imageTransform';
 
 const PROFILE_AVATAR_TRANSFORM = avatarImageTransform(96);
@@ -14,6 +15,7 @@ type Props = {
   disabled: boolean;
   avatarRefreshKey?: number;
   onPress?: () => void;
+  verified?: boolean;
 };
 
 const ProfileHeaderAvatar = ({
@@ -23,6 +25,7 @@ const ProfileHeaderAvatar = ({
   disabled,
   avatarRefreshKey,
   onPress,
+  verified,
 }: Props) => {
   const initial = displayName.charAt(0).toUpperCase() || '?';
 
@@ -34,27 +37,30 @@ const ProfileHeaderAvatar = ({
       accessibilityRole={editable ? 'button' : undefined}
       accessibilityLabel={editable ? 'Change profile photo' : undefined}
     >
-      <View className="h-24 w-24 overflow-hidden rounded-2xl border-4 border-border bg-muted">
-        {avatarUrl ? (
-          <SignedStorageImage
-            bucket={USER_AVATARS_BUCKET}
-            storagePath={avatarUrl}
-            className="absolute inset-0"
-            cacheVersion={avatarRefreshKey}
-            imageTransform={PROFILE_AVATAR_TRANSFORM}
-            recyclingKey={`${avatarUrl}:${avatarRefreshKey ?? 0}`}
-            priority="low"
-          />
-        ) : (
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-3xl font-bold text-muted">{initial}</Text>
-          </View>
-        )}
-        {editable && (
-          <View className="absolute bottom-0 left-0 right-0 items-center justify-center bg-black/45 py-1.5">
-            <Camera size={14} color="white" />
-          </View>
-        )}
+      <View className="h-24 w-24">
+        <View className="h-full w-full overflow-hidden rounded-2xl border-4 border-border bg-muted">
+          {avatarUrl ? (
+            <SignedStorageImage
+              bucket={USER_AVATARS_BUCKET}
+              storagePath={avatarUrl}
+              className="absolute inset-0"
+              cacheVersion={avatarRefreshKey}
+              imageTransform={PROFILE_AVATAR_TRANSFORM}
+              recyclingKey={`${avatarUrl}:${avatarRefreshKey ?? 0}`}
+              priority="low"
+            />
+          ) : (
+            <View className="flex-1 items-center justify-center">
+              <Text className="text-3xl font-bold text-muted">{initial}</Text>
+            </View>
+          )}
+          {editable && (
+            <View className="absolute bottom-0 left-0 right-0 items-center justify-center bg-black/45 py-1.5">
+              <Camera size={14} color="white" />
+            </View>
+          )}
+        </View>
+        {verified ? <VerifiedBadge size={22} className="absolute -bottom-1 -right-1" /> : null}
       </View>
     </TouchableOpacity>
   );
