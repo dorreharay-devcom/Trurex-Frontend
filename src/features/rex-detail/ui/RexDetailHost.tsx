@@ -17,6 +17,7 @@ type Props = {
   onAuthorPress?: (authorId: string) => void;
   onUserPress?: (userId: string) => void;
   onEditRex?: (rexId: string) => void;
+  onOpenBusinessPage?: (rexId: string) => void;
 };
 
 function RexDetailHost({

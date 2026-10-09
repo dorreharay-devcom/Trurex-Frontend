@@ -52,6 +52,10 @@ export function toRexRequestRoute(requestId: string): Href {
   return `/rex-request/${requestId}`;
 }
 
+export function toBusinessRoute(rexId: string): Href {
+  return `/business/${rexId}`;
+}
+
 export function toCircleRoute(circleId: string): Href {
   return `/circles/${circleId}`;
 }

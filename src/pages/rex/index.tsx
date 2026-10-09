@@ -58,6 +58,7 @@ function RexPage() {
         onAddYourOwn={onAddYourOwn}
         onAddToWishList={onAddToWishList}
         onEditRex={onEditRex}
+        onOpenBusinessPage={nav.openBusinessPage}
         scrollToComments={page.scrollToComments}
         scrollToCommentId={page.scrollToCommentId}
       />

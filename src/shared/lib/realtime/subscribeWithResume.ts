@@ -4,6 +4,7 @@ import { Backend } from '~/shared/api/client';
 
 type Options = {
   enabled: boolean;
+  topic: string;
   createChannel: () => RealtimeChannel;
   onSoftRefresh: () => void;
 };
@@ -37,6 +38,12 @@ export function subscribeRealtimeWithResume(options: Options): () => void {
     void Backend.removeChannel(current);
   };
 
+  const removeStaleChannelWithSameTopic = () => {
+    const fullTopic = `realtime:${options.topic}`;
+    const stale = Backend.getChannels().find((c) => c.topic === fullTopic);
+    if (stale) void Backend.removeChannel(stale);
+  };
+
   const scheduleRebind = () => {
     clearRebind();
     rebindTimer = setTimeout(() => {
@@ -47,6 +54,7 @@ export function subscribeRealtimeWithResume(options: Options): () => void {
   const attach = () => {
     if (disposed) return;
     detach();
+    removeStaleChannelWithSameTopic();
     const next = options.createChannel();
     channel = next;
     next.subscribe((status) => {

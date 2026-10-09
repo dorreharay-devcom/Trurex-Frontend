@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { TAB, type Tab } from '~/shared/config/mainTabs';
-import { toRexRoute, toUserRoute } from '~/shared/config/routes';
+import { toBusinessRoute, toRexRoute, toUserRoute } from '~/shared/config/routes';
 import { openMainTab } from '~/shared/lib/mainTab';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 
@@ -41,5 +41,12 @@ export function useRexPageNav() {
     [router],
   );
 
-  return { router, closeRex, goToDiscover, changeTab, openUser, openRex };
+  const openBusinessPage = useCallback(
+    (rexId: string) => {
+      router.push(toBusinessRoute(rexId));
+    },
+    [router],
+  );
+
+  return { router, closeRex, goToDiscover, changeTab, openUser, openRex, openBusinessPage };
 }

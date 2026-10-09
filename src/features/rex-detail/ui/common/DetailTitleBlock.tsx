@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import { MapPin, Link2, Bookmark } from 'lucide-react-native';
+import { MapPin, Link2, Bookmark, ChevronRight } from 'lucide-react-native';
 import type { RexDetailView } from '~/features/rex-detail/hooks/useRexDetail';
 import { Theme } from '~/shared/theme/Theme';
 import type { Recommendation } from '~/shared/types/recommendation';
@@ -58,9 +58,16 @@ type Props = {
   detail: RexDetailView;
   isSaved: boolean;
   onSavePress: () => void;
+  onOpenBusinessPage?: (rexId: string) => void;
 };
 
-function DetailTitleBlock({ recommendation, detail, isSaved, onSavePress }: Props) {
+function DetailTitleBlock({
+  recommendation,
+  detail,
+  isSaved,
+  onSavePress,
+  onOpenBusinessPage,
+}: Props) {
   return (
     <View>
       <View className="mb-1 flex-row items-center justify-between gap-2">
@@ -71,9 +78,22 @@ function DetailTitleBlock({ recommendation, detail, isSaved, onSavePress }: Prop
         </View>
         <SaveButton isSaved={isSaved} onPress={onSavePress} />
       </View>
-      <Text className="mt-2 font-display text-2xl font-bold text-foreground">
-        {placeDisplayTitle(recommendation.title)}
-      </Text>
+      <View className="mt-2 flex-row items-center justify-between gap-2">
+        <Text className="flex-1 font-display text-2xl font-bold text-foreground" numberOfLines={1}>
+          {placeDisplayTitle(recommendation.title)}
+        </Text>
+        {detail.businessPage && onOpenBusinessPage ? (
+          <Pressable
+            onPress={() => onOpenBusinessPage(detail.businessPage!.rexId)}
+            accessibilityRole="link"
+            accessibilityLabel="Open business page"
+            className="shrink-0 flex-row items-center gap-1 active:opacity-80"
+          >
+            <Text className="text-sm text-muted-foreground">Open business page</Text>
+            <ChevronRight size={14} color={Theme.colors.secondaryText} />
+          </Pressable>
+        ) : null}
+      </View>
       {detail.placeLocationLine ? (
         <Pressable
           onPress={detail.openMaps}
