@@ -81,6 +81,7 @@ function DetailBody({
           avatar={recommendation.user?.avatar ?? ''}
           authorId={effectiveAuthorId}
           authorTierIcon={detail.rexDetail?.author_tier_icon}
+          verified={detail.rexDetail?.author_verified}
           onPress={onAuthorPress}
           rexId={recommendation.id}
           isThanked={detail.rexDetail?.is_thanked ?? false}

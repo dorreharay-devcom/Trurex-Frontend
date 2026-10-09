@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
 import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
+import { VerifiedBadge } from '~/shared/ui/primitives/VerifiedBadge';
 import { Theme } from '~/shared/theme/Theme';
 import ThankRexButton from './ThankRexButton';
 
@@ -10,6 +11,7 @@ type Props = {
   avatar: string;
   authorId: string | undefined | null;
   authorTierIcon?: string | null;
+  verified?: boolean;
   onPress: () => void;
   rexId: string;
   isThanked: boolean;
@@ -21,6 +23,7 @@ function DetailAuthorCard({
   avatar,
   authorId,
   authorTierIcon,
+  verified,
   onPress,
   rexId,
   isThanked,
@@ -39,6 +42,7 @@ function DetailAuthorCard({
           <Text className="text-sm text-muted-foreground">Recommended by</Text>
           <View className="flex-row items-center gap-1.5">
             <Text className="font-semibold text-foreground">{name}</Text>
+            {verified ? <VerifiedBadge size={14} /> : null}
             {authorTierIcon ? <Text className="text-xs">{authorTierIcon}</Text> : null}
           </View>
         </View>

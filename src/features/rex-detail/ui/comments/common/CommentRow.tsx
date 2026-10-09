@@ -55,6 +55,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
         <SignedUserAvatar
           name={name}
           avatar={comment.profile?.avatar_url ?? undefined}
+          verified={comment.profile?.verified}
           className="mt-0.5 h-7 w-7"
           sizePt={28}
         />

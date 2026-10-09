@@ -49,7 +49,8 @@ function mapAuthor(row: Record<string, unknown>): RecommendationAuthor | null {
     ) ?? '';
 
   if (!name && !handle && !avatar) return null;
-  return { name, handle, avatar };
+  const verified = optionalBoolean(row, 'author_verified', 'is_author_verified') ?? false;
+  return { name, handle, avatar, verified };
 }
 
 function mapCategory(row: Record<string, unknown>): { categoryId: string; category: string } {

@@ -36,6 +36,7 @@ export function useOAuthSignIn() {
               setMfaPending,
               setMfaChecking,
               onRequireMfa: () => router.replace(Routes.Mfa),
+              onRequireIdentityVerificationPrompt: () => router.replace(Routes.VerifyIdentity),
               onReady: () => openMainTab(router, TAB.discover),
             });
           } else {

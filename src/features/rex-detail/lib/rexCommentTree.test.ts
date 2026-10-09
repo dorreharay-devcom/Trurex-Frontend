@@ -25,6 +25,7 @@ function comment(partial: Partial<RexComment> & { id: string }): RexComment {
       avatar_url: null,
       username: null,
       relationship_status: null,
+      verified: false,
     },
     replies: partial.replies ?? [],
     mentions: partial.mentions ?? [],

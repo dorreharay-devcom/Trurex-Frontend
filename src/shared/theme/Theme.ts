@@ -17,6 +17,7 @@ export const Brand = {
   colorLight: '#E4EBEE',
   colorOnBrand: '#1A2830',
   colorMuted: '#5A7280',
+  colorVerifiedAccent: '#D4AF37',
 } as const;
 
 export const Colors = {

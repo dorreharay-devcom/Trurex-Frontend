@@ -79,7 +79,7 @@ function DetailTitleBlock({
         <SaveButton isSaved={isSaved} onPress={onSavePress} />
       </View>
       <View className="mt-2 flex-row items-center justify-between gap-2">
-        <Text className="flex-1 font-display text-2xl font-bold text-foreground" numberOfLines={1}>
+        <Text className="flex-1 font-display text-2xl font-bold text-foreground">
           {placeDisplayTitle(recommendation.title)}
         </Text>
         {detail.businessPage && onOpenBusinessPage ? (
@@ -89,7 +89,7 @@ function DetailTitleBlock({
             accessibilityLabel="Open business page"
             className="shrink-0 flex-row items-center gap-1 active:opacity-80"
           >
-            <Text className="text-sm text-muted-foreground">Open business page</Text>
+            <Text className="text-sm text-muted-foreground">Business page</Text>
             <ChevronRight size={14} color={Theme.colors.secondaryText} />
           </Pressable>
         ) : null}

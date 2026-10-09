@@ -1,6 +1,7 @@
 export { Button, ButtonVariant } from './primitives/Button';
 export { Input } from './primitives/Input';
 export { Skeleton } from './primitives/Skeleton';
+export { VerifiedBadge } from './primitives/VerifiedBadge';
 export { ClearableSearchInput } from './primitives/ClearableSearchInput';
 export { LoadMoreButton } from './primitives/LoadMoreButton';
 

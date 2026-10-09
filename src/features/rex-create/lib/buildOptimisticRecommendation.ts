@@ -69,7 +69,7 @@ export function buildOptimisticRecommendationFromCreate(params: {
     photoPath: flow.photos.paths[0] ?? null,
     photoPaths: flow.photos.paths,
     createdAt: new Date().toISOString(),
-    user: authorName ? { name: authorName, handle: '', avatar: '' } : null,
+    user: authorName ? { name: authorName, handle: '', avatar: '', verified: false } : null,
     likes: 0,
     comments: 0,
     saves: 0,

@@ -69,6 +69,12 @@ module.exports = {
       'expo-secure-store',
       'expo-updates',
       [
+        'expo-local-authentication',
+        {
+          faceIDPermission: "Allow TruRex to use Face ID to confirm it's you when signing in on a new device.",
+        },
+      ],
+      [
         'expo-image-picker',
         {
           photosPermission: PHOTO_LIBRARY_USAGE_DESCRIPTION,

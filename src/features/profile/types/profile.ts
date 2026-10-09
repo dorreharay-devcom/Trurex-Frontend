@@ -30,6 +30,7 @@ export type ProfileData = {
   following: number;
   relationshipStatus: RelationshipStatus;
   currently?: CurrentlyData;
+  verified: boolean;
 };
 
 export type ProfileUserRow = {
@@ -51,6 +52,7 @@ export type ProfileUserRow = {
   rexes_created_count: number;
   relationship_status: RelationshipStatus | string | null;
   user_id?: string;
+  verified?: boolean | null;
 };
 
 export type UpdateProfileInput = {

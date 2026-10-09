@@ -13,6 +13,7 @@ export const Routes = {
   ForgotPassword: '/forgot-password',
   ResetPassword: '/reset-password',
   Mfa: '/mfa',
+  VerifyIdentity: '/verify-identity',
   Terms: '/terms',
   CommunityGuidelines: '/community-guidelines',
   Privacy: '/privacy',
