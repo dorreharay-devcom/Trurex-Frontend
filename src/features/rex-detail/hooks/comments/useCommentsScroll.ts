@@ -21,6 +21,8 @@ type WebScrollable = {
   scrollIntoView?: (options: { behavior?: string; block?: string; inline?: string }) => void;
 };
 
+type ScrollBlock = 'center' | 'nearest';
+
 type UseCommentsScrollArgs = {
   visible: boolean;
   recommendationId: string | undefined;
@@ -37,13 +39,18 @@ export function useCommentsScroll({
   const scrollRef = useRef<ScrollView>(null);
   const commentsSectionWrapRef = useRef<View>(null);
   const composerAnchorRef = useRef<View>(null);
+  const hasAutoScrolledToComposerRef = useRef(false);
 
-  const scrollTargetIntoView = useCallback((targetEl: View) => {
+  useEffect(() => {
+    hasAutoScrolledToComposerRef.current = false;
+  }, [recommendationId]);
+
+  const scrollTargetIntoView = useCallback((targetEl: View, block: ScrollBlock = 'center') => {
     try {
       if (isWeb) {
         (targetEl as unknown as WebScrollable).scrollIntoView?.({
           behavior: 'smooth',
-          block: 'center',
+          block,
           inline: 'nearest',
         });
         return;
@@ -67,7 +74,10 @@ export function useCommentsScroll({
   const scrollComposerIntoView = useCallback(() => {
     const targetEl = composerAnchorRef.current ?? commentsSectionWrapRef.current;
     if (!targetEl) return;
-    scrollTargetIntoView(targetEl);
+    // 'nearest' is a no-op when the composer is already visible, unlike 'center'
+    // which always recomputes and re-centers — disruptive on a refocus where
+    // nothing actually moved out of view.
+    scrollTargetIntoView(targetEl, 'nearest');
   }, [scrollTargetIntoView]);
 
   const handleFocusCommentReady = useCallback(
@@ -78,8 +88,14 @@ export function useCommentsScroll({
   );
 
   const handleComposerFocus = useCallback(() => {
+    if (hasAutoScrolledToComposerRef.current) return;
+    hasAutoScrolledToComposerRef.current = true;
+
     if (isWeb) {
-      scrollComposerIntoView();
+      // A just-landed background refetch (e.g. returning from editing the Rex)
+      // can still be reflowing content above the composer; wait a tick so this
+      // doesn't compute its scroll target against a layout that's about to shift.
+      runAfterLayoutSettles(scrollComposerIntoView);
       return;
     }
     runAfterDelays(COMPOSER_REFOCUS_DELAYS_MS, scrollComposerIntoView);

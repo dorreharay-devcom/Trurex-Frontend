@@ -11,8 +11,8 @@ type Props = {
 
 function BusinessRexTabs({ networkOnly, onChange, networkCount, totalCount }: Props) {
   const tabs = [
-    { networkOnly: true, label: `Network · ${networkCount}` },
     { networkOnly: false, label: `All Rex's · ${totalCount}` },
+    { networkOnly: true, label: `Network · ${networkCount}` },
   ];
 
   return (
