@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Pressable } from 'react-native';
 import { Flag } from 'lucide-react-native';
 import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
+import MentionText from '~/features/mentions/ui/MentionText';
 import { canDeleteRexComment } from '~/features/rex-detail/api/rexCommentsApi';
 import type { RexComment } from '~/features/rex-detail/types/rexComment';
 import { formatCompactRelativeTime } from '~/shared/lib/data/date';
@@ -67,7 +68,12 @@ const CommentRow: React.FC<CommentRowProps> = ({
             {formatCompactRelativeTime(comment.created_at)}
           </Text>
         </View>
-        <Text className="mt-0.5 text-sm leading-relaxed text-foreground/90">{comment.body}</Text>
+        <MentionText
+          body={comment.body}
+          mentions={comment.mentions}
+          onUserPress={onUserPress}
+          className="mt-0.5 text-sm leading-relaxed text-foreground/90"
+        />
         <View className="mt-1.5 flex-row flex-wrap items-center gap-2">
           <LikeAction
             count={comment.like_count ?? 0}

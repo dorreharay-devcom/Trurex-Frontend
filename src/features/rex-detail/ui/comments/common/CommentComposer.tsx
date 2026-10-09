@@ -10,17 +10,21 @@ import {
 import { INPUT_FOCUS_RING_CLASS } from '~/shared/config/inputFocus';
 import type { CommentComposerState } from '~/features/rex-detail/hooks/comments/useCommentComposer';
 import { webNoOutline, cn } from '~/shared/lib/ui/styles';
+import type { MentionAutocompleteState } from '~/features/mentions/hooks/useMentionAutocomplete';
+import MentionSuggestionsList from '~/features/mentions/ui/MentionSuggestionsList';
 
 export type CommentComposerProps = {
   composer: CommentComposerState;
   composerAnchorRef?: React.RefObject<View | null>;
   onInputFocus?: () => void;
+  mention?: MentionAutocompleteState;
 };
 
 const CommentComposer: React.FC<CommentComposerProps> = ({
   composer,
   composerAnchorRef,
   onInputFocus,
+  mention,
 }) => {
   const { text, setText, replyTo, posting, inputRef, post, cancelReply } = composer;
   const canSubmit = text.trim().length > 0 && !posting;
@@ -81,6 +85,14 @@ const CommentComposer: React.FC<CommentComposerProps> = ({
           </Pressable>
         </View>
       </View>
+      {mention?.showDropdown ? (
+        <MentionSuggestionsList
+          candidates={mention.candidates}
+          onSelect={mention.selectMention}
+          onLoadMore={mention.loadMore}
+          isLoadingMore={mention.isLoadingMore}
+        />
+      ) : null}
     </View>
   );
 };

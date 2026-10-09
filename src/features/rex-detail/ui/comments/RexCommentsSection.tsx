@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { MessageCircle } from 'lucide-react-native';
 import { useRexComments } from '~/features/rex-detail/hooks/comments/useRexComments';
@@ -12,6 +12,10 @@ import CommentThread from './common/CommentThread';
 import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 import { totalRexCommentCount } from '~/features/rex-detail/lib/rexCommentTree';
 import type { RexComment } from '~/features/rex-detail/types/rexComment';
+import {
+  useMentionAutocomplete,
+  type MentionAutocompleteState,
+} from '~/features/mentions/hooks/useMentionAutocomplete';
 
 export type RexCommentsSectionProps = {
   rexId: string;
@@ -80,11 +84,24 @@ const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
   const { comments, loading, loadError, refetch, addComment, deleteComment, toggleCommentLike } =
     useRexComments(rexId);
 
+  const mentionRef = useRef<MentionAutocompleteState | null>(null);
+  const addCommentWithMentions = useCallback(
+    async (body: string, parentCommentId?: string | null) => {
+      const taggedMentions = mentionRef.current?.resolveTaggedMentions(body) ?? [];
+      await addComment(body, parentCommentId, taggedMentions);
+      mentionRef.current?.reset();
+    },
+    [addComment],
+  );
+
   const composer = useCommentComposer({
     rexId,
-    addComment,
+    addComment: addCommentWithMentions,
     autoFocus: !!autoFocusComposer && !!user && !focusCommentId,
   });
+  const mention = useMentionAutocomplete({ text: composer.text, setText: composer.setText });
+  mentionRef.current = mention;
+
   const focus = useCommentFocus({ rexId, focusCommentId, loading, comments, onFocusCommentReady });
   const { handleDelete, handleToggleLike } = useCommentActions({
     canLike: !!user,
@@ -127,6 +144,7 @@ const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
           composer={composer}
           composerAnchorRef={composerAnchorRef}
           onInputFocus={onComposerFocus}
+          mention={mention}
         />
       ) : null}
     </View>

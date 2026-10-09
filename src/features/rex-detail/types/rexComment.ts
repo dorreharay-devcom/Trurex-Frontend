@@ -1,3 +1,5 @@
+import type { MentionRef } from '~/features/mentions/types/mention';
+
 export type RexCommentRpc = {
   id: string;
   rex_id: string;
@@ -14,6 +16,7 @@ export type RexCommentRpc = {
   liked_by_me: boolean;
   reply_count: number;
   subcomments: RexCommentRpc[];
+  mentions?: MentionRef[];
 };
 
 export type RexCommentDbRow = {
@@ -52,4 +55,5 @@ export type RexComment = {
   reply_count: number;
   profile: RexCommentAuthor;
   replies: RexComment[];
+  mentions: MentionRef[];
 };

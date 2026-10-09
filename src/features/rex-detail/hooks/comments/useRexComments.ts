@@ -16,6 +16,7 @@ import {
   updateCommentInTree,
 } from '~/features/rex-detail/lib/rexCommentTree';
 import { patchFeedCommentCount } from '~/features/rex-detail/lib/patchRecommendationCaches';
+import type { MentionRef } from '~/features/mentions/types/mention';
 import type { RexComment } from '~/features/rex-detail/types/rexComment';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 import { assertOnlineForMutation } from '~/shared/lib/network/assertOnline';
@@ -30,6 +31,7 @@ function optimisticComment(params: {
   parentCommentId: string | null;
   authorId: string;
   displayName: string;
+  mentions: MentionRef[];
 }): RexComment {
   const now = new Date().toISOString();
   return {
@@ -50,6 +52,7 @@ function optimisticComment(params: {
       relationship_status: null,
     },
     replies: [],
+    mentions: params.mentions,
   };
 }
 
@@ -134,7 +137,7 @@ export function useRexComments(rexId: string | undefined) {
   }, [loadComments]);
 
   const addComment = useCallback(
-    async (body: string, parentCommentId?: string | null) => {
+    async (body: string, parentCommentId?: string | null, taggedUsers: MentionRef[] = []) => {
       if (!rexId || !user) return;
       if (!assertOnlineForMutation('Comments')) return;
       const parentId = parentCommentId ?? null;
@@ -150,6 +153,7 @@ export function useRexComments(rexId: string | undefined) {
             user.user_metadata.display_name) ||
           user.email ||
           'You',
+        mentions: taggedUsers,
       });
 
       setComments((prev) => {
@@ -160,7 +164,15 @@ export function useRexComments(rexId: string | undefined) {
       suppressRealtimeUntil.current = Date.now() + REALTIME_SELF_ECHO_MS;
 
       try {
-        await addRexComment({ rexId, body, parentCommentId: parentId }, comments);
+        await addRexComment(
+          {
+            rexId,
+            body,
+            parentCommentId: parentId,
+            taggedUserIds: taggedUsers.map((ref) => ref.userId),
+          },
+          comments,
+        );
         await afterLocalWrite();
       } catch (e: unknown) {
         setComments((prev) => {
