@@ -36,6 +36,7 @@ type Props = {
   scrollToCommentId?: string;
   onUserPress?: (userId: string) => void;
   onReportComment: (commentId: string) => void;
+  onOpenBusinessPage?: (rexId: string) => void;
 };
 
 function DetailBody({
@@ -52,6 +53,7 @@ function DetailBody({
   scrollToCommentId,
   onUserPress,
   onReportComment,
+  onOpenBusinessPage,
 }: Props) {
   const authorName = authorDisplayName(recommendation.user);
   return (
@@ -72,6 +74,7 @@ function DetailBody({
           detail={detail}
           isSaved={save.isSaved}
           onSavePress={save.openSave}
+          onOpenBusinessPage={onOpenBusinessPage}
         />
         <DetailAuthorCard
           name={authorName}

@@ -1,5 +1,9 @@
 import type { QueryClient } from '@tanstack/react-query';
-import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
+import {
+  PLACE_REXES_QUERY_KEY_ROOT,
+  PLACE_SUMMARY_QUERY_KEY_ROOT,
+  REX_QUERY_KEYS,
+} from '~/shared/config/queryKeys';
 
 const REX_SURFACE_KEYS = [
   REX_QUERY_KEYS.discoverFeed,
@@ -17,6 +21,15 @@ export function invalidateActiveRexSurfaces(
   for (const queryKey of REX_SURFACE_KEYS) {
     void queryClient.invalidateQueries({ queryKey, refetchType: 'active' });
   }
+
+  void queryClient.invalidateQueries({
+    queryKey: PLACE_SUMMARY_QUERY_KEY_ROOT,
+    refetchType: 'active',
+  });
+  void queryClient.invalidateQueries({
+    queryKey: PLACE_REXES_QUERY_KEY_ROOT,
+    refetchType: 'active',
+  });
 
   if (options?.includeCollections !== false) {
     void queryClient.invalidateQueries({

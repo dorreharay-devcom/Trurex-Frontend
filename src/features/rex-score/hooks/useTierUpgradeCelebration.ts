@@ -45,6 +45,7 @@ export function useTierUpgradeCelebration(userId: string | null | undefined) {
 
     return subscribeRealtimeWithResume({
       enabled: true,
+      topic: `tier-upgrade:${userId}`,
       createChannel: () =>
         Backend.channel(`tier-upgrade:${userId}`).on(
           'postgres_changes',

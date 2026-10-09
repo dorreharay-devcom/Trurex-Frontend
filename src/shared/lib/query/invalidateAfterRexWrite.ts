@@ -1,6 +1,10 @@
 import type { InfiniteData, QueryClient } from '@tanstack/react-query';
 import type { MapPinRow } from '~/features/map/types/mapPinRow';
-import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
+import {
+  PLACE_REXES_QUERY_KEY_ROOT,
+  PLACE_SUMMARY_QUERY_KEY_ROOT,
+  REX_QUERY_KEYS,
+} from '~/shared/config/queryKeys';
 import { WISH_LIST_QUERY_KEYS } from '~/features/wish-list/config/queryKeys';
 import type { Recommendation } from '~/shared/types/recommendation';
 
@@ -30,6 +34,15 @@ export function invalidateAfterRexWrite(
   for (const queryKey of AFTER_CREATE_FEED_KEYS) {
     void queryClient.invalidateQueries({ queryKey, refetchType: 'active' });
   }
+
+  void queryClient.invalidateQueries({
+    queryKey: PLACE_SUMMARY_QUERY_KEY_ROOT,
+    refetchType: 'active',
+  });
+  void queryClient.invalidateQueries({
+    queryKey: PLACE_REXES_QUERY_KEY_ROOT,
+    refetchType: 'active',
+  });
 
   if (options?.editRexId) {
     void queryClient.invalidateQueries({ queryKey: ['rexDetail', options.editRexId] });

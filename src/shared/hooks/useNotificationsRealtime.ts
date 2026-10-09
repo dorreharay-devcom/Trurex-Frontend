@@ -25,6 +25,7 @@ export function useNotificationsRealtime(userId: string | null | undefined) {
 
     return subscribeRealtimeWithResume({
       enabled: true,
+      topic: `notifications:${userId}`,
       createChannel: () =>
         Backend.channel(`notifications:${userId}`).on(
           'postgres_changes',

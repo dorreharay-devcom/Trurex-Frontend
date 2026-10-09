@@ -107,6 +107,7 @@ export function useRexComments(rexId: string | undefined) {
 
     return subscribeRealtimeWithResume({
       enabled: true,
+      topic: `rex-comments-${rexId}`,
       createChannel: () =>
         Backend.channel(`rex-comments-${rexId}`).on(
           'postgres_changes',

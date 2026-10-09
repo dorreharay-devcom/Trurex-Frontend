@@ -12,6 +12,8 @@ import {
 } from '~/shared/lib/media/rexImages';
 import { mapDirectionsUrl } from '~/features/map/lib/directions';
 import { toastError } from '~/shared/lib/appToast';
+import { fetchPlaceSummary } from '~/features/business/api/placeSummaryApi';
+import { PLACE_SUMMARY_QUERY_KEY } from '~/shared/config/queryKeys';
 
 function normalizeGalleryPath(raw: string): string | null {
   const trimmed = raw.trim();
@@ -33,6 +35,18 @@ export function useRexDetail(recommendation: Recommendation | null, visible: boo
     staleTime: 60_000,
     refetchOnMount: true,
   });
+
+  const { data: placeSummary } = useQuery({
+    queryKey: PLACE_SUMMARY_QUERY_KEY(recommendation?.id),
+    queryFn: () => fetchPlaceSummary(recommendation!.id),
+    enabled: visible && typeof recommendation?.id === 'string',
+    staleTime: 60_000,
+  });
+
+  const businessPage = useMemo(() => {
+    if (!recommendation || !placeSummary?.is_visible_business_page) return null;
+    return { rexId: recommendation.id, totalRexCount: placeSummary.total_rex_count };
+  }, [recommendation, placeSummary]);
 
   const detailRatings = useMemo(() => {
     if (!rexDetail) return { overall: null, dimensions: [] };
@@ -108,6 +122,7 @@ export function useRexDetail(recommendation: Recommendation | null, visible: boo
     coverHttp,
     hasCoverImage,
     showHeroLoading,
+    businessPage,
   };
 }
 

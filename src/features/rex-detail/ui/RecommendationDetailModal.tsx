@@ -30,6 +30,7 @@ type Props = {
   onAuthorPress?: (authorId: string) => void;
   onUserPress?: (userId: string) => void;
   onEditRex?: (rexId: string) => void;
+  onOpenBusinessPage?: (rexId: string) => void;
 };
 
 const RecommendationDetailModal: React.FC<Props> = ({
@@ -46,6 +47,7 @@ const RecommendationDetailModal: React.FC<Props> = ({
   onAuthorPress,
   onUserPress,
   onEditRex,
+  onOpenBusinessPage,
 }) => {
   const { height: windowHeight } = useWindowDimensions();
   const { user: authUser } = useAuth();
@@ -123,6 +125,7 @@ const RecommendationDetailModal: React.FC<Props> = ({
           scrollToCommentId={scrollToCommentId}
           onUserPress={onUserPress}
           onReportComment={report.openCommentReport}
+          onOpenBusinessPage={onOpenBusinessPage}
         />
         <DetailOverlays report={report} del={del} save={save} />
       </View>

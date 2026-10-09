@@ -111,6 +111,8 @@ function CardTagsContent({ tags }: { tags: readonly string[] }) {
     [tagsKey],
   );
 
+  if (tags.length === 0) return null;
+
   return (
     <View className="px-4 pt-2">
       {!ready && rowWidth > 0 ? (
@@ -137,10 +139,7 @@ function CardTagsContent({ tags }: { tags: readonly string[] }) {
 }
 
 function CardTags({ tags }: Props) {
-  const items = tags ?? [];
-  if (items.length === 0) return null;
-
-  return <CardTagsContent tags={items} />;
+  return <CardTagsContent tags={tags ?? []} />;
 }
 
 export default CardTags;
