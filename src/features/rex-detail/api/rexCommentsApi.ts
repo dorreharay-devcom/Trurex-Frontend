@@ -58,7 +58,6 @@ export async function addRexComment(
     rexId: string;
     body: string;
     parentCommentId?: string | null;
-    taggedUserIds?: string[];
   },
   existingComments: RexComment[] = [],
 ): Promise<RexCommentDbRow> {
@@ -74,7 +73,6 @@ export async function addRexComment(
       input_rex_id: params.rexId,
       input_body: trimmed,
       input_parent_comment_id: parentCommentId,
-      input_tagged_user_ids: params.taggedUserIds ?? [],
     }),
   ) as RexCommentDbRow;
 }

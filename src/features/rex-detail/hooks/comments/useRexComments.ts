@@ -164,15 +164,7 @@ export function useRexComments(rexId: string | undefined) {
       suppressRealtimeUntil.current = Date.now() + REALTIME_SELF_ECHO_MS;
 
       try {
-        await addRexComment(
-          {
-            rexId,
-            body,
-            parentCommentId: parentId,
-            taggedUserIds: taggedUsers.map((ref) => ref.userId),
-          },
-          comments,
-        );
+        await addRexComment({ rexId, body, parentCommentId: parentId }, comments);
         await afterLocalWrite();
       } catch (e: unknown) {
         setComments((prev) => {
