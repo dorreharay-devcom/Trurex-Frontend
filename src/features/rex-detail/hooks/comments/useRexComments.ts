@@ -50,6 +50,7 @@ function optimisticComment(params: {
       avatar_url: null,
       username: null,
       relationship_status: null,
+      verified: false,
     },
     replies: [],
     mentions: params.mentions,

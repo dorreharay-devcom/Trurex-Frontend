@@ -25,6 +25,7 @@ function mapRpcCommentFields(node: RexCommentRpc): Omit<RexComment, 'replies'> {
       avatar_url: node.author_profile_picture_url,
       username: node.author_username,
       relationship_status: node.author_relationship_status,
+      verified: node.author_verified ?? false,
     },
   };
 }

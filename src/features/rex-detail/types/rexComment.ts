@@ -9,6 +9,7 @@ export type RexCommentRpc = {
   author_username: string | null;
   author_profile_picture_url: string | null;
   author_relationship_status: string | null;
+  author_verified?: boolean;
   body: string;
   created_at: string;
   updated_at: string;
@@ -40,6 +41,7 @@ export type RexCommentAuthor = {
   avatar_url: string | null;
   username: string | null;
   relationship_status: string | null;
+  verified: boolean;
 };
 
 export type RexComment = {

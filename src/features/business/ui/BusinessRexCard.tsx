@@ -33,6 +33,7 @@ function BusinessRexCard({ row, categoryIcon, onPress }: Props) {
           <SignedUserAvatar
             name={row.author_display_name}
             avatar={row.author_avatar_url}
+            verified={row.author_verified}
             className="h-7 w-7"
             sizePt={28}
           />
