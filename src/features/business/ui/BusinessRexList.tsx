@@ -6,6 +6,7 @@ import type { PlaceRexRow } from '~/features/business/types/placeRex';
 
 const ROW_CONTENT_STYLE = { alignItems: 'flex-start' as const };
 const EMPTY_CARD_HEIGHT = 280;
+const SKELETON_COUNT = 3;
 
 function BusinessRexEmptyCard() {
   return (
@@ -15,6 +16,24 @@ function BusinessRexEmptyCard() {
     >
       <Text className="text-sm text-muted-foreground">No content added</Text>
     </View>
+  );
+}
+
+function BusinessRexListSkeleton() {
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerClassName="gap-3 pb-1"
+    >
+      {Array.from({ length: SKELETON_COUNT }, (_, i) => (
+        <View
+          key={i}
+          style={{ width: BUSINESS_REX_CARD_WIDTH, height: EMPTY_CARD_HEIGHT }}
+          className="rounded-2xl bg-border/40"
+        />
+      ))}
+    </ScrollView>
   );
 }
 
@@ -37,7 +56,11 @@ function BusinessRexList({
   onLoadMore,
   onOpenRex,
 }: Props) {
-  if (isInitialLoading || rows.length === 0) {
+  if (isInitialLoading) {
+    return <BusinessRexListSkeleton />;
+  }
+
+  if (rows.length === 0) {
     return <BusinessRexEmptyCard />;
   }
 

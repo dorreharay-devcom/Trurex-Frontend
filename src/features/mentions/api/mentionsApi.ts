@@ -32,3 +32,9 @@ export async function searchMentionCandidates(params: {
     .map(normalizeMentionCandidate)
     .filter((candidate): candidate is MentionCandidate => candidate !== null);
 }
+
+export async function resolveUserByHandle(handle: string): Promise<MentionCandidate | null> {
+  const normalized = handle.toLowerCase();
+  const candidates = await searchMentionCandidates({ query: handle, limit: 5, offset: 0 });
+  return candidates.find((candidate) => candidate.handle.toLowerCase() === normalized) ?? null;
+}

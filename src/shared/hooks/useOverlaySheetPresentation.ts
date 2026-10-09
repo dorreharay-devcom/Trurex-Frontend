@@ -14,10 +14,12 @@ export function useOverlaySheetPresentation({ visible, windowHeight, onClose }: 
   const sheetTranslateY = useRef(
     new RNAnimated.Value(Math.max(Dimensions.get('window').height, 1)),
   ).current;
+  const windowHeightRef = useRef(windowHeight);
+  windowHeightRef.current = windowHeight;
 
   useEffect(() => {
     if (!visible) return;
-    const h = Math.max(windowHeight, Dimensions.get('window').height, 1);
+    const h = Math.max(windowHeightRef.current, Dimensions.get('window').height, 1);
     sheetTranslateY.setValue(h);
     RNAnimated.timing(sheetTranslateY, {
       toValue: 0,
@@ -25,7 +27,9 @@ export function useOverlaySheetPresentation({ visible, windowHeight, onClose }: 
       easing: RNEasing.out(RNEasing.cubic),
       useNativeDriver: true,
     }).start();
-  }, [visible, windowHeight, sheetTranslateY]);
+    // Re-running this on every windowHeight change (e.g. keyboard open while typing)
+    // would replay the slide-in from off-screen mid-interaction.
+  }, [visible, sheetTranslateY]);
 
   const handleClose = useCallback(() => {
     const h = Math.max(windowHeight, Dimensions.get('window').height, 1);

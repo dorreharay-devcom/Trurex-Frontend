@@ -53,7 +53,7 @@ function BusinessRexCard({ row, categoryIcon, onPress }: Props) {
                 {row.review}
               </Text>
             ) : null}
-            <View className="-mx-1">
+            <View className="-mx-4">
               <CardTags tags={row.tag_slugs} />
             </View>
           </View>
