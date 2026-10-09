@@ -101,9 +101,17 @@ export async function untagRexFromRequest(requestId: string, rexId: string): Pro
   unwrap(await Backend.rpc('untag_rex_from_request', { p_request_id: requestId, p_rex_id: rexId }));
 }
 
-export async function commentOnRexRequest(requestId: string, body: string): Promise<string> {
+export async function commentOnRexRequest(
+  requestId: string,
+  body: string,
+  taggedUserIds: string[] = [],
+): Promise<string> {
   return unwrap(
-    await Backend.rpc('comment_on_rex_request', { p_request_id: requestId, p_body: body }),
+    await Backend.rpc('comment_on_rex_request', {
+      p_request_id: requestId,
+      p_body: body,
+      p_tagged_user_ids: taggedUserIds,
+    }),
   );
 }
 

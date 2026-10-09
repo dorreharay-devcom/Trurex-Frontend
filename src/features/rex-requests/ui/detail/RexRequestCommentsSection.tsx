@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { useAuth } from '~/features/auth/providers';
 import { useCommentComposer } from '~/features/rex-detail/hooks/comments/useCommentComposer';
@@ -8,6 +8,10 @@ import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 import { Theme } from '~/shared/theme/Theme';
 import { useRexRequestComments } from '~/features/rex-requests/hooks/detail/useRexRequestComments';
 import RexRequestCommentRow from '~/features/rex-requests/ui/detail/RexRequestCommentRow';
+import {
+  useMentionAutocomplete,
+  type MentionAutocompleteState,
+} from '~/features/mentions/hooks/useMentionAutocomplete';
 
 type Props = {
   requestId: string;
@@ -20,11 +24,24 @@ function RexRequestCommentsSection({ requestId, canComment, onUserPress, onRepor
   const { user } = useAuth();
   const { comments, loading, loadError, refetch, addComment, deleteComment } =
     useRexRequestComments(requestId);
+
+  const mentionRef = useRef<MentionAutocompleteState | null>(null);
+  const addCommentWithMentions = useCallback(
+    async (body: string) => {
+      const taggedMentions = mentionRef.current?.resolveTaggedMentions(body) ?? [];
+      await addComment(body, taggedMentions);
+      mentionRef.current?.reset();
+    },
+    [addComment],
+  );
+
   const composer = useCommentComposer({
     rexId: requestId,
-    addComment: (body) => addComment(body),
+    addComment: addCommentWithMentions,
     autoFocus: false,
   });
+  const mention = useMentionAutocomplete({ text: composer.text, setText: composer.setText });
+  mentionRef.current = mention;
 
   const handleDelete = useCallback(
     async (commentId: string) => {
@@ -60,7 +77,7 @@ function RexRequestCommentsSection({ requestId, canComment, onUserPress, onRepor
         </View>
       )}
 
-      {user && canComment ? <CommentComposer composer={composer} /> : null}
+      {user && canComment ? <CommentComposer composer={composer} mention={mention} /> : null}
     </View>
   );
 }

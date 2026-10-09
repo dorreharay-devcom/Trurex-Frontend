@@ -7,6 +7,7 @@ import {
   ReportAction,
 } from '~/features/rex-detail/ui/comments/common/CommentActions';
 import type { RexRequestCommentRow as RexRequestCommentRowType } from '~/features/rex-requests/api/types';
+import MentionText from '~/features/mentions/ui/MentionText';
 
 type Props = {
   comment: RexRequestCommentRowType;
@@ -42,7 +43,12 @@ function RexRequestCommentRow({ comment, currentUserId, onUserPress, onReport, o
             {formatCompactRelativeTime(comment.created_at)}
           </Text>
         </View>
-        <Text className="mt-0.5 text-sm leading-relaxed text-foreground/90">{comment.body}</Text>
+        <MentionText
+          body={comment.body}
+          mentions={comment.mentions}
+          onUserPress={onUserPress}
+          className="mt-0.5 text-sm leading-relaxed text-foreground/90"
+        />
         {canDelete || canReport ? (
           <View className="mt-1.5 flex-row flex-wrap items-center gap-3">
             {canDelete ? <DeleteAction onPress={() => onDelete?.(comment.comment_id)} /> : null}

@@ -19,6 +19,7 @@ function mapRpcCommentFields(node: RexCommentRpc): Omit<RexComment, 'replies'> {
     like_count: node.like_count,
     liked_by_me: node.liked_by_me,
     reply_count: node.reply_count,
+    mentions: node.mentions ?? [],
     profile: {
       display_name: node.author_display_name,
       avatar_url: node.author_profile_picture_url,
@@ -57,6 +58,7 @@ export async function addRexComment(
     rexId: string;
     body: string;
     parentCommentId?: string | null;
+    taggedUserIds?: string[];
   },
   existingComments: RexComment[] = [],
 ): Promise<RexCommentDbRow> {
@@ -72,6 +74,7 @@ export async function addRexComment(
       input_rex_id: params.rexId,
       input_body: trimmed,
       input_parent_comment_id: parentCommentId,
+      input_tagged_user_ids: params.taggedUserIds ?? [],
     }),
   ) as RexCommentDbRow;
 }

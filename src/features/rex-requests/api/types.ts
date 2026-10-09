@@ -1,4 +1,5 @@
 import type { NeedBy } from '~/features/rex-requests/config/needBy';
+import type { MentionRef } from '~/features/mentions/types/mention';
 
 export type CategoryItem = {
   id: string;
@@ -76,6 +77,7 @@ export type RexRequestCommentRow = {
   commenter_avatar_url: string | null;
   body: string;
   created_at: string;
+  mentions?: MentionRef[];
 };
 
 export type EditRexRequestParams = {

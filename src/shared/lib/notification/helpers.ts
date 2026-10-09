@@ -11,17 +11,20 @@ const REX_TYPES = new Set<string>([
   NOTIFICATION_TYPE.thank,
   NOTIFICATION_TYPE.first_thank,
   NOTIFICATION_TYPE.milestone_thank,
+  NOTIFICATION_TYPE.mention,
 ]);
 
 const REX_REQUEST_TYPES = new Set<string>([
   NOTIFICATION_TYPE.rex_request,
   NOTIFICATION_TYPE.rex_request_response,
+  NOTIFICATION_TYPE.mention,
 ]);
 
 const COMMENT_TYPES = new Set<string>([
   NOTIFICATION_TYPE.comment,
   NOTIFICATION_TYPE.comment_reply,
   NOTIFICATION_TYPE.reply,
+  NOTIFICATION_TYPE.mention,
 ]);
 
 const FOLLOWABLE_TYPES = new Set<string>([
@@ -49,6 +52,7 @@ const VERB_BY_TYPE: Record<string, string> = {
   [NOTIFICATION_TYPE.comment]: 'commented on your Rex',
   [NOTIFICATION_TYPE.comment_reply]: 'replied to your comment',
   [NOTIFICATION_TYPE.reply]: 'replied to your comment',
+  [NOTIFICATION_TYPE.mention]: 'tagged you in a comment',
   [NOTIFICATION_TYPE.save]: 'saved your Rex',
   [NOTIFICATION_TYPE.follow]: 'started following you',
   [NOTIFICATION_TYPE.following]: 'started following you',
