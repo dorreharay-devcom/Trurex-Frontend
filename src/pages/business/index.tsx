@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import DeepLinkShell from '~/widgets/DeepLinkShell';
 import ProtectedRoute from '~/features/auth/ui/ProtectedRoute';
 import { useBusinessPage } from '~/pages/business/hooks/useBusinessPage';
 import { useBusinessPageNav } from '~/pages/business/hooks/useBusinessPageNav';
 import BusinessPageBody from '~/pages/business/ui/BusinessPageBody';
 import { TAB } from '~/shared/config/mainTabs';
+import { Theme } from '~/shared/theme/Theme';
 
 function BusinessPage() {
   const nav = useBusinessPageNav();
@@ -21,8 +22,11 @@ function BusinessPage() {
   return (
     <View className="flex-1">
       <DeepLinkShell currentTab={TAB.discover} onTabChange={nav.changeTab} onRexPress={nav.openRex}>
-        <BusinessPageBody page={page} onBack={nav.goBack} onOpenRex={nav.openRex} />
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color={Theme.colors.primary} />
+        </View>
       </DeepLinkShell>
+      <BusinessPageBody page={page} onBack={nav.goBack} onOpenRex={nav.openRex} />
     </View>
   );
 }

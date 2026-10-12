@@ -3,7 +3,7 @@ export const NOTIFICATION_TYPE = {
   trusted: 'trusted',
   comment: 'comment',
   comment_reply: 'comment_reply',
-  mention: 'mention',
+  comment_mention: 'comment_mention',
   reaction: 'reaction',
   reply: 'reply',
   save: 'save',

@@ -25,6 +25,7 @@ type Props = {
   onBlockPress?: () => void;
   onUnblockPress?: () => void;
   blockLoading?: boolean;
+  onVerifyIdentity?: () => void;
 };
 
 const ProfileHeader = ({
@@ -42,6 +43,7 @@ const ProfileHeader = ({
   onBlockPress,
   onUnblockPress,
   blockLoading = false,
+  onVerifyIdentity,
 }: Props) => {
   const onShare = () => void shareProfile(profile, isOwnProfile);
   const { getTier, isTopTier } = useRexScoreTiers();
@@ -59,6 +61,7 @@ const ProfileHeader = ({
             avatarRefreshKey={avatarRefreshKey}
             onPress={onAvatarPress}
             verified={profile.verified}
+            onVerifyPress={onVerifyIdentity}
           />
         </View>
 

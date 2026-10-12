@@ -35,6 +35,7 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
           onBlockPress={social.openBlockConfirm}
           onUnblockPress={social.onUnblock}
           blockLoading={social.blockPending}
+          onVerifyIdentity={flow.openVerifyIdentity}
         />
       ) : null}
 

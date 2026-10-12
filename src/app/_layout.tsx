@@ -128,6 +128,15 @@ export default function RootLayout() {
                 }}
               />
               <Stack.Screen
+                name="business/[rexId]"
+                options={{
+                  title: 'Business Page',
+                  presentation: 'transparentModal',
+                  animation: 'none',
+                  contentStyle: { flex: 1, backgroundColor: 'transparent' },
+                }}
+              />
+              <Stack.Screen
                 name="rex-request/[id]"
                 options={{
                   presentation: 'transparentModal',
