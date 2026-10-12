@@ -13,6 +13,7 @@ import { useProfileData } from '~/features/profile/hooks/data/useProfileData';
 import { useProfileAvatarUpload } from '~/features/profile/hooks/useProfileAvatarUpload';
 import { useProfileSocial } from '~/features/profile/hooks/useProfileSocial';
 import { firstRouteParam } from '~/shared/lib/navigation/routeIds';
+import { Routes } from '~/shared/config/routes';
 import type { Recommendation } from '~/shared/types/recommendation';
 
 type Params = {
@@ -128,6 +129,10 @@ export function useProfileScreen({
     onOpenReferrals?.();
   }, [onOpenReferrals]);
 
+  const openVerifyIdentity = useCallback(() => {
+    router.push(Routes.VerifyIdentity);
+  }, [router]);
+
   const openWishList = useCallback(() => {
     if (!profileData.profileContentUserId) return;
     onOpenWishList?.(profileData.profileContentUserId);
@@ -150,6 +155,7 @@ export function useProfileScreen({
   return {
     openEdit,
     openReferrals,
+    openVerifyIdentity,
     openWishList,
     profile: profileData.profile,
     loading: profileData.loading,

@@ -6,24 +6,36 @@ import { cn } from '~/shared/lib/ui/styles';
 type Props = {
   size?: number;
   onDarkBackground?: boolean;
+  muted?: boolean;
   className?: string;
 };
 
-export const VerifiedBadge = ({ size = 16, onDarkBackground = false, className }: Props) => (
+export const VerifiedBadge = ({
+  size = 16,
+  onDarkBackground = false,
+  muted = false,
+  className,
+}: Props) => (
   <View
     className={cn('items-center justify-center rounded-full', className)}
     style={{
       width: size,
       height: size,
-      backgroundColor: Theme.brand.color,
+      backgroundColor: muted ? Theme.colors.card : Theme.brand.color,
       borderWidth: 1.5,
-      borderColor: Theme.colors.card,
+      borderColor: muted ? Theme.colors.border : Theme.colors.card,
     }}
-    accessibilityLabel="Verified account"
+    accessibilityLabel={muted ? 'Not verified' : 'Verified account'}
   >
     <Check
-      size={size * 0.6}
-      color={onDarkBackground ? Theme.brand.colorVerifiedAccent : Theme.brand.colorOnBrand}
+      size={size * 0.7}
+      color={
+        muted
+          ? Theme.colors.secondaryText
+          : onDarkBackground
+            ? Theme.brand.colorVerifiedAccent
+            : Theme.brand.colorOnBrand
+      }
       strokeWidth={3}
     />
   </View>

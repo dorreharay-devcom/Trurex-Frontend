@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { Camera } from 'lucide-react-native';
 import { USER_AVATARS_BUCKET } from '~/shared/config/app';
 import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
@@ -7,6 +7,7 @@ import { VerifiedBadge } from '~/shared/ui/primitives/VerifiedBadge';
 import { avatarImageTransform } from '~/shared/lib/media/imageTransform';
 
 const PROFILE_AVATAR_TRANSFORM = avatarImageTransform(96);
+const CORNER_BADGE_SIZE = 26;
 
 type Props = {
   displayName: string;
@@ -16,6 +17,7 @@ type Props = {
   avatarRefreshKey?: number;
   onPress?: () => void;
   verified?: boolean;
+  onVerifyPress?: () => void;
 };
 
 const ProfileHeaderAvatar = ({
@@ -26,6 +28,7 @@ const ProfileHeaderAvatar = ({
   avatarRefreshKey,
   onPress,
   verified,
+  onVerifyPress,
 }: Props) => {
   const initial = displayName.charAt(0).toUpperCase() || '?';
 
@@ -60,7 +63,18 @@ const ProfileHeaderAvatar = ({
             </View>
           )}
         </View>
-        {verified ? <VerifiedBadge size={22} className="absolute -bottom-1 -right-1" /> : null}
+        {verified ? (
+          <VerifiedBadge size={CORNER_BADGE_SIZE} className="absolute -top-1 -right-1" />
+        ) : editable && onVerifyPress ? (
+          <Pressable
+            onPress={onVerifyPress}
+            accessibilityRole="button"
+            accessibilityLabel="Verify your identity"
+            className="absolute -top-1 -right-1"
+          >
+            <VerifiedBadge size={CORNER_BADGE_SIZE} muted />
+          </Pressable>
+        ) : null}
       </View>
     </TouchableOpacity>
   );

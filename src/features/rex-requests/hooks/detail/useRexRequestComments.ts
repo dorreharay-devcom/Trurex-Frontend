@@ -5,7 +5,6 @@ import {
   getRexRequestComments,
 } from '~/features/rex-requests/api/rexRequestsApi';
 import type { RexRequestCommentRow } from '~/features/rex-requests/api/types';
-import type { MentionRef } from '~/features/mentions/types/mention';
 import { assertOnlineForMutation } from '~/shared/lib/network/assertOnline';
 
 export function useRexRequestComments(requestId: string) {
@@ -31,13 +30,9 @@ export function useRexRequestComments(requestId: string) {
   }, [refetch]);
 
   const addComment = useCallback(
-    async (body: string, taggedUsers: MentionRef[] = []) => {
+    async (body: string) => {
       if (!assertOnlineForMutation('Commenting')) return;
-      await commentOnRexRequest(
-        requestId,
-        body,
-        taggedUsers.map((ref) => ref.userId),
-      );
+      await commentOnRexRequest(requestId, body);
       await refetch();
     },
     [requestId, refetch],
