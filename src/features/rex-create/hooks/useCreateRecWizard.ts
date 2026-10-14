@@ -21,7 +21,7 @@ type PendingSubcategoryPrefill = {
 export function useCreateRecWizard() {
   const categoryCodePrefillRef = useRef<string | null>(null);
   const pendingSubcategoryPrefillRef = useRef<PendingSubcategoryPrefill | null>(null);
-  const editPrefillRef = useRef<RexForEditRow | null>(null);
+  const [editPrefillRow, setEditPrefillRow] = useState<RexForEditRow | null>(null);
   const editSessionRef = useRef(false);
 
   const place = usePlaceSearch();
@@ -67,12 +67,16 @@ export function useCreateRecWizard() {
   } = circles;
   const { stepId, reset: resetNav, stepIndex, isFirstStep, isLastStep, goNext, goBack } = nav;
 
+  const effectiveEditPrefill = useMemo(
+    () => (editPrefillRow?.category_code === selectedCategoryId ? editPrefillRow : null),
+    [editPrefillRow, selectedCategoryId],
+  );
+
+  const prevCategoryIdRef = useRef<string | null>(null);
   useEffect(() => {
-    if (editPrefillRef.current?.category_code === selectedCategoryId) {
-      setHasSubcategoryStep(false);
-      return;
-    }
-    editPrefillRef.current = null;
+    const prevCategoryId = prevCategoryIdRef.current;
+    prevCategoryIdRef.current = selectedCategoryId;
+    if (prevCategoryId === null || prevCategoryId === selectedCategoryId) return;
     setSelectedSubcategoryCode(null);
     setHasSubcategoryStep(false);
     clearScorecard();
@@ -146,20 +150,15 @@ export function useCreateRecWizard() {
 
   const syncFormToConfig = useCallback(
     (dimensions: CategoryRatingDimension[]) => {
-      const edit =
-        editPrefillRef.current?.category_code === selectedCategoryId
-          ? editPrefillRef.current
-          : null;
-      syncToConfig(dimensions, edit);
-      if (edit) editPrefillRef.current = null;
+      syncToConfig(dimensions, effectiveEditPrefill);
     },
-    [selectedCategoryId, syncToConfig],
+    [effectiveEditPrefill, syncToConfig],
   );
 
   const resetForms = useCallback(() => {
     categoryCodePrefillRef.current = null;
     pendingSubcategoryPrefillRef.current = null;
-    editPrefillRef.current = null;
+    setEditPrefillRow(null);
     editSessionRef.current = false;
     resetPlace();
     resetCategory();
@@ -204,7 +203,7 @@ export function useCreateRecWizard() {
     (row: RexForEditRow) => {
       reset();
       editSessionRef.current = true;
-      editPrefillRef.current = row;
+      setEditPrefillRow(row);
       prefillPlaceFromEditRow(row);
       setSelectedCategoryId(row.category_code);
       setSelectedSubcategoryCode(row.subcategory_code || null);

@@ -1,11 +1,15 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { X } from 'lucide-react-native';
 import type { Recommendation } from '~/shared/types/recommendation';
 import { authorDisplayName, categoryDisplayLabel } from '~/shared/lib/recommendation';
 import { formatRelativeTime } from '~/shared/lib/data/date';
 import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 import { VerifiedBadge } from '~/shared/ui/primitives/VerifiedBadge';
+import { isWeb } from '~/shared/lib/ui/platform';
+import { CATEGORY_ICON_FALLBACK } from '~/shared/api/categories';
+
+const NARROW_WEB_BREAKPOINT = 500;
 
 type Props = {
   rec: Recommendation;
@@ -16,6 +20,8 @@ function CardHeader({ rec, onRemove }: Props) {
   const name = authorDisplayName(rec.user);
   const handle = rec.user?.handle?.trim() ?? '';
   const timeAgo = formatRelativeTime(rec.createdAt);
+  const { width } = useWindowDimensions();
+  const compactCategory = isWeb && width < NARROW_WEB_BREAKPOINT;
 
   return (
     <View className="flex-row items-center gap-3 p-4 pb-2">
@@ -30,11 +36,15 @@ function CardHeader({ rec, onRemove }: Props) {
           {timeAgo}
         </Text>
       </View>
-      <View className="rounded-full border border-border/80 bg-border/40 px-2.5 py-1">
-        <Text className="text-xs font-medium capitalize text-foreground">
-          {categoryDisplayLabel(rec.category)}
-        </Text>
-      </View>
+      {compactCategory ? (
+        <Text className="text-lg">{rec.categoryIcon ?? CATEGORY_ICON_FALLBACK}</Text>
+      ) : (
+        <View className="rounded-full border border-border/80 bg-border/40 px-2.5 py-1">
+          <Text className="text-xs font-medium capitalize text-foreground">
+            {categoryDisplayLabel(rec.category)}
+          </Text>
+        </View>
+      )}
       {onRemove && (
         <TouchableOpacity
           onPress={onRemove}
