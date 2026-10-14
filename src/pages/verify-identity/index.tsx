@@ -103,7 +103,7 @@ const VerifyIdentityPage = () => {
             />
           )}
 
-          {verification.showSkip ? (
+          {verification.showSkip && !isWeb ? (
             <AuthLinkButton
               title="Skip for now"
               onPress={verification.handleSkip}
