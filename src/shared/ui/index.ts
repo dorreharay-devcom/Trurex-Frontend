@@ -4,6 +4,7 @@ export { Skeleton } from './primitives/Skeleton';
 export { VerifiedBadge } from './primitives/VerifiedBadge';
 export { ClearableSearchInput } from './primitives/ClearableSearchInput';
 export { LoadMoreButton } from './primitives/LoadMoreButton';
+export { ShowAllToggle } from './primitives/ShowAllToggle';
 
 export { default as SignedStorageImage } from './media/SignedStorageImage';
 export type { SignedStorageImageProps } from '~/shared/types/signedStorageImage';

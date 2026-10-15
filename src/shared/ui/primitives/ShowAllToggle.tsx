@@ -9,7 +9,7 @@ type ShowAllToggleProps = {
   onToggle: () => void;
 };
 
-const ShowAllToggle = ({ showAll, total, onToggle }: ShowAllToggleProps) => {
+export function ShowAllToggle({ showAll, total, onToggle }: ShowAllToggleProps) {
   return (
     <TouchableOpacity
       onPress={onToggle}
@@ -26,6 +26,4 @@ const ShowAllToggle = ({ showAll, total, onToggle }: ShowAllToggleProps) => {
       )}
     </TouchableOpacity>
   );
-};
-
-export default ShowAllToggle;
+}

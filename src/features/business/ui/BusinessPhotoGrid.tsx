@@ -4,6 +4,8 @@ import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
 import { RexPhotoPlaceholder } from '~/shared/ui/media/RexPhotoPlaceholder';
 import { REX_IMAGES_BUCKET } from '~/shared/config/app';
 import { gridCoverImageTransform } from '~/shared/lib/media/imageTransform';
+import { useIsNarrowWeb } from '~/shared/hooks/useIsNarrowWeb';
+import RexImageCarousel from '~/features/rex-detail/ui/carousel/RexImageCarousel';
 
 type Props = {
   photoPaths: string[];
@@ -11,6 +13,8 @@ type Props = {
 };
 
 function BusinessPhotoGrid({ photoPaths, categoryIcon }: Props) {
+  const isNarrowWeb = useIsNarrowWeb();
+
   if (photoPaths.length === 0) {
     return (
       <RexPhotoPlaceholder
@@ -32,6 +36,10 @@ function BusinessPhotoGrid({ photoPaths, categoryIcon }: Props) {
         />
       </View>
     );
+  }
+
+  if (isNarrowWeb) {
+    return <RexImageCarousel paths={photoPaths} />;
   }
 
   const transform = gridCoverImageTransform(200);

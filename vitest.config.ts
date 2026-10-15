@@ -3,6 +3,7 @@ import path from 'node:path';
 
 const pureInclude = [
   'src/shared/lib/data/guards.ts',
+  'src/shared/lib/data/collapsibleList.ts',
   'src/shared/lib/errors/network.ts',
   'src/shared/lib/navigation/routeIds.ts',
   'src/shared/lib/a11y.ts',
@@ -21,6 +22,7 @@ const pureInclude = [
   'src/features/circles/lib/networkUserRow.ts',
   'src/features/circles/lib/circlePolicy.ts',
   'src/features/circles/lib/display.ts',
+  'src/features/business/lib/placeScorecard.ts',
   'src/features/map/lib/geo.ts',
   'src/features/map/lib/clusterMarkers.ts',
   'src/features/map/lib/pinTypes.ts',
