@@ -1,15 +1,13 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { X } from 'lucide-react-native';
 import type { Recommendation } from '~/shared/types/recommendation';
 import { authorDisplayName, categoryDisplayLabel } from '~/shared/lib/recommendation';
 import { formatRelativeTime } from '~/shared/lib/data/date';
 import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 import { VerifiedBadge } from '~/shared/ui/primitives/VerifiedBadge';
-import { isWeb } from '~/shared/lib/ui/platform';
+import { useIsNarrowWeb } from '~/shared/hooks/useIsNarrowWeb';
 import { CATEGORY_ICON_FALLBACK } from '~/shared/api/categories';
-
-const NARROW_WEB_BREAKPOINT = 500;
 
 type Props = {
   rec: Recommendation;
@@ -20,8 +18,7 @@ function CardHeader({ rec, onRemove }: Props) {
   const name = authorDisplayName(rec.user);
   const handle = rec.user?.handle?.trim() ?? '';
   const timeAgo = formatRelativeTime(rec.createdAt);
-  const { width } = useWindowDimensions();
-  const compactCategory = isWeb && width < NARROW_WEB_BREAKPOINT;
+  const compactCategory = useIsNarrowWeb();
 
   return (
     <View className="flex-row items-center gap-3 p-4 pb-2">

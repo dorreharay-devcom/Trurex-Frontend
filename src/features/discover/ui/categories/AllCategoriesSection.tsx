@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import CategoryGrid from '~/features/discover/ui/categories/CategoryGrid';
 import CategoryPillsRow from '~/features/discover/ui/categories/CategoryPillsRow';
 import PinHint from '~/features/discover/ui/categories/PinHint';
-import ShowAllToggle from '~/features/discover/ui/categories/ShowAllToggle';
+import { ShowAllToggle } from '~/shared/ui/primitives/ShowAllToggle';
 import type { Category } from '~/features/discover/types';
 
 type AllCategoriesSectionProps = {

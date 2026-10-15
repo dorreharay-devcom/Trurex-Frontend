@@ -9,3 +9,5 @@ export function buildScorecardRows(
     .map((entry) => ({ label: entry.label, value: entry.avg_score }))
     .sort((a, b) => a.label.localeCompare(b.label));
 }
+
+export const SCORECARD_COLLAPSED_COUNT = 5;
