@@ -5,6 +5,7 @@ export type NetworkUserRow = {
   display_name: string;
   handle: string | null;
   avatar_url: string | null;
+  verified: boolean;
   trust_score: number;
   followers_count?: number;
   following_count?: number;

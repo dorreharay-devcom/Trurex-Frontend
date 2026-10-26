@@ -20,6 +20,7 @@ const CircleMemberRow = ({ member, onUserPress, onRemove, removing }: Props) => 
       avatarName={member.display_name ?? '?'}
       handle={member.handle}
       avatarUrl={member.avatar_url}
+      verified={member.verified}
       onUserPress={onUserPress}
     >
       {onRemove && (

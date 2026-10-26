@@ -24,7 +24,12 @@ function BlockedUserRowItem({ row, busy, disabled, onUnblock }: RowProps) {
 
   return (
     <View className="flex-row items-center gap-3 rounded-xl px-2 py-2.5">
-      <SignedUserAvatar name={label} avatar={row.avatar_url} className="h-10 w-10" />
+      <SignedUserAvatar
+        name={label}
+        avatar={row.avatar_url}
+        verified={row.verified}
+        className="h-10 w-10"
+      />
       <View className="min-w-0 flex-1">
         <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
           {label}

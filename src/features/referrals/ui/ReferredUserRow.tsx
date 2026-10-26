@@ -44,7 +44,12 @@ function ReferredUserRow({ user, onPress }: Props) {
       accessibilityLabel={user.display_name}
       className="flex-row items-center gap-3 rounded-xl border border-border bg-card px-4 py-3"
     >
-      <SignedUserAvatar name={user.display_name} avatar={user.avatar_url} sizePt={36} />
+      <SignedUserAvatar
+        name={user.display_name}
+        avatar={user.avatar_url}
+        verified={user.verified}
+        sizePt={36}
+      />
       <View className="min-w-0 flex-1 gap-0.5">
         <Text className="text-sm font-medium text-foreground" numberOfLines={1}>
           {user.display_name}

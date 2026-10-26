@@ -23,6 +23,7 @@ export async function navigateAfterAuthenticatedSession(
   await params.setMfaPending(false);
 
   if (await shouldPromptIdentityVerification()) {
+    params.setMfaChecking(false);
     params.onRequireIdentityVerificationPrompt();
     return;
   }

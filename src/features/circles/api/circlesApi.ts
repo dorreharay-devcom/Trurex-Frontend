@@ -101,6 +101,7 @@ function mapCircleMemberRow(raw: unknown): CircleMemberProfile | null {
     display_name: optStr(raw.display_name),
     handle: optStr(raw.handle),
     avatar_url: optStr(raw.avatar_url),
+    verified: Boolean(raw.verified),
   };
 }
 

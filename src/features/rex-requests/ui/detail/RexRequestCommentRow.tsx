@@ -30,6 +30,7 @@ function RexRequestCommentRow({ comment, currentUserId, onUserPress, onReport, o
         <SignedUserAvatar
           name={name}
           avatar={comment.commenter_avatar_url ?? undefined}
+          verified={comment.commenter_verified}
           className="mt-0.5 h-7 w-7"
           sizePt={28}
         />

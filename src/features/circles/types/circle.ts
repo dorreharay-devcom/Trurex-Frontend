@@ -34,4 +34,5 @@ export type CircleMemberProfile = {
   display_name: string | null;
   handle: string | null;
   avatar_url: string | null;
+  verified: boolean;
 };

@@ -70,7 +70,12 @@ const NotificationRow = ({ n, followed, followPending, onOpen, onOpenActor, onFo
         disabled={!onOpenActor}
         className="shrink-0 active:opacity-70"
       >
-        <SignedUserAvatar name={name} avatar={n.actor_avatar_url} className="h-9 w-9 border-0" />
+        <SignedUserAvatar
+          name={name}
+          avatar={n.actor_avatar_url}
+          verified={n.actor_verified}
+          className="h-9 w-9 border-0"
+        />
       </Pressable>
 
       <View className="min-w-0 flex-1">

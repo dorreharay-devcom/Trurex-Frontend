@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { shouldPromptIdentityVerification } from './shouldPromptIdentityVerification';
 
 const platform = { web: false };
+const authUser = { id: 'user-1' };
 const profile = { verified: false };
 const storage = new Map<string, string>();
 const getCurrentUser = vi.fn(async () => profile);
@@ -13,7 +14,7 @@ vi.mock('~/shared/lib/ui/platform', () => ({
 }));
 
 vi.mock('~/shared/api/client', () => ({
-  Auth: { getUser: vi.fn(async () => ({ data: { user: { id: 'user-1' } } })) },
+  Auth: { getUser: vi.fn(async () => ({ data: { user: authUser } })) },
 }));
 
 vi.mock('~/features/profile/api/profileApi', () => ({
@@ -31,6 +32,7 @@ vi.mock('~/shared/lib/storage/kv', () => ({
 
 beforeEach(() => {
   platform.web = false;
+  authUser.id = 'user-1';
   profile.verified = false;
   storage.clear();
   getCurrentUser.mockClear();
@@ -49,9 +51,16 @@ describe('shouldPromptIdentityVerification', () => {
   });
 
   it('does not prompt on mobile again once the user has seen it', async () => {
-    storage.set('trurex.identity_verification.prompted', 'true');
+    storage.set('trurex.identity_verification.prompted.user-1', 'true');
 
     expect(await shouldPromptIdentityVerification()).toBe(false);
+  });
+
+  it('prompts another account on the same device after the first one has seen it', async () => {
+    storage.set('trurex.identity_verification.prompted.user-1', 'true');
+    authUser.id = 'user-2';
+
+    expect(await shouldPromptIdentityVerification()).toBe(true);
   });
 
   it('does not prompt a user who is already verified', async () => {

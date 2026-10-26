@@ -71,6 +71,7 @@ export function useBlockUser(params: {
               display_name: 'Member',
               handle: null,
               avatar_url: null,
+              verified: false,
               blocked_at: new Date().toISOString(),
             },
             ...list,

@@ -12,6 +12,7 @@ function normalizeMentionCandidate(row: Record<string, unknown>): MentionCandida
     handle,
     displayName: firstNonEmptyString(row, 'display_name', 'full_name') ?? handle,
     avatarUrl: firstNonEmptyString(row, 'avatar_url'),
+    verified: Boolean(row.verified),
   };
 }
 

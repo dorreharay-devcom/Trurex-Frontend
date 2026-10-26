@@ -9,6 +9,7 @@ function normalizeBlockedUserRow(r: Record<string, unknown>): BlockedUserRow {
     display_name: optStr(r.display_name) ?? 'Member',
     handle: optStr(r.handle),
     avatar_url: optStr(r.avatar_url),
+    verified: Boolean(r.verified),
     blocked_at: optStr(r.blocked_at) ?? '',
   };
 }

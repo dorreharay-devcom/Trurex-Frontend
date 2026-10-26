@@ -10,6 +10,7 @@ type Props = {
   handle: string | null;
   avatarUrl: string | null;
   avatarName?: string;
+  verified?: boolean;
   onUserPress?: (userId: string) => void;
   children?: ReactNode;
 };
@@ -20,6 +21,7 @@ const ConnectionRowShell = ({
   handle,
   avatarUrl,
   avatarName,
+  verified,
   onUserPress,
   children,
 }: Props) => {
@@ -28,7 +30,12 @@ const ConnectionRowShell = ({
   return (
     <View className="flex-row items-center gap-3 rounded-xl border border-border bg-card p-3">
       <ProfileTapArea label={name} onPress={pressProfile}>
-        <SignedUserAvatar name={avatarName ?? name} avatar={avatarUrl} className="h-10 w-10" />
+        <SignedUserAvatar
+          name={avatarName ?? name}
+          avatar={avatarUrl}
+          verified={verified}
+          className="h-10 w-10"
+        />
         <View className="min-w-0 flex-1">
           <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
             {name}

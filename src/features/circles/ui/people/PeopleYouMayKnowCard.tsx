@@ -57,6 +57,7 @@ const PeopleYouMayKnowCard = ({
         <SignedUserAvatar
           name={label}
           avatar={suggestion.avatar_url}
+          verified={suggestion.verified}
           className="h-12 w-12 rounded-xl"
           sizePt={48}
         />

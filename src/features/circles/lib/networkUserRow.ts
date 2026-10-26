@@ -15,6 +15,7 @@ export function normalizeNetworkUserRow(r: Record<string, unknown>): NetworkUser
     display_name: optStr(r.display_name) ?? 'Member',
     handle: optStr(r.handle),
     avatar_url: optStr(r.avatar_url),
+    verified: Boolean(r.verified),
     trust_score: finiteNum(r.trust_score),
     relationship_status: parseRelationshipStatus(r.relationship_status),
     followed_at: optStrUndef(r.followed_at),
