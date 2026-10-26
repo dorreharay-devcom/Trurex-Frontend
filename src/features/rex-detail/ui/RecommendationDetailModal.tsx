@@ -88,7 +88,6 @@ const RecommendationDetailModal: React.FC<Props> = ({
 
   const handleAuthorPress = () => {
     if (!effectiveAuthorId || !onAuthorPress) return;
-    onClose();
     onAuthorPress(effectiveAuthorId);
   };
 

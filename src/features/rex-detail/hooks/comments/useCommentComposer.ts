@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Keyboard, type TextInput } from 'react-native';
 import { isWeb } from '~/shared/lib/ui/platform';
+import { COMMENT_MAX_LENGTH } from '~/features/rex-detail/config/comments';
 import { runCommentMutation } from './useCommentActions';
 
 const AUTO_FOCUS_DELAY_MS = isWeb ? 780 : 600;
@@ -17,6 +18,10 @@ export function useCommentComposer({ rexId, addComment, autoFocus }: Params) {
   const [posting, setPosting] = useState(false);
   const postingRef = useRef(false);
   const inputRef = useRef<TextInput | null>(null);
+
+  const changeText = useCallback((value: string) => {
+    setText(value.slice(0, COMMENT_MAX_LENGTH));
+  }, []);
 
   useEffect(() => {
     if (!autoFocus) return;
@@ -51,7 +56,16 @@ export function useCommentComposer({ rexId, addComment, autoFocus }: Params) {
     Keyboard.dismiss();
   }, []);
 
-  return { text, setText, replyTo, posting, inputRef, post, startReply, cancelReply };
+  return {
+    text,
+    setText: changeText,
+    replyTo,
+    posting,
+    inputRef,
+    post,
+    startReply,
+    cancelReply,
+  };
 }
 
 export type CommentComposerState = ReturnType<typeof useCommentComposer>;

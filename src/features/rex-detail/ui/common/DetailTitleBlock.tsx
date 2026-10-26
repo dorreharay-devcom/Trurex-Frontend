@@ -99,10 +99,15 @@ function DetailTitleBlock({
           onPress={detail.openMaps}
           accessibilityRole="link"
           accessibilityLabel={`Open ${detail.placeLocationLine} in Maps`}
-          className="mt-1 flex-row items-center gap-1.5 self-start active:opacity-80"
+          className="mt-1 flex-row items-start gap-1.5 self-start active:opacity-80"
+          style={{ maxWidth: '100%' }}
         >
-          <MapPin size={14} color={Theme.colors.secondaryText} />
-          <Text className="text-sm text-muted-foreground">{detail.placeLocationLine}</Text>
+          <View className="h-5 justify-center">
+            <MapPin size={14} color={Theme.colors.secondaryText} />
+          </View>
+          <Text className="min-w-0 shrink text-sm text-muted-foreground">
+            {detail.placeLocationLine}
+          </Text>
         </Pressable>
       ) : null}
       <WebsiteLink website={detail.website} />
