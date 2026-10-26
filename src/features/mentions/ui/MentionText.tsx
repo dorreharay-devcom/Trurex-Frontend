@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, type StyleProp, type TextStyle } from 'react-native';
+import { Text, type StyleProp, type TextProps, type TextStyle } from 'react-native';
 import { resolveUserByHandle } from '~/features/mentions/api/mentionsApi';
 import { splitBodyByMentions, type MentionTextSegment } from '~/features/mentions/lib/mentionText';
 import type { MentionRef } from '~/features/mentions/types/mention';
@@ -10,6 +10,8 @@ type Props = {
   onUserPress?: (userId: string) => void;
   className?: string;
   style?: StyleProp<TextStyle>;
+  numberOfLines?: number;
+  onLayout?: TextProps['onLayout'];
 };
 
 function MentionSpan({
@@ -40,11 +42,19 @@ function MentionSpan({
   );
 }
 
-function MentionText({ body, mentions, onUserPress, className, style }: Props) {
+function MentionText({
+  body,
+  mentions,
+  onUserPress,
+  className,
+  style,
+  numberOfLines,
+  onLayout,
+}: Props) {
   const segments = splitBodyByMentions(body, mentions ?? []);
 
   return (
-    <Text className={className} style={style}>
+    <Text className={className} style={style} numberOfLines={numberOfLines} onLayout={onLayout}>
       {segments.map((segment, index) =>
         segment.kind === 'mention' ? (
           <MentionSpan

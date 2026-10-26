@@ -4,14 +4,19 @@ import { Reply, Send } from 'lucide-react-native';
 import {
   Theme,
   textFieldCaretStyle,
-  textFieldSingleLineCompactHeightStyle,
+  textFieldMultilineStyle,
   textFieldSingleLineStyle,
 } from '~/shared/theme/Theme';
 import { INPUT_FOCUS_RING_CLASS } from '~/shared/config/inputFocus';
 import type { CommentComposerState } from '~/features/rex-detail/hooks/comments/useCommentComposer';
 import { webNoOutline, cn } from '~/shared/lib/ui/styles';
+import { isWeb } from '~/shared/lib/ui/platform';
 import type { MentionAutocompleteState } from '~/features/mentions/hooks/useMentionAutocomplete';
 import MentionSuggestionsList from '~/features/mentions/ui/MentionSuggestionsList';
+import {
+  COMMENT_COUNTER_VISIBLE_FROM,
+  COMMENT_MAX_LENGTH,
+} from '~/features/rex-detail/config/comments';
 
 export type CommentComposerProps = {
   composer: CommentComposerState;
@@ -40,24 +45,23 @@ const CommentComposer: React.FC<CommentComposerProps> = ({
           </Pressable>
         </View>
       ) : null}
-      <View className="flex-row items-center gap-2">
+      <View className="flex-row items-end gap-2">
         <TextInput
           ref={inputRef}
           value={text}
           onChangeText={setText}
           placeholder="Ask a question or leave a note..."
           placeholderTextColor={Theme.colors.secondaryText}
-          className={`min-h-10 min-w-0 flex-1 rounded-xl border border-border/80 bg-border/40 px-3 py-2.5 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
+          className={`min-h-10 max-h-48 min-w-0 flex-1 rounded-xl border border-border/80 bg-border/40 px-3 py-2.5 text-sm text-foreground ${INPUT_FOCUS_RING_CLASS}`}
           style={[
             webNoOutline,
             textFieldCaretStyle,
-            textFieldSingleLineStyle,
-            textFieldSingleLineCompactHeightStyle,
+            isWeb ? textFieldSingleLineStyle : textFieldMultilineStyle,
           ]}
           onFocus={onInputFocus}
-          multiline={false}
-          numberOfLines={1}
-          scrollEnabled={false}
+          maxLength={COMMENT_MAX_LENGTH}
+          multiline={!isWeb}
+          submitBehavior="submit"
           underlineColorAndroid="transparent"
           selectionColor={Theme.colors.foreground}
           onSubmitEditing={() => void post()}
@@ -85,6 +89,11 @@ const CommentComposer: React.FC<CommentComposerProps> = ({
           </Pressable>
         </View>
       </View>
+      {text.length >= COMMENT_COUNTER_VISIBLE_FROM ? (
+        <Text className="self-end pr-12 text-[10px] text-muted-foreground">
+          {text.length}/{COMMENT_MAX_LENGTH}
+        </Text>
+      ) : null}
       {mention?.showDropdown ? (
         <MentionSuggestionsList
           candidates={mention.candidates}

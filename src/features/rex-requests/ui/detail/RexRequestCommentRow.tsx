@@ -7,7 +7,7 @@ import {
   ReportAction,
 } from '~/features/rex-detail/ui/comments/common/CommentActions';
 import type { RexRequestCommentRow as RexRequestCommentRowType } from '~/features/rex-requests/api/types';
-import MentionText from '~/features/mentions/ui/MentionText';
+import CollapsibleMentionText from '~/features/mentions/ui/CollapsibleMentionText';
 
 type Props = {
   comment: RexRequestCommentRowType;
@@ -44,7 +44,7 @@ function RexRequestCommentRow({ comment, currentUserId, onUserPress, onReport, o
             {formatCompactRelativeTime(comment.created_at)}
           </Text>
         </View>
-        <MentionText
+        <CollapsibleMentionText
           body={comment.body}
           mentions={comment.mentions}
           onUserPress={onUserPress}

@@ -53,7 +53,7 @@ function RexPage() {
         visible={page.recommendation != null}
         recommendation={page.recommendation}
         onClose={nav.closeRex}
-        onAuthorPress={nav.openUser}
+        onAuthorPress={nav.openAuthor}
         onUserPress={nav.openUser}
         onAddYourOwn={onAddYourOwn}
         onAddToWishList={onAddToWishList}
