@@ -5,6 +5,7 @@ import CurrentlySection from '~/features/profile/ui/CurrentlySection';
 import ProfileHeader from '~/features/profile/ui/ProfileHeader';
 import ProfileReferralsSection from '~/features/profile/ui/ProfileReferralsSection';
 import ProfileTabs from '~/features/profile/ui/ProfileTabs';
+import ProfileVerifySection from '~/features/profile/ui/ProfileVerifySection';
 import ProfileWishListSection from '~/features/wish-list/ui/profile-section/ProfileWishListSection';
 
 type Flow = ReturnType<typeof useProfileScreen>;
@@ -37,6 +38,10 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
           blockLoading={social.blockPending}
           onVerifyIdentity={flow.openVerifyIdentity}
         />
+      ) : null}
+
+      {flow.isOwnProfile && profile && !profile.verified ? (
+        <ProfileVerifySection onPress={flow.openVerifyIdentity} />
       ) : null}
 
       {flow.isOwnProfile ? <ProfileReferralsSection onPress={flow.openReferrals} /> : null}

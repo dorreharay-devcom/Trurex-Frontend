@@ -1,12 +1,14 @@
 import { StorageService } from '~/shared/lib/storage/kv';
 
-export const IDENTITY_VERIFICATION_PROMPTED_STORAGE_KEY = 'trurex.identity_verification.prompted';
+function storageKey(userId: string): string {
+  return `trurex.identity_verification.prompted.${userId}`;
+}
 
-export async function readStoredIdentityVerificationPrompted(): Promise<boolean> {
-  const value = await StorageService.getItem(IDENTITY_VERIFICATION_PROMPTED_STORAGE_KEY);
+export async function readStoredIdentityVerificationPrompted(userId: string): Promise<boolean> {
+  const value = await StorageService.getItem(storageKey(userId));
   return value === 'true';
 }
 
-export async function writeStoredIdentityVerificationPrompted(): Promise<void> {
-  await StorageService.setItem(IDENTITY_VERIFICATION_PROMPTED_STORAGE_KEY, 'true');
+export async function writeStoredIdentityVerificationPrompted(userId: string): Promise<void> {
+  await StorageService.setItem(storageKey(userId), 'true');
 }

@@ -18,6 +18,7 @@ const NetworkConnectionRow = ({ row, onAddToCircle, onUserPress }: Props) => {
       name={row.display_name || 'Member'}
       handle={row.handle}
       avatarUrl={row.avatar_url}
+      verified={row.verified}
       onUserPress={onUserPress}
     >
       {onAddToCircle && (

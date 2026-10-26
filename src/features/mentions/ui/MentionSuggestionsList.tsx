@@ -48,6 +48,7 @@ function MentionSuggestionsList({ candidates, onSelect, onLoadMore, isLoadingMor
             <SignedUserAvatar
               name={candidate.displayName}
               avatar={candidate.avatarUrl}
+              verified={candidate.verified}
               className="h-7 w-7"
               sizePt={28}
             />

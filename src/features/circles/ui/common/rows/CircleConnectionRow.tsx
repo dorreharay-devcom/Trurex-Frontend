@@ -34,6 +34,7 @@ const CircleConnectionRow = ({ row, onAdd, isMember, isAdding, onUserPress }: Pr
       name={row.display_name || 'Member'}
       handle={row.handle}
       avatarUrl={row.avatar_url}
+      verified={row.verified}
       onUserPress={onUserPress}
     >
       <Pressable

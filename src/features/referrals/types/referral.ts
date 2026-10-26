@@ -3,6 +3,7 @@ export type ReferredUser = {
   handle: string | null;
   display_name: string;
   avatar_url: string | null;
+  verified: boolean;
   signup_rewarded: boolean;
   activation_rewarded: boolean;
   joined_at: string;

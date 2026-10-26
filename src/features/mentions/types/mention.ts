@@ -3,6 +3,7 @@ export type MentionCandidate = {
   handle: string;
   displayName: string;
   avatarUrl: string | null;
+  verified: boolean;
 };
 
 export type MentionRef = {

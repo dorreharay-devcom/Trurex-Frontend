@@ -3,5 +3,6 @@ export type BlockedUserRow = {
   display_name: string;
   handle: string | null;
   avatar_url: string | null;
+  verified: boolean;
   blocked_at: string;
 };

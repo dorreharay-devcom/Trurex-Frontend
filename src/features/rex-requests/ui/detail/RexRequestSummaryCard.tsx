@@ -37,6 +37,7 @@ function RexRequestSummaryCard({
           <SignedUserAvatar
             name={request.requester_display_name ?? 'Member'}
             avatar={request.requester_avatar_url}
+            verified={request.requester_verified}
             sizePt={36}
           />
         </TouchableOpacity>

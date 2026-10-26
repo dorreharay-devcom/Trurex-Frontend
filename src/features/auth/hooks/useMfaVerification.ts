@@ -14,6 +14,7 @@ import {
   getDeviceFingerprint,
 } from '~/features/auth/lib/mfa';
 import { attemptBiometricUnlock } from '~/features/auth/lib/biometrics';
+import { shouldPromptIdentityVerification } from '~/features/identity-verification/lib/shouldPromptIdentityVerification';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 
 const MIN_CODE_LENGTH = 6;
@@ -34,7 +35,18 @@ export function useMfaVerification() {
   const busy = pending !== 'idle';
   const trimmedCode = code.trim();
   const canSubmit = !busy && trimmedCode.length >= MIN_CODE_LENGTH;
-  const redirectTo = !session ? Routes.Login : !mfaPending ? Routes.Main : null;
+  const redirectTo = !session ? Routes.Login : !mfaPending && !busy ? Routes.Main : null;
+
+  async function enterApp() {
+    const promptVerification = await shouldPromptIdentityVerification();
+    await setMfaPending(false);
+    if (promptVerification) {
+      router.replace(Routes.VerifyIdentity);
+      return;
+    }
+    setMfaChecking(true);
+    openMainTab(router, TAB.discover);
+  }
 
   async function completeSignIn() {
     const biometricResult = await attemptBiometricUnlock();
@@ -45,9 +57,7 @@ export function useMfaVerification() {
     }
 
     setAwaitingBiometric(false);
-    await setMfaPending(false);
-    setMfaChecking(true);
-    openMainTab(router, TAB.discover);
+    await enterApp();
   }
 
   async function restartMfa(message: string) {
@@ -55,9 +65,7 @@ export function useMfaVerification() {
     const result = await initiateMfa(deviceFingerprint);
 
     if (!result.required) {
-      await setMfaPending(false);
-      setMfaChecking(true);
-      openMainTab(router, TAB.discover);
+      await enterApp();
       return;
     }
 

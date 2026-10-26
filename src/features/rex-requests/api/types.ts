@@ -16,6 +16,7 @@ export type RexRequestRow = {
   requester_display_name?: string;
   requester_handle?: string;
   requester_avatar_url?: string | null;
+  requester_verified?: boolean;
   categories: CategoryItem[];
   looking_for_text: string;
   location_text: string | null;
@@ -58,6 +59,7 @@ export type RexRequestResponseRow = {
   responder_display_name: string;
   responder_handle: string;
   responder_avatar_url: string | null;
+  responder_verified: boolean;
   responded_at: string;
   rex_id: string;
   rex_place_name: string;
@@ -75,6 +77,7 @@ export type RexRequestCommentRow = {
   commenter_display_name: string;
   commenter_handle: string;
   commenter_avatar_url: string | null;
+  commenter_verified: boolean;
   body: string;
   created_at: string;
   mentions?: MentionRef[];

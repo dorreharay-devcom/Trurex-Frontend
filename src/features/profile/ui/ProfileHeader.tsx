@@ -71,7 +71,6 @@ const ProfileHeader = ({
           bio={profile.bio}
           location={profile.location}
           relationshipStatus={profile.relationshipStatus}
-          verified={profile.verified}
           tierBadge={
             tier ? (
               <ProfileTierBadge

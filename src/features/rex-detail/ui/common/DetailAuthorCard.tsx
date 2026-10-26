@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
 import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
-import { VerifiedBadge } from '~/shared/ui/primitives/VerifiedBadge';
 import { Theme } from '~/shared/theme/Theme';
 import ThankRexButton from './ThankRexButton';
 
@@ -37,12 +36,11 @@ function DetailAuthorCard({
         accessibilityLabel={`View ${name}'s profile`}
         className="flex-1 flex-row items-center gap-3 active:opacity-90"
       >
-        <SignedUserAvatar name={name} avatar={avatar} className="h-10 w-10" />
+        <SignedUserAvatar name={name} avatar={avatar} verified={verified} className="h-10 w-10" />
         <View className="flex-1">
           <Text className="text-sm text-muted-foreground">Recommended by</Text>
           <View className="flex-row items-center gap-1.5">
             <Text className="font-semibold text-foreground">{name}</Text>
-            {verified ? <VerifiedBadge size={14} /> : null}
             {authorTierIcon ? <Text className="text-xs">{authorTierIcon}</Text> : null}
           </View>
         </View>

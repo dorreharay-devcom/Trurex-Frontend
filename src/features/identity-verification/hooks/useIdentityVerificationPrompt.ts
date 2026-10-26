@@ -13,7 +13,7 @@ type Pending = 'idle' | 'verify' | 'skip';
 
 export function useIdentityVerificationPrompt() {
   const router = useRouter();
-  const { session } = useAuth();
+  const { session, user } = useAuth();
   const canGoBack = router.canGoBack();
 
   const [pending, setPending] = useState<Pending>('idle');
@@ -22,7 +22,7 @@ export function useIdentityVerificationPrompt() {
   const redirectTo = !session ? Routes.Login : null;
 
   async function proceedToApp() {
-    await writeStoredIdentityVerificationPrompted();
+    if (user) await writeStoredIdentityVerificationPrompted(user.id);
     if (canGoBack) {
       router.back();
       return;

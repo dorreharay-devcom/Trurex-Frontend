@@ -30,6 +30,7 @@ function RexRequestResponseCard({
       <SignedUserAvatar
         name={response.responder_display_name}
         avatar={response.responder_avatar_url}
+        verified={response.responder_verified}
         sizePt={32}
       />
       <View className="min-w-0 flex-1">

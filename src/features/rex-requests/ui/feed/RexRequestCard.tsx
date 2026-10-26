@@ -41,6 +41,7 @@ const RexRequestCard = memo(function RexRequestCard({ request, onPress }: Props)
             <SignedUserAvatar
               name={request.requester_display_name!}
               avatar={request.requester_avatar_url}
+              verified={request.requester_verified}
               sizePt={32}
             />
             <View className="min-w-0 flex-1">

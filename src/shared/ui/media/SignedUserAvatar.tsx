@@ -65,7 +65,7 @@ export function SignedUserAvatar({
           </Text>
         </View>
       )}
-      {verified ? <VerifiedBadge size={14} className="absolute -bottom-0.5 -right-0.5" /> : null}
+      {verified ? <VerifiedBadge size={14} className="absolute -top-0.5 -right-0.5" /> : null}
     </View>
   );
 }

@@ -24,6 +24,7 @@ const PinSheetMeta = ({ pin, pinType }: Props) => {
             <SignedUserAvatar
               name={pin.user.name}
               avatar={pin.user.avatar}
+              verified={pin.user.verified}
               className="h-6 w-6"
               sizePt={24}
             />
