@@ -8,6 +8,8 @@ import { isPlainObject, unknownErrorMessage } from '~/shared/lib/data/guards';
 import { invalidateActiveRexSurfaces } from '~/shared/lib/query/invalidateActiveRexSurfaces';
 import { isOfflineMutationBlocked, withOnlineMutation } from '~/shared/lib/network/assertOnline';
 import { NOTIFICATIONS_QUERY_KEY } from '~/shared/config/queryKeys';
+import { REX_REQUEST_QUERY_KEYS } from '~/features/rex-requests/config/queryKeys';
+import { CIRCLES_QUERY_KEYS } from '~/features/circles/config/queryKeys';
 
 export const blockedUsersQueryKey = (viewerId: string) => ['blocked-users', viewerId] as const;
 
@@ -53,6 +55,8 @@ export function useBlockUser(params: {
       queryKey: NOTIFICATIONS_QUERY_KEY,
       refetchType: 'active',
     });
+    void queryClient.invalidateQueries({ queryKey: REX_REQUEST_QUERY_KEYS.feed });
+    void queryClient.invalidateQueries({ queryKey: CIRCLES_QUERY_KEYS.peopleSuggestions });
   }, [queryClient, viewerId]);
 
   const blockFn = withOnlineMutation('Blocking', (_: void) => blockUser(targetUserId));
