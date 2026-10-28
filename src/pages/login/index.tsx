@@ -8,6 +8,7 @@ import {
   AuthBrandHeader,
   AuthOrDivider,
   AuthSwitchLink,
+  AuthTermsAcceptanceField,
   ForgotPasswordLink,
   InviteCodeInput,
   OAuthSocialButtons,
@@ -57,6 +58,8 @@ const LoginPage = () => {
             error={login.invite.error}
           />
         )}
+
+        <AuthTermsAcceptanceField variant="login" />
 
         <Button
           title="Sign in"
