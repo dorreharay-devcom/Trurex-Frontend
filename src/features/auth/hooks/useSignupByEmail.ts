@@ -23,6 +23,7 @@ import {
   SIGNUP_ACCOUNT_TYPE_CONFIG,
   parseSignupAccountType,
 } from '~/features/auth/config/signupAccountType';
+import { TEMPORARY_ENABLE_BUSINESS_PROFILE_CLAIM } from '~/shared/config/featureFlags';
 import { firstRouteParam } from '~/shared/lib/navigation/routeIds';
 
 type SignupErrors = {
@@ -48,7 +49,9 @@ export function useSignupByEmail() {
   const [errors, setErrors] = useState<SignupErrors>({});
   const [loading, setLoading] = useState(false);
 
-  const accountType = parseSignupAccountType(firstRouteParam(searchParams.account));
+  const accountType = TEMPORARY_ENABLE_BUSINESS_PROFILE_CLAIM
+    ? parseSignupAccountType(firstRouteParam(searchParams.account))
+    : SIGNUP_ACCOUNT_TYPE.personal;
   const accountConfig = SIGNUP_ACCOUNT_TYPE_CONFIG[accountType];
   const isBusinessAccount = accountType === SIGNUP_ACCOUNT_TYPE.business;
 

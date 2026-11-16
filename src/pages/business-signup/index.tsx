@@ -8,9 +8,15 @@ import { Button } from '~/shared/ui/primitives/Button';
 import { Input } from '~/shared/ui/primitives/Input';
 import { AuthBrandHeader } from '~/features/auth';
 import { useBusinessSignupCompletion } from '~/features/auth/hooks/useBusinessSignupCompletion';
+import { Routes } from '~/shared/config/routes';
+import { TEMPORARY_ENABLE_BUSINESS_PROFILE_CLAIM } from '~/shared/config/featureFlags';
 
 const BusinessSignupPage = () => {
   const completion = useBusinessSignupCompletion();
+
+  if (!TEMPORARY_ENABLE_BUSINESS_PROFILE_CLAIM) {
+    return <Redirect href={Routes.Main} />;
+  }
 
   if (completion.redirectTo) {
     return <Redirect href={completion.redirectTo} />;

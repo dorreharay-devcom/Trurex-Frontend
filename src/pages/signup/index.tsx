@@ -14,6 +14,7 @@ import {
   OAuthSocialButtons,
   useSignupByEmail,
 } from '~/features/auth';
+import { TEMPORARY_ENABLE_BUSINESS_PROFILE_CLAIM } from '~/shared/config/featureFlags';
 
 const SignupPage = () => {
   const signup = useSignupByEmail();
@@ -23,13 +24,15 @@ const SignupPage = () => {
       <AuthBrandHeader subtitle="Create your TruRex account" />
 
       <View className="gap-4">
-        <AuthLinkButton
-          title={signup.accountConfig.switchLabel}
-          onPress={signup.switchAccountType}
-          tone="accent"
-          centered
-          disabled={signup.busy}
-        />
+        {TEMPORARY_ENABLE_BUSINESS_PROFILE_CLAIM && (
+          <AuthLinkButton
+            title={signup.accountConfig.switchLabel}
+            onPress={signup.switchAccountType}
+            tone="accent"
+            centered
+            disabled={signup.busy}
+          />
+        )}
         <OAuthSocialButtons
           disabled={signup.busy}
           onGooglePress={() => signup.handleOAuthSignup('google')}
