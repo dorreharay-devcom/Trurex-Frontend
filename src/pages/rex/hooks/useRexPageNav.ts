@@ -6,11 +6,20 @@ import { TAB, type Tab } from '~/shared/config/mainTabs';
 import { Routes, toBusinessRoute, toRexRoute, toUserRoute } from '~/shared/config/routes';
 import { openMainTab } from '~/shared/lib/mainTab';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
+import type { UserProfileOpenOptions } from '~/shared/types/userProfileOpen';
 
-function isPreviousRouteUserProfile(state: NavigationState | undefined, userId: string): boolean {
+function isPreviousRouteUserProfile(
+  state: NavigationState | undefined,
+  userId: string,
+  options?: UserProfileOpenOptions,
+): boolean {
   const previous = state?.routes[state.index - 1];
-  const params = previous?.params as { userId?: string } | undefined;
-  return previous?.name === 'user/[userId]' && params?.userId === userId;
+  const params = previous?.params as { userId?: string; as?: string } | undefined;
+  return (
+    previous?.name === 'user/[userId]' &&
+    params?.userId === userId &&
+    (params?.as === 'business') === (options?.asBusiness === true)
+  );
 }
 
 export function useRexPageNav() {
@@ -39,25 +48,25 @@ export function useRexPageNav() {
   );
 
   const openUser = useCallback(
-    (userId: string) => {
+    (userId: string, options?: UserProfileOpenOptions) => {
       if (userId === currentUserId) {
         router.dismissTo(Routes.Profile);
         return;
       }
-      router.push(toUserRoute(userId));
+      router.push(toUserRoute(userId, options));
     },
     [router, currentUserId],
   );
 
   const openAuthor = useCallback(
-    (authorId: string) => {
+    (authorId: string, options?: UserProfileOpenOptions) => {
       if (authorId === currentUserId) {
         router.dismissTo(Routes.Profile);
         return;
       }
-      const returnsToAuthor = isPreviousRouteUserProfile(navigation.getState(), authorId);
+      const returnsToAuthor = isPreviousRouteUserProfile(navigation.getState(), authorId, options);
       closeRex();
-      if (!returnsToAuthor) router.push(toUserRoute(authorId));
+      if (!returnsToAuthor) router.push(toUserRoute(authorId, options));
     },
     [router, navigation, currentUserId, closeRex],
   );

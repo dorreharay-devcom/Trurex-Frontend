@@ -11,6 +11,8 @@ import { useMyRexes } from '~/features/profile/hooks/data/useMyRexes';
 import { useMyRexRequests } from '~/features/rex-requests/hooks/useMyRexRequests';
 import { useProfileData } from '~/features/profile/hooks/data/useProfileData';
 import { useProfileAvatarUpload } from '~/features/profile/hooks/useProfileAvatarUpload';
+import { useProfileBusinessView } from '~/features/profile/hooks/useProfileBusinessView';
+import { withBusinessFace } from '~/features/profile/lib/profileFace';
 import { useProfileSocial } from '~/features/profile/hooks/useProfileSocial';
 import { firstRouteParam } from '~/shared/lib/navigation/routeIds';
 import { Routes } from '~/shared/config/routes';
@@ -27,6 +29,7 @@ type Params = {
   onOpenRexRequest?: (requestId: string) => void;
   onOpenReferrals?: () => void;
   onOpenWishList?: (userId: string) => void;
+  asBusiness?: boolean;
 };
 
 export function useProfileScreen({
@@ -40,6 +43,7 @@ export function useProfileScreen({
   onOpenRexRequest,
   onOpenReferrals,
   onOpenWishList,
+  asBusiness = false,
 }: Params) {
   const router = useRouter();
   const rawParams = useLocalSearchParams<{ tab?: string | string[] }>();
@@ -64,9 +68,17 @@ export function useProfileScreen({
     authUserId: authUser?.id,
   });
 
-  const rexes = useMyRexes(profileData.profileContentUserId);
-  const collections = useMyCollections(profileData.profileContentUserId);
-  const rexRequests = useMyRexRequests(profileData.profileContentUserId, profileData.isOwnProfile);
+  const business = useProfileBusinessView({
+    isOwnProfile: profileData.isOwnProfile,
+    profileKind: profileData.profile?.accountKind ?? null,
+    asBusiness,
+  });
+  const contentUserId = business.contentReady ? profileData.profileContentUserId : undefined;
+  const contentFilter = business.postedAsBusinessFilter;
+  const rexes = useMyRexes(contentUserId, contentFilter);
+  const collections = useMyCollections(contentUserId, contentFilter);
+  const rexRequests = useMyRexRequests(contentUserId, profileData.isOwnProfile, contentFilter);
+  const contentPending = !business.contentReady;
   const {
     fetchNextPage: fetchNextRexesPage,
     data: rexesData,
@@ -96,6 +108,11 @@ export function useProfileScreen({
     refetch: refetchRexRequests,
   } = rexRequests;
   const { beginLoading, fetchProfile } = profileData;
+
+  const headerProfile = useMemo(
+    () => profileData.profile && withBusinessFace(profileData.profile, business.businessFace),
+    [profileData.profile, business.businessFace],
+  );
 
   const avatar = useProfileAvatarUpload({
     userId: authUser?.id,
@@ -158,6 +175,7 @@ export function useProfileScreen({
     openVerifyIdentity,
     openWishList,
     profile: profileData.profile,
+    headerProfile,
     loading: profileData.loading,
     notFound: profileData.notFound,
     isError: profileData.isError,
@@ -177,17 +195,17 @@ export function useProfileScreen({
       activeTab,
       setActiveTab,
       myRexes: rexesData ?? [],
-      rexesLoading,
+      rexesLoading: rexesLoading || contentPending,
       rexesError: rexesIsError && (rexesData?.length ?? 0) === 0,
       isFetchingNextRexesPage,
       isFetchNextRexesError,
       myCollections: collectionsList,
-      collectionsLoading,
+      collectionsLoading: collectionsLoading || contentPending,
       collectionsError: collectionsIsError && collectionsList.length === 0,
       isFetchingNextCollectionsPage,
       isFetchNextCollectionsError,
       myRexRequests: rexRequestsData,
-      rexRequestsLoading,
+      rexRequestsLoading: rexRequestsLoading || contentPending,
       rexRequestsError: rexRequestsIsError && rexRequestsData.length === 0,
       isFetchingNextRexRequestsPage,
       isFetchNextRexRequestsError,
@@ -202,5 +220,6 @@ export function useProfileScreen({
       retryRexRequests: () => void refetchRexRequests(),
     },
     social,
+    business,
   };
 }

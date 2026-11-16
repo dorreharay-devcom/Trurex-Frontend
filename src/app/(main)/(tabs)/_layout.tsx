@@ -58,6 +58,10 @@ function MainTabsChrome() {
     router.push(Routes.Referrals);
   }, [router]);
 
+  const onMyBusinessPagePress = useCallback(() => {
+    router.push(Routes.MyBusinessPage);
+  }, [router]);
+
   return (
     <View className="min-h-0 flex-1 bg-background">
       <StickyTopChromeLayout
@@ -70,6 +74,7 @@ function MainTabsChrome() {
               onRexPress={onRexPress}
               onRexRequestPress={onRexRequestPress}
               onReferralsPress={onReferralsPress}
+              onMyBusinessPagePress={onMyBusinessPagePress}
             />
             <TabBar currentTab={currentTab} onTabChange={changeTab} />
             <OfflineBanner />

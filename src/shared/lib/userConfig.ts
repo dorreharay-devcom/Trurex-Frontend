@@ -6,6 +6,9 @@ export function emptyUserConfig(): UserConfigRow {
     avatar_url: null,
     pinned_category_ids: [],
     status: null,
+    is_business_account: false,
+    business_claim_status: null,
+    account_type: null,
   };
 }
 

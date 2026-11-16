@@ -5,11 +5,14 @@ export const Routes = {
   Profile: '/profile',
   ProfileEdit: '/profile/edit',
   ProfileBlocked: '/profile/blocked',
+  ProfileEditBusiness: '/profile/edit-business',
+  MyBusinessPage: '/profile?view=page',
   Gems: '/gems',
   Circles: '/circles',
   Create: '/create',
   Login: '/login',
   Signup: '/signup',
+  BusinessSignup: '/business-signup',
   ForgotPassword: '/forgot-password',
   ResetPassword: '/reset-password',
   Mfa: '/mfa',
@@ -20,8 +23,8 @@ export const Routes = {
   Referrals: '/referrals',
 } as const satisfies Record<string, Href>;
 
-export function toUserRoute(userId: string): Href {
-  return `/user/${userId}`;
+export function toUserRoute(userId: string, options?: { asBusiness?: boolean }): Href {
+  return options?.asBusiness ? `/user/${userId}?as=business` : `/user/${userId}`;
 }
 
 export function toRexRoute(

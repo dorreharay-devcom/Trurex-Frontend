@@ -17,6 +17,7 @@ type Props = {
   onRexPress?: (rexId: string, options?: RecommendationOpenOptions) => void;
   onRexRequestPress?: (requestId: string) => void;
   onReferralsPress?: () => void;
+  onMyBusinessPagePress?: () => void;
   isProfileActive?: boolean;
 };
 
@@ -37,6 +38,7 @@ const Header = ({
   onRexPress,
   onRexRequestPress,
   onReferralsPress,
+  onMyBusinessPagePress,
   isProfileActive,
 }: Props) => {
   const { width } = useWindowDimensions();
@@ -75,6 +77,7 @@ const Header = ({
           onRexPress={onRexPress}
           onRexRequestPress={onRexRequestPress}
           onReferralsPress={onReferralsPress}
+          onMyBusinessPagePress={onMyBusinessPagePress}
         />
       </View>
     </View>

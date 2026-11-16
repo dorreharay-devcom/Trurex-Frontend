@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { ProfileApi } from '~/features/profile/api/profileApi';
-import { pickAvatarAsset } from '~/features/profile/lib/pickAvatarAsset';
+import { pickSingleLibraryImage } from '~/shared/lib/media/photos/pickSingleLibraryImage';
 import { photoUploadErrorMessage } from '~/shared/lib/media/photos/storageUpload';
 import { toastError } from '~/shared/lib/appToast';
 import { assertOnlineForMutation } from '~/shared/lib/network/assertOnline';
@@ -19,7 +19,7 @@ export function useProfileAvatarUpload({ userId, onUploaded, onAvatarUpdated }: 
     if (!assertOnlineForMutation('Uploading photo')) return;
 
     try {
-      const asset = await pickAvatarAsset();
+      const asset = await pickSingleLibraryImage('Allow photo access to change your avatar.');
       if (!asset) return;
 
       try {

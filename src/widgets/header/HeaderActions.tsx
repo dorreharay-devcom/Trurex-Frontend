@@ -20,6 +20,7 @@ type Props = {
   onRexPress?: (rexId: string, options?: RecommendationOpenOptions) => void;
   onRexRequestPress?: (requestId: string) => void;
   onReferralsPress?: () => void;
+  onMyBusinessPagePress?: () => void;
 };
 
 const HeaderActions = ({
@@ -33,6 +34,7 @@ const HeaderActions = ({
   onRexPress,
   onRexRequestPress,
   onReferralsPress,
+  onMyBusinessPagePress,
 }: Props) => (
   <View
     className={cn(
@@ -62,6 +64,7 @@ const HeaderActions = ({
       onRexPress={onRexPress}
       onRexRequestPress={onRexRequestPress}
       onReferralsPress={onReferralsPress}
+      onMyBusinessPagePress={onMyBusinessPagePress}
     />
 
     <TouchableOpacity

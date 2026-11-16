@@ -26,6 +26,7 @@ export const AuthApi = {
           data: {
             display_name: params.displayName,
             ...(referralCode ? { referral_code: referralCode } : {}),
+            ...(params.isBusinessAccount ? { is_business_account: true } : {}),
           },
         },
       }),
@@ -47,6 +48,10 @@ export const AuthApi = {
       console.error('Supabase Sign Out Error:', error);
       throw error;
     }
+  },
+
+  refreshSession: async (): Promise<void> => {
+    unwrap(await Auth.refreshSession());
   },
 
   getSession: async (): Promise<Session | null> => {

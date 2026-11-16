@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchUserConfig } from '~/shared/api/userConfigApi';
 import { useAuth } from '~/features/auth/providers';
+import { USER_CONFIG_QUERY_KEY } from '~/shared/config/queryKeys';
 import {
   isAccountSuspendedStatus,
   terminateSessionForSuspendedAccount,
@@ -12,7 +13,7 @@ export function useUserConfig() {
   const userId = user?.id;
 
   const query = useQuery({
-    queryKey: ['user_config', userId ?? 'no-session'],
+    queryKey: USER_CONFIG_QUERY_KEY(userId),
     queryFn: fetchUserConfig,
     enabled: Boolean(userId),
   });

@@ -33,6 +33,7 @@ export function resolvePushNotificationHref(data: PushData): Href | null {
   if (target?.kind === 'rex') return toRexRoute(target.rexId, target.options);
   if (target?.kind === 'user') return toUserRoute(target.userId);
   if (target?.kind === 'referrals') return Routes.Referrals;
+  if (target?.kind === 'myBusinessPage') return Routes.MyBusinessPage;
 
   if (stringField(data, 'type') === NOTIFICATION_TYPE.tier_upgrade) return Routes.Profile;
 

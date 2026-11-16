@@ -12,8 +12,8 @@ import {
 } from '~/shared/lib/media/rexImages';
 import { mapDirectionsUrl } from '~/features/map/lib/directions';
 import { toastError } from '~/shared/lib/appToast';
-import { fetchPlaceSummary } from '~/features/business/api/placeSummaryApi';
-import { PLACE_SUMMARY_QUERY_KEY } from '~/shared/config/queryKeys';
+import { usePlaceSummary } from '~/features/business/hooks/usePlaceSummary';
+import { rexPlaceRef } from '~/features/business/lib/placeRef';
 
 function normalizeGalleryPath(raw: string): string | null {
   const trimmed = raw.trim();
@@ -36,12 +36,7 @@ export function useRexDetail(recommendation: Recommendation | null, visible: boo
     refetchOnMount: true,
   });
 
-  const { data: placeSummary } = useQuery({
-    queryKey: PLACE_SUMMARY_QUERY_KEY(recommendation?.id),
-    queryFn: () => fetchPlaceSummary(recommendation!.id),
-    enabled: visible && typeof recommendation?.id === 'string',
-    staleTime: 60_000,
-  });
+  const { data: placeSummary } = usePlaceSummary(visible ? rexPlaceRef(recommendation?.id) : null);
 
   const businessPage = useMemo(() => {
     if (!recommendation || !placeSummary?.is_visible_business_page) return null;

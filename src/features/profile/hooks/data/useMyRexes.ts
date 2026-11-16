@@ -8,16 +8,17 @@ import { nextPageOffset } from '~/shared/lib/data/guards';
 
 const MY_REXES_PAGE_SIZE = 20;
 
-export const useMyRexes = (userId?: string) => {
+export const useMyRexes = (userId?: string, postedAsBusiness: boolean | null = null) => {
   const pageSize = MY_REXES_PAGE_SIZE;
   const query = useInfiniteQuery({
-    queryKey: [...REX_QUERY_KEYS.myRexes, userId, pageSize],
+    queryKey: [...REX_QUERY_KEYS.myRexes, userId, pageSize, postedAsBusiness],
     queryFn: async ({ pageParam }) => {
       const raw = unwrap(
         await Backend.rpc('user_rexes', {
           input_user_id: userId,
           result_limit: pageSize,
           result_offset: Number(pageParam ?? 0),
+          p_posted_as_business: postedAsBusiness,
         }),
       );
       if (!Array.isArray(raw)) return [] as Recommendation[];

@@ -1,4 +1,13 @@
-import type { ProfileData, ProfileUserRow } from '~/features/profile/types/profile';
+import {
+  ACCOUNT_KIND,
+  parseAccountKind,
+  type AccountKind,
+} from '~/features/business-account/config/accountKind';
+import type {
+  ProfileBusinessIdentity,
+  ProfileData,
+  ProfileUserRow,
+} from '~/features/profile/types/profile';
 import { parseRelationshipStatus } from '~/shared/lib/data/guards';
 
 function formatHandle(raw: string): string {
@@ -6,8 +15,22 @@ function formatHandle(raw: string): string {
   return raw.startsWith('@') ? raw : `@${raw}`;
 }
 
+function toBusinessIdentity(
+  row: ProfileUserRow,
+  accountKind: AccountKind,
+): ProfileBusinessIdentity | null {
+  if (accountKind === ACCOUNT_KIND.regular) return null;
+  return {
+    name: row.business_name || null,
+    photoPath: row.business_photo_path || null,
+    verified: row.is_verified_business === true,
+    placeId: row.business_place_id || null,
+  };
+}
+
 export function toProfileData(row: ProfileUserRow): ProfileData {
   const handle = row.handle ?? '';
+  const accountKind = parseAccountKind(row.account_type) ?? ACCOUNT_KIND.regular;
   return {
     userId: row.user_id || row.id || '',
     displayName: row.display_name || 'Anonymous',
@@ -23,6 +46,8 @@ export function toProfileData(row: ProfileUserRow): ProfileData {
     following: row.following_count ?? 0,
     relationshipStatus: parseRelationshipStatus(row.relationship_status),
     verified: Boolean(row.verified),
+    accountKind,
+    business: toBusinessIdentity(row, accountKind),
     currently: {
       binging: row.currently_binging || undefined,
       listening: row.currently_listening_to || undefined,

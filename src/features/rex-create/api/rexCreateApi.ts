@@ -8,6 +8,7 @@ import type {
 import type { RexForEditRow } from '~/features/rex-detail/types/rexDetail';
 import type { DiscardDraftRexDataResult } from '~/features/rex-create/types/rexApi';
 import { isFiniteNumber, isPlainObject } from '~/shared/lib/data/guards';
+import type { PostedAs } from '~/shared/types/postedAs';
 
 export async function fetchAllCategoryCreateConfigs(): Promise<CategoryCreateConfig[]> {
   const { data, error } = await Backend.rpc('get_all_category_create_configs');
@@ -25,8 +26,11 @@ export async function fetchCategoryCreateConfig(
   return (data ?? null) as CategoryCreateConfig | null;
 }
 
-export async function createRex(params: CreateRexRpcParams) {
-  const { data, error } = await Backend.rpc('create_rex', params);
+export async function createRex(params: CreateRexRpcParams, postedAs: PostedAs) {
+  const { data, error } = await Backend.rpc('create_rex', {
+    ...params,
+    p_posted_as_business: postedAs.postedAsBusiness,
+  });
   throwRpcIfFailed({ data, error });
   return data;
 }

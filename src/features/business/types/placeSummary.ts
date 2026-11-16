@@ -29,4 +29,10 @@ export type PlaceSummaryRow = {
   network_rex_count: number;
   network_score: number | null;
   top_tags: PlaceTopTag[];
+  is_verified_business?: boolean | null;
+  business_owner_id?: string | null;
+  business_name?: string | null;
+  business_description?: string | null;
+  business_photo_path?: string | null;
+  my_claim_status?: string | null;
 };

@@ -10,6 +10,7 @@ export type RecommendationAuthor = {
   handle: string;
   avatar: string;
   verified: boolean;
+  postedAsBusiness: boolean;
 };
 
 export type Recommendation = {

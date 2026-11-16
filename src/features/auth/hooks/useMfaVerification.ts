@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Routes } from '~/shared/config/routes';
 import { useAuth } from '~/features/auth/providers/AuthProvider';
-import { TAB } from '~/shared/config/mainTabs';
-import { openMainTab } from '~/shared/lib/mainTab';
+import { useContinueAfterAuth } from '~/features/auth/hooks/useContinueAfterAuth';
 import {
   MfaErrorCode,
   MfaMessage,
@@ -14,7 +13,7 @@ import {
   getDeviceFingerprint,
 } from '~/features/auth/lib/mfa';
 import { attemptBiometricUnlock } from '~/features/auth/lib/biometrics';
-import { shouldPromptIdentityVerification } from '~/features/identity-verification/lib/shouldPromptIdentityVerification';
+import { writeStoredBusinessSignupIntent } from '~/features/auth/lib/businessSignupIntentStorage';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 
 const MIN_CODE_LENGTH = 6;
@@ -24,7 +23,8 @@ type Feedback = { tone: 'error' | 'notice'; text: string };
 
 export function useMfaVerification() {
   const router = useRouter();
-  const { session, mfaPending, setMfaPending, setMfaChecking, signOut } = useAuth();
+  const { session, mfaPending, signOut } = useAuth();
+  const enterApp = useContinueAfterAuth();
 
   const [code, setCode] = useState('');
   const [trustDevice, setTrustDevice] = useState(true);
@@ -36,17 +36,6 @@ export function useMfaVerification() {
   const trimmedCode = code.trim();
   const canSubmit = !busy && trimmedCode.length >= MIN_CODE_LENGTH;
   const redirectTo = !session ? Routes.Login : !mfaPending && !busy ? Routes.Main : null;
-
-  async function enterApp() {
-    const promptVerification = await shouldPromptIdentityVerification();
-    await setMfaPending(false);
-    if (promptVerification) {
-      router.replace(Routes.VerifyIdentity);
-      return;
-    }
-    setMfaChecking(true);
-    openMainTab(router, TAB.discover);
-  }
 
   async function completeSignIn() {
     const biometricResult = await attemptBiometricUnlock();
@@ -160,6 +149,7 @@ export function useMfaVerification() {
   }
 
   async function handleBackToLogin() {
+    await writeStoredBusinessSignupIntent(false);
     await signOut().catch(() => {});
     router.replace(Routes.Login);
   }

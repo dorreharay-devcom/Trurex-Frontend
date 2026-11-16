@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import * as Linking from 'expo-linking';
 import { completeOAuthSessionFromUrl } from '~/features/auth/lib/oauth';
 import { navigateAfterAuthenticatedSession } from '~/features/auth/lib/mfa';
+import { writeStoredBusinessSignupIntent } from '~/features/auth/lib/businessSignupIntentStorage';
 import { useAuth } from '~/features/auth/providers';
 import { AuthEvent } from '~/features/auth/types';
 import { Auth } from '~/shared/api/client';
@@ -25,7 +26,8 @@ export function useOAuthCallback() {
       if (active) openMainTab(router, TAB.discover);
     };
 
-    const goLogin = () => {
+    const goLogin = async () => {
+      await writeStoredBusinessSignupIntent(false);
       if (active) {
         setMfaChecking(false);
         router.replace(Routes.Login);
@@ -41,17 +43,8 @@ export function useOAuthCallback() {
         await navigateAfterAuthenticatedSession({
           setMfaPending,
           setMfaChecking,
-          onRequireMfa: () => {
-            if (active) {
-              setMfaChecking(false);
-              router.replace(Routes.Mfa);
-            }
-          },
-          onRequireIdentityVerificationPrompt: () => {
-            if (active) {
-              setMfaChecking(false);
-              router.replace(Routes.VerifyIdentity);
-            }
+          onRedirect: (href) => {
+            if (active) router.replace(href);
           },
           onReady: goMain,
         });

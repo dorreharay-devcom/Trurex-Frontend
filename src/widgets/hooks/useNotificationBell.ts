@@ -20,6 +20,7 @@ type Params = {
   onRexPress?: (rexId: string, options?: RecommendationOpenOptions) => void;
   onRexRequestPress?: (requestId: string) => void;
   onReferralsPress?: () => void;
+  onMyBusinessPagePress?: () => void;
 };
 
 export function useNotificationBell({
@@ -27,6 +28,7 @@ export function useNotificationBell({
   onRexPress,
   onRexRequestPress,
   onReferralsPress,
+  onMyBusinessPagePress,
 }: Params) {
   const { notifications, unreadCount, loading, isError, markAllAsRead, markOneAsRead, refetch } =
     useNotifications();
@@ -101,13 +103,26 @@ export function useNotificationBell({
         onReferralsPress();
         return;
       }
+      if (target?.kind === 'myBusinessPage' && onMyBusinessPagePress) {
+        close();
+        onMyBusinessPagePress();
+        return;
+      }
       if (__DEV__ && !target) {
         console.warn(
           `[notifications] no deep-link target for "${n.type}" notification ${n.id} — rex_id=${String(n.rex_id)} rex_request_id=${String(n.rex_request_id)} actor_id=${String(n.actor_id)}`,
         );
       }
     },
-    [close, markOneAsRead, onRexPress, onUserPress, onRexRequestPress, onReferralsPress],
+    [
+      close,
+      markOneAsRead,
+      onRexPress,
+      onUserPress,
+      onRexRequestPress,
+      onReferralsPress,
+      onMyBusinessPagePress,
+    ],
   );
 
   const openActor = useCallback(

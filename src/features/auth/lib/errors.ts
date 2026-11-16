@@ -1,3 +1,4 @@
+import type { AuthSessionData } from '~/shared/types/auth';
 import {
   isRateLimitError,
   isTimeoutError,
@@ -10,16 +11,20 @@ export const AuthErrorCode = {
   UserNotFound: 'user_not_found',
   SignupDisabled: 'signup_disabled',
   UserAlreadyExists: 'user_already_exists',
+  EmailExists: 'email_exists',
   WeakPassword: 'weak_password',
   OverEmailSendRateLimit: 'over_email_send_rate_limit',
 } as const;
+
+export const EMAIL_ALREADY_USED_MESSAGE = 'This email is already used.';
 
 const AUTH_ERROR_MESSAGES: Record<string, string> = {
   [AuthErrorCode.InvalidCredentials]: 'Invalid email or password. Please try again.',
   [AuthErrorCode.EmailNotConfirmed]: 'Please verify your email before signing in.',
   [AuthErrorCode.UserNotFound]: 'No account found with this email.',
   [AuthErrorCode.SignupDisabled]: 'Sign up is currently disabled.',
-  [AuthErrorCode.UserAlreadyExists]: 'An account with this email already exists.',
+  [AuthErrorCode.UserAlreadyExists]: EMAIL_ALREADY_USED_MESSAGE,
+  [AuthErrorCode.EmailExists]: EMAIL_ALREADY_USED_MESSAGE,
   [AuthErrorCode.WeakPassword]: 'Password is too weak. Please use a stronger password.',
   [AuthErrorCode.OverEmailSendRateLimit]: 'Too many requests. Please try again later.',
 };
@@ -54,7 +59,7 @@ export function getErrorMessage(error: unknown): string {
 type AuthFieldErrors = {
   email?: string;
   password?: string;
-  fullName?: string;
+  displayName?: string;
   general?: string;
 };
 
@@ -75,8 +80,12 @@ export function mapAuthError(error: unknown, setErrors: (errors: AuthFieldErrors
     return;
   }
   if (normalized.includes('name')) {
-    setErrors({ fullName: message });
+    setErrors({ displayName: message });
     return;
   }
   setErrors({ general: message });
+}
+
+export function isExistingAccountSignUp(data: AuthSessionData): boolean {
+  return !data.session && data.user?.identities?.length === 0;
 }

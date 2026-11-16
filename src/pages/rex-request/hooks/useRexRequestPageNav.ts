@@ -5,6 +5,7 @@ import { toRexRoute, toUserRoute } from '~/shared/config/routes';
 import { openMainTab } from '~/shared/lib/mainTab';
 import { openCreateRexRequest } from '~/shared/lib/navigation/rexRequest';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
+import type { UserProfileOpenOptions } from '~/shared/types/userProfileOpen';
 
 export function useRexRequestPageNav() {
   const router = useRouter();
@@ -29,8 +30,8 @@ export function useRexRequestPageNav() {
   );
 
   const openUser = useCallback(
-    (userId: string) => {
-      router.push(toUserRoute(userId));
+    (userId: string, options?: UserProfileOpenOptions) => {
+      router.push(toUserRoute(userId, options));
     },
     [router],
   );

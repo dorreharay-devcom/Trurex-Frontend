@@ -3,6 +3,7 @@ import {
   getConfirmPasswordValidationError,
   getEmailValidationError,
   getFullNameValidationError,
+  getBusinessNameValidationError,
   getPasswordValidationError,
   isFieldErrorsEmpty,
 } from '~/features/auth/lib/credentials';
@@ -15,6 +16,8 @@ describe('credentials validation', () => {
     expect(getPasswordValidationError('123456')).toBeUndefined();
     expect(getFullNameValidationError('  ')).toBeTruthy();
     expect(getFullNameValidationError('Ann')).toBeUndefined();
+    expect(getBusinessNameValidationError('  ')).toBe('Business name is required');
+    expect(getBusinessNameValidationError('Acme')).toBeUndefined();
     expect(getConfirmPasswordValidationError('a', '')).toBeTruthy();
     expect(getConfirmPasswordValidationError('a', 'b')).toBeTruthy();
     expect(getConfirmPasswordValidationError('a', 'a')).toBeUndefined();

@@ -21,13 +21,19 @@ function nextCollectionsOffset(
   return nextOffset;
 }
 
-export const useMyCollections = (userId?: string) => {
+export const useMyCollections = (userId?: string, postedAsBusiness: boolean | null = null) => {
   const query = useInfiniteQuery({
-    queryKey: [...COLLECTIONS_QUERY_KEYS.myCollections, userId, USER_COLLECTIONS_PAGE_LIMIT],
+    queryKey: [
+      ...COLLECTIONS_QUERY_KEYS.myCollections,
+      userId,
+      USER_COLLECTIONS_PAGE_LIMIT,
+      postedAsBusiness,
+    ],
     queryFn: ({ pageParam }) =>
       CollectionsApi.userCollections(userId!, {
         result_limit: USER_COLLECTIONS_PAGE_LIMIT,
         result_offset: Number(pageParam ?? 0),
+        posted_as_business: postedAsBusiness,
       }),
     initialPageParam: 0,
     getNextPageParam: nextCollectionsOffset,

@@ -5,6 +5,7 @@ import type { Recommendation } from '~/shared/types/recommendation';
 import { authorDisplayName, categoryDisplayLabel } from '~/shared/lib/recommendation';
 import { formatRelativeTime } from '~/shared/lib/data/date';
 import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
+import BusinessAuthorTag from '~/shared/ui/primitives/BusinessAuthorTag';
 import { useIsNarrowWeb } from '~/shared/hooks/useIsNarrowWeb';
 import { CATEGORY_ICON_FALLBACK } from '~/shared/api/categories';
 
@@ -23,7 +24,10 @@ function CardHeader({ rec, onRemove }: Props) {
     <View className="flex-row items-center gap-3 p-4 pb-2">
       <SignedUserAvatar name={name} avatar={rec.user?.avatar} verified={rec.user?.verified} />
       <View className="flex-1">
-        <Text className="text-sm font-semibold text-foreground">{name}</Text>
+        <View className="min-w-0 flex-row items-center gap-1">
+          <Text className="shrink text-sm font-semibold text-foreground">{name}</Text>
+          {rec.user?.postedAsBusiness ? <BusinessAuthorTag /> : null}
+        </View>
         <Text className="text-xs text-muted">
           {handle ? `${handle}\u00A0·\u00A0` : ''}
           {timeAgo}

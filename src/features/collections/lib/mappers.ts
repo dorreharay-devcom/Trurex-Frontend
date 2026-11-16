@@ -23,6 +23,7 @@ export function entryToRecommendation(entry: CollectionRexEntry): Recommendation
             handle: entry.recommender_handle ?? '',
             avatar: '',
             verified: false,
+            postedAsBusiness: entry.posted_as_business ?? false,
           }
         : null,
     createdAt: null,

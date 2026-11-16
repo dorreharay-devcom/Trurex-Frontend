@@ -15,6 +15,11 @@ export function getFullNameValidationError(fullName: string): string | undefined
   return undefined;
 }
 
+export function getBusinessNameValidationError(businessName: string): string | undefined {
+  if (!businessName.trim()) return 'Business name is required';
+  return undefined;
+}
+
 export function getConfirmPasswordValidationError(
   password: string,
   confirmPassword: string,

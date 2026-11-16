@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Backend } from '~/shared/api/client';
 import { fetchUserNotifications } from '~/shared/api/notificationsApi';
 import { NOTIFICATIONS_QUERY_KEY } from '~/shared/config/queryKeys';
+import { refreshQueriesForNotification } from '~/shared/lib/notification/refresh';
 import { subscribeRealtimeWithResume } from '~/shared/lib/realtime/subscribeWithResume';
 
 export function useNotificationsRealtime(userId: string | null | undefined) {
@@ -20,6 +21,14 @@ export function useNotificationsRealtime(userId: string | null | undefined) {
     void queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY });
   }, [queryClient]);
 
+  const onInsert = useCallback(
+    (payload: { new: Record<string, unknown> }) => {
+      softRefresh();
+      refreshQueriesForNotification(queryClient, payload.new.type);
+    },
+    [queryClient, softRefresh],
+  );
+
   useEffect(() => {
     if (!userId) return;
 
@@ -35,9 +44,9 @@ export function useNotificationsRealtime(userId: string | null | undefined) {
             table: 'user_notifications',
             filter: `user_id=eq.${userId}`,
           },
-          softRefresh,
+          onInsert,
         ),
       onSoftRefresh: softRefresh,
     });
-  }, [userId, softRefresh]);
+  }, [userId, onInsert, softRefresh]);
 }

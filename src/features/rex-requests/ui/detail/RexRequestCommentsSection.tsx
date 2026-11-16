@@ -9,11 +9,12 @@ import { Theme } from '~/shared/theme/Theme';
 import { useRexRequestComments } from '~/features/rex-requests/hooks/detail/useRexRequestComments';
 import RexRequestCommentRow from '~/features/rex-requests/ui/detail/RexRequestCommentRow';
 import { useMentionAutocomplete } from '~/features/mentions/hooks/useMentionAutocomplete';
+import type { UserProfileOpenOptions } from '~/shared/types/userProfileOpen';
 
 type Props = {
   requestId: string;
   canComment: boolean;
-  onUserPress?: (userId: string) => void;
+  onUserPress?: (userId: string, options?: UserProfileOpenOptions) => void;
   onReportComment?: (commentId: string) => void;
 };
 

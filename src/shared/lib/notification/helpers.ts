@@ -47,6 +47,8 @@ export const REFERRAL_TYPES = new Set<string>([
 
 const DEFAULT_VERB = 'interacted with your Rex';
 
+const BUSINESS_CLAIM_APPROVED_TITLE = 'Your business has been verified';
+
 const VERB_BY_TYPE: Record<string, string> = {
   [NOTIFICATION_TYPE.reaction]: 'hearted your Rex',
   [NOTIFICATION_TYPE.comment]: 'commented on your Rex',
@@ -80,7 +82,8 @@ export type NotificationOpenTarget =
   | ({ kind: 'rex' } & NotificationRexLink)
   | { kind: 'user'; userId: string }
   | { kind: 'rexRequest'; requestId: string }
-  | { kind: 'referrals' };
+  | { kind: 'referrals' }
+  | { kind: 'myBusinessPage' };
 
 function trimOrEmpty(value: string | null | undefined): string {
   return value?.trim() ?? '';
@@ -122,6 +125,8 @@ export function notificationOpenTarget(n: AppNotification): NotificationOpenTarg
 
   if (REFERRAL_TYPES.has(n.type)) return { kind: 'referrals' };
 
+  if (n.type === NOTIFICATION_TYPE.business_claim_approved) return { kind: 'myBusinessPage' };
+
   const userId = trimOrEmpty(n.actor_id);
   if (PROFILE_TYPES.has(n.type) && userId) return { kind: 'user', userId };
 
@@ -151,6 +156,7 @@ export function notificationActorLabel(n: AppNotification): string {
 
 export function notificationDescription(n: AppNotification): string {
   if (n.title) return n.title;
+  if (n.type === NOTIFICATION_TYPE.business_claim_approved) return BUSINESS_CLAIM_APPROVED_TITLE;
 
   const actor = notificationActorLabel(n);
   if (n.type === NOTIFICATION_TYPE.trusted) return `${actor} is now Trusted`;

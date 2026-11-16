@@ -20,6 +20,7 @@ export const NOTIFICATION_TYPE = {
   rex_request_response: 'rex_request_response',
   referral_signup: 'referral_signup',
   referral_activation: 'referral_activation',
+  business_claim_approved: 'business_claim_approved',
 } as const;
 
 export type KnownNotificationType = (typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICATION_TYPE];

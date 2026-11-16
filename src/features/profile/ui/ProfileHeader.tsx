@@ -26,6 +26,8 @@ type Props = {
   onUnblockPress?: () => void;
   blockLoading?: boolean;
   onVerifyIdentity?: () => void;
+  accessory?: React.ReactNode;
+  avatarEditable?: boolean;
 };
 
 const ProfileHeader = ({
@@ -44,6 +46,8 @@ const ProfileHeader = ({
   onUnblockPress,
   blockLoading = false,
   onVerifyIdentity,
+  accessory,
+  avatarEditable = isOwnProfile,
 }: Props) => {
   const onShare = () => void shareProfile(profile, isOwnProfile);
   const { getTier, isTopTier } = useRexScoreTiers();
@@ -52,17 +56,18 @@ const ProfileHeader = ({
   return (
     <View className="overflow-hidden rounded-t-xl bg-card">
       <View className="px-4 pt-5">
-        <View className="self-start">
+        <View className="flex-row items-center justify-between gap-3">
           <ProfileHeaderAvatar
             displayName={profile.displayName}
             avatarUrl={profile.avatarUrl}
-            editable={isOwnProfile}
-            disabled={!isOwnProfile || avatarUploading}
+            editable={avatarEditable}
+            disabled={!avatarEditable || avatarUploading}
             avatarRefreshKey={avatarRefreshKey}
             onPress={onAvatarPress}
             verified={profile.verified}
             onVerifyPress={onVerifyIdentity}
           />
+          {accessory}
         </View>
 
         <ProfileHeaderIdentity

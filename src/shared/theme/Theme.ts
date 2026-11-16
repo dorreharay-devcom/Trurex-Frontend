@@ -38,6 +38,7 @@ export const Colors = {
   searchFieldBackground: 'hsl(0, 0%, 86%)',
 
   destructive: '#DB2424',
+  warning: '#F59B0A',
 
   sand: '#E4DBCD',
   sandDark: '#3D3529',

@@ -13,6 +13,7 @@ type Props = {
   onRexPress?: (rexId: string, options?: RecommendationOpenOptions) => void;
   onRexRequestPress?: (requestId: string) => void;
   onReferralsPress?: () => void;
+  onMyBusinessPagePress?: () => void;
 };
 
 const NotificationBell = ({
@@ -20,6 +21,7 @@ const NotificationBell = ({
   onRexPress,
   onRexRequestPress,
   onReferralsPress,
+  onMyBusinessPagePress,
 }: Props) => {
   const insets = useSafeAreaInsets();
   const bell = useNotificationBell({
@@ -27,6 +29,7 @@ const NotificationBell = ({
     onRexPress,
     onRexRequestPress,
     onReferralsPress,
+    onMyBusinessPagePress,
   });
 
   return (

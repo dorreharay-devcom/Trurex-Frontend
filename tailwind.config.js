@@ -33,6 +33,7 @@ module.exports = {
         'accent-foreground': '#5A7280',
         'rating-star': '#F59B0A',
         destructive: '#DB2424', // hsl(0 72% 50%)
+        warning: '#F59B0A',
         border: '#D4D4D4', // hsl(0 0% 83%)
         'search-field': '#DBDBDB', // hsl(0 0% 86%) — Theme.colors.searchFieldBackground
         ring: '#B7C7CF',

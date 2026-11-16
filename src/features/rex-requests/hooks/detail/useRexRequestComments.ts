@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import {
   commentOnRexRequest,
   deleteRexRequestComment,
@@ -8,6 +9,7 @@ import type { RexRequestCommentRow } from '~/features/rex-requests/api/types';
 import { assertOnlineForMutation } from '~/shared/lib/network/assertOnline';
 
 export function useRexRequestComments(requestId: string) {
+  const { postedAsBusiness } = useAccountMode();
   const [comments, setComments] = useState<RexRequestCommentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -32,10 +34,10 @@ export function useRexRequestComments(requestId: string) {
   const addComment = useCallback(
     async (body: string) => {
       if (!assertOnlineForMutation('Commenting')) return;
-      await commentOnRexRequest(requestId, body);
+      await commentOnRexRequest({ requestId, body, postedAsBusiness });
       await refetch();
     },
-    [requestId, refetch],
+    [requestId, postedAsBusiness, refetch],
   );
 
   const deleteComment = useCallback(async (commentId: string) => {

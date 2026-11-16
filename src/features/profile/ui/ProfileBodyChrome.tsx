@@ -1,5 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
+import AccountModeSwitcher from '~/features/business-account/ui/AccountModeSwitcher';
+import BusinessClaimProfileEntry from '~/features/business-account/ui/claim/BusinessClaimProfileEntry';
+import BusinessProfileViewTabs from '~/features/business-account/ui/profile/BusinessProfileViewTabs';
 import type { useProfileScreen } from '~/features/profile/hooks/useProfileScreen';
 import CurrentlySection from '~/features/profile/ui/CurrentlySection';
 import ProfileHeader from '~/features/profile/ui/ProfileHeader';
@@ -16,13 +19,13 @@ type Props = {
 };
 
 function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
-  const { profile, content, social, avatar } = flow;
+  const { profile, headerProfile, content, social, avatar, business } = flow;
 
   return (
     <View className="pb-3">
-      {profile ? (
+      {headerProfile ? (
         <ProfileHeader
-          profile={profile}
+          profile={headerProfile}
           isOwnProfile={flow.isOwnProfile}
           onEditProfile={flow.openEdit}
           onSignOut={flow.signOut}
@@ -36,7 +39,13 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
           onBlockPress={social.openBlockConfirm}
           onUnblockPress={social.onUnblock}
           blockLoading={social.blockPending}
-          onVerifyIdentity={flow.openVerifyIdentity}
+          onVerifyIdentity={business.businessFace ? undefined : flow.openVerifyIdentity}
+          avatarEditable={flow.isOwnProfile && !business.businessFace}
+          accessory={
+            business.canSwitch ? (
+              <AccountModeSwitcher mode={business.mode} onChange={business.setMode} />
+            ) : null
+          }
         />
       ) : null}
 
@@ -44,9 +53,15 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
         <ProfileVerifySection onPress={flow.openVerifyIdentity} />
       ) : null}
 
+      {flow.isOwnProfile && !business.showMyBusinessPage ? <BusinessClaimProfileEntry /> : null}
+
       {flow.isOwnProfile ? <ProfileReferralsSection onPress={flow.openReferrals} /> : null}
 
-      {profile ? (
+      {business.active ? (
+        <BusinessProfileViewTabs view={business.view} onChange={business.setView} />
+      ) : null}
+
+      {profile && business.showContentTabs ? (
         <ProfileWishListSection
           profile={profile}
           isOwnProfile={flow.isOwnProfile}
@@ -54,15 +69,19 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
         />
       ) : null}
 
-      {profile?.currently ? <CurrentlySection currently={profile.currently} /> : null}
+      {profile?.currently && business.showContentTabs ? (
+        <CurrentlySection currently={profile.currently} />
+      ) : null}
 
-      <ProfileTabs
-        activeTab={content.activeTab}
-        onChange={content.setActiveTab}
-        rexCount={content.rexTabCount}
-        collectionsCount={content.collectionsTabCount}
-        rexRequestsCount={content.rexRequestsTabCount}
-      />
+      {business.showContentTabs ? (
+        <ProfileTabs
+          activeTab={content.activeTab}
+          onChange={content.setActiveTab}
+          rexCount={content.rexTabCount}
+          collectionsCount={content.collectionsTabCount}
+          rexRequestsCount={content.rexRequestsTabCount}
+        />
+      ) : null}
     </View>
   );
 }
