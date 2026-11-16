@@ -15,6 +15,8 @@ import {
   PLAY_STORE_BADGE_URI,
   PLAY_STORE_URL,
 } from '~/shared/config/appStoreLinks';
+import { Routes } from '~/shared/config/routes';
+import { TEMPORARY_ENABLE_IDENTITY_VERIFICATION } from '~/shared/config/featureFlags';
 import { useIdentityVerificationPrompt } from '~/features/identity-verification/hooks/useIdentityVerificationPrompt';
 
 function verifySubtitle(showSkip: boolean): string {
@@ -60,6 +62,10 @@ function AppStoreLinks() {
 const VerifyIdentityPage = () => {
   const verification = useIdentityVerificationPrompt();
   const insets = useSafeAreaInsets();
+
+  if (!TEMPORARY_ENABLE_IDENTITY_VERIFICATION) {
+    return <Redirect href={Routes.Main} />;
+  }
 
   if (verification.redirectTo) {
     return <Redirect href={verification.redirectTo} />;

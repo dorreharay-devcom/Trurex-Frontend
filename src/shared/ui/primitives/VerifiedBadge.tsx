@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import { TEMPORARY_ENABLE_IDENTITY_VERIFICATION } from '~/shared/config/featureFlags';
 import { Theme } from '~/shared/theme/Theme';
 
 const SEAL_PATH =
@@ -25,6 +26,8 @@ type Props = {
 };
 
 export const VerifiedBadge = ({ size = 16, muted = false, className }: Props) => {
+  if (!TEMPORARY_ENABLE_IDENTITY_VERIFICATION) return null;
+
   const colors = muted ? MUTED_COLORS : VERIFIED_COLORS;
 
   return (

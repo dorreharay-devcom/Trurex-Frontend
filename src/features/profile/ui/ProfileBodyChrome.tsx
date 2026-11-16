@@ -10,6 +10,7 @@ import ProfileReferralsSection from '~/features/profile/ui/ProfileReferralsSecti
 import ProfileTabs from '~/features/profile/ui/ProfileTabs';
 import ProfileVerifySection from '~/features/profile/ui/ProfileVerifySection';
 import ProfileWishListSection from '~/features/wish-list/ui/profile-section/ProfileWishListSection';
+import { TEMPORARY_ENABLE_IDENTITY_VERIFICATION } from '~/shared/config/featureFlags';
 
 type Flow = ReturnType<typeof useProfileScreen>;
 
@@ -39,7 +40,11 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
           onBlockPress={social.openBlockConfirm}
           onUnblockPress={social.onUnblock}
           blockLoading={social.blockPending}
-          onVerifyIdentity={business.businessFace ? undefined : flow.openVerifyIdentity}
+          onVerifyIdentity={
+            business.businessFace || !TEMPORARY_ENABLE_IDENTITY_VERIFICATION
+              ? undefined
+              : flow.openVerifyIdentity
+          }
           avatarEditable={flow.isOwnProfile && !business.businessFace}
           accessory={
             business.canSwitch ? (
@@ -49,7 +54,7 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
         />
       ) : null}
 
-      {flow.isOwnProfile && profile && !profile.verified ? (
+      {TEMPORARY_ENABLE_IDENTITY_VERIFICATION && flow.isOwnProfile && profile && !profile.verified ? (
         <ProfileVerifySection onPress={flow.openVerifyIdentity} />
       ) : null}
 
