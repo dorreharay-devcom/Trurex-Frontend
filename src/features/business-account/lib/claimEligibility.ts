@@ -1,4 +1,3 @@
-import { ACCOUNT_KIND, type AccountKind } from '~/features/business-account/config/accountKind';
 import {
   BUSINESS_CLAIM_STATUS,
   parseBusinessClaimStatus,
@@ -16,8 +15,12 @@ type PlaceClaimInput = {
   place: Pick<PlaceSummaryRow, 'business_owner_id' | 'is_verified_business' | 'my_claim_status'>;
 };
 
+type PlaceOwnerInput = {
+  userId: string | undefined;
+  place: Pick<PlaceSummaryRow, 'business_owner_id'>;
+};
+
 type ProfileClaimEntryInput = {
-  kind: AccountKind;
   claimStatus: BusinessClaimStatus | null;
   canStartClaim: boolean;
 };
@@ -36,13 +39,12 @@ export function canStartBusinessClaim({ claimStatus, isReadOnly }: ClaimEligibil
 }
 
 export function resolveProfileClaimEntry({
-  kind,
   claimStatus,
   canStartClaim,
 }: ProfileClaimEntryInput): ProfileClaimEntry {
   return {
     showPending: claimStatus === BUSINESS_CLAIM_STATUS.pending,
-    showClaim: kind === ACCOUNT_KIND.businessOnly && canStartClaim,
+    showClaim: canStartClaim,
   };
 }
 
@@ -50,4 +52,8 @@ export function canClaimPlace({ canStartClaim, place }: PlaceClaimInput): boolea
   if (!canStartClaim) return false;
   if (place.is_verified_business || place.business_owner_id) return false;
   return isOpenClaimStatus(parseBusinessClaimStatus(place.my_claim_status));
+}
+
+export function isPlaceOwner({ userId, place }: PlaceOwnerInput): boolean {
+  return userId != null && place.business_owner_id === userId;
 }

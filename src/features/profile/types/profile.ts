@@ -39,6 +39,7 @@ export type ProfileData = {
   relationshipStatus: RelationshipStatus;
   currently?: CurrentlyData;
   verified: boolean;
+  businessFace: boolean;
   accountKind: AccountKind;
   business: ProfileBusinessIdentity | null;
 };

@@ -17,6 +17,7 @@ const profile: ProfileData = {
   following: 0,
   relationshipStatus: null,
   verified: true,
+  businessFace: false,
   accountKind: ACCOUNT_KIND.converted,
   business: {
     name: 'Acme Coffee',
@@ -50,6 +51,7 @@ describe('withBusinessFace', () => {
       displayName: 'Acme Coffee',
       avatarUrl: 'user-1/business-1.jpg',
       verified: false,
+      businessFace: true,
     });
   });
 
@@ -59,6 +61,7 @@ describe('withBusinessFace', () => {
       ...profile,
       business,
       verified: true,
+      businessFace: true,
     });
   });
 });

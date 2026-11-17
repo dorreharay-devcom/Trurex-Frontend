@@ -22,16 +22,22 @@ const MUTED_COLORS = {
 type Props = {
   size?: number;
   muted?: boolean;
+  business?: boolean;
   className?: string;
 };
 
-export const VerifiedBadge = ({ size = 16, muted = false, className }: Props) => {
-  if (!TEMPORARY_ENABLE_IDENTITY_VERIFICATION) return null;
+export const VerifiedBadge = ({ size = 16, muted = false, business = false, className }: Props) => {
+  if (!business && !TEMPORARY_ENABLE_IDENTITY_VERIFICATION) return null;
 
   const colors = muted ? MUTED_COLORS : VERIFIED_COLORS;
 
   return (
-    <View className={className} accessibilityLabel={muted ? 'Not verified' : 'Verified account'}>
+    <View
+      className={className}
+      accessibilityLabel={
+        muted ? 'Not verified' : business ? 'Verified business' : 'Verified account'
+      }
+    >
       <Svg width={size} height={size} viewBox="0 0 24 24">
         <Path
           d={SEAL_PATH}

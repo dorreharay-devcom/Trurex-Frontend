@@ -34,14 +34,14 @@ export const SIGNUP_ACCOUNT_TYPE_CONFIG = {
   [SIGNUP_ACCOUNT_TYPE.personal]: {
     nameLabel: 'Full name',
     namePlaceholder: 'Jane Doe',
-    switchLabel: 'Go as a business.',
+    switchLabel: 'Go as a business',
     switchTo: SIGNUP_ACCOUNT_TYPE.business,
     validateName: getFullNameValidationError,
   },
   [SIGNUP_ACCOUNT_TYPE.business]: {
     nameLabel: 'Business Name',
     namePlaceholder: 'Acme Coffee Co.',
-    switchLabel: 'Go as a personal user.',
+    switchLabel: 'Go as a personal user',
     switchTo: SIGNUP_ACCOUNT_TYPE.personal,
     validateName: getBusinessNameValidationError,
   },

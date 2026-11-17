@@ -65,6 +65,7 @@ const ProfileHeader = ({
             avatarRefreshKey={avatarRefreshKey}
             onPress={onAvatarPress}
             verified={profile.verified}
+            business={profile.businessFace}
             onVerifyPress={onVerifyIdentity}
           />
           {accessory}

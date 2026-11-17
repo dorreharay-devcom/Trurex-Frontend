@@ -48,7 +48,7 @@ function MyBusinessProfileCard({ profile, onEdit }: Props) {
             </Text>
           ) : null}
           <View className="flex-row items-center gap-1.5">
-            <VerifiedBadge size={16} />
+            <VerifiedBadge size={16} business />
             <Text className="text-xs font-medium text-muted-foreground">Verified business</Text>
           </View>
         </View>

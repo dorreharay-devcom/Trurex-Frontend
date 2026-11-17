@@ -46,6 +46,7 @@ export function toProfileData(row: ProfileUserRow): ProfileData {
     following: row.following_count ?? 0,
     relationshipStatus: parseRelationshipStatus(row.relationship_status),
     verified: Boolean(row.verified),
+    businessFace: false,
     accountKind,
     business: toBusinessIdentity(row, accountKind),
     currently: {

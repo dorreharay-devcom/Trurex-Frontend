@@ -13,5 +13,6 @@ export function withBusinessFace(profile: ProfileData, businessFace: boolean): P
     displayName: profile.business.name ?? profile.displayName,
     avatarUrl: profile.business.photoPath ?? profile.avatarUrl,
     verified: profile.business.verified,
+    businessFace: true,
   };
 }

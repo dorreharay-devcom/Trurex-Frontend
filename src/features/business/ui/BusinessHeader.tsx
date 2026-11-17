@@ -38,7 +38,7 @@ function BusinessHeader({ summary, photoPaths }: Props) {
         <View className="min-w-0 flex-1">
           <View className="flex-row items-center gap-2">
             <Text className="shrink font-display text-2xl font-bold text-foreground">{name}</Text>
-            {summary.is_verified_business ? <VerifiedBadge size={20} /> : null}
+            {summary.is_verified_business ? <VerifiedBadge size={20} business /> : null}
           </View>
           {summary.normalized_address ? (
             <Text className="mt-1 text-sm text-muted-foreground">{summary.normalized_address}</Text>

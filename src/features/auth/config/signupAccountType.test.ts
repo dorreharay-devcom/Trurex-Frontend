@@ -36,14 +36,14 @@ describe('SIGNUP_ACCOUNT_TYPE_CONFIG', () => {
     const config = SIGNUP_ACCOUNT_TYPE_CONFIG[SIGNUP_ACCOUNT_TYPE.personal];
     expect(config.nameLabel).toBe('Full name');
     expect(config.namePlaceholder).toBe('Jane Doe');
-    expect(config.switchLabel).toBe('Go as a business.');
+    expect(config.switchLabel).toBe('Go as a business');
   });
 
   it('uses business copy for business sign-up', () => {
     const config = SIGNUP_ACCOUNT_TYPE_CONFIG[SIGNUP_ACCOUNT_TYPE.business];
     expect(config.nameLabel).toBe('Business Name');
     expect(config.namePlaceholder).toBe('Acme Coffee Co.');
-    expect(config.switchLabel).toBe('Go as a personal user.');
+    expect(config.switchLabel).toBe('Go as a personal user');
   });
 
   it('switches between the two account types', () => {
