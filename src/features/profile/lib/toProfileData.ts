@@ -1,8 +1,5 @@
-import {
-  ACCOUNT_KIND,
-  parseAccountKind,
-  type AccountKind,
-} from '~/features/business-account/config/accountKind';
+import { ACCOUNT_KIND, type AccountKind } from '~/features/business-account/config/accountKind';
+import { resolveAccountKind } from '~/features/business-account/lib/accountKind';
 import type {
   ProfileBusinessIdentity,
   ProfileData,
@@ -30,7 +27,10 @@ function toBusinessIdentity(
 
 export function toProfileData(row: ProfileUserRow): ProfileData {
   const handle = row.handle ?? '';
-  const accountKind = parseAccountKind(row.account_type) ?? ACCOUNT_KIND.regular;
+  const accountKind = resolveAccountKind({
+    accountType: row.account_type,
+    isBusinessAccount: row.is_business_account === true,
+  });
   return {
     userId: row.user_id || row.id || '',
     displayName: row.display_name || 'Anonymous',

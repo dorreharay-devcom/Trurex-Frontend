@@ -52,7 +52,6 @@ describe('resolvePostAuthRoute', () => {
     expect(storage.has(BUSINESS_SIGNUP_INTENT_STORAGE_KEY)).toBe(false);
   });
 
-
   it('enters the app when nothing else is pending', async () => {
     expect(await resolvePostAuthRoute()).toBeNull();
     expect(fetchUserConfig).not.toHaveBeenCalled();

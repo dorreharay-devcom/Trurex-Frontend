@@ -39,7 +39,7 @@ export const SIGNUP_ACCOUNT_TYPE_CONFIG = {
     validateName: getFullNameValidationError,
   },
   [SIGNUP_ACCOUNT_TYPE.business]: {
-    nameLabel: 'Business name',
+    nameLabel: 'Business Name',
     namePlaceholder: 'Acme Coffee Co.',
     switchLabel: 'Go as a personal user.',
     switchTo: SIGNUP_ACCOUNT_TYPE.personal,

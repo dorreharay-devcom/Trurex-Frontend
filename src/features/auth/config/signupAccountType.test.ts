@@ -41,7 +41,7 @@ describe('SIGNUP_ACCOUNT_TYPE_CONFIG', () => {
 
   it('uses business copy for business sign-up', () => {
     const config = SIGNUP_ACCOUNT_TYPE_CONFIG[SIGNUP_ACCOUNT_TYPE.business];
-    expect(config.nameLabel).toBe('Business name');
+    expect(config.nameLabel).toBe('Business Name');
     expect(config.namePlaceholder).toBe('Acme Coffee Co.');
     expect(config.switchLabel).toBe('Go as a personal user.');
   });

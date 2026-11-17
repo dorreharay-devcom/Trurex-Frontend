@@ -54,7 +54,10 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
         />
       ) : null}
 
-      {TEMPORARY_ENABLE_IDENTITY_VERIFICATION && flow.isOwnProfile && profile && !profile.verified ? (
+      {TEMPORARY_ENABLE_IDENTITY_VERIFICATION &&
+      flow.isOwnProfile &&
+      profile &&
+      !profile.verified ? (
         <ProfileVerifySection onPress={flow.openVerifyIdentity} />
       ) : null}
 

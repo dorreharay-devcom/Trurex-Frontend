@@ -63,6 +63,7 @@ export type ProfileUserRow = {
   relationship_status: RelationshipStatus | string | null;
   user_id?: string;
   verified?: boolean | null;
+  is_business_account?: boolean | null;
   account_type?: string | null;
   business_name?: string | null;
   business_photo_path?: string | null;
