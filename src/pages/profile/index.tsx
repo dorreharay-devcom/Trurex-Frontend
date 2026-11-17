@@ -21,6 +21,7 @@ function ProfilePage() {
       <ProfileView
         userId={page.userId}
         handle={page.handle}
+        asBusiness={page.asBusiness}
         onBack={page.goBack}
         onRexPress={page.openRecommendation}
         onEditProfile={onEditProfile}

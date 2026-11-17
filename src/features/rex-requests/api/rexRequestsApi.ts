@@ -1,9 +1,11 @@
 import { Backend, unwrap } from '~/shared/api/client';
 import { firstRecord } from '~/shared/lib/data/guards';
 import type {
+  CommentOnRexRequestParams,
   CreateRexRequestParams,
   EditRexRequestParams,
   GetRexRequestsFeedParams,
+  GetUserRexRequestsParams,
   RexRequestCommentRow,
   RexRequestResponseRow,
   RexRequestRow,
@@ -21,6 +23,7 @@ export async function createRexRequest(params: CreateRexRequestParams): Promise<
       p_location_lng: params.locationLng ?? null,
       p_note: params.note ?? null,
       p_is_public: params.isPublic ?? false,
+      p_posted_as_business: params.postedAsBusiness,
     }),
   );
 }
@@ -52,13 +55,14 @@ export async function myRexRequests(params: GetRexRequestsFeedParams): Promise<R
 
 export async function getUserRexRequests(
   userId: string,
-  params: GetRexRequestsFeedParams,
+  params: GetUserRexRequestsParams,
 ): Promise<RexRequestRow[]> {
   const raw = unwrap(
     await Backend.rpc('get_user_rex_requests', {
       p_user_id: userId,
       result_limit: params.resultLimit,
       result_offset: params.resultOffset,
+      p_posted_as_business: params.postedAsBusiness ?? null,
     }),
   );
   return Array.isArray(raw) ? (raw as RexRequestRow[]) : [];
@@ -101,11 +105,12 @@ export async function untagRexFromRequest(requestId: string, rexId: string): Pro
   unwrap(await Backend.rpc('untag_rex_from_request', { p_request_id: requestId, p_rex_id: rexId }));
 }
 
-export async function commentOnRexRequest(requestId: string, body: string): Promise<string> {
+export async function commentOnRexRequest(params: CommentOnRexRequestParams): Promise<string> {
   return unwrap(
     await Backend.rpc('comment_on_rex_request', {
-      p_request_id: requestId,
-      p_body: body,
+      p_request_id: params.requestId,
+      p_body: params.body,
+      p_posted_as_business: params.postedAsBusiness,
     }),
   );
 }

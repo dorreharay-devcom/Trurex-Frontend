@@ -4,8 +4,13 @@ import { useRouter } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { resolvePushNotificationHref } from '~/features/push-notifications/lib/pushNotificationTarget';
 import { NOTIFICATIONS_QUERY_KEY } from '~/shared/config/queryKeys';
+import { refreshQueriesForNotification } from '~/shared/lib/notification/refresh';
 import { isWeb } from '~/shared/lib/ui/platform';
 import { track, AnalyticsEvent } from '~/shared/lib/analytics/track';
+
+function notificationData(notification: Notifications.Notification) {
+  return notification.request.content.data as Record<string, unknown> | undefined;
+}
 
 export function usePushNotificationRouting() {
   const router = useRouter();
@@ -16,9 +21,8 @@ export function usePushNotificationRouting() {
 
     const openFromResponse = (response: Notifications.NotificationResponse | null) => {
       if (!response) return;
-      const data = response.notification.request.content.data as
-        | Record<string, unknown>
-        | undefined;
+      const data = notificationData(response.notification);
+      refreshQueriesForNotification(queryClient, data?.type);
       const href = resolvePushNotificationHref(data);
       if (!href) return;
       track(AnalyticsEvent.PushNotificationTapped, { type: String(data?.type ?? '') });
@@ -29,8 +33,9 @@ export function usePushNotificationRouting() {
 
     const tapSubscription = Notifications.addNotificationResponseReceivedListener(openFromResponse);
 
-    const receivedSubscription = Notifications.addNotificationReceivedListener(() => {
+    const receivedSubscription = Notifications.addNotificationReceivedListener((notification) => {
       void queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY });
+      refreshQueriesForNotification(queryClient, notificationData(notification)?.type);
     });
 
     return () => {

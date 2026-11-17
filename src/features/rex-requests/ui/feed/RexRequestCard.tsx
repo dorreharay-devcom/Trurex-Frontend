@@ -7,6 +7,7 @@ import { formatCompactRelativeTime } from '~/shared/lib/data/date';
 import { needByLabel } from '~/features/rex-requests/config/needBy';
 import { cn } from '~/shared/lib/ui/styles';
 import type { RexRequestRow } from '~/features/rex-requests/api/types';
+import BusinessAuthorTag from '~/shared/ui/primitives/BusinessAuthorTag';
 
 type Props = {
   request: RexRequestRow;
@@ -45,9 +46,12 @@ const RexRequestCard = memo(function RexRequestCard({ request, onPress }: Props)
               sizePt={32}
             />
             <View className="min-w-0 flex-1">
-              <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
-                {request.requester_display_name}
-              </Text>
+              <View className="min-w-0 flex-row items-center gap-1">
+                <Text className="shrink text-sm font-semibold text-foreground" numberOfLines={1}>
+                  {request.requester_display_name}
+                </Text>
+                {request.posted_as_business ? <BusinessAuthorTag /> : null}
+              </View>
               <Text className="text-xs text-muted-foreground" numberOfLines={1}>
                 @{request.requester_handle} · {formatCompactRelativeTime(request.created_at)}
                 {request.status === 'resolved' ? (

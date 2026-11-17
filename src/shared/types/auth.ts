@@ -6,6 +6,7 @@ export type SignUpParams = {
   displayName?: string;
   redirectTo?: string;
   referralCode?: string;
+  isBusinessAccount?: boolean;
 };
 
 export type SignInParams = {

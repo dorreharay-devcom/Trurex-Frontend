@@ -12,6 +12,7 @@ export default function ProfileStackLayout() {
     >
       <Stack.Screen name="index" />
       <Stack.Screen name="edit" />
+      <Stack.Screen name="edit-business" />
       <Stack.Screen name="blocked" />
       <Stack.Screen name="[collectionId]" />
     </Stack>

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Backend } from '~/shared/api/client';
 import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import {
   addRexComment,
   deleteRexComment,
@@ -31,6 +32,7 @@ function optimisticComment(params: {
   parentCommentId: string | null;
   authorId: string;
   displayName: string;
+  postedAsBusiness: boolean;
   mentions: MentionRef[];
 }): RexComment {
   const now = new Date().toISOString();
@@ -51,6 +53,7 @@ function optimisticComment(params: {
       username: null,
       relationship_status: null,
       verified: false,
+      posted_as_business: params.postedAsBusiness,
     },
     replies: [],
     mentions: params.mentions,
@@ -60,6 +63,7 @@ function optimisticComment(params: {
 export function useRexComments(rexId: string | undefined) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { postedAsBusiness } = useAccountMode();
   const [comments, setComments] = useState<RexComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -154,6 +158,7 @@ export function useRexComments(rexId: string | undefined) {
             user.user_metadata.display_name) ||
           user.email ||
           'You',
+        postedAsBusiness,
         mentions: taggedUsers,
       });
 
@@ -165,7 +170,7 @@ export function useRexComments(rexId: string | undefined) {
       suppressRealtimeUntil.current = Date.now() + REALTIME_SELF_ECHO_MS;
 
       try {
-        await addRexComment({ rexId, body, parentCommentId: parentId }, comments);
+        await addRexComment({ rexId, body, parentCommentId: parentId, postedAsBusiness }, comments);
         await afterLocalWrite();
       } catch (e: unknown) {
         setComments((prev) => {
@@ -176,7 +181,7 @@ export function useRexComments(rexId: string | undefined) {
         throw new Error(unknownErrorMessage(e, 'Could not post comment'));
       }
     },
-    [rexId, user, comments, afterLocalWrite, syncFeedCommentCount],
+    [rexId, user, postedAsBusiness, comments, afterLocalWrite, syncFeedCommentCount],
   );
 
   const deleteComment = useCallback(

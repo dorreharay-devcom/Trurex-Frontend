@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { shouldPromptIdentityVerification } from './shouldPromptIdentityVerification';
 
 const platform = { web: false };
+const flags = { identityVerification: true };
 const authUser = { id: 'user-1' };
 const profile = { verified: false };
 const storage = new Map<string, string>();
@@ -10,6 +11,12 @@ const getCurrentUser = vi.fn(async () => profile);
 vi.mock('~/shared/lib/ui/platform', () => ({
   get isWeb() {
     return platform.web;
+  },
+}));
+
+vi.mock('~/shared/config/featureFlags', () => ({
+  get TEMPORARY_ENABLE_IDENTITY_VERIFICATION() {
+    return flags.identityVerification;
   },
 }));
 
@@ -32,6 +39,7 @@ vi.mock('~/shared/lib/storage/kv', () => ({
 
 beforeEach(() => {
   platform.web = false;
+  flags.identityVerification = true;
   authUser.id = 'user-1';
   profile.verified = false;
   storage.clear();
@@ -39,6 +47,13 @@ beforeEach(() => {
 });
 
 describe('shouldPromptIdentityVerification', () => {
+  it('never prompts while the feature flag is off', async () => {
+    flags.identityVerification = false;
+
+    expect(await shouldPromptIdentityVerification()).toBe(false);
+    expect(getCurrentUser).not.toHaveBeenCalled();
+  });
+
   it('never prompts on web, where identity verification is not available', async () => {
     platform.web = true;
 

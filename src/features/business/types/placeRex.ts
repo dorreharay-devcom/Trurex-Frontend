@@ -8,6 +8,7 @@ export type PlaceRexRow = {
   author_avatar_url: string | null;
   author_tier_icon: string | null;
   author_verified: boolean;
+  posted_as_business: boolean;
   is_from_network: boolean;
   review: string | null;
   score_value_for_money: number | null;

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { useActiveCategories } from '~/shared/hooks/useActiveCategories';
 import { useCirclesRingSelection } from '~/features/circles/hooks/useCirclesRingSelection';
 import {
@@ -32,6 +33,7 @@ function locationTextFromPlace(place: CreateRecSearchPlace): string {
 export function useCreateRexRequestWizard(editRequestId?: string | null) {
   const isEditMode = editRequestId != null;
   const { user } = useAuth();
+  const { postedAsBusiness } = useAccountMode();
   const [stepIndex, setStepIndex] = useState(0);
   const stepId = REX_REQUEST_STEP_ORDER[stepIndex];
 
@@ -177,6 +179,7 @@ export function useCreateRexRequestWizard(editRequestId?: string | null) {
           locationLng,
           note: note.trim() || null,
           isPublic,
+          postedAsBusiness,
         });
         track(AnalyticsEvent.RexRequestCreated);
       }

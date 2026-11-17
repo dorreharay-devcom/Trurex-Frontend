@@ -8,15 +8,17 @@ import type {
   UserCollectionRex,
 } from '~/features/collections/types/collection';
 import { throwRpcIfFailed } from '~/shared/lib/errors/restriction';
+import type { PostedAs } from '~/shared/types/postedAs';
 
 export const CollectionsApi = {
-  createCollection: async (params: CreateCollectionInput): Promise<UserCollection> => {
+  createCollection: async (params: CreateCollectionInput & PostedAs): Promise<UserCollection> => {
     return unwrap(
       await Backend.rpc('create_collection', {
         input_display_name: params.display_name,
         input_description: params.description ?? null,
         input_cover_image_path: params.cover_image_path ?? null,
         input_visibility: params.visibility ?? 'private',
+        input_posted_as_business: params.postedAsBusiness,
       }),
     );
   },
@@ -54,13 +56,18 @@ export const CollectionsApi = {
 
   userCollections: async (
     userId: string,
-    params: { result_limit?: number; result_offset?: number } = {},
+    params: {
+      result_limit?: number;
+      result_offset?: number;
+      posted_as_business?: boolean | null;
+    } = {},
   ): Promise<UserCollection[]> => {
     return unwrap(
       await Backend.rpc('user_collections', {
         input_user_id: userId,
         result_limit: params.result_limit ?? 50,
         result_offset: params.result_offset ?? 0,
+        p_posted_as_business: params.posted_as_business ?? null,
       }),
     );
   },

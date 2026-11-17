@@ -5,8 +5,9 @@ import { signInWithOAuthProvider, type OAuthProvider } from '~/features/auth/lib
 import { TAB } from '~/shared/config/mainTabs';
 import { openMainTab } from '~/shared/lib/mainTab';
 import { navigateAfterAuthenticatedSession } from '~/features/auth/lib/mfa';
+import { writeStoredBusinessSignupIntent } from '~/features/auth/lib/businessSignupIntentStorage';
 import { useAuth } from '~/features/auth/providers/AuthProvider';
-import { Routes } from '~/shared/config/routes';
+import type { OAuthSignInOptions } from '~/features/auth/types/oauth';
 import { isWeb } from '~/shared/lib/ui/platform';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 import { AuthApi } from '~/shared/api/authApi';
@@ -16,17 +17,23 @@ const providerLabel: Record<OAuthProvider, string> = {
   apple: 'Apple',
 };
 
+const DEFAULT_OAUTH_SIGN_IN_OPTIONS: OAuthSignInOptions = { businessSignup: false };
+
 export function useOAuthSignIn() {
   const router = useRouter();
   const { setMfaPending, setMfaChecking } = useAuth();
   const [oauthPending, setOauthPending] = useState(false);
 
   const signInWithOAuth = useCallback(
-    async (provider: OAuthProvider) => {
+    async (
+      provider: OAuthProvider,
+      options: OAuthSignInOptions = DEFAULT_OAUTH_SIGN_IN_OPTIONS,
+    ) => {
       setOauthPending(true);
       let signedIn = false;
       try {
         setMfaChecking(true);
+        await writeStoredBusinessSignupIntent(options.businessSignup);
         await signInWithOAuthProvider(provider);
         if (!isWeb) {
           const session = await AuthApi.getSession();
@@ -35,16 +42,17 @@ export function useOAuthSignIn() {
             await navigateAfterAuthenticatedSession({
               setMfaPending,
               setMfaChecking,
-              onRequireMfa: () => router.replace(Routes.Mfa),
-              onRequireIdentityVerificationPrompt: () => router.replace(Routes.VerifyIdentity),
+              onRedirect: (href) => router.replace(href),
               onReady: () => openMainTab(router, TAB.discover),
             });
           } else {
+            await writeStoredBusinessSignupIntent(false);
             await setMfaPending(false);
             setMfaChecking(false);
           }
         }
       } catch (error: unknown) {
+        await writeStoredBusinessSignupIntent(false);
         await setMfaPending(false);
         setMfaChecking(false);
         if (signedIn) {

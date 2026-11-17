@@ -6,6 +6,7 @@ import { formatCompactRelativeTime } from '~/shared/lib/data/date';
 import { needByLabel } from '~/features/rex-requests/config/needBy';
 import { Theme } from '~/shared/theme/Theme';
 import type { RexRequestRow } from '~/features/rex-requests/api/types';
+import BusinessAuthorTag from '~/shared/ui/primitives/BusinessAuthorTag';
 
 type Props = {
   request: RexRequestRow;
@@ -42,9 +43,12 @@ function RexRequestSummaryCard({
           />
         </TouchableOpacity>
         <View className="min-w-0 flex-1">
-          <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
-            {request.requester_display_name ?? 'Member'}
-          </Text>
+          <View className="min-w-0 flex-row items-center gap-1">
+            <Text className="shrink text-sm font-semibold text-foreground" numberOfLines={1}>
+              {request.requester_display_name ?? 'Member'}
+            </Text>
+            {request.posted_as_business ? <BusinessAuthorTag /> : null}
+          </View>
           <Text className="mt-0.5 text-xs text-muted-foreground" numberOfLines={1}>
             {request.requester_handle ? `@${request.requester_handle} · ` : ''}
             {formatCompactRelativeTime(request.created_at)}

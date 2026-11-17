@@ -22,13 +22,14 @@ import RexRequestDetailTabs, {
 } from '~/features/rex-requests/ui/detail/RexRequestDetailTabs';
 import MyRexPickerSheet from '~/features/rex-requests/ui/detail/MyRexPickerSheet';
 import RexRequestDetailOverlays from '~/features/rex-requests/ui/detail/RexRequestDetailOverlays';
+import type { UserProfileOpenOptions } from '~/shared/types/userProfileOpen';
 
 type Props = {
   visible: boolean;
   embedded?: boolean;
   request: RexRequestRow;
   onClose: () => void;
-  onUserPress?: (userId: string) => void;
+  onUserPress?: (userId: string, options?: UserProfileOpenOptions) => void;
   onEditRequest?: (requestId: string) => void;
   onOpenRex?: (rexId: string) => void;
 };
@@ -66,6 +67,9 @@ function RexRequestDetailModal({
 
   const isOwner = authUser != null && authUser.id === request.requester_id;
   const showReport = authUser != null && authUser.id !== request.requester_id;
+  const openRequester = onUserPress
+    ? () => onUserPress(request.requester_id, { asBusiness: request.posted_as_business === true })
+    : undefined;
 
   return (
     <OverlayModal
@@ -95,7 +99,7 @@ function RexRequestDetailModal({
             onSharePress={() =>
               void shareRexRequest({ id: request.id, lookingForText: request.looking_for_text })
             }
-            onRequesterPress={onUserPress ? () => onUserPress(request.requester_id) : undefined}
+            onRequesterPress={openRequester}
             showResolve={isOwner && request.status === 'open'}
             resolving={resolve.pending}
             onResolvePress={() => resolve.resolve()}

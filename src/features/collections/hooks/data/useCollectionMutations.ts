@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { CollectionsApi } from '~/features/collections/api/collectionsApi';
 import { COLLECTIONS_QUERY_KEYS } from '~/features/collections/config/queryKeys';
+import type { CreateCollectionInput } from '~/features/collections/types/collection';
 import { mutationErrorToast } from '~/shared/lib/errors/restriction';
 import { withOnlineMutation } from '~/shared/lib/network/assertOnline';
 import { toastSuccess } from '~/shared/lib/appToast';
@@ -8,7 +10,10 @@ import { REX_QUERY_KEYS } from '~/shared/config/queryKeys';
 
 export const useCreateCollection = () => {
   const queryClient = useQueryClient();
-  const mutationFn = withOnlineMutation('Creating collections', CollectionsApi.createCollection);
+  const { postedAsBusiness } = useAccountMode();
+  const mutationFn = withOnlineMutation('Creating collections', (input: CreateCollectionInput) =>
+    CollectionsApi.createCollection({ ...input, postedAsBusiness }),
+  );
 
   return useMutation({
     mutationFn,

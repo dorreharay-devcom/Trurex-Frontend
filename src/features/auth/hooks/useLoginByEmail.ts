@@ -10,6 +10,7 @@ import {
 } from '~/features/auth/lib/credentials';
 import { mapAuthError } from '~/features/auth/lib/errors';
 import { navigateAfterAuthenticatedSession } from '~/features/auth/lib/mfa';
+import { writeStoredBusinessSignupIntent } from '~/features/auth/lib/businessSignupIntentStorage';
 import { TAB } from '~/shared/config/mainTabs';
 import { openMainTab } from '~/shared/lib/mainTab';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
@@ -74,14 +75,14 @@ export function useLoginByEmail() {
 
     try {
       setMfaChecking(true);
+      await writeStoredBusinessSignupIntent(false);
       await AuthApi.signIn({ email, password });
       signedIn = true;
 
       await navigateAfterAuthenticatedSession({
         setMfaPending,
         setMfaChecking,
-        onRequireMfa: () => router.replace(Routes.Mfa),
-        onRequireIdentityVerificationPrompt: () => router.replace(Routes.VerifyIdentity),
+        onRedirect: (href) => router.replace(href),
         onReady: () => openMainTab(router, TAB.discover),
       });
     } catch (error: unknown) {

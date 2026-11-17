@@ -20,6 +20,7 @@ type Props = {
   onOpenRexRequest?: (requestId: string) => void;
   onOpenReferrals?: () => void;
   onOpenWishList?: (userId: string) => void;
+  asBusiness?: boolean;
 };
 
 const ProfileView = ({
@@ -34,6 +35,7 @@ const ProfileView = ({
   onOpenRexRequest,
   onOpenReferrals,
   onOpenWishList,
+  asBusiness,
 }: Props) => {
   const { width: windowWidth } = useWindowDimensions();
   const flow = useProfileScreen({
@@ -47,6 +49,7 @@ const ProfileView = ({
     onOpenRexRequest,
     onOpenReferrals,
     onOpenWishList,
+    asBusiness,
   });
   const { social } = flow;
 

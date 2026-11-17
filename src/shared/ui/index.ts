@@ -2,6 +2,7 @@ export { Button, ButtonVariant } from './primitives/Button';
 export { Input } from './primitives/Input';
 export { Skeleton } from './primitives/Skeleton';
 export { VerifiedBadge } from './primitives/VerifiedBadge';
+export { default as BusinessAuthorTag } from './primitives/BusinessAuthorTag';
 export { ClearableSearchInput } from './primitives/ClearableSearchInput';
 export { LoadMoreButton } from './primitives/LoadMoreButton';
 export { ShowAllToggle } from './primitives/ShowAllToggle';

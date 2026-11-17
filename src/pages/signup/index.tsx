@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import AuthLayout from '~/features/auth/ui/common/AuthLayout';
 import AuthGeneralError from '~/features/auth/ui/common/AuthGeneralError';
+import AuthLinkButton from '~/features/auth/ui/common/AuthLinkButton';
 import { Button } from '~/shared/ui/primitives/Button';
 import { Input } from '~/shared/ui/primitives/Input';
 import {
@@ -13,6 +14,7 @@ import {
   OAuthSocialButtons,
   useSignupByEmail,
 } from '~/features/auth';
+import { TEMPORARY_ENABLE_BUSINESS_PROFILE_CLAIM } from '~/shared/config/featureFlags';
 
 const SignupPage = () => {
   const signup = useSignupByEmail();
@@ -21,22 +23,33 @@ const SignupPage = () => {
     <AuthLayout>
       <AuthBrandHeader subtitle="Create your TruRex account" />
 
-      <OAuthSocialButtons
-        disabled={signup.busy}
-        onGooglePress={() => signup.handleOAuthSignup('google')}
-        onApplePress={() => signup.handleOAuthSignup('apple')}
-      />
+      <View className="gap-4">
+        {TEMPORARY_ENABLE_BUSINESS_PROFILE_CLAIM && (
+          <AuthLinkButton
+            title={signup.accountConfig.switchLabel}
+            onPress={signup.switchAccountType}
+            tone="accent"
+            centered
+            disabled={signup.busy}
+          />
+        )}
+        <OAuthSocialButtons
+          disabled={signup.busy}
+          onGooglePress={() => signup.handleOAuthSignup('google')}
+          onApplePress={() => signup.handleOAuthSignup('apple')}
+        />
+      </View>
 
       <AuthOrDivider />
 
       <View className="gap-6">
         <Input
-          label="Full name"
-          value={signup.fullName}
-          onChangeText={signup.onFullNameChange}
-          placeholder="Jane Doe"
+          label={signup.accountConfig.nameLabel}
+          value={signup.displayName}
+          onChangeText={signup.onDisplayNameChange}
+          placeholder={signup.accountConfig.namePlaceholder}
           autoCapitalize="words"
-          error={signup.errors.fullName}
+          error={signup.errors.displayName}
         />
 
         <Input

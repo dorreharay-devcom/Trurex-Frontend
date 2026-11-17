@@ -17,6 +17,7 @@ type Props = {
   avatarRefreshKey?: number;
   onPress?: () => void;
   verified?: boolean;
+  business?: boolean;
   onVerifyPress?: () => void;
 };
 
@@ -28,6 +29,7 @@ const ProfileHeaderAvatar = ({
   avatarRefreshKey,
   onPress,
   verified,
+  business = false,
   onVerifyPress,
 }: Props) => {
   const initial = displayName.charAt(0).toUpperCase() || '?';
@@ -64,8 +66,12 @@ const ProfileHeaderAvatar = ({
           )}
         </View>
         {verified ? (
-          <VerifiedBadge size={CORNER_BADGE_SIZE} className="absolute -top-1 -right-1" />
-        ) : editable && onVerifyPress ? (
+          <VerifiedBadge
+            size={CORNER_BADGE_SIZE}
+            business={business}
+            className="absolute -top-1 -right-1"
+          />
+        ) : editable && !business && onVerifyPress ? (
           <Pressable
             onPress={onVerifyPress}
             accessibilityRole="button"

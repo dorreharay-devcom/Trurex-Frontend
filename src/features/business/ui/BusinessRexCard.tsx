@@ -6,6 +6,7 @@ import CardTags from '~/features/discover/ui/feed/common/CardTags';
 import BusinessRexCardMedia from '~/features/business/ui/BusinessRexCardMedia';
 import { averagePlaceRexScore } from '~/features/business/lib/placeRexRating';
 import { Theme } from '~/shared/theme/Theme';
+import BusinessAuthorTag from '~/shared/ui/primitives/BusinessAuthorTag';
 import type { PlaceRexRow } from '~/features/business/types/placeRex';
 
 export const BUSINESS_REX_CARD_WIDTH = 260;
@@ -37,9 +38,12 @@ function BusinessRexCard({ row, categoryIcon, onPress }: Props) {
             className="h-7 w-7"
             sizePt={28}
           />
-          <Text className="min-w-0 flex-1 text-sm font-semibold text-foreground" numberOfLines={1}>
-            {row.author_display_name}
-          </Text>
+          <View className="min-w-0 flex-1 flex-row items-center gap-1">
+            <Text className="shrink text-sm font-semibold text-foreground" numberOfLines={1}>
+              {row.author_display_name}
+            </Text>
+            {row.posted_as_business ? <BusinessAuthorTag /> : null}
+          </View>
           {score != null ? (
             <View className="flex-row shrink-0 items-center gap-1">
               <Star size={13} color={Theme.colors.ratingStar} fill={Theme.colors.ratingStar} />

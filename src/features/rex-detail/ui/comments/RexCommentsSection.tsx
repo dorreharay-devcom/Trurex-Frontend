@@ -12,6 +12,7 @@ import CommentThread from './common/CommentThread';
 import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 import { totalRexCommentCount } from '~/features/rex-detail/lib/rexCommentTree';
 import type { RexComment } from '~/features/rex-detail/types/rexComment';
+import type { UserProfileOpenOptions } from '~/shared/types/userProfileOpen';
 import {
   useMentionAutocomplete,
   type MentionAutocompleteState,
@@ -24,7 +25,7 @@ export type RexCommentsSectionProps = {
   autoFocusComposer?: boolean;
   focusCommentId?: string;
   onFocusCommentReady?: (target: View) => void;
-  onUserPress?: (userId: string) => void;
+  onUserPress?: (userId: string, options?: UserProfileOpenOptions) => void;
   onReportComment?: (commentId: string) => void;
   onComposerFocus?: () => void;
 };

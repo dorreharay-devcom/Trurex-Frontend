@@ -15,6 +15,7 @@ export type UserCollection = {
   total_count?: number;
   is_my_collection: boolean;
   is_saved?: boolean;
+  posted_as_business?: boolean;
 };
 
 export type UserCollectionRex = {
@@ -40,6 +41,7 @@ export type CollectionRexEntry = {
   rating?: number | null;
   recommender_name?: string | null;
   recommender_handle?: string | null;
+  posted_as_business?: boolean | null;
   note?: string | null;
 };
 

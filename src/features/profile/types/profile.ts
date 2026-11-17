@@ -1,3 +1,4 @@
+import type { AccountKind } from '~/features/business-account/config/accountKind';
 import type { RelationshipStatus as KnownRelationshipStatus } from '~/shared/config/relationshipStatus';
 
 export type RelationshipStatus = KnownRelationshipStatus | null;
@@ -13,6 +14,13 @@ export type PendingAvatar = {
   fileName?: string | null;
   mimeType?: string | null;
   dispose?: () => void;
+};
+
+export type ProfileBusinessIdentity = {
+  name: string | null;
+  photoPath: string | null;
+  verified: boolean;
+  placeId: string | null;
 };
 
 export type ProfileData = {
@@ -31,6 +39,9 @@ export type ProfileData = {
   relationshipStatus: RelationshipStatus;
   currently?: CurrentlyData;
   verified: boolean;
+  businessFace: boolean;
+  accountKind: AccountKind;
+  business: ProfileBusinessIdentity | null;
 };
 
 export type ProfileUserRow = {
@@ -53,6 +64,12 @@ export type ProfileUserRow = {
   relationship_status: RelationshipStatus | string | null;
   user_id?: string;
   verified?: boolean | null;
+  is_business_account?: boolean | null;
+  account_type?: string | null;
+  business_name?: string | null;
+  business_photo_path?: string | null;
+  is_verified_business?: boolean | null;
+  business_place_id?: string | null;
 };
 
 export type UpdateProfileInput = {

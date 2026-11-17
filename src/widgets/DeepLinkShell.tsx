@@ -24,6 +24,7 @@ const DeepLinkShell = ({ currentTab, onTabChange, onRexPress, children }: Props)
         onUserPress={(userId) => router.replace(toUserRoute(userId))}
         onRexPress={onRexPress}
         onReferralsPress={() => router.push(Routes.Referrals)}
+        onMyBusinessPagePress={() => router.push(Routes.MyBusinessPage)}
       />
       <TabBar currentTab={currentTab} onTabChange={onTabChange} />
       {children}

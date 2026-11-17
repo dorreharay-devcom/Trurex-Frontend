@@ -35,6 +35,7 @@ export {
   getEmailValidationError,
   getPasswordValidationError,
   getFullNameValidationError,
+  getBusinessNameValidationError,
   getConfirmPasswordValidationError,
   isFieldErrorsEmpty,
 } from './lib/credentials';

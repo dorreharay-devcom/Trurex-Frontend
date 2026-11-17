@@ -50,7 +50,8 @@ function mapAuthor(row: Record<string, unknown>): RecommendationAuthor | null {
 
   if (!name && !handle && !avatar) return null;
   const verified = optionalBoolean(row, 'author_verified', 'is_author_verified') ?? false;
-  return { name, handle, avatar, verified };
+  const postedAsBusiness = firstBoolean(row, 'posted_as_business');
+  return { name, handle, avatar, verified, postedAsBusiness };
 }
 
 function mapCategory(row: Record<string, unknown>): { categoryId: string; category: string } {

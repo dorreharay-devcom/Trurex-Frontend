@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { createRex, updateRex } from '~/features/rex-create/api/rexCreateApi';
 import type { CreateConfigState } from '~/features/rex-create/hooks/useCategoryCreateConfig';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
@@ -51,6 +52,7 @@ export function usePrimaryAction({
 }: UsePrimaryActionArgs) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { postedAsBusiness } = useAccountMode();
   const [submitting, setSubmitting] = useState(false);
 
   const advanceStep = useCallback(async () => {
@@ -91,7 +93,7 @@ export function usePrimaryAction({
       if (isEditMode && editRexId) {
         await updateRex({ ...params, p_rex_id: editRexId });
       } else {
-        const created = await createRex(params);
+        const created = await createRex(params, { postedAsBusiness });
         const rexId = parseCreatedRexId(created);
         if (rexId) {
           const authorName =
@@ -105,6 +107,7 @@ export function usePrimaryAction({
             config,
             authorId: user?.id,
             authorName,
+            postedAsBusiness,
           });
           prependRecommendationToFeedCaches(queryClient, stub);
           const pin = mapPinRowFromOptimisticRec(stub);
@@ -133,7 +136,7 @@ export function usePrimaryAction({
     } finally {
       setSubmitting(false);
     }
-  }, [flow, config, isEditMode, editRexId, onClose, onPosted, queryClient, user]);
+  }, [flow, config, isEditMode, editRexId, onClose, onPosted, queryClient, user, postedAsBusiness]);
 
   const handlePrimaryFooter = useCallback(
     () => (flow.nav.isLastStep ? submitRex() : advanceStep()),

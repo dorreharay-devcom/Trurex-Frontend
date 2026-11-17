@@ -7,18 +7,25 @@ import { nextPageOffset } from '~/shared/lib/data/guards';
 
 const PROFILE_REX_REQUESTS_PAGE_SIZE = 20;
 
-export function useMyRexRequests(userId: string | undefined, isOwnProfile: boolean) {
+export function useMyRexRequests(
+  userId: string | undefined,
+  isOwnProfile: boolean,
+  postedAsBusiness: boolean | null = null,
+) {
   const query = useInfiniteQuery({
     queryKey: [
       ...REX_REQUEST_QUERY_KEYS.profile(userId, isOwnProfile),
       PROFILE_REX_REQUESTS_PAGE_SIZE,
+      postedAsBusiness,
     ],
     queryFn: ({ pageParam }) => {
       const params = {
         resultLimit: PROFILE_REX_REQUESTS_PAGE_SIZE,
         resultOffset: Number(pageParam ?? 0),
       };
-      return isOwnProfile ? myRexRequests(params) : getUserRexRequests(userId!, params);
+      return isOwnProfile && postedAsBusiness === null
+        ? myRexRequests(params)
+        : getUserRexRequests(userId!, { ...params, postedAsBusiness });
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage: RexRequestRow[], allPages: RexRequestRow[][]) =>

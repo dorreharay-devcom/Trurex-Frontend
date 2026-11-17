@@ -16,8 +16,8 @@ async function ensureLibraryPermission(permissionMessage: string): Promise<boole
   return false;
 }
 
-export async function pickAvatarAsset(
-  permissionMessage = 'Allow photo access to change your avatar.',
+export async function pickSingleLibraryImage(
+  permissionMessage: string,
 ): Promise<PickedLibraryImage | null> {
   if (!(await ensureLibraryPermission(permissionMessage))) return null;
 

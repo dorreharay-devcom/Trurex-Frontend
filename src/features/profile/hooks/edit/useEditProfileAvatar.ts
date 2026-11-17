@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { PendingAvatar } from '~/features/profile/types/profile';
 import { ProfileApi } from '~/features/profile/api/profileApi';
-import { pickAvatarAsset } from '~/features/profile/lib/pickAvatarAsset';
+import { pickSingleLibraryImage } from '~/shared/lib/media/photos/pickSingleLibraryImage';
 import { toastError } from '~/shared/lib/appToast';
 import { photoUploadErrorMessage } from '~/shared/lib/media/photos/storageUpload';
 
@@ -22,7 +22,7 @@ export function useEditProfileAvatar({ userId, setCurrentAvatarUrl }: Params) {
 
     setUploading(true);
     try {
-      const asset = await pickAvatarAsset('Please allow access to your photo library.');
+      const asset = await pickSingleLibraryImage('Please allow access to your photo library.');
       if (!asset) return;
 
       setPendingAvatar((prev) => {

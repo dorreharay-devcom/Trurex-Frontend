@@ -9,6 +9,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import MyBusinessPage from '~/features/business-account/ui/page/MyBusinessPage';
 import CollectionCard from '~/features/collections/ui/CollectionCard';
 import { PROFILE_TAB, type ProfileTab } from '~/features/profile/config/tabs';
 import { profileGridLayout } from '~/features/profile/ui/ProfileGridCell';
@@ -86,7 +87,7 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
     Math.max(windowWidth - GRID_PAD * 4, 1),
   );
   const { numColumns, cellWidth, gap } = profileGridLayout(gridContentWidth);
-  const { content } = flow;
+  const { content, business } = flow;
   const isRecs = content.activeTab === PROFILE_TAB.recs;
   const isCollections = content.activeTab === PROFILE_TAB.collections;
   const isRexRequests = content.activeTab === PROFILE_TAB.rexRequests;
@@ -106,7 +107,7 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
     : isCollections
       ? content.collectionsError
       : content.rexRequestsError;
-  const hasItems = items.length > 0;
+  const hasItems = business.showContentTabs && items.length > 0;
 
   const loadMore = isRecs
     ? content.loadMoreRexes
@@ -153,7 +154,11 @@ const ProfileMainBody = ({ flow, avatarRefreshKey, onBack }: Props) => {
       <View className="overflow-hidden rounded-xl border border-border bg-card shadow-card">
         <ProfileBodyChrome flow={flow} avatarRefreshKey={avatarRefreshKey} />
 
-        {hasItems ? (
+        {business.showMyBusinessPage ? (
+          <View className="px-4 pb-4">
+            <MyBusinessPage />
+          </View>
+        ) : hasItems ? (
           <>
             <View className="px-4 pb-4">
               {isRexRequests ? (
