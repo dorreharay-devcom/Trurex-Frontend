@@ -8,9 +8,9 @@ import BusinessClaimSheet from '~/features/business-account/ui/claim/BusinessCla
 import BusinessCtaRow from '~/features/business-account/ui/common/BusinessCtaRow';
 
 function BusinessClaimProfileEntry() {
-  const { claimStatus, canStartClaim } = useBusinessAccount();
+  const { kind, claimStatus, canStartClaim } = useBusinessAccount();
   const flow = useBusinessClaimFlow();
-  const entry = resolveProfileClaimEntry({ claimStatus, canStartClaim });
+  const entry = resolveProfileClaimEntry({ kind, claimStatus, canStartClaim });
 
   return (
     <>

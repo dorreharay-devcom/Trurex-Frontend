@@ -1,3 +1,4 @@
+import { ACCOUNT_KIND, type AccountKind } from '~/features/business-account/config/accountKind';
 import {
   BUSINESS_CLAIM_STATUS,
   parseBusinessClaimStatus,
@@ -21,6 +22,7 @@ type PlaceOwnerInput = {
 };
 
 type ProfileClaimEntryInput = {
+  kind: AccountKind;
   claimStatus: BusinessClaimStatus | null;
   canStartClaim: boolean;
 };
@@ -39,12 +41,13 @@ export function canStartBusinessClaim({ claimStatus, isReadOnly }: ClaimEligibil
 }
 
 export function resolveProfileClaimEntry({
+  kind,
   claimStatus,
   canStartClaim,
 }: ProfileClaimEntryInput): ProfileClaimEntry {
   return {
     showPending: claimStatus === BUSINESS_CLAIM_STATUS.pending,
-    showClaim: canStartClaim,
+    showClaim: kind === ACCOUNT_KIND.businessOnly && canStartClaim,
   };
 }
 

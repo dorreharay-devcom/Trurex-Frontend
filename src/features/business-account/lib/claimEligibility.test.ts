@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { ACCOUNT_KIND } from '~/features/business-account/config/accountKind';
 import { BUSINESS_CLAIM_STATUS } from '~/features/business-account/config/claimStatus';
 import {
   canClaimPlace,
@@ -29,13 +30,24 @@ describe('canStartBusinessClaim', () => {
 });
 
 describe('resolveProfileClaimEntry', () => {
-  it('offers the profile claim to any user who can start one', () => {
-    expect(resolveProfileClaimEntry({ claimStatus: null, canStartClaim: true })).toEqual({
-      showPending: false,
-      showClaim: true,
-    });
+  it('offers the profile claim only to business accounts that can claim', () => {
     expect(
       resolveProfileClaimEntry({
+        kind: ACCOUNT_KIND.businessOnly,
+        claimStatus: null,
+        canStartClaim: true,
+      }),
+    ).toEqual({ showPending: false, showClaim: true });
+    expect(
+      resolveProfileClaimEntry({
+        kind: ACCOUNT_KIND.regular,
+        claimStatus: null,
+        canStartClaim: true,
+      }),
+    ).toEqual({ showPending: false, showClaim: false });
+    expect(
+      resolveProfileClaimEntry({
+        kind: ACCOUNT_KIND.converted,
         claimStatus: BUSINESS_CLAIM_STATUS.approved,
         canStartClaim: false,
       }),
@@ -43,12 +55,15 @@ describe('resolveProfileClaimEntry', () => {
   });
 
   it('shows the pending notice instead of the claim while a claim is under review', () => {
-    expect(
-      resolveProfileClaimEntry({
-        claimStatus: BUSINESS_CLAIM_STATUS.pending,
-        canStartClaim: false,
-      }),
-    ).toEqual({ showPending: true, showClaim: false });
+    for (const kind of [ACCOUNT_KIND.regular, ACCOUNT_KIND.businessOnly]) {
+      expect(
+        resolveProfileClaimEntry({
+          kind,
+          claimStatus: BUSINESS_CLAIM_STATUS.pending,
+          canStartClaim: false,
+        }),
+      ).toEqual({ showPending: true, showClaim: false });
+    }
   });
 });
 
