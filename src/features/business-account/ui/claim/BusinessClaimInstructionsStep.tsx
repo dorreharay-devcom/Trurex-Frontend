@@ -24,11 +24,16 @@ function BusinessClaimInstructionsStep({ submitting, onProceed, onBack }: Props)
     >
       <View className="mb-4 gap-3">
         {CLAIM_VERIFICATION_STEPS.map((step, index) => (
-          <View key={step} className="flex-row gap-3">
+          <View key={step.title} className="flex-row gap-3">
             <View className="h-6 w-6 items-center justify-center rounded-full bg-accent">
               <Text className="text-xs font-semibold text-foreground">{index + 1}</Text>
             </View>
-            <Text className="min-w-0 flex-1 text-sm leading-relaxed text-foreground">{step}</Text>
+            <View className="min-w-0 flex-1 gap-0.5">
+              <Text className="text-sm font-semibold text-foreground">{step.title}</Text>
+              <Text className="text-sm leading-relaxed text-muted-foreground">
+                {step.description}
+              </Text>
+            </View>
           </View>
         ))}
       </View>

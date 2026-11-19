@@ -25,7 +25,19 @@ export const BUSINESS_CLAIM_ERROR_CODE = {
 } as const;
 
 export const CLAIM_VERIFICATION_STEPS = [
-  'We’ll email you instructions on where and how to submit your verification documents.',
-  'Send us documents that prove you own or manage this business.',
-  'Our team reviews them and lets you know once your business is verified.',
+  {
+    title: 'Check your email',
+    description:
+      'We’ll send you instructions on how and where to submit your verification documents.',
+  },
+  {
+    title: 'Submit your documents',
+    description:
+      'Send us documents confirming that you own or are authorized to manage this business.',
+  },
+  {
+    title: 'Wait for verification',
+    description:
+      'Our team will review your documents and notify you once the verification process is complete.',
+  },
 ] as const;
