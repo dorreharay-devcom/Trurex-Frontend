@@ -18,7 +18,7 @@ describe('requiresBusinessSignup', () => {
 
 describe('business sign-up error codes', () => {
   it('maps the backend codes', () => {
-    expect(BUSINESS_SIGNUP_ERROR_CODE).toEqual({ ineligible: 'BIZ01', invalidName: 'BIZ02' });
+    expect(BUSINESS_SIGNUP_ERROR_CODE).toEqual({ ineligible: 'BIZ01', invalidName: '22023' });
   });
 
   it('detects the ineligible error on plain objects and Error instances', () => {
@@ -26,14 +26,14 @@ describe('business sign-up error codes', () => {
     expect(
       isBusinessSignupIneligibleError(Object.assign(new Error('taken'), { code: 'BIZ01' })),
     ).toBe(true);
-    expect(isBusinessSignupIneligibleError({ code: 'BIZ02' })).toBe(false);
+    expect(isBusinessSignupIneligibleError({ code: '22023' })).toBe(false);
     expect(isBusinessSignupIneligibleError(new Error('BIZ01'))).toBe(false);
     expect(isBusinessSignupIneligibleError('BIZ01')).toBe(false);
     expect(isBusinessSignupIneligibleError(null)).toBe(false);
   });
 
   it('detects the invalid name error', () => {
-    expect(isBusinessSignupInvalidNameError({ code: 'BIZ02' })).toBe(true);
+    expect(isBusinessSignupInvalidNameError({ code: '22023' })).toBe(true);
     expect(isBusinessSignupInvalidNameError({ code: 'BIZ01' })).toBe(false);
     expect(isBusinessSignupInvalidNameError(undefined)).toBe(false);
   });

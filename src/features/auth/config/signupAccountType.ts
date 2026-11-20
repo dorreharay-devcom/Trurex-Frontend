@@ -25,8 +25,7 @@ export function parseSignupAccountType(value: string | undefined): SignupAccount
 type SignupAccountTypeConfig = {
   nameLabel: string;
   namePlaceholder: string;
-  switchLabel: string;
-  switchTo: SignupAccountType;
+  tabLabel: string;
   validateName: (name: string) => string | undefined;
 };
 
@@ -34,18 +33,18 @@ export const SIGNUP_ACCOUNT_TYPE_CONFIG = {
   [SIGNUP_ACCOUNT_TYPE.personal]: {
     nameLabel: 'Full name',
     namePlaceholder: 'Jane Doe',
-    switchLabel: 'Go as a business',
-    switchTo: SIGNUP_ACCOUNT_TYPE.business,
+    tabLabel: 'Personal',
     validateName: getFullNameValidationError,
   },
   [SIGNUP_ACCOUNT_TYPE.business]: {
     nameLabel: 'Business Name',
     namePlaceholder: 'Acme Coffee Co.',
-    switchLabel: 'Go as a personal user',
-    switchTo: SIGNUP_ACCOUNT_TYPE.personal,
+    tabLabel: 'Business',
     validateName: getBusinessNameValidationError,
   },
 } as const satisfies Record<SignupAccountType, SignupAccountTypeConfig>;
+
+export const SIGNUP_ACCOUNT_TYPES = Object.values(SIGNUP_ACCOUNT_TYPE);
 
 export function signupHref(type: SignupAccountType): Href {
   return { pathname: Routes.Signup, params: { account: type } };

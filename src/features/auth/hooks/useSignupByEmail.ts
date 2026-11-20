@@ -22,6 +22,7 @@ import {
   SIGNUP_ACCOUNT_TYPE,
   SIGNUP_ACCOUNT_TYPE_CONFIG,
   parseSignupAccountType,
+  type SignupAccountType,
 } from '~/features/auth/config/signupAccountType';
 import { TEMPORARY_ENABLE_BUSINESS_PROFILE_CLAIM } from '~/shared/config/featureFlags';
 import { firstRouteParam } from '~/shared/lib/navigation/routeIds';
@@ -101,8 +102,9 @@ export function useSignupByEmail() {
     signInWithOAuth(provider, { businessSignup: isBusinessAccount });
   }
 
-  function switchAccountType() {
-    router.setParams({ account: accountConfig.switchTo });
+  function selectAccountType(type: SignupAccountType) {
+    if (type === accountType) return;
+    router.setParams({ account: type });
     setErrors((e) => ({ ...e, displayName: undefined, general: undefined }));
   }
 
@@ -131,7 +133,7 @@ export function useSignupByEmail() {
       setErrors((e) => ({ ...e, password: undefined, general: undefined }));
     },
     onReferralCodeChange: setReferralCode,
-    switchAccountType,
+    selectAccountType,
     handleOAuthSignup,
     handleSignup,
     goToLogin: () => router.replace(Routes.Login),

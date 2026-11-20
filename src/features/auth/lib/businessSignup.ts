@@ -3,7 +3,7 @@ import type { UserConfigRow } from '~/shared/types/userConfig';
 
 export const BUSINESS_SIGNUP_ERROR_CODE = {
   ineligible: 'BIZ01',
-  invalidName: 'BIZ02',
+  invalidName: '22023',
 } as const;
 
 export type BusinessSignupErrorCode =

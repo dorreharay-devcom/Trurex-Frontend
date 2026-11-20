@@ -36,22 +36,14 @@ describe('SIGNUP_ACCOUNT_TYPE_CONFIG', () => {
     const config = SIGNUP_ACCOUNT_TYPE_CONFIG[SIGNUP_ACCOUNT_TYPE.personal];
     expect(config.nameLabel).toBe('Full name');
     expect(config.namePlaceholder).toBe('Jane Doe');
-    expect(config.switchLabel).toBe('Go as a business');
+    expect(config.tabLabel).toBe('Personal');
   });
 
   it('uses business copy for business sign-up', () => {
     const config = SIGNUP_ACCOUNT_TYPE_CONFIG[SIGNUP_ACCOUNT_TYPE.business];
     expect(config.nameLabel).toBe('Business Name');
     expect(config.namePlaceholder).toBe('Acme Coffee Co.');
-    expect(config.switchLabel).toBe('Go as a personal user');
-  });
-
-  it('switches between the two account types', () => {
-    for (const type of Object.values(SIGNUP_ACCOUNT_TYPE)) {
-      const switched = SIGNUP_ACCOUNT_TYPE_CONFIG[type].switchTo;
-      expect(switched).not.toBe(type);
-      expect(SIGNUP_ACCOUNT_TYPE_CONFIG[switched].switchTo).toBe(type);
-    }
+    expect(config.tabLabel).toBe('Business');
   });
 
   it('validates the name with account-specific messages', () => {
