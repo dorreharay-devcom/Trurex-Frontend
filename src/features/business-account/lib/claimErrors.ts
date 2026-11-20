@@ -21,9 +21,15 @@ export function businessClaimErrorMessage(error: unknown): string {
   return known ?? unknownErrorMessage(error, 'Could not submit your claim. Please try again.');
 }
 
+const PROFILE_UPDATE_ERROR_MESSAGES: Record<string, string> = {
+  [BUSINESS_CLAIM_ERROR_CODE.notAllowed]: 'Only business accounts can edit a business profile.',
+  [BUSINESS_CLAIM_ERROR_CODE.notApproved]:
+    'You can edit your business profile once your claim is verified.',
+};
+
 export function businessProfileUpdateErrorMessage(error: unknown): string {
-  if (rpcErrorCode(error) === BUSINESS_CLAIM_ERROR_CODE.notAllowed) {
-    return 'Only business accounts can edit a business profile.';
-  }
-  return unknownErrorMessage(error, 'Could not save your business profile. Please try again.');
+  const known = PROFILE_UPDATE_ERROR_MESSAGES[rpcErrorCode(error) ?? ''];
+  return (
+    known ?? unknownErrorMessage(error, 'Could not save your business profile. Please try again.')
+  );
 }

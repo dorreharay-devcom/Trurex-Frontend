@@ -21,8 +21,8 @@ export function entryToRecommendation(entry: CollectionRexEntry): Recommendation
         ? {
             name: entry.recommender_name ?? '',
             handle: entry.recommender_handle ?? '',
-            avatar: '',
-            verified: false,
+            avatar: entry.recommender_avatar_url ?? '',
+            verified: entry.recommender_verified ?? false,
             postedAsBusiness: entry.posted_as_business ?? false,
           }
         : null,

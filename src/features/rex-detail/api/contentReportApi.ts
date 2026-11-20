@@ -60,11 +60,13 @@ export async function flagComment(params: {
   commentId: string;
   reasonCode: string;
   details?: string | null;
+  postedAsBusiness: boolean;
 }): Promise<void> {
   unwrap(
     await Backend.rpc('flag_comment', {
       input_comment_id: params.commentId,
       input_reason_code: params.reasonCode,
+      input_posted_as_business: params.postedAsBusiness,
       ...optionalDetailsPayload(params.details),
     }),
   );
@@ -88,11 +90,13 @@ export async function flagRexRequestComment(params: {
   commentId: string;
   reasonCode: string;
   details?: string | null;
+  postedAsBusiness: boolean;
 }): Promise<void> {
   unwrap(
     await Backend.rpc('flag_rex_request_comment', {
       p_comment_id: params.commentId,
       p_reason_code: params.reasonCode,
+      p_posted_as_business: params.postedAsBusiness,
       ...optionalPDetailsPayload(params.details),
     }),
   );

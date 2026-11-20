@@ -8,6 +8,7 @@ import {
 import type { ContentReportTarget } from '~/features/rex-detail/types/contentReport';
 import { toastError, toastSuccess } from '~/shared/lib/appToast';
 import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { didAccountFrozenMutationToast } from '~/shared/lib/errors/restriction';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 import { assertOnlineForMutation } from '~/shared/lib/network/assertOnline';
@@ -19,6 +20,7 @@ type Params = {
 
 export function useContentReportFlow({ open, target }: Params) {
   const { user } = useAuth();
+  const { postedAsBusiness } = useAccountMode();
   const [reason, setReason] = useState<string | null>(null);
   const [details, setDetails] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -89,6 +91,7 @@ export function useContentReportFlow({ open, target }: Params) {
             commentId: target.commentId,
             reasonCode: reason,
             details: detailPayload,
+            postedAsBusiness,
           });
           break;
         case 'rex_request':
@@ -103,6 +106,7 @@ export function useContentReportFlow({ open, target }: Params) {
             commentId: target.commentId,
             reasonCode: reason,
             details: detailPayload,
+            postedAsBusiness,
           });
           break;
       }
@@ -116,7 +120,7 @@ export function useContentReportFlow({ open, target }: Params) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [target, reason, details, otherSelected, reset]);
+  }, [target, reason, details, otherSelected, postedAsBusiness, reset]);
 
   return {
     reason,

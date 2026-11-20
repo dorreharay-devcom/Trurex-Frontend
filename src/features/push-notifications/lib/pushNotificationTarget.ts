@@ -21,7 +21,7 @@ function toAppNotificationShape(data: PushData): AppNotification {
     created_at: '',
     rex_id: stringField(data, 'rex_id'),
     comment_id: stringField(data, 'comment_id'),
-    rex_request_id: stringField(data, 'rex_request_id'),
+    rex_request_id: stringField(data, 'rex_request_id') || stringField(data, 'request_id'),
   };
 }
 

@@ -41,6 +41,12 @@ describe('businessProfileUpdateErrorMessage', () => {
     );
   });
 
+  it('explains that editing waits for claim approval', () => {
+    expect(businessProfileUpdateErrorMessage({ code: 'BIZ03' })).toBe(
+      'You can edit your business profile once your claim is verified.',
+    );
+  });
+
   it('falls back to the error message or a default', () => {
     expect(businessProfileUpdateErrorMessage({ message: 'Too long' })).toBe('Too long');
     expect(businessProfileUpdateErrorMessage(undefined)).toBe(

@@ -1,9 +1,8 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import { Store, User } from 'lucide-react-native';
 import AuthLayout from '~/features/auth/ui/common/AuthLayout';
 import AuthGeneralError from '~/features/auth/ui/common/AuthGeneralError';
-import AuthPillButton from '~/features/auth/ui/oauth/AuthPillButton';
+import SignupAccountTypeTabs from '~/features/auth/ui/common/SignupAccountTypeTabs';
 import { Button } from '~/shared/ui/primitives/Button';
 import { Input } from '~/shared/ui/primitives/Input';
 import {
@@ -15,19 +14,10 @@ import {
   OAuthSocialButtons,
   useSignupByEmail,
 } from '~/features/auth';
-import { SIGNUP_ACCOUNT_TYPE } from '~/features/auth/config/signupAccountType';
 import { TEMPORARY_ENABLE_BUSINESS_PROFILE_CLAIM } from '~/shared/config/featureFlags';
-
-const SWITCH_ICON = {
-  [SIGNUP_ACCOUNT_TYPE.business]: Store,
-  [SIGNUP_ACCOUNT_TYPE.personal]: User,
-} as const;
-
-const SWITCH_ICON_COLOR = '#1f1f1f';
 
 const SignupPage = () => {
   const signup = useSignupByEmail();
-  const SwitchIcon = SWITCH_ICON[signup.accountConfig.switchTo];
 
   return (
     <AuthLayout>
@@ -36,10 +26,9 @@ const SignupPage = () => {
       <View className="gap-4">
         {TEMPORARY_ENABLE_BUSINESS_PROFILE_CLAIM && (
           <>
-            <AuthPillButton
-              icon={<SwitchIcon size={20} color={SWITCH_ICON_COLOR} />}
-              label={signup.accountConfig.switchLabel}
-              onPress={signup.switchAccountType}
+            <SignupAccountTypeTabs
+              value={signup.accountType}
+              onChange={signup.selectAccountType}
               disabled={signup.busy}
             />
             <View className="h-px bg-border" />

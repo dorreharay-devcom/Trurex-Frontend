@@ -22,6 +22,7 @@ export const BUSINESS_CLAIM_ERROR_CODE = {
   missingTarget: '22023',
   notAllowed: '42501',
   placeAlreadyClaimed: 'BIZ02',
+  notApproved: 'BIZ03',
 } as const;
 
 export const CLAIM_VERIFICATION_STEPS = [

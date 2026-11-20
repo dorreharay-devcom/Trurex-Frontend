@@ -41,6 +41,8 @@ export type CollectionRexEntry = {
   rating?: number | null;
   recommender_name?: string | null;
   recommender_handle?: string | null;
+  recommender_avatar_url?: string | null;
+  recommender_verified?: boolean | null;
   posted_as_business?: boolean | null;
   note?: string | null;
 };
