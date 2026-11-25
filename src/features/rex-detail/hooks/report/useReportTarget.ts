@@ -1,11 +1,13 @@
 import { useCallback, useState } from 'react';
 import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import type { ContentReportTarget } from '~/features/rex-detail/types/contentReport';
 import type { Recommendation } from '~/shared/types/recommendation';
 import { toastInfo } from '~/shared/lib/appToast';
 
 export function useReportTarget(recommendation: Recommendation | null) {
   const { user: authUser } = useAuth();
+  const { activeProfileId } = useAccountMode();
   const [reportTarget, setReportTarget] = useState<ContentReportTarget | null>(null);
 
   const clearReportTarget = useCallback(() => setReportTarget(null), []);
@@ -16,9 +18,9 @@ export function useReportTarget(recommendation: Recommendation | null) {
       toastInfo('Sign in', 'Sign in to report this recommendation.');
       return;
     }
-    if (recommendation.authorId != null && authUser.id === recommendation.authorId) return;
+    if (recommendation.authorId != null && activeProfileId === recommendation.authorId) return;
     setReportTarget({ kind: 'recommendation', rexId: recommendation.id });
-  }, [recommendation, authUser]);
+  }, [recommendation, authUser, activeProfileId]);
 
   const openCommentReport = useCallback(
     (commentId: string) => {

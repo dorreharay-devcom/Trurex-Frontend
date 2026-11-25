@@ -23,7 +23,6 @@ export async function createRexRequest(params: CreateRexRequestParams): Promise<
       p_location_lng: params.locationLng ?? null,
       p_note: params.note ?? null,
       p_is_public: params.isPublic ?? false,
-      p_posted_as_business: params.postedAsBusiness,
     }),
   );
 }
@@ -62,7 +61,6 @@ export async function getUserRexRequests(
       p_user_id: userId,
       result_limit: params.resultLimit,
       result_offset: params.resultOffset,
-      p_posted_as_business: params.postedAsBusiness ?? null,
     }),
   );
   return Array.isArray(raw) ? (raw as RexRequestRow[]) : [];
@@ -110,7 +108,6 @@ export async function commentOnRexRequest(params: CommentOnRexRequestParams): Pr
     await Backend.rpc('comment_on_rex_request', {
       p_request_id: params.requestId,
       p_body: params.body,
-      p_posted_as_business: params.postedAsBusiness,
     }),
   );
 }

@@ -3,11 +3,13 @@ import { createClient } from '@supabase/supabase-js';
 import { AuthStorage } from '~/shared/lib/storage/authStorage';
 import { isFatalAuthSessionErrorCode } from '~/shared/lib/errors/authSession';
 import {
+  resetIfBusinessProfileMissingRpcError,
   terminateIfAccountSuspendedRpcError,
   terminateIfUnauthorizedRequestError,
   terminateSessionForUnauthorizedRequest,
   toastIfAccountFrozenMutationError,
 } from '~/shared/lib/errors/restriction';
+import { isActingAsBusiness, withActingProfileHeader } from '~/shared/api/actingProfile';
 import { fetchWithTimeout } from '~/shared/api/fetchWithTimeout';
 import { isWeb } from '~/shared/lib/ui/platform';
 import '~/shared/api/urlPolyfill';
@@ -28,8 +30,13 @@ function requestUrl(input: RequestInfo | URL): string {
 }
 
 const supabaseFetch: typeof fetch = async (input, init) => {
-  const timeoutMs = requestUrl(input).includes('/auth/v1/') ? AUTH_API_TIMEOUT_MS : undefined;
-  const response = await fetchWithTimeout(input, init, timeoutMs);
+  const url = requestUrl(input);
+  const timeoutMs = url.includes('/auth/v1/') ? AUTH_API_TIMEOUT_MS : undefined;
+  const response = await fetchWithTimeout(
+    input,
+    withActingProfileHeader(url, init, isActingAsBusiness()),
+    timeoutMs,
+  );
   if (response.status === 401) {
     terminateSessionForUnauthorizedRequest();
   }
@@ -82,6 +89,7 @@ export function unwrap<T>(response: { data: unknown; error: unknown }): T {
     terminateIfUnauthorizedRequestError(response.error);
     terminateIfAccountSuspendedRpcError(response.error);
     toastIfAccountFrozenMutationError(response.error);
+    resetIfBusinessProfileMissingRpcError(response.error);
     throw response.error;
   }
   return response.data as T;

@@ -18,6 +18,8 @@ import { checkForOtaUpdate } from '~/shared/lib/updates/checkForOtaUpdate';
 import { Theme } from '~/shared/theme/Theme';
 import { setupPushNotifications } from '~/features/push-notifications/lib/setupPushNotifications';
 import PushNotificationRoutingBridge from '~/features/push-notifications/ui/PushNotificationRoutingBridge';
+import ActingProfileBridge from '~/features/business-account/ui/ActingProfileBridge';
+import NotificationsRealtimeBridge from '~/widgets/NotificationsRealtimeBridge';
 import { fetchRexScoreTiers } from '~/features/rex-score/api/rexScoreTiersApi';
 import { REX_SCORE_TIERS_QUERY_KEY } from '~/shared/config/queryKeys';
 import TierUpgradeCelebrationBridge from '~/features/rex-score/ui/TierUpgradeCelebrationBridge';
@@ -83,6 +85,8 @@ export default function RootLayout() {
         <SafeAreaProvider style={{ flex: 1, backgroundColor: Theme.colors.background }}>
           <AuthProvider>
             <BootstrapEffects />
+            <ActingProfileBridge />
+            <NotificationsRealtimeBridge />
             <PushNotificationRoutingBridge />
             <TierUpgradeCelebrationBridge />
             <Stack

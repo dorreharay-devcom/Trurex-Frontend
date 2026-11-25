@@ -1,14 +1,13 @@
 import React from 'react';
 import RexRequestDetailModal from '~/features/rex-requests/ui/detail/RexRequestDetailModal';
 import type { RexRequestRow } from '~/features/rex-requests/api/types';
-import type { UserProfileOpenOptions } from '~/shared/types/userProfileOpen';
 
 type Props = {
   visible: boolean;
   embedded?: boolean;
   request: RexRequestRow | null;
   onClose: () => void;
-  onUserPress?: (userId: string, options?: UserProfileOpenOptions) => void;
+  onUserPress?: (userId: string) => void;
   onEditRequest?: (requestId: string) => void;
   onOpenRex?: (rexId: string) => void;
 };

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { useMyRexes } from '~/features/profile/hooks/data/useMyRexes';
 import { respondToRexRequest } from '~/features/rex-requests/api/rexRequestsApi';
 import { REX_REQUEST_QUERY_KEYS } from '~/features/rex-requests/config/queryKeys';
@@ -17,9 +17,9 @@ type Params = {
 };
 
 export function useMyRexPicker({ open, requestId, onClose, excludeRexIds }: Params) {
-  const { user } = useAuth();
+  const { activeProfileId } = useAccountMode();
   const queryClient = useQueryClient();
-  const rexes = useMyRexes(user?.id);
+  const rexes = useMyRexes(activeProfileId);
   const availableRexes = useMemo(
     () =>
       excludeRexIds?.size ? rexes.data.filter((rec) => !excludeRexIds.has(rec.id)) : rexes.data,

@@ -6,7 +6,6 @@ import { formatCompactRelativeTime } from '~/shared/lib/data/date';
 import { needByLabel } from '~/features/rex-requests/config/needBy';
 import { Theme } from '~/shared/theme/Theme';
 import type { RexRequestRow } from '~/features/rex-requests/api/types';
-import BusinessAuthorTag from '~/shared/ui/primitives/BusinessAuthorTag';
 
 type Props = {
   request: RexRequestRow;
@@ -47,7 +46,6 @@ function RexRequestSummaryCard({
             <Text className="shrink text-sm font-semibold text-foreground" numberOfLines={1}>
               {request.requester_display_name ?? 'Member'}
             </Text>
-            {request.posted_as_business ? <BusinessAuthorTag /> : null}
           </View>
           <Text className="mt-0.5 text-xs text-muted-foreground" numberOfLines={1}>
             {request.requester_handle ? `@${request.requester_handle} · ` : ''}

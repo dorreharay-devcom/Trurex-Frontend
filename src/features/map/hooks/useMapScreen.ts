@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { useMapBoundsData } from '~/features/map/hooks/data/useMapBoundsData';
 import { useMapDerivedData } from '~/features/map/hooks/data/useMapDerivedData';
 import { useSavedRexOverrides } from '~/features/map/hooks/data/useSavedRexOverrides';
@@ -13,8 +13,8 @@ type Params = {
 };
 
 export function useMapScreen({ onRecommendationPress }: Params) {
-  const { user } = useAuth();
-  const userId = user?.id ?? null;
+  const { activeProfileId } = useAccountMode();
+  const userId = activeProfileId ?? null;
 
   const { userCoords, recenterTo, locateMe, recenterOn, fitMarkers, fitCoords } = useMapLocation();
   const saved = useSavedRexOverrides();

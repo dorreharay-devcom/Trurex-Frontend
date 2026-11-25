@@ -6,13 +6,13 @@ import { useCommentActions } from '~/features/rex-detail/hooks/comments/useComme
 import { useCommentComposer } from '~/features/rex-detail/hooks/comments/useCommentComposer';
 import { useCommentFocus } from '~/features/rex-detail/hooks/comments/useCommentFocus';
 import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { Theme } from '~/shared/theme/Theme';
 import CommentComposer from './common/CommentComposer';
 import CommentThread from './common/CommentThread';
 import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 import { totalRexCommentCount } from '~/features/rex-detail/lib/rexCommentTree';
 import type { RexComment } from '~/features/rex-detail/types/rexComment';
-import type { UserProfileOpenOptions } from '~/shared/types/userProfileOpen';
 import {
   useMentionAutocomplete,
   type MentionAutocompleteState,
@@ -25,7 +25,7 @@ export type RexCommentsSectionProps = {
   autoFocusComposer?: boolean;
   focusCommentId?: string;
   onFocusCommentReady?: (target: View) => void;
-  onUserPress?: (userId: string, options?: UserProfileOpenOptions) => void;
+  onUserPress?: (userId: string) => void;
   onReportComment?: (commentId: string) => void;
   onComposerFocus?: () => void;
 };
@@ -82,6 +82,7 @@ const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
   onComposerFocus,
 }) => {
   const { user } = useAuth();
+  const { activeProfileId } = useAccountMode();
   const { comments, loading, loadError, refetch, addComment, deleteComment, toggleCommentLike } =
     useRexComments(rexId);
 
@@ -130,7 +131,7 @@ const RexCommentsSection: React.FC<RexCommentsSectionProps> = ({
         loadError={loadError}
         onRetry={() => void refetch()}
         comments={comments}
-        currentUserId={user?.id}
+        currentUserId={activeProfileId}
         onReply={composer.startReply}
         onDelete={handleDelete}
         onUserPress={onUserPress}

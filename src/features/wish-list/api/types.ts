@@ -47,7 +47,6 @@ export type ProductBrandRexRow = {
   author_handle: string | null;
   author_display_name: string;
   author_avatar_url: string | null;
-  posted_as_business: boolean;
   brand_name: string;
   product_name: string | null;
   review: string | null;

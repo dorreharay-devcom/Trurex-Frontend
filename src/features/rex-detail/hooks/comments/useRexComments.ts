@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Backend } from '~/shared/api/client';
-import { useAuth } from '~/features/auth/providers';
 import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import {
   addRexComment,
@@ -19,6 +18,7 @@ import {
 import { patchFeedCommentCount } from '~/features/rex-detail/lib/patchRecommendationCaches';
 import type { MentionRef } from '~/features/mentions/types/mention';
 import type { RexComment } from '~/features/rex-detail/types/rexComment';
+import type { MyProfile } from '~/features/business-account/types/myProfile';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 import { assertOnlineForMutation } from '~/shared/lib/network/assertOnline';
 import { subscribeRealtimeWithResume } from '~/shared/lib/realtime/subscribeWithResume';
@@ -30,9 +30,7 @@ function optimisticComment(params: {
   rexId: string;
   body: string;
   parentCommentId: string | null;
-  authorId: string;
-  displayName: string;
-  postedAsBusiness: boolean;
+  author: MyProfile;
   mentions: MentionRef[];
 }): RexComment {
   const now = new Date().toISOString();
@@ -40,7 +38,7 @@ function optimisticComment(params: {
     id: params.tempId,
     rex_id: params.rexId,
     parent_comment_id: params.parentCommentId,
-    author_id: params.authorId,
+    author_id: params.author.id,
     body: params.body,
     created_at: now,
     updated_at: now,
@@ -48,12 +46,11 @@ function optimisticComment(params: {
     liked_by_me: false,
     reply_count: 0,
     profile: {
-      display_name: params.displayName,
-      avatar_url: null,
-      username: null,
+      display_name: params.author.displayName,
+      avatar_url: params.author.avatarUrl,
+      username: params.author.handle,
       relationship_status: null,
-      verified: false,
-      posted_as_business: params.postedAsBusiness,
+      verified: params.author.verified,
     },
     replies: [],
     mentions: params.mentions,
@@ -62,8 +59,7 @@ function optimisticComment(params: {
 
 export function useRexComments(rexId: string | undefined) {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
-  const { postedAsBusiness } = useAccountMode();
+  const { activeProfile } = useAccountMode();
   const [comments, setComments] = useState<RexComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -143,7 +139,7 @@ export function useRexComments(rexId: string | undefined) {
 
   const addComment = useCallback(
     async (body: string, parentCommentId?: string | null, taggedUsers: MentionRef[] = []) => {
-      if (!rexId || !user) return;
+      if (!rexId || !activeProfile) return;
       if (!assertOnlineForMutation('Comments')) return;
       const parentId = parentCommentId ?? null;
       const tempId = `temp-${Date.now()}`;
@@ -152,13 +148,7 @@ export function useRexComments(rexId: string | undefined) {
         rexId,
         body,
         parentCommentId: parentId,
-        authorId: user.id,
-        displayName:
-          (typeof user.user_metadata?.display_name === 'string' &&
-            user.user_metadata.display_name) ||
-          user.email ||
-          'You',
-        postedAsBusiness,
+        author: activeProfile,
         mentions: taggedUsers,
       });
 
@@ -170,7 +160,7 @@ export function useRexComments(rexId: string | undefined) {
       suppressRealtimeUntil.current = Date.now() + REALTIME_SELF_ECHO_MS;
 
       try {
-        await addRexComment({ rexId, body, parentCommentId: parentId, postedAsBusiness }, comments);
+        await addRexComment({ rexId, body, parentCommentId: parentId }, comments);
         await afterLocalWrite();
       } catch (e: unknown) {
         setComments((prev) => {
@@ -181,7 +171,7 @@ export function useRexComments(rexId: string | undefined) {
         throw new Error(unknownErrorMessage(e, 'Could not post comment'));
       }
     },
-    [rexId, user, postedAsBusiness, comments, afterLocalWrite, syncFeedCommentCount],
+    [rexId, activeProfile, comments, afterLocalWrite, syncFeedCommentCount],
   );
 
   const deleteComment = useCallback(

@@ -24,12 +24,12 @@ export function useProfileAvatarUpload({ userId, onUploaded, onAvatarUpdated }: 
 
       try {
         setAvatarUploading(true);
-        await ProfileApi.uploadAvatar(
-          userId,
-          asset.uri,
-          asset.fileName ?? `avatar-${Date.now()}.jpg`,
-          asset.mimeType,
-        );
+        await ProfileApi.uploadAvatar({
+          loginId: userId,
+          imageUri: asset.uri,
+          fileName: asset.fileName ?? `avatar-${Date.now()}.jpg`,
+          mimeType: asset.mimeType,
+        });
         await onUploaded();
         onAvatarUpdated?.();
       } finally {

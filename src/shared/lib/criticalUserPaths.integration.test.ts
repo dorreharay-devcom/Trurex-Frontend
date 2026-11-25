@@ -87,7 +87,6 @@ function comment(id: string, parent: string | null = null, replies: RexComment[]
       username: null,
       relationship_status: null,
       verified: false,
-      posted_as_business: false,
     },
     replies,
     mentions: [],

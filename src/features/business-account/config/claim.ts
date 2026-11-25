@@ -25,6 +25,11 @@ export const BUSINESS_CLAIM_ERROR_CODE = {
   notApproved: 'BIZ03',
 } as const;
 
+export const BUSINESS_PROFILE_DELETE_ERROR_CODE = {
+  missing: 'BIZ04',
+  businessOnly: 'BIZ06',
+} as const;
+
 export const CLAIM_VERIFICATION_STEPS = [
   {
     title: 'Check your email',

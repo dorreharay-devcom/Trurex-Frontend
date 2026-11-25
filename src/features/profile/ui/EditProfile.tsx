@@ -85,6 +85,7 @@ const EditProfile = ({ onClose, onOpenBlockedUsers }: Props) => {
         />
 
         <EditProfileDangerZone
+          deleteCopy={account.copy}
           blockedCount={blocked.count}
           disabled={actionsDisabled}
           onOpenBlockedUsers={onOpenBlockedUsers}
@@ -94,9 +95,9 @@ const EditProfile = ({ onClose, onOpenBlockedUsers }: Props) => {
 
       <DestructiveActionConfirmModal
         visible={account.confirmVisible}
-        title="Delete your account?"
-        message="This will permanently delete your account, rexes, collections, and all other data. This action cannot be undone."
-        confirmLabel="Delete account"
+        title={account.copy.title}
+        message={account.copy.message}
+        confirmLabel={account.copy.action}
         pending={account.pending}
         onCancel={account.closeConfirm}
         onConfirm={() => void account.confirm()}

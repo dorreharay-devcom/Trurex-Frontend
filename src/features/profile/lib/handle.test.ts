@@ -11,7 +11,8 @@ const UUID = '550e8400-e29b-41d4-a716-446655440000';
 describe('profile handle', () => {
   it('normalizes input and save shape', () => {
     expect(normalizeHandleInput('@@Alex ')).toBe('Alex');
-    expect(normalizeHandleForSave('')).toBeNull();
+    expect(normalizeHandleForSave('')).toBe('');
+    expect(normalizeHandleForSave('  @ ')).toBe('');
     expect(normalizeHandleForSave('@Alex Smith')).toBe('alexsmith');
   });
 

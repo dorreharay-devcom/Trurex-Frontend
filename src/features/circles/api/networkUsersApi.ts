@@ -43,16 +43,6 @@ export async function fetchTrustedUsers(
     throwRpcIfFailed({ data, error });
   }
 
-  const { data: sessionData } = await Backend.auth.getSession();
-  const authId = sessionData.session?.user?.id;
-  if (authId != null && authId === inputUserId) {
-    const second = await Backend.rpc('trusted_users', {
-      input_limit: limit,
-      input_offset: offset,
-    });
-    if (!second.error) return parseNetworkUserRows(second.data);
-  }
-
   const following = await fetchUserFollowing(inputUserId, limit, offset);
   return following.filter((r) => r.relationship_status === RELATIONSHIP_STATUS.trusted);
 }

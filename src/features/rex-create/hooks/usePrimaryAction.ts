@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '~/features/auth/providers';
 import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
+import { toRecommendationAuthor } from '~/features/business-account/lib/myProfileAuthor';
 import { createRex, updateRex } from '~/features/rex-create/api/rexCreateApi';
 import type { CreateConfigState } from '~/features/rex-create/hooks/useCategoryCreateConfig';
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
@@ -51,8 +51,7 @@ export function usePrimaryAction({
   onPosted,
 }: UsePrimaryActionArgs) {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
-  const { postedAsBusiness } = useAccountMode();
+  const { activeProfile } = useAccountMode();
   const [submitting, setSubmitting] = useState(false);
 
   const advanceStep = useCallback(async () => {
@@ -93,21 +92,15 @@ export function usePrimaryAction({
       if (isEditMode && editRexId) {
         await updateRex({ ...params, p_rex_id: editRexId });
       } else {
-        const created = await createRex(params, { postedAsBusiness });
+        const created = await createRex(params);
         const rexId = parseCreatedRexId(created);
         if (rexId) {
-          const authorName =
-            (typeof user?.user_metadata?.display_name === 'string' &&
-              user.user_metadata.display_name) ||
-            user?.email ||
-            undefined;
           const stub = buildOptimisticRecommendationFromCreate({
             rexId,
             flow,
             config,
-            authorId: user?.id,
-            authorName,
-            postedAsBusiness,
+            authorId: activeProfile?.id,
+            author: activeProfile ? toRecommendationAuthor(activeProfile) : null,
           });
           prependRecommendationToFeedCaches(queryClient, stub);
           const pin = mapPinRowFromOptimisticRec(stub);
@@ -136,7 +129,7 @@ export function usePrimaryAction({
     } finally {
       setSubmitting(false);
     }
-  }, [flow, config, isEditMode, editRexId, onClose, onPosted, queryClient, user, postedAsBusiness]);
+  }, [flow, config, isEditMode, editRexId, onClose, onPosted, queryClient, activeProfile]);
 
   const handlePrimaryFooter = useCallback(
     () => (flow.nav.isLastStep ? submitRex() : advanceStep()),

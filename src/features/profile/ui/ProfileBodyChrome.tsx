@@ -19,7 +19,7 @@ type Props = {
 };
 
 function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
-  const { profile, headerProfile, content, social, avatar, business } = flow;
+  const { profile, content, social, avatar, business } = flow;
 
   return (
     <View className="pb-3">
@@ -27,9 +27,9 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
         <BusinessProfileViewTabs view={business.view} onChange={business.setView} />
       ) : null}
 
-      {headerProfile && business.showContentTabs ? (
+      {profile && business.showContentTabs ? (
         <ProfileHeader
-          profile={headerProfile}
+          profile={profile}
           isOwnProfile={flow.isOwnProfile}
           onEditProfile={flow.openEdit}
           onSignOut={flow.signOut}
@@ -44,11 +44,10 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
           onUnblockPress={social.onUnblock}
           blockLoading={social.blockPending}
           onVerifyIdentity={
-            business.businessFace || !TEMPORARY_ENABLE_IDENTITY_VERIFICATION
+            profile.isBusiness || !TEMPORARY_ENABLE_IDENTITY_VERIFICATION
               ? undefined
               : flow.openVerifyIdentity
           }
-          avatarEditable={flow.isOwnProfile && !business.businessFace}
         />
       ) : null}
 
@@ -56,6 +55,7 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
       flow.isOwnProfile &&
       business.showContentTabs &&
       profile &&
+      !profile.isBusiness &&
       !profile.verified ? (
         <ProfileVerifySection onPress={flow.openVerifyIdentity} />
       ) : null}

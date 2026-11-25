@@ -1,4 +1,6 @@
 import type { Href } from 'expo-router';
+import type { AccountMode } from '~/features/business-account/config/accountMode';
+import type { MyProfile } from '~/features/business-account/types/myProfile';
 import { NOTIFICATION_TYPE } from '~/shared/config/notificationTypes';
 import { notificationOpenTarget } from '~/shared/lib/notification/helpers';
 import type { AppNotification } from '~/shared/types/appNotification';
@@ -44,4 +46,12 @@ export function resolvePushNotificationHref(data: PushData): Href | null {
   if (actorId) return toUserRoute(actorId);
 
   return null;
+}
+
+export function resolvePushAccountMode(
+  data: PushData,
+  profiles: readonly MyProfile[],
+): AccountMode | null {
+  const profileId = stringField(data, 'profile_id');
+  return profiles.find((profile) => profile.id === profileId)?.kind ?? null;
 }

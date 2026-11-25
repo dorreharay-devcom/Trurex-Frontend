@@ -2,7 +2,7 @@ import type { CreateConfigState } from '~/features/rex-create/hooks/useCategoryC
 import type { CreateRecFlow } from '~/features/rex-create/hooks/useCreateRecWizard';
 import { getPlaceNameForRex } from '~/features/rex-create/lib/place';
 import { SEARCH_MODE } from '~/features/rex-create/types/create';
-import type { Recommendation } from '~/shared/types/recommendation';
+import type { Recommendation, RecommendationAuthor } from '~/shared/types/recommendation';
 
 export function resolveCreatePlaceCoords(flow: CreateRecFlow): {
   latitude: number;
@@ -32,10 +32,9 @@ export function buildOptimisticRecommendationFromCreate(params: {
   flow: CreateRecFlow;
   config: CreateConfigState;
   authorId?: string;
-  authorName?: string;
-  postedAsBusiness: boolean;
+  author: RecommendationAuthor | null;
 }): Recommendation {
-  const { rexId, flow, config, authorId, authorName, postedAsBusiness } = params;
+  const { rexId, flow, config, authorId, author } = params;
   const placeName = getPlaceNameForRex(
     flow.place.searchMode,
     flow.place.selectedSearchPlace,
@@ -70,9 +69,7 @@ export function buildOptimisticRecommendationFromCreate(params: {
     photoPath: flow.photos.paths[0] ?? null,
     photoPaths: flow.photos.paths,
     createdAt: new Date().toISOString(),
-    user: authorName
-      ? { name: authorName, handle: '', avatar: '', verified: false, postedAsBusiness }
-      : null,
+    user: author,
     likes: 0,
     comments: 0,
     saves: 0,

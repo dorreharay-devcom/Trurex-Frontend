@@ -56,29 +56,23 @@ export const ProfileApi = {
     return toProfileData(asProfileUserRow(data));
   },
 
-  updateAvatar: async (avatarUrl: string): Promise<ProfileUserRow> => {
-    const data = unwrap(
-      await Backend.rpc('update_my_avatar_url', {
-        input_avatar_url: avatarUrl,
-      }),
-    );
-    return asProfileUserRow(data);
+  updateAvatar: async (avatarPath: string | null): Promise<void> => {
+    unwrap(await Backend.rpc('update_my_avatar_url', { input_avatar_url: avatarPath }));
   },
 
-  uploadAvatar: async (
-    userId: string,
-    imageUri: string,
-    fileName?: string | null,
-    mimeType?: string | null,
-  ): Promise<string> => {
+  uploadAvatar: async (params: {
+    loginId: string;
+    imageUri: string;
+    fileName?: string | null;
+    mimeType?: string | null;
+  }): Promise<string> => {
+    const { loginId, imageUri, fileName, mimeType } = params;
     const name = fileName ?? `avatar-${Date.now()}.jpg`;
     const prepared = await preparePickerImageForUpload(imageUri, name, mimeType, AVATAR_MAX_WIDTH);
-    const path = `${userId}/avatar-${Date.now()}.jpg`;
+    const path = `${loginId}/avatar-${Date.now()}.jpg`;
     await uploadBlobToStorageBucket(USER_AVATARS_BUCKET, path, prepared.body, prepared.contentType);
 
     await ProfileApi.updateAvatar(path);
-
-    const { data } = Backend.storage.from(USER_AVATARS_BUCKET).getPublicUrl(path);
-    return data.publicUrl;
+    return path;
   },
 };

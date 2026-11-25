@@ -1,6 +1,5 @@
 import type { NeedBy } from '~/features/rex-requests/config/needBy';
 import type { MentionRef } from '~/features/mentions/types/mention';
-import type { PostedAs } from '~/shared/types/postedAs';
 
 export type CategoryItem = {
   id: string;
@@ -18,7 +17,6 @@ export type RexRequestRow = {
   requester_handle?: string;
   requester_avatar_url?: string | null;
   requester_verified?: boolean;
-  posted_as_business?: boolean;
   categories: CategoryItem[];
   looking_for_text: string;
   location_text: string | null;
@@ -45,7 +43,7 @@ export type CreateRexRequestParams = {
   locationLng?: number | null;
   note?: string | null;
   isPublic?: boolean;
-} & PostedAs;
+};
 
 export type GetRexRequestsFeedParams = {
   resultLimit: number;
@@ -58,9 +56,7 @@ export type GetRexRequestsFeedParams = {
 export type GetUserRexRequestsParams = Pick<
   GetRexRequestsFeedParams,
   'resultLimit' | 'resultOffset'
-> & {
-  postedAsBusiness?: boolean | null;
-};
+>;
 
 export type RexRequestResponseRow = {
   response_id: string;
@@ -87,7 +83,6 @@ export type RexRequestCommentRow = {
   commenter_handle: string;
   commenter_avatar_url: string | null;
   commenter_verified: boolean;
-  posted_as_business: boolean;
   body: string;
   created_at: string;
   mentions?: MentionRef[];
@@ -96,7 +91,7 @@ export type RexRequestCommentRow = {
 export type CommentOnRexRequestParams = {
   requestId: string;
   body: string;
-} & PostedAs;
+};
 
 export type EditRexRequestParams = {
   requestId: string;

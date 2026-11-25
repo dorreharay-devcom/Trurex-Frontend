@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   businessClaimErrorMessage,
+  businessProfileDeleteErrorMessage,
   businessProfileUpdateErrorMessage,
   isBusinessClaimAlreadyPending,
 } from '~/features/business-account/lib/claimErrors';
@@ -52,5 +53,14 @@ describe('businessProfileUpdateErrorMessage', () => {
     expect(businessProfileUpdateErrorMessage(undefined)).toBe(
       'Could not save your business profile. Please try again.',
     );
+  });
+});
+
+describe('businessProfileDeleteErrorMessage', () => {
+  it('explains a business-only login and falls back to the raw message', () => {
+    expect(businessProfileDeleteErrorMessage({ code: 'BIZ06' })).toBe(
+      'This is a business-only account. Delete the whole account instead.',
+    );
+    expect(businessProfileDeleteErrorMessage(new Error('Network down'))).toBe('Network down');
   });
 });

@@ -23,8 +23,8 @@ export const Routes = {
   Referrals: '/referrals',
 } as const satisfies Record<string, Href>;
 
-export function toUserRoute(userId: string, options?: { asBusiness?: boolean }): Href {
-  return options?.asBusiness ? `/user/${userId}?as=business` : `/user/${userId}`;
+export function toUserRoute(userId: string): Href {
+  return `/user/${userId}`;
 }
 
 export function toRexRoute(

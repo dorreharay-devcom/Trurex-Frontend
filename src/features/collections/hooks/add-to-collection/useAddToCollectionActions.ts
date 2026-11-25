@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { CollectionsApi } from '~/features/collections/api/collectionsApi';
 import { COLLECTIONS_QUERY_KEYS } from '~/features/collections/config/queryKeys';
 import { modalConfig } from '~/shared/config/overlaySheet';
@@ -33,7 +32,6 @@ export function useAddToCollectionActions({
   onCollectionCreated,
 }: Params) {
   const queryClient = useQueryClient();
-  const { postedAsBusiness } = useAccountMode();
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
 
@@ -118,10 +116,7 @@ export function useAddToCollectionActions({
       setError(null);
       try {
         await ensureRexSaved();
-        const collection = await CollectionsApi.createCollection({
-          display_name: name.trim(),
-          postedAsBusiness,
-        });
+        const collection = await CollectionsApi.createCollection({ display_name: name.trim() });
         await CollectionsApi.addRexToCollection({ collection_id: collection.id, rex_id: rec.id });
         queryClient.invalidateQueries({ queryKey: [...COLLECTIONS_QUERY_KEYS.myCollections] });
         setCreating(false);
@@ -144,7 +139,7 @@ export function useAddToCollectionActions({
         setCreating(false);
       }
     },
-    [rec, ensureRexSaved, postedAsBusiness, queryClient, setError, onClose, onCollectionCreated],
+    [rec, ensureRexSaved, queryClient, setError, onClose, onCollectionCreated],
   );
 
   return { saving, creating, applyChanges, createAndAdd };

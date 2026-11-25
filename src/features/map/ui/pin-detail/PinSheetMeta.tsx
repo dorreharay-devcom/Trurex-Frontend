@@ -4,7 +4,6 @@ import { MAP_PIN_TYPE_COPY } from '~/features/map/config/pinCopy';
 import { MAP_PIN_TYPE } from '~/features/map/config/pins';
 import { mapAuthorRecommendedLabel } from '~/features/map/lib/pinTypes';
 import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
-import BusinessAuthorTag from '~/shared/ui/primitives/BusinessAuthorTag';
 import type { MapPinType } from '~/features/map/types/mapPin';
 import type { Recommendation } from '~/shared/types/recommendation';
 
@@ -31,7 +30,6 @@ const PinSheetMeta = ({ pin, pinType }: Props) => {
             />
             <View className="min-w-0 flex-1 flex-row items-center gap-1">
               <Text className="shrink text-xs text-muted-foreground">{authorLabel}</Text>
-              {pin.user.postedAsBusiness ? <BusinessAuthorTag /> : null}
             </View>
           </>
         ) : (

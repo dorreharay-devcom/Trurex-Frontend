@@ -68,19 +68,12 @@ const HeaderActions = ({
       onMyBusinessPagePress={onMyBusinessPagePress}
     />
 
-    <AccountModeSwitcher>
-      <TouchableOpacity
-        onPress={onProfilePress}
-        accessibilityRole="button"
-        accessibilityLabel="Profile"
-        className="items-center justify-center"
-      >
-        <SignedUserAvatar
-          name={profileName}
-          avatar={avatarPath}
-          className={profileActive ? 'border-primary' : undefined}
-        />
-      </TouchableOpacity>
+    <AccountModeSwitcher onProfilePress={onProfilePress}>
+      <SignedUserAvatar
+        name={profileName}
+        avatar={avatarPath}
+        className={profileActive ? 'border-primary' : undefined}
+      />
     </AccountModeSwitcher>
   </View>
 );

@@ -55,14 +55,14 @@ export function useEditProfileAvatar({ userId, setCurrentAvatarUrl }: Params) {
     if (!userId) return;
 
     if (pendingAvatar) {
-      const publicUrl = await ProfileApi.uploadAvatar(
-        userId,
-        pendingAvatar.uri,
-        pendingAvatar.fileName ?? `avatar-${Date.now()}.jpg`,
-        pendingAvatar.mimeType,
-      );
+      const avatarPath = await ProfileApi.uploadAvatar({
+        loginId: userId,
+        imageUri: pendingAvatar.uri,
+        fileName: pendingAvatar.fileName ?? `avatar-${Date.now()}.jpg`,
+        mimeType: pendingAvatar.mimeType,
+      });
       pendingAvatar.dispose?.();
-      setCurrentAvatarUrl(publicUrl);
+      setCurrentAvatarUrl(avatarPath);
       setPendingAvatar(null);
       setAvatarRemoved(false);
       return;
@@ -70,7 +70,7 @@ export function useEditProfileAvatar({ userId, setCurrentAvatarUrl }: Params) {
 
     if (!avatarRemoved) return;
 
-    await ProfileApi.updateAvatar('');
+    await ProfileApi.updateAvatar(null);
     setCurrentAvatarUrl(null);
     setAvatarRemoved(false);
   }, [userId, pendingAvatar, avatarRemoved, setCurrentAvatarUrl]);

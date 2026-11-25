@@ -6,6 +6,7 @@ import { ProfileApi } from '~/features/profile/api/profileApi';
 import { CREATE_REC_STEP_INNER } from '~/features/rex-create/config/layout';
 import CreateStepTitle from '../../CreateStepTitle';
 import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import {
   authorForConfirmPreview,
   averageCategoryRatings,
@@ -65,10 +66,11 @@ const Confirm: React.FC<Props> = ({
   tagOptions,
 }) => {
   const { user } = useAuth();
+  const { activeProfileId } = useAccountMode();
   const { data: meProfile } = useQuery({
-    queryKey: ['getUserProfile', 'confirmPreview', user?.id],
-    queryFn: () => ProfileApi.getProfile({ userId: user!.id }),
-    enabled: !!user?.id,
+    queryKey: ['getUserProfile', 'confirmPreview', activeProfileId],
+    queryFn: () => ProfileApi.getProfile({ userId: activeProfileId! }),
+    enabled: !!activeProfileId,
   });
   const author = useMemo(
     () => authorForConfirmPreview(user, meProfile ?? undefined),

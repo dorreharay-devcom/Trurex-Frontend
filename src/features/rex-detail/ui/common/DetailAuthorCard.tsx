@@ -3,7 +3,6 @@ import { View, Text, Pressable } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
 import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 import { Theme } from '~/shared/theme/Theme';
-import BusinessAuthorTag from '~/shared/ui/primitives/BusinessAuthorTag';
 import ThankRexButton from './ThankRexButton';
 
 type Props = {
@@ -12,7 +11,6 @@ type Props = {
   authorId: string | undefined | null;
   authorTierIcon?: string | null;
   verified?: boolean;
-  postedAsBusiness?: boolean;
   onPress: () => void;
   rexId: string;
   isThanked: boolean;
@@ -25,7 +23,6 @@ function DetailAuthorCard({
   authorId,
   authorTierIcon,
   verified,
-  postedAsBusiness,
   onPress,
   rexId,
   isThanked,
@@ -45,7 +42,6 @@ function DetailAuthorCard({
           <View className="min-w-0 flex-row items-center gap-1.5">
             <Text className="shrink font-semibold text-foreground">{name}</Text>
             {authorTierIcon ? <Text className="text-xs">{authorTierIcon}</Text> : null}
-            {postedAsBusiness ? <BusinessAuthorTag /> : null}
           </View>
         </View>
       </Pressable>

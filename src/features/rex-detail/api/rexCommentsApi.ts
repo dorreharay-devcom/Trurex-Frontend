@@ -6,7 +6,6 @@ import type {
   RexCommentLikeRow,
   RexCommentRpc,
 } from '~/features/rex-detail/types/rexComment';
-import type { PostedAs } from '~/shared/types/postedAs';
 
 function mapRpcCommentFields(node: RexCommentRpc): Omit<RexComment, 'replies'> {
   return {
@@ -27,7 +26,6 @@ function mapRpcCommentFields(node: RexCommentRpc): Omit<RexComment, 'replies'> {
       username: node.author_username,
       relationship_status: node.author_relationship_status,
       verified: node.author_verified ?? false,
-      posted_as_business: node.posted_as_business ?? false,
     },
   };
 }
@@ -61,7 +59,7 @@ export async function addRexComment(
     rexId: string;
     body: string;
     parentCommentId?: string | null;
-  } & PostedAs,
+  },
   existingComments: RexComment[] = [],
 ): Promise<RexCommentDbRow> {
   const trimmed = params.body.trim();
@@ -76,7 +74,6 @@ export async function addRexComment(
       input_rex_id: params.rexId,
       input_body: trimmed,
       input_parent_comment_id: parentCommentId,
-      input_posted_as_business: params.postedAsBusiness,
     }),
   ) as RexCommentDbRow;
 }

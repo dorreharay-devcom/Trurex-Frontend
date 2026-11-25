@@ -5,10 +5,8 @@ import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 import CollapsibleMentionText from '~/features/mentions/ui/CollapsibleMentionText';
 import { canDeleteRexComment } from '~/features/rex-detail/api/rexCommentsApi';
 import type { RexComment } from '~/features/rex-detail/types/rexComment';
-import type { UserProfileOpenOptions } from '~/shared/types/userProfileOpen';
 import { formatCompactRelativeTime } from '~/shared/lib/data/date';
 import { Theme } from '~/shared/theme/Theme';
-import BusinessAuthorTag from '~/shared/ui/primitives/BusinessAuthorTag';
 import { DeleteAction, LikeAction, ReplyAction } from './CommentActions';
 
 export type CommentRowProps = {
@@ -17,7 +15,7 @@ export type CommentRowProps = {
   isReply?: boolean;
   onReply: (id: string) => void;
   onDelete: (id: string) => void;
-  onUserPress?: (userId: string, options?: UserProfileOpenOptions) => void;
+  onUserPress?: (userId: string) => void;
   onToggleLike: (commentId: string, currentlyLiked: boolean) => void;
   onReport?: (commentId: string) => void;
   highlight?: boolean;
@@ -42,9 +40,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
     onReport && currentUserId && comment.author_id && currentUserId !== comment.author_id,
   );
 
-  const goToProfile = () =>
-    comment.author_id &&
-    onUserPress?.(comment.author_id, { asBusiness: comment.profile?.posted_as_business });
+  const goToProfile = () => comment.author_id && onUserPress?.(comment.author_id);
 
   return (
     <View
@@ -70,7 +66,6 @@ const CommentRow: React.FC<CommentRowProps> = ({
             <TouchableOpacity onPress={goToProfile} activeOpacity={0.7} className="shrink">
               <Text className="text-sm font-semibold text-foreground">{name}</Text>
             </TouchableOpacity>
-            {comment.profile?.posted_as_business ? <BusinessAuthorTag /> : null}
           </View>
           <Text className="text-[10px] text-muted-foreground">
             {formatCompactRelativeTime(comment.created_at)}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollView } from 'react-native';
 import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import CircleAssignmentSheet from '~/features/circles/ui/assignment/CircleAssignmentSheet';
 import ShareProfileCard from '~/features/circles/ui/ShareProfileCard';
 import { useCirclesPageState } from '~/features/circles/hooks/useCirclesPageState';
@@ -18,6 +19,7 @@ type Props = {
 
 const CirclesPage = ({ isActive, onUserPress, onOpenCircle }: Props) => {
   const { user } = useAuth();
+  const { activeProfileId } = useAccountMode();
   const page = useCirclesPageState();
 
   return (
@@ -36,9 +38,9 @@ const CirclesPage = ({ isActive, onUserPress, onOpenCircle }: Props) => {
           onOpenCircle={(circleId) => onOpenCircle?.(circleId)}
         />
 
-        {user && isActive && (
+        {activeProfileId && isActive && (
           <ConnectionsSection
-            userId={user.id}
+            userId={activeProfileId}
             onUserPress={onUserPress}
             onAddToCircle={page.openAssign}
           />

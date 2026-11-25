@@ -49,7 +49,7 @@ const ProfileHeaderIdentity = ({
       <Text className="text-xl font-bold text-foreground">{displayName}</Text>
       <RelationshipBadge status={relationshipStatus} />
     </View>
-    <Text className="text-sm text-muted-foreground">{handle}</Text>
+    {handle ? <Text className="text-sm text-muted-foreground">{handle}</Text> : null}
     {tierBadge ? <View className="mt-2 self-start">{tierBadge}</View> : null}
     {bio ? <Text className="mt-2 text-sm leading-relaxed text-foreground/80">{bio}</Text> : null}
     {location ? (

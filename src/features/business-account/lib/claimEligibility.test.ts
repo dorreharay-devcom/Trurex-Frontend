@@ -99,10 +99,11 @@ describe('canClaimPlace', () => {
 });
 
 describe('isPlaceOwner', () => {
-  it('matches only the approved owner of the place', () => {
-    expect(isPlaceOwner({ userId: 'user-1', place: { business_owner_id: 'user-1' } })).toBe(true);
-    expect(isPlaceOwner({ userId: 'user-1', place: { business_owner_id: 'user-2' } })).toBe(false);
-    expect(isPlaceOwner({ userId: 'user-1', place: { business_owner_id: null } })).toBe(false);
-    expect(isPlaceOwner({ userId: undefined, place: { business_owner_id: null } })).toBe(false);
+  it('matches only when my business profile owns the place', () => {
+    const owner = (id: string | null) => ({ business_owner_id: id });
+    expect(isPlaceOwner({ businessProfileId: 'biz-1', place: owner('biz-1') })).toBe(true);
+    expect(isPlaceOwner({ businessProfileId: 'biz-1', place: owner('biz-2') })).toBe(false);
+    expect(isPlaceOwner({ businessProfileId: 'biz-1', place: owner(null) })).toBe(false);
+    expect(isPlaceOwner({ businessProfileId: undefined, place: owner(null) })).toBe(false);
   });
 });

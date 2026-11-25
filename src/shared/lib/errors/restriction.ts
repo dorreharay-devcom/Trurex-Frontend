@@ -8,6 +8,7 @@ export const ACCOUNT_SUSPENDED_RPC_CODE = 'CSUS1';
 export const ACCOUNT_SUSPENDED_STATUS = 'suspended';
 export const AUTHENTICATION_REQUIRED_RPC_CODE = '42501';
 export const ACCOUNT_FROZEN_RPC_CODE = 'CFRZ1';
+export const BUSINESS_PROFILE_MISSING_RPC_CODE = 'BIZ04';
 
 const FROZEN_TOAST_MARK = '__rexAccountFrozenMutationToastShown';
 
@@ -19,6 +20,7 @@ type SessionTerminationHandler = () => Promise<void> | void;
 
 let sessionTerminationHandler: SessionTerminationHandler | null = null;
 let unauthorizedRequestHandler: SessionTerminationHandler | null = null;
+let businessProfileMissingHandler: (() => void) | null = null;
 let suspensionLogoutInFlight = false;
 let unauthorizedLogoutInFlight = false;
 
@@ -89,6 +91,18 @@ export function registerUnauthorizedRequestHandler(handler: SessionTerminationHa
   return () => {
     if (unauthorizedRequestHandler === handler) unauthorizedRequestHandler = null;
   };
+}
+
+export function registerBusinessProfileMissingHandler(handler: () => void): () => void {
+  businessProfileMissingHandler = handler;
+  return () => {
+    if (businessProfileMissingHandler === handler) businessProfileMissingHandler = null;
+  };
+}
+
+export function resetIfBusinessProfileMissingRpcError(error: unknown): void {
+  if (rpcErrorCode(error) !== BUSINESS_PROFILE_MISSING_RPC_CODE) return;
+  businessProfileMissingHandler?.();
 }
 
 export function terminateSessionForSuspendedAccount(): void {
@@ -163,6 +177,7 @@ export function throwRpcIfFailed<T>(result: { data: T | null; error: unknown }):
     terminateIfUnauthorizedRequestError(result.error);
     terminateIfAccountSuspendedRpcError(result.error);
     toastIfAccountFrozenMutationError(result.error);
+    resetIfBusinessProfileMissingRpcError(result.error);
     throw result.error;
   }
 }
