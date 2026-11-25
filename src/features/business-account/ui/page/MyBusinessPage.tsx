@@ -9,6 +9,7 @@ import BusinessClaimSheet from '~/features/business-account/ui/claim/BusinessCla
 import BusinessPlaceholder from '~/features/business-account/ui/common/BusinessPlaceholder';
 import MyBusinessProfileCard from '~/features/business-account/ui/page/MyBusinessProfileCard';
 import { Theme } from '~/shared/theme/Theme';
+import { Button, ButtonVariant } from '~/shared/ui/primitives/Button';
 import QueryErrorState from '~/shared/ui/query/QueryErrorState';
 
 type PageView = ReturnType<typeof useMyBusinessPage>;
@@ -27,14 +28,30 @@ function ApprovedPageBody({ view }: { view: PageView }) {
     return <QueryErrorState title="Couldn't load your business page" onRetry={view.retry} />;
   }
   if (view.state === MY_BUSINESS_PAGE_STATE.visible && summary) {
-    return <BusinessPageContent summary={summary} page={view.page} onOpenRex={view.openRex} />;
+    return (
+      <BusinessPageContent
+        summary={summary}
+        page={view.page}
+        onOpenRex={view.openRex}
+        headerAction={
+          <Button
+            title="Edit My Business Page"
+            variant={ButtonVariant.Secondary}
+            onPress={view.openEdit}
+          />
+        }
+      />
+    );
   }
   return (
-    <BusinessPlaceholder
-      icon={<Store size={22} color={Theme.colors.accentForeground} />}
-      title="No rex added yet"
-      message="Your business page appears once at least two Rexes mention your business."
-    />
+    <>
+      <MyBusinessProfileCard profile={view.profile} onEdit={view.openEdit} />
+      <BusinessPlaceholder
+        icon={<Store size={22} color={Theme.colors.accentForeground} />}
+        title="No rex added yet"
+        message="Your business page appears once at least two Rexes mention your business."
+      />
+    </>
   );
 }
 
@@ -53,12 +70,7 @@ function PageBody({ view }: { view: PageView }) {
   if (view.state === MY_BUSINESS_PAGE_STATE.pending) {
     return <BusinessClaimPendingNotice />;
   }
-  return (
-    <>
-      <MyBusinessProfileCard profile={view.profile} onEdit={view.openEdit} />
-      <ApprovedPageBody view={view} />
-    </>
-  );
+  return <ApprovedPageBody view={view} />;
 }
 
 function MyBusinessPage() {

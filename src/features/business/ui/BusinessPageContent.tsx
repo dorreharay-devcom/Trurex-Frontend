@@ -13,17 +13,18 @@ type Props = {
   summary: PlaceSummaryRow;
   page: PlaceBusinessPageState;
   onOpenRex: (rexId: string) => void;
+  headerAction?: ReactNode;
   footer?: ReactNode;
 };
 
-function BusinessPageContent({ summary, page, onOpenRex, footer }: Props) {
+function BusinessPageContent({ summary, page, onOpenRex, headerAction, footer }: Props) {
   const showScoreSection = summary.scored_rex_count > 0 && summary.global_score != null;
   const showScorecardSection = page.scorecardRows.length > 0;
   const firstCategoryIcon = summary.categories[0]?.icon ?? null;
 
   return (
     <View className="gap-6">
-      <BusinessHeader summary={summary} photoPaths={page.headerPhotos} />
+      <BusinessHeader summary={summary} photoPaths={page.headerPhotos} action={headerAction} />
       {showScoreSection ? <BusinessScoreCards summary={summary} /> : null}
       {showScorecardSection ? <BusinessScorecardBars rows={page.scorecardRows} /> : null}
       <BusinessTopTags tags={summary.top_tags} />

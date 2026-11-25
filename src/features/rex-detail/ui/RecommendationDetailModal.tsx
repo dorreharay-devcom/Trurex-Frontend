@@ -3,6 +3,7 @@ import { View, useWindowDimensions } from 'react-native';
 import { OverlayModal } from '~/shared/ui/overlay/OverlayModal';
 import { useOverlaySheetPresentation } from '~/shared/hooks/useOverlaySheetPresentation';
 import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { useCommentsScroll } from '~/features/rex-detail/hooks/comments/useCommentsScroll';
 import { useDeleteRex } from '~/features/rex-detail/hooks/useDeleteRex';
 import { useReportTarget } from '~/features/rex-detail/hooks/report/useReportTarget';
@@ -10,7 +11,6 @@ import { useRexDetail } from '~/features/rex-detail/hooks/useRexDetail';
 import { useSaveRex } from '~/features/rex-detail/hooks/useSaveRex';
 import type { AddYourOwnRecSource } from '~/features/rex-create/lib/addYourOwn';
 import type { Recommendation } from '~/shared/types/recommendation';
-import type { UserProfileOpenOptions } from '~/shared/types/userProfileOpen';
 import { isIos } from '~/shared/lib/ui/platform';
 import { canOfferAddToWishList } from '~/features/wish-list/lib/feedGating';
 import DetailBody from './common/DetailBody';
@@ -28,8 +28,8 @@ type Props = {
   onCommentCountChange?: (total: number) => void;
   scrollToComments?: boolean;
   scrollToCommentId?: string;
-  onAuthorPress?: (authorId: string, options?: UserProfileOpenOptions) => void;
-  onUserPress?: (userId: string, options?: UserProfileOpenOptions) => void;
+  onAuthorPress?: (authorId: string) => void;
+  onUserPress?: (userId: string) => void;
   onEditRex?: (rexId: string) => void;
   onOpenBusinessPage?: (rexId: string) => void;
 };
@@ -52,6 +52,7 @@ const RecommendationDetailModal: React.FC<Props> = ({
 }) => {
   const { height: windowHeight } = useWindowDimensions();
   const { user: authUser } = useAuth();
+  const { activeProfileId } = useAccountMode();
   const recommendationId = recommendation?.id;
 
   const { sheetTranslateY, handleClose } = useOverlaySheetPresentation({
@@ -81,17 +82,14 @@ const RecommendationDetailModal: React.FC<Props> = ({
   }
 
   const effectiveAuthorId = recommendation.authorId ?? detail.rexDetail?.author_id;
-  const authorPostedAsBusiness =
-    detail.rexDetail?.posted_as_business ?? recommendation.user?.postedAsBusiness ?? false;
-  const isOwner =
-    authUser != null && effectiveAuthorId != null && authUser.id === effectiveAuthorId;
+  const isOwner = effectiveAuthorId != null && activeProfileId === effectiveAuthorId;
   const showReport =
     authUser != null &&
-    (recommendation.authorId == null || authUser.id !== recommendation.authorId);
+    (recommendation.authorId == null || activeProfileId !== recommendation.authorId);
 
   const handleAuthorPress = () => {
     if (!effectiveAuthorId || !onAuthorPress) return;
-    onAuthorPress(effectiveAuthorId, { asBusiness: authorPostedAsBusiness });
+    onAuthorPress(effectiveAuthorId);
   };
 
   return (
@@ -119,7 +117,6 @@ const RecommendationDetailModal: React.FC<Props> = ({
           save={save}
           commentsScroll={commentsScroll}
           effectiveAuthorId={effectiveAuthorId}
-          authorPostedAsBusiness={authorPostedAsBusiness}
           isOwner={isOwner}
           onAuthorPress={handleAuthorPress}
           onAddYourOwn={onAddYourOwn}

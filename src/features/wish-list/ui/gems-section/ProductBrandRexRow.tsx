@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';
-import { Store, User } from 'lucide-react-native';
+import { User } from 'lucide-react-native';
 import CategoryBadge from '~/features/gems/ui/uncollected-rex-row/CategoryBadge';
 import IconMetaRow from '~/features/gems/ui/uncollected-rex-row/IconMetaRow';
 import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
@@ -57,7 +57,7 @@ function ProductBrandRexRow({ item, onPress, onAddToWishList }: Props) {
           {item.brand_name}
         </Text>
         <CategoryBadge label="Product or Brand" />
-        <IconMetaRow icon={item.posted_as_business ? Store : User} text={authorMetaLabel(item)} />
+        <IconMetaRow icon={User} text={authorMetaLabel(item)} />
       </View>
 
       <TouchableOpacity

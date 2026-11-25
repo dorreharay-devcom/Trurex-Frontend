@@ -7,7 +7,7 @@ import { resolveIsOwnProfile, resolveProfileContentUserId } from '~/features/pro
 type Params = {
   propUserId?: string;
   propHandle?: string;
-  authUserId?: string | null;
+  viewerId?: string | null;
 };
 
 function isNotFoundError(error: unknown): boolean {
@@ -15,7 +15,7 @@ function isNotFoundError(error: unknown): boolean {
   return /not found/i.test(message);
 }
 
-export function useProfileData({ propUserId, propHandle, authUserId }: Params) {
+export function useProfileData({ propUserId, propHandle, viewerId }: Params) {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -25,11 +25,8 @@ export function useProfileData({ propUserId, propHandle, authUserId }: Params) {
   const viewingByUserId = Boolean(propUserId);
 
   const fetchProfile = useCallback(async () => {
-    const targetId = propUserId || authUserId;
-    if (!targetId && !propHandle) {
-      setLoading(false);
-      return;
-    }
+    const targetId = propUserId || viewerId;
+    if (!targetId && !propHandle) return;
     setIsError(false);
     try {
       const data = await ProfileApi.getProfile(
@@ -54,14 +51,14 @@ export function useProfileData({ propUserId, propHandle, authUserId }: Params) {
     } finally {
       setLoading(false);
     }
-  }, [propUserId, propHandle, authUserId]);
+  }, [propUserId, propHandle, viewerId]);
 
   useEffect(() => {
     setLoading(true);
     setNotFound(false);
     setIsError(false);
     setProfile(null);
-  }, [propUserId, propHandle]);
+  }, [propUserId, propHandle, viewerId]);
 
   useFocusEffect(
     useCallback(() => {
@@ -73,14 +70,14 @@ export function useProfileData({ propUserId, propHandle, authUserId }: Params) {
     profile,
     propUserId,
     propHandle,
-    authUserId,
+    viewerId,
   });
 
   const profileContentUserId = resolveProfileContentUserId({
     profile,
     propUserId,
     propHandle,
-    authUserId,
+    viewerId,
   });
 
   const awaitingHandleProfile = viewingByHandle && profile == null && !notFound && !isError;

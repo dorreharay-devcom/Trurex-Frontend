@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { AuthApi } from '~/shared/api/authApi';
-import { USER_CONFIG_QUERY_KEY_ROOT } from '~/shared/config/queryKeys';
+import { USER_CONFIG_QUERY_KEY_ROOT, MY_PROFILES_QUERY_KEY_ROOT } from '~/shared/config/queryKeys';
 import { toastError } from '~/shared/lib/appToast';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 import { useAuth } from '~/features/auth/providers/AuthProvider';
@@ -69,7 +69,10 @@ export function useBusinessSignupCompletion() {
     try {
       await setBusinessAccount(businessName.trim());
       await AuthApi.refreshSession().catch(() => undefined);
-      await queryClient.invalidateQueries({ queryKey: USER_CONFIG_QUERY_KEY_ROOT });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: USER_CONFIG_QUERY_KEY_ROOT }),
+        queryClient.invalidateQueries({ queryKey: MY_PROFILES_QUERY_KEY_ROOT }),
+      ]);
       await continueAfterAuth();
     } catch (error: unknown) {
       await handleSubmitFailure(error);

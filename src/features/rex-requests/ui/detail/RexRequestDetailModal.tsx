@@ -4,6 +4,7 @@ import { Tag } from 'lucide-react-native';
 import { OverlayModal } from '~/shared/ui/overlay/OverlayModal';
 import { useOverlaySheetPresentation } from '~/shared/hooks/useOverlaySheetPresentation';
 import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import DetailHeader from '~/features/rex-detail/ui/common/DetailHeader';
 import { webContainerStyle } from '~/shared/lib/ui/styles';
 import { Theme } from '~/shared/theme/Theme';
@@ -22,14 +23,13 @@ import RexRequestDetailTabs, {
 } from '~/features/rex-requests/ui/detail/RexRequestDetailTabs';
 import MyRexPickerSheet from '~/features/rex-requests/ui/detail/MyRexPickerSheet';
 import RexRequestDetailOverlays from '~/features/rex-requests/ui/detail/RexRequestDetailOverlays';
-import type { UserProfileOpenOptions } from '~/shared/types/userProfileOpen';
 
 type Props = {
   visible: boolean;
   embedded?: boolean;
   request: RexRequestRow;
   onClose: () => void;
-  onUserPress?: (userId: string, options?: UserProfileOpenOptions) => void;
+  onUserPress?: (userId: string) => void;
   onEditRequest?: (requestId: string) => void;
   onOpenRex?: (rexId: string) => void;
 };
@@ -45,6 +45,7 @@ function RexRequestDetailModal({
 }: Props) {
   const { height: windowHeight } = useWindowDimensions();
   const { user: authUser } = useAuth();
+  const { activeProfileId } = useAccountMode();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<RexRequestDetailTab>('responses');
 
@@ -65,11 +66,9 @@ function RexRequestDetailModal({
     [responses.responses],
   );
 
-  const isOwner = authUser != null && authUser.id === request.requester_id;
-  const showReport = authUser != null && authUser.id !== request.requester_id;
-  const openRequester = onUserPress
-    ? () => onUserPress(request.requester_id, { asBusiness: request.posted_as_business === true })
-    : undefined;
+  const isOwner = activeProfileId === request.requester_id;
+  const showReport = authUser != null && activeProfileId !== request.requester_id;
+  const openRequester = onUserPress ? () => onUserPress(request.requester_id) : undefined;
 
   return (
     <OverlayModal
@@ -136,7 +135,7 @@ function RexRequestDetailModal({
                       key={r.response_id}
                       response={r}
                       onPress={() => onOpenRex?.(r.rex_id)}
-                      canUntag={authUser != null && authUser.id === r.responder_id}
+                      canUntag={activeProfileId === r.responder_id}
                       untagging={untagRex.isPending(r.rex_id)}
                       onUntag={() => untagRex.untag(r.rex_id)}
                     />

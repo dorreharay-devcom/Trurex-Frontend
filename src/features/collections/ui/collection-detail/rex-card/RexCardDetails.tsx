@@ -3,7 +3,6 @@ import { Text, View } from 'react-native';
 import MetaRow from '~/features/collections/ui/collection-detail/rex-card/MetaRow';
 import WebsiteRow from '~/features/collections/ui/collection-detail/rex-card/WebsiteRow';
 import type { CollectionRexEntry } from '~/features/collections/types/collection';
-import BusinessAuthorTag from '~/shared/ui/primitives/BusinessAuthorTag';
 
 function RexCardDetails({ item }: { item: CollectionRexEntry }) {
   return (
@@ -21,7 +20,6 @@ function RexCardDetails({ item }: { item: CollectionRexEntry }) {
           <Text className="shrink text-[10px] font-medium text-muted-foreground">
             Rec'd by {item.recommender_name}
           </Text>
-          {item.posted_as_business ? <BusinessAuthorTag size={10} /> : null}
         </View>
       )}
     </View>

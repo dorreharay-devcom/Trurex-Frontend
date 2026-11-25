@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { ScrollView } from 'react-native';
 import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { useCircleDetail } from '~/features/circles/hooks/detail/useCircleDetail';
 import { useDeleteCircle } from '~/features/circles/hooks/detail/useDeleteCircle';
 import { useEditCircle } from '~/features/circles/hooks/detail/useEditCircle';
@@ -27,6 +28,7 @@ type Props = {
 
 const CircleDetailScreen = ({ circleId, onBack, onUserPress }: Props) => {
   const { user } = useAuth();
+  const { activeProfileId } = useAccountMode();
   const { circle, displayRow } = useCircleDetail(circleId, Boolean(user), onBack);
   const { members, loading: membersLoading } = useCircleMembers(circleId, Boolean(user));
   const membership = useCircleMembership(circleId);
@@ -35,16 +37,16 @@ const CircleDetailScreen = ({ circleId, onBack, onUserPress }: Props) => {
 
   const memberIds = useMemo(() => new Set(members.map((m) => m.user_id)), [members]);
   const listedMembers = useMemo(
-    () => (user ? members.filter((m) => m.user_id !== user.id) : members),
-    [members, user],
+    () => members.filter((m) => m.user_id !== activeProfileId),
+    [members, activeProfileId],
   );
 
   if (!circle || !displayRow) return null;
 
   const policy = getCircleUiPolicy(circle);
-  const canManage = canEditOrDeleteUserCircle(circle, user?.id);
+  const canManage = canEditOrDeleteUserCircle(circle, activeProfileId);
   const canRemoveMembers = Boolean(
-    user && circle.owner_id === user.id && policy.allowOwnerRemoveMemberRpc,
+    circle.owner_id === activeProfileId && policy.allowOwnerRemoveMemberRpc,
   );
 
   return (
@@ -82,7 +84,7 @@ const CircleDetailScreen = ({ circleId, onBack, onUserPress }: Props) => {
 
         {policy.showConnectionsAddPanel && (
           <AddToCircleSection
-            userId={user?.id}
+            userId={activeProfileId}
             memberIds={memberIds}
             addingMemberId={membership.addingMemberId}
             onAddMember={membership.addMember}

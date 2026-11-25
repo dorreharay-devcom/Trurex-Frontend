@@ -15,7 +15,7 @@ type Props = {
   currentAvatarUrl: string | null;
   uploading: boolean;
   onPick: () => void;
-  onClear: () => void;
+  onClear?: () => void;
 };
 
 const EditProfileAvatar = ({
@@ -26,7 +26,7 @@ const EditProfileAvatar = ({
   onPick,
   onClear,
 }: Props) => {
-  const showClear = Boolean(pendingAvatar || currentAvatarUrl) && !uploading;
+  const showClear = Boolean(onClear && (pendingAvatar || currentAvatarUrl)) && !uploading;
   const showOverlay = uploading || (!pendingAvatar && !currentAvatarUrl);
   const initial = displayName.charAt(0).toUpperCase() || '?';
 

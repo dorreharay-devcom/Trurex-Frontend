@@ -1,6 +1,5 @@
 import React from 'react';
 import { View } from 'react-native';
-import AccountModeSwitcher from '~/features/business-account/ui/AccountModeSwitcher';
 import BusinessClaimProfileEntry from '~/features/business-account/ui/claim/BusinessClaimProfileEntry';
 import BusinessProfileViewTabs from '~/features/business-account/ui/profile/BusinessProfileViewTabs';
 import type { useProfileScreen } from '~/features/profile/hooks/useProfileScreen';
@@ -20,13 +19,17 @@ type Props = {
 };
 
 function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
-  const { profile, headerProfile, content, social, avatar, business } = flow;
+  const { profile, content, social, avatar, business } = flow;
 
   return (
     <View className="pb-3">
-      {headerProfile ? (
+      {business.active ? (
+        <BusinessProfileViewTabs view={business.view} onChange={business.setView} />
+      ) : null}
+
+      {profile && business.showContentTabs ? (
         <ProfileHeader
-          profile={headerProfile}
+          profile={profile}
           isOwnProfile={flow.isOwnProfile}
           onEditProfile={flow.openEdit}
           onSignOut={flow.signOut}
@@ -41,32 +44,26 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
           onUnblockPress={social.onUnblock}
           blockLoading={social.blockPending}
           onVerifyIdentity={
-            business.businessFace || !TEMPORARY_ENABLE_IDENTITY_VERIFICATION
+            profile.isBusiness || !TEMPORARY_ENABLE_IDENTITY_VERIFICATION
               ? undefined
               : flow.openVerifyIdentity
-          }
-          avatarEditable={flow.isOwnProfile && !business.businessFace}
-          accessory={
-            business.canSwitch ? (
-              <AccountModeSwitcher mode={business.mode} onChange={business.setMode} />
-            ) : null
           }
         />
       ) : null}
 
       {TEMPORARY_ENABLE_IDENTITY_VERIFICATION &&
       flow.isOwnProfile &&
+      business.showContentTabs &&
       profile &&
+      !profile.isBusiness &&
       !profile.verified ? (
         <ProfileVerifySection onPress={flow.openVerifyIdentity} />
       ) : null}
 
-      {flow.isOwnProfile && !business.showMyBusinessPage ? <BusinessClaimProfileEntry /> : null}
+      {flow.isOwnProfile && business.showContentTabs ? <BusinessClaimProfileEntry /> : null}
 
-      {flow.isOwnProfile ? <ProfileReferralsSection onPress={flow.openReferrals} /> : null}
-
-      {business.active ? (
-        <BusinessProfileViewTabs view={business.view} onChange={business.setView} />
+      {flow.isOwnProfile && business.showContentTabs ? (
+        <ProfileReferralsSection onPress={flow.openReferrals} />
       ) : null}
 
       {profile && business.showContentTabs ? (

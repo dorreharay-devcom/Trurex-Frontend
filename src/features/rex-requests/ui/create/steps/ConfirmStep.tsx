@@ -3,6 +3,7 @@ import { ScrollView, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { ProfileApi } from '~/features/profile/api/profileApi';
 import {
   authorForConfirmPreview,
@@ -25,10 +26,11 @@ type Props = {
 
 function ConfirmStep({ flow }: Props) {
   const { user } = useAuth();
+  const { activeProfileId } = useAccountMode();
   const { data: meProfile } = useQuery({
-    queryKey: ['getUserProfile', 'confirmPreview', user?.id],
-    queryFn: () => ProfileApi.getProfile({ userId: user!.id }),
-    enabled: !!user?.id,
+    queryKey: ['getUserProfile', 'confirmPreview', activeProfileId],
+    queryFn: () => ProfileApi.getProfile({ userId: activeProfileId! }),
+    enabled: !!activeProfileId,
   });
   const author = useMemo(
     () => authorForConfirmPreview(user, meProfile ?? undefined),

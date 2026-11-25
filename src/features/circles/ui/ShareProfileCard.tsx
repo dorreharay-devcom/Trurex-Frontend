@@ -4,7 +4,7 @@ import { Check, Copy, Share2 } from 'lucide-react-native';
 import { useQuery } from '@tanstack/react-query';
 import * as Clipboard from 'expo-clipboard';
 import { ProfileApi } from '~/features/profile/api/profileApi';
-import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { CIRCLES_QUERY_KEYS } from '~/features/circles/config/queryKeys';
 import { Theme } from '~/shared/theme/Theme';
 import { toastSuccess } from '~/shared/lib/appToast';
@@ -16,13 +16,13 @@ const COPIED_RESET_MS = 2000;
 type Props = { isActive: boolean };
 
 const ShareProfileCard = ({ isActive }: Props) => {
-  const { user } = useAuth();
+  const { activeProfileId } = useAccountMode();
   const [copied, setCopied] = useState(false);
 
   const { data: profileData } = useQuery({
-    queryKey: [CIRCLES_QUERY_KEYS.profileShare, user?.id],
-    queryFn: () => ProfileApi.getProfile({ userId: user!.id }),
-    enabled: !!user?.id && isActive,
+    queryKey: [CIRCLES_QUERY_KEYS.profileShare, activeProfileId],
+    queryFn: () => ProfileApi.getProfile({ userId: activeProfileId! }),
+    enabled: !!activeProfileId && isActive,
   });
 
   const shareUrl = useMemo(() => {
@@ -38,7 +38,7 @@ const ShareProfileCard = ({ isActive }: Props) => {
     setTimeout(() => setCopied(false), COPIED_RESET_MS);
   };
 
-  if (!user) return null;
+  if (!activeProfileId) return null;
 
   return (
     <View className="mb-6 rounded-xl border border-border bg-card p-4 shadow-sm">

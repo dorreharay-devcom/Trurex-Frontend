@@ -4,10 +4,8 @@ export function normalizeHandleInput(value: string | null | undefined): string {
   return (value ?? '').trim().replace(/^@+/, '');
 }
 
-export function normalizeHandleForSave(value: string): string | null {
-  const trimmed = normalizeHandleInput(value);
-  if (!trimmed) return null;
-  return trimmed.replace(/\s+/g, '').toLowerCase();
+export function normalizeHandleForSave(value: string): string {
+  return normalizeHandleInput(value).replace(/\s+/g, '').toLowerCase();
 }
 
 export function formatProfileHandle(handle: string | null | undefined): string | null {

@@ -2,7 +2,6 @@ import React from 'react';
 import RecommendationDetailModal from '~/features/rex-detail/ui/RecommendationDetailModal';
 import type { AddYourOwnRecSource } from '~/features/rex-create/lib/addYourOwn';
 import type { Recommendation, RecommendationOpenOptions } from '~/shared/types/recommendation';
-import type { UserProfileOpenOptions } from '~/shared/types/userProfileOpen';
 
 type Props = {
   visible: boolean;
@@ -15,8 +14,8 @@ type Props = {
   onCommentCountChange?: (total: number) => void;
   scrollToComments?: boolean;
   scrollToCommentId?: string;
-  onAuthorPress?: (authorId: string, options?: UserProfileOpenOptions) => void;
-  onUserPress?: (userId: string, options?: UserProfileOpenOptions) => void;
+  onAuthorPress?: (authorId: string) => void;
+  onUserPress?: (userId: string) => void;
   onEditRex?: (rexId: string) => void;
   onOpenBusinessPage?: (rexId: string) => void;
 };

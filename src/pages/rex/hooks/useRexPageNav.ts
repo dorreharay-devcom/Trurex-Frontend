@@ -1,32 +1,22 @@
 import { useCallback } from 'react';
 import { useNavigation, useRouter } from 'expo-router';
 import type { NavigationState } from '@react-navigation/native';
-import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { TAB, type Tab } from '~/shared/config/mainTabs';
 import { Routes, toBusinessRoute, toRexRoute, toUserRoute } from '~/shared/config/routes';
 import { openMainTab } from '~/shared/lib/mainTab';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
-import type { UserProfileOpenOptions } from '~/shared/types/userProfileOpen';
 
-function isPreviousRouteUserProfile(
-  state: NavigationState | undefined,
-  userId: string,
-  options?: UserProfileOpenOptions,
-): boolean {
+function isPreviousRouteUserProfile(state: NavigationState | undefined, userId: string): boolean {
   const previous = state?.routes[state.index - 1];
-  const params = previous?.params as { userId?: string; as?: string } | undefined;
-  return (
-    previous?.name === 'user/[userId]' &&
-    params?.userId === userId &&
-    (params?.as === 'business') === (options?.asBusiness === true)
-  );
+  const params = previous?.params as { userId?: string } | undefined;
+  return previous?.name === 'user/[userId]' && params?.userId === userId;
 }
 
 export function useRexPageNav() {
   const router = useRouter();
   const navigation = useNavigation();
-  const { user } = useAuth();
-  const currentUserId = user?.id;
+  const { activeProfileId: currentUserId } = useAccountMode();
 
   const closeRex = useCallback(() => {
     if (router.canGoBack()) {
@@ -48,25 +38,25 @@ export function useRexPageNav() {
   );
 
   const openUser = useCallback(
-    (userId: string, options?: UserProfileOpenOptions) => {
+    (userId: string) => {
       if (userId === currentUserId) {
         router.dismissTo(Routes.Profile);
         return;
       }
-      router.push(toUserRoute(userId, options));
+      router.push(toUserRoute(userId));
     },
     [router, currentUserId],
   );
 
   const openAuthor = useCallback(
-    (authorId: string, options?: UserProfileOpenOptions) => {
+    (authorId: string) => {
       if (authorId === currentUserId) {
         router.dismissTo(Routes.Profile);
         return;
       }
-      const returnsToAuthor = isPreviousRouteUserProfile(navigation.getState(), authorId, options);
+      const returnsToAuthor = isPreviousRouteUserProfile(navigation.getState(), authorId);
       closeRex();
-      if (!returnsToAuthor) router.push(toUserRoute(authorId, options));
+      if (!returnsToAuthor) router.push(toUserRoute(authorId));
     },
     [router, navigation, currentUserId, closeRex],
   );

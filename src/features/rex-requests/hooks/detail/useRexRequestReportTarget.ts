@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import type { ContentReportTarget } from '~/features/rex-detail/types/contentReport';
 import { toastInfo } from '~/shared/lib/appToast';
 
@@ -8,6 +9,7 @@ export function useRexRequestReportTarget(
   requesterId: string | undefined,
 ) {
   const { user: authUser } = useAuth();
+  const { activeProfileId } = useAccountMode();
   const [reportTarget, setReportTarget] = useState<ContentReportTarget | null>(null);
 
   const clearReportTarget = useCallback(() => setReportTarget(null), []);
@@ -18,9 +20,9 @@ export function useRexRequestReportTarget(
       toastInfo('Sign in', 'Sign in to report this request.');
       return;
     }
-    if (requesterId != null && authUser.id === requesterId) return;
+    if (requesterId != null && activeProfileId === requesterId) return;
     setReportTarget({ kind: 'rex_request', rexRequestId: requestId });
-  }, [requestId, requesterId, authUser]);
+  }, [requestId, requesterId, authUser, activeProfileId]);
 
   const openCommentReport = useCallback(
     (commentId: string) => {

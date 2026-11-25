@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import ProtectedRoute from '~/features/auth/ui/ProtectedRoute';
-import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import UserWishListScreen from '~/features/wish-list/ui/full-list/UserWishListScreen';
 import DeepLinkShell from '~/widgets/DeepLinkShell';
 import { TAB } from '~/shared/config/mainTabs';
@@ -13,8 +13,8 @@ import { openWishListItem } from '~/shared/lib/navigation/wishList';
 function WishListPage() {
   const { userId } = useLocalSearchParams<{ userId: string }>();
   const router = useRouter();
-  const { user } = useAuth();
-  const isOwnProfile = user?.id === userId;
+  const { activeProfileId } = useAccountMode();
+  const isOwnProfile = activeProfileId === userId;
 
   const onBack = useCallback(() => {
     if (router.canGoBack()) {

@@ -28,7 +28,7 @@ type Props = {
 };
 
 const PADDED = 'py-2.5 px-6 rounded-lg';
-const BORDERED = `${PADDED} bg-card border border-border hover:bg-muted`;
+const BORDERED = `${PADDED} bg-card border border-border`;
 
 const VARIANT: Record<ButtonVariantName, { root: string; text: string; spinner: string }> = {
   [ButtonVariant.Primary]: {

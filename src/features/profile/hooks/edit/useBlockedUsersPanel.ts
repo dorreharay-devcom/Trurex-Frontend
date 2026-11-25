@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { unblockUser as unblockUserRequest } from '~/features/profile/api/blockUserApi';
 import { blockedUsersQueryKey, useBlockedUsers } from '~/features/profile/hooks/useBlockUser';
 import type { BlockedUserRow } from '~/features/profile/types/blockedUser';
@@ -11,8 +11,7 @@ import { withOnlineMutation } from '~/shared/lib/network/assertOnline';
 import { toastError, toastSuccess } from '~/shared/lib/appToast';
 
 export function useBlockedUsersPanel() {
-  const { user } = useAuth();
-  const viewerId = user?.id;
+  const { activeProfileId: viewerId } = useAccountMode();
   const queryClient = useQueryClient();
   const list = useBlockedUsers(viewerId);
   const [pendingUserId, setPendingUserId] = useState<string | null>(null);

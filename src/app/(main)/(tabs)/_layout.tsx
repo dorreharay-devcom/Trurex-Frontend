@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { View } from 'react-native';
 import { Tabs, usePathname, useRouter } from 'expo-router';
+import { useOpenMyBusinessPage } from '~/features/business-account/hooks/useOpenMyBusinessPage';
 import { TAB, tabFromPathname } from '~/shared/config/mainTabs';
 import { Routes, toUserRoute } from '~/shared/config/routes';
 import { openCreateRex, openRex } from '~/shared/lib/navigation/createRex';
@@ -58,9 +59,10 @@ function MainTabsChrome() {
     router.push(Routes.Referrals);
   }, [router]);
 
+  const openMyBusinessPage = useOpenMyBusinessPage();
   const onMyBusinessPagePress = useCallback(() => {
-    router.push(Routes.MyBusinessPage);
-  }, [router]);
+    void openMyBusinessPage();
+  }, [openMyBusinessPage]);
 
   return (
     <View className="min-h-0 flex-1 bg-background">

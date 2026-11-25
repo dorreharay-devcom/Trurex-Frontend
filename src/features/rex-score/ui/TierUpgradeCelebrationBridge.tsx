@@ -1,11 +1,13 @@
 import React from 'react';
 import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { useTierUpgradeCelebration } from '~/features/rex-score/hooks/useTierUpgradeCelebration';
 import TierUpgradeCelebrationOverlay from '~/features/rex-score/ui/TierUpgradeCelebrationOverlay';
 
 const TierUpgradeCelebrationBridge = () => {
-  const { user, mfaPending, booting } = useAuth();
-  const userId = !booting && !mfaPending ? user?.id : null;
+  const { mfaPending, booting } = useAuth();
+  const { activeProfileId } = useAccountMode();
+  const userId = !booting && !mfaPending ? activeProfileId : null;
   const celebration = useTierUpgradeCelebration(userId);
 
   return (

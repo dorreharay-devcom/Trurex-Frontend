@@ -26,7 +26,6 @@ type Props = {
   onUnblockPress?: () => void;
   blockLoading?: boolean;
   onVerifyIdentity?: () => void;
-  accessory?: React.ReactNode;
   avatarEditable?: boolean;
 };
 
@@ -46,7 +45,6 @@ const ProfileHeader = ({
   onUnblockPress,
   blockLoading = false,
   onVerifyIdentity,
-  accessory,
   avatarEditable = isOwnProfile,
 }: Props) => {
   const onShare = () => void shareProfile(profile, isOwnProfile);
@@ -56,7 +54,7 @@ const ProfileHeader = ({
   return (
     <View className="overflow-hidden rounded-t-xl bg-card">
       <View className="px-4 pt-5">
-        <View className="flex-row items-center justify-between gap-3">
+        <View className="self-start">
           <ProfileHeaderAvatar
             displayName={profile.displayName}
             avatarUrl={profile.avatarUrl}
@@ -65,10 +63,9 @@ const ProfileHeader = ({
             avatarRefreshKey={avatarRefreshKey}
             onPress={onAvatarPress}
             verified={profile.verified}
-            business={profile.businessFace}
+            business={profile.isBusiness}
             onVerifyPress={onVerifyIdentity}
           />
-          {accessory}
         </View>
 
         <ProfileHeaderIdentity

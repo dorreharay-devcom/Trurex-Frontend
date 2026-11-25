@@ -35,7 +35,19 @@ export const USER_CONFIG_QUERY_KEY = (userId: string | undefined) =>
 
 export const BUSINESS_PROFILE_QUERY_KEY_ROOT = ['businessProfile'] as const;
 
+export const MY_PROFILES_QUERY_KEY_ROOT = ['myProfiles'] as const;
+
+export const ACCOUNT_MODE_QUERY_KEY_ROOT = ['accountMode'] as const;
+
 export const BUSINESS_ACCOUNT_REFRESH_KEYS = [
   USER_CONFIG_QUERY_KEY_ROOT,
   BUSINESS_PROFILE_QUERY_KEY_ROOT,
+  MY_PROFILES_QUERY_KEY_ROOT,
 ] as const;
+
+export const LOGIN_SCOPED_QUERY_ROOTS: readonly string[] = [
+  ACCOUNT_MODE_QUERY_KEY_ROOT[0],
+  MY_PROFILES_QUERY_KEY_ROOT[0],
+  BUSINESS_PROFILE_QUERY_KEY_ROOT[0],
+  REX_SCORE_TIERS_QUERY_KEY[0],
+];

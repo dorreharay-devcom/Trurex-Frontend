@@ -8,21 +8,18 @@ import {
 } from '~/features/rex-detail/ui/comments/common/CommentActions';
 import type { RexRequestCommentRow as RexRequestCommentRowType } from '~/features/rex-requests/api/types';
 import CollapsibleMentionText from '~/features/mentions/ui/CollapsibleMentionText';
-import BusinessAuthorTag from '~/shared/ui/primitives/BusinessAuthorTag';
-import type { UserProfileOpenOptions } from '~/shared/types/userProfileOpen';
 
 type Props = {
   comment: RexRequestCommentRowType;
   currentUserId?: string;
-  onUserPress?: (userId: string, options?: UserProfileOpenOptions) => void;
+  onUserPress?: (userId: string) => void;
   onReport?: (commentId: string) => void;
   onDelete?: (commentId: string) => void;
 };
 
 function RexRequestCommentRow({ comment, currentUserId, onUserPress, onReport, onDelete }: Props) {
   const name = comment.commenter_display_name?.trim() || 'Member';
-  const goToProfile = () =>
-    onUserPress?.(comment.commenter_id, { asBusiness: comment.posted_as_business });
+  const goToProfile = () => onUserPress?.(comment.commenter_id);
   const isOwnComment = Boolean(currentUserId && currentUserId === comment.commenter_id);
   const canReport = Boolean(onReport && currentUserId && !isOwnComment);
   const canDelete = Boolean(onDelete && isOwnComment);
@@ -44,7 +41,6 @@ function RexRequestCommentRow({ comment, currentUserId, onUserPress, onReport, o
             <TouchableOpacity onPress={goToProfile} activeOpacity={0.7} className="shrink">
               <Text className="text-sm font-semibold text-foreground">{name}</Text>
             </TouchableOpacity>
-            {comment.posted_as_business ? <BusinessAuthorTag /> : null}
           </View>
           <Text className="text-[10px] text-muted-foreground">
             {formatCompactRelativeTime(comment.created_at)}

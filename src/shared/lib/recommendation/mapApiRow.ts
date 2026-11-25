@@ -17,7 +17,7 @@ function nonEmptyStringList(raw: unknown): string[] | null {
   return values.length > 0 ? values : null;
 }
 
-function withHandlePrefix(raw: string | null): string {
+export function withHandlePrefix(raw: string | null): string {
   if (!raw) return '';
   const trimmed = raw.trim();
   if (!trimmed) return '';
@@ -50,8 +50,7 @@ function mapAuthor(row: Record<string, unknown>): RecommendationAuthor | null {
 
   if (!name && !handle && !avatar) return null;
   const verified = optionalBoolean(row, 'author_verified', 'is_author_verified') ?? false;
-  const postedAsBusiness = firstBoolean(row, 'posted_as_business');
-  return { name, handle, avatar, verified, postedAsBusiness };
+  return { name, handle, avatar, verified };
 }
 
 function mapCategory(row: Record<string, unknown>): { categoryId: string; category: string } {

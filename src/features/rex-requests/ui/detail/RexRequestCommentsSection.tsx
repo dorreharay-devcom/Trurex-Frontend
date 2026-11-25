@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { useCommentComposer } from '~/features/rex-detail/hooks/comments/useCommentComposer';
 import { runCommentMutation } from '~/features/rex-detail/hooks/comments/useCommentActions';
 import CommentComposer from '~/features/rex-detail/ui/comments/common/CommentComposer';
@@ -9,17 +10,17 @@ import { Theme } from '~/shared/theme/Theme';
 import { useRexRequestComments } from '~/features/rex-requests/hooks/detail/useRexRequestComments';
 import RexRequestCommentRow from '~/features/rex-requests/ui/detail/RexRequestCommentRow';
 import { useMentionAutocomplete } from '~/features/mentions/hooks/useMentionAutocomplete';
-import type { UserProfileOpenOptions } from '~/shared/types/userProfileOpen';
 
 type Props = {
   requestId: string;
   canComment: boolean;
-  onUserPress?: (userId: string, options?: UserProfileOpenOptions) => void;
+  onUserPress?: (userId: string) => void;
   onReportComment?: (commentId: string) => void;
 };
 
 function RexRequestCommentsSection({ requestId, canComment, onUserPress, onReportComment }: Props) {
   const { user } = useAuth();
+  const { activeProfileId } = useAccountMode();
   const { comments, loading, loadError, refetch, addComment, deleteComment } =
     useRexRequestComments(requestId);
 
@@ -55,7 +56,7 @@ function RexRequestCommentsSection({ requestId, canComment, onUserPress, onRepor
             <RexRequestCommentRow
               key={c.comment_id}
               comment={c}
-              currentUserId={user?.id}
+              currentUserId={activeProfileId}
               onUserPress={onUserPress}
               onReport={onReportComment}
               onDelete={(commentId) => void handleDelete(commentId)}

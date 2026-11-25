@@ -1,6 +1,9 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
+import type { Session } from '@supabase/supabase-js';
 import { AuthApi } from '~/shared/api/authApi';
+import { setActingAsBusiness } from '~/shared/api/actingProfile';
 import { Auth } from '~/shared/api/client';
+import { hydrateActingProfile } from '~/features/business-account/lib/accountModeStorage';
 import {
   registerAccountSuspendedHandler,
   registerUnauthorizedRequestHandler,
@@ -9,7 +12,6 @@ import { clearMfaRequirementCache } from '~/features/auth/lib/mfa';
 import { useAuthSession } from '~/features/auth/hooks/useAuthSession';
 import { useMfaSessionGate } from '~/features/auth/hooks/useMfaSessionGate';
 import type { AuthState } from '~/features/auth/types/authState';
-import { useNotificationsRealtime } from '~/shared/hooks/useNotificationsRealtime';
 import { usePushTokenRegistration } from '~/features/push-notifications/hooks/usePushTokenRegistration';
 import { unregisterCurrentDevicePushToken } from '~/features/push-notifications/lib/unregisterCurrentDevicePushToken';
 import { withTimeout } from '~/shared/lib/network/withTimeout';
@@ -17,12 +19,6 @@ import { withTimeout } from '~/shared/lib/network/withTimeout';
 const SIGN_OUT_PUSH_CLEANUP_TIMEOUT_MS = 2500;
 
 const AuthContext = createContext<AuthState | null>(null);
-
-function NotificationsRealtimeBridge() {
-  const { user, mfaPending, booting } = useAuth();
-  useNotificationsRealtime(!booting && !mfaPending ? user?.id : null);
-  return null;
-}
 
 function PushTokenBridge() {
   const { user, mfaPending, booting } = useAuth();
@@ -40,10 +36,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     hydrateMfaPending,
   } = useMfaSessionGate();
 
-  const { session, loading } = useAuthSession({
-    onSessionCleared: clearMfaGate,
-    onSessionLoaded: hydrateMfaPending,
-  });
+  const onSessionLoaded = useCallback(
+    async (loaded: Session | null) => {
+      await Promise.all([
+        hydrateMfaPending(Boolean(loaded)),
+        hydrateActingProfile(loaded?.user.id),
+      ]);
+    },
+    [hydrateMfaPending],
+  );
+
+  const onSessionCleared = useCallback(() => {
+    setActingAsBusiness(false);
+    clearMfaGate();
+  }, [clearMfaGate]);
+
+  const { session, loading } = useAuthSession({ onSessionCleared, onSessionLoaded });
 
   const signOut = useCallback(async () => {
     setMfaChecking(false);
@@ -91,7 +99,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      <NotificationsRealtimeBridge />
       <PushTokenBridge />
       {children}
     </AuthContext.Provider>

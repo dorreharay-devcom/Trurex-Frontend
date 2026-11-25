@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import Header from '~/widgets/Header';
 import TabBar from '~/widgets/TabBar';
 import { TAB, type Tab } from '~/shared/config/mainTabs';
+import { useOpenMyBusinessPage } from '~/features/business-account/hooks/useOpenMyBusinessPage';
 import { Routes, toUserRoute } from '~/shared/config/routes';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 
@@ -16,6 +17,7 @@ type Props = {
 
 const DeepLinkShell = ({ currentTab, onTabChange, onRexPress, children }: Props) => {
   const router = useRouter();
+  const openMyBusinessPage = useOpenMyBusinessPage();
 
   return (
     <View className="flex-1 bg-background">
@@ -24,7 +26,7 @@ const DeepLinkShell = ({ currentTab, onTabChange, onRexPress, children }: Props)
         onUserPress={(userId) => router.replace(toUserRoute(userId))}
         onRexPress={onRexPress}
         onReferralsPress={() => router.push(Routes.Referrals)}
-        onMyBusinessPagePress={() => router.push(Routes.MyBusinessPage)}
+        onMyBusinessPagePress={() => void openMyBusinessPage()}
       />
       <TabBar currentTab={currentTab} onTabChange={onTabChange} />
       {children}

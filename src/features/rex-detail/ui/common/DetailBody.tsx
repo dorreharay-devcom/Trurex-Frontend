@@ -10,7 +10,6 @@ import {
   type AddYourOwnRecSource,
 } from '~/features/rex-create/lib/addYourOwn';
 import type { Recommendation } from '~/shared/types/recommendation';
-import type { UserProfileOpenOptions } from '~/shared/types/userProfileOpen';
 import { authorDisplayName } from '~/shared/lib/recommendation';
 import { isIos, isWeb } from '~/shared/lib/ui/platform';
 import { cn } from '~/shared/lib/ui/styles';
@@ -29,14 +28,13 @@ type Props = {
   save: SaveRexState;
   commentsScroll: CommentsScrollState;
   effectiveAuthorId: string | undefined;
-  authorPostedAsBusiness: boolean;
   isOwner: boolean;
   onAuthorPress: () => void;
   onAddYourOwn?: (source: AddYourOwnRecSource) => void;
   onCommentCountChange?: (total: number) => void;
   scrollToComments?: boolean;
   scrollToCommentId?: string;
-  onUserPress?: (userId: string, options?: UserProfileOpenOptions) => void;
+  onUserPress?: (userId: string) => void;
   onReportComment: (commentId: string) => void;
   onOpenBusinessPage?: (rexId: string) => void;
 };
@@ -47,7 +45,6 @@ function DetailBody({
   save,
   commentsScroll,
   effectiveAuthorId,
-  authorPostedAsBusiness,
   isOwner,
   onAuthorPress,
   onAddYourOwn,
@@ -85,7 +82,6 @@ function DetailBody({
           authorId={effectiveAuthorId}
           authorTierIcon={detail.rexDetail?.author_tier_icon}
           verified={detail.rexDetail?.author_verified}
-          postedAsBusiness={authorPostedAsBusiness}
           onPress={onAuthorPress}
           rexId={recommendation.id}
           isThanked={detail.rexDetail?.is_thanked ?? false}

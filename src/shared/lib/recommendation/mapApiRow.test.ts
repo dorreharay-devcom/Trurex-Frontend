@@ -59,17 +59,6 @@ describe('mapApiRowToRecommendation', () => {
     expect(rec?.tags).toEqual(['cozy']);
   });
 
-  it('maps posted_as_business onto the author only when strictly true', () => {
-    const author = { id: 'r3', author_display_name: 'Shop' };
-    expect(
-      mapApiRowToRecommendation({ ...author, posted_as_business: true })?.user?.postedAsBusiness,
-    ).toBe(true);
-    expect(mapApiRowToRecommendation(author)?.user?.postedAsBusiness).toBe(false);
-    expect(
-      mapApiRowToRecommendation({ ...author, posted_as_business: 'true' })?.user?.postedAsBusiness,
-    ).toBe(false);
-  });
-
   it('falls back category label from code', () => {
     const rec = mapApiRowToRecommendation({ id: 'r2', category_code: 'food_drink' });
     expect(rec?.categoryId).toBe('food_drink');

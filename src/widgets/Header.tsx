@@ -1,14 +1,12 @@
 import React from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import type { User } from '@supabase/supabase-js';
-import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 import { isWeb } from '~/shared/lib/ui/platform';
 import { cn } from '~/shared/lib/ui/styles';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
 import HeaderActions from '~/widgets/header/HeaderActions';
 import HeaderLogo from '~/widgets/header/HeaderLogo';
-import { useHeaderAvatar } from '~/widgets/hooks/useHeaderAvatar';
 
 type Props = {
   onProfilePress: () => void;
@@ -19,13 +17,6 @@ type Props = {
   onReferralsPress?: () => void;
   onMyBusinessPagePress?: () => void;
   isProfileActive?: boolean;
-};
-
-const profileDisplayName = (user: User | null | undefined) => {
-  if (typeof user?.user_metadata?.display_name === 'string') {
-    return user.user_metadata.display_name;
-  }
-  return user?.email || 'You';
 };
 
 const headerTopPadding = (safeTop: number) => (isWeb ? 12 : safeTop + 6);
@@ -43,9 +34,8 @@ const Header = ({
 }: Props) => {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const { user } = useAuth();
+  const { activeProfile } = useAccountMode();
   const compact = !isWeb || width < COMPACT_MAX_WIDTH;
-  const avatarPath = useHeaderAvatar(user?.id);
 
   return (
     <View
@@ -69,8 +59,8 @@ const Header = ({
         <HeaderActions
           compact={compact}
           profileActive={isProfileActive}
-          profileName={profileDisplayName(user)}
-          avatarPath={avatarPath}
+          profileName={activeProfile?.displayName || 'You'}
+          avatarPath={activeProfile?.avatarUrl ?? null}
           onAddPress={onAddPress}
           onProfilePress={onProfilePress}
           onUserPress={onUserPress}

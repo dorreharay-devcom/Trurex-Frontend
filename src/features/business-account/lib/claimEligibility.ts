@@ -17,7 +17,7 @@ type PlaceClaimInput = {
 };
 
 type PlaceOwnerInput = {
-  userId: string | undefined;
+  businessProfileId: string | undefined;
   place: Pick<PlaceSummaryRow, 'business_owner_id'>;
 };
 
@@ -57,6 +57,6 @@ export function canClaimPlace({ canStartClaim, place }: PlaceClaimInput): boolea
   return isOpenClaimStatus(parseBusinessClaimStatus(place.my_claim_status));
 }
 
-export function isPlaceOwner({ userId, place }: PlaceOwnerInput): boolean {
-  return userId != null && place.business_owner_id === userId;
+export function isPlaceOwner({ businessProfileId, place }: PlaceOwnerInput): boolean {
+  return businessProfileId != null && place.business_owner_id === businessProfileId;
 }

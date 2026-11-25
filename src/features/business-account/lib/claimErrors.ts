@@ -1,4 +1,7 @@
-import { BUSINESS_CLAIM_ERROR_CODE } from '~/features/business-account/config/claim';
+import {
+  BUSINESS_CLAIM_ERROR_CODE,
+  BUSINESS_PROFILE_DELETE_ERROR_CODE,
+} from '~/features/business-account/config/claim';
 import { isPlainObject, unknownErrorMessage } from '~/shared/lib/data/guards';
 
 const CLAIM_ERROR_MESSAGES: Record<string, string> = {
@@ -32,4 +35,15 @@ export function businessProfileUpdateErrorMessage(error: unknown): string {
   return (
     known ?? unknownErrorMessage(error, 'Could not save your business profile. Please try again.')
   );
+}
+
+const PROFILE_DELETE_ERROR_MESSAGES: Record<string, string> = {
+  [BUSINESS_PROFILE_DELETE_ERROR_CODE.missing]: 'There is no business profile to delete.',
+  [BUSINESS_PROFILE_DELETE_ERROR_CODE.businessOnly]:
+    'This is a business-only account. Delete the whole account instead.',
+};
+
+export function businessProfileDeleteErrorMessage(error: unknown): string {
+  const known = PROFILE_DELETE_ERROR_MESSAGES[rpcErrorCode(error) ?? ''];
+  return known ?? unknownErrorMessage(error, 'Could not delete your business profile.');
 }

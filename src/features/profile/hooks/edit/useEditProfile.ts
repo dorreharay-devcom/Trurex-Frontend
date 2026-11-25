@@ -1,6 +1,10 @@
 import { useCallback, useState } from 'react';
 import { Keyboard } from 'react-native';
 import { useAuth } from '~/features/auth/providers';
+import { ACCOUNT_KIND } from '~/features/business-account/config/accountKind';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
+import { useDeleteBusinessProfile } from '~/features/business-account/hooks/useDeleteBusinessProfile';
+import { DELETE_PROFILE_COPY } from '~/features/profile/config/deleteProfile';
 import { useDeleteAccount } from '~/features/profile/hooks/edit/useDeleteAccount';
 import { useEditProfileAvatar } from '~/features/profile/hooks/edit/useEditProfileAvatar';
 import { useEditProfileForm } from '~/features/profile/hooks/edit/useEditProfileForm';
@@ -19,10 +23,11 @@ type Params = {
 
 export function useEditProfile({ onClose }: Params) {
   const { user, signOut } = useAuth();
-  const { data: blockedUsers } = useBlockedUsers(user?.id);
+  const { kind, activeProfileId, isBusinessMode } = useAccountMode();
+  const { data: blockedUsers } = useBlockedUsers(activeProfileId);
   const [saving, setSaving] = useState(false);
 
-  const fields = useEditProfileForm({ userId: user?.id });
+  const fields = useEditProfileForm({ userId: activeProfileId });
   const avatar = useEditProfileAvatar({
     userId: user?.id,
     setCurrentAvatarUrl: fields.setCurrentAvatarUrl,
@@ -32,6 +37,9 @@ export function useEditProfile({ onClose }: Params) {
     signOut,
     onDeleted: onClose,
   });
+  const deleteBusinessProfile = useDeleteBusinessProfile({ onDeleted: onClose });
+  const deletesBusinessProfile = kind === ACCOUNT_KIND.converted && isBusinessMode;
+  const deletion = deletesBusinessProfile ? deleteBusinessProfile : deleteAccount;
 
   const save = useCallback(async () => {
     if (!user) return;
@@ -95,11 +103,12 @@ export function useEditProfile({ onClose }: Params) {
       clear: avatar.clear,
     },
     account: {
-      confirmVisible: deleteAccount.confirmVisible,
-      pending: deleteAccount.pending,
-      openConfirm: deleteAccount.openConfirm,
-      closeConfirm: deleteAccount.closeConfirm,
-      confirm: deleteAccount.confirm,
+      copy: deletesBusinessProfile ? DELETE_PROFILE_COPY.business : DELETE_PROFILE_COPY.account,
+      confirmVisible: deletion.confirmVisible,
+      pending: deletion.pending,
+      openConfirm: deletion.openConfirm,
+      closeConfirm: deletion.closeConfirm,
+      confirm: deletion.confirm,
     },
     save,
   };

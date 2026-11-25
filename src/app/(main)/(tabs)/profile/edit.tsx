@@ -3,27 +3,23 @@ import { KeyboardAvoidingView, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
 import EditProfile from '~/features/profile/ui/EditProfile';
-import { useAuth } from '~/features/auth/providers';
 import { KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT } from '~/shared/config/keyboard';
 import { Routes } from '~/shared/config/routes';
 import { webContainerStyle } from '~/shared/lib/ui/styles';
-import { shellAvatarQueryKey } from '~/widgets/hooks/useHeaderAvatar';
+import { MY_PROFILES_QUERY_KEY_ROOT } from '~/shared/config/queryKeys';
 
 export default function EditProfileScreen() {
   const router = useRouter();
-  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   const onClose = useCallback(() => {
-    if (user?.id) {
-      void queryClient.invalidateQueries({ queryKey: shellAvatarQueryKey(user.id) });
-    }
+    void queryClient.invalidateQueries({ queryKey: MY_PROFILES_QUERY_KEY_ROOT });
     if (router.canGoBack()) {
       router.back();
       return;
     }
     router.replace(Routes.Profile);
-  }, [queryClient, router, user?.id]);
+  }, [queryClient, router]);
 
   return (
     <KeyboardAvoidingView behavior={KEYBOARD_BEHAVIOR_PADDING_OR_HEIGHT} className="min-h-0 flex-1">

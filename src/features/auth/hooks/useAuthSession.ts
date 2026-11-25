@@ -5,7 +5,7 @@ import { Auth } from '~/shared/api/client';
 
 type Params = {
   onSessionCleared: () => void;
-  onSessionLoaded: (hasSession: boolean) => Promise<void>;
+  onSessionLoaded: (session: Session | null) => Promise<void>;
 };
 
 export function useAuthSession({ onSessionCleared, onSessionLoaded }: Params) {
@@ -32,7 +32,7 @@ export function useAuthSession({ onSessionCleared, onSessionLoaded }: Params) {
         }
 
         applySession(data.session);
-        await onSessionLoaded(Boolean(data.session));
+        await onSessionLoaded(data.session);
       } catch (error) {
         console.warn('[Auth] getSession failed', error);
       } finally {

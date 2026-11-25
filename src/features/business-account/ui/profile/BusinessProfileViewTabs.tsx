@@ -13,7 +13,7 @@ type Props = {
 
 function BusinessProfileViewTabs({ view, onChange }: Props) {
   return (
-    <View className="mt-3 flex-row border-b border-border" accessibilityRole="tablist">
+    <View className="flex-row border-b border-border" accessibilityRole="tablist">
       {BUSINESS_PROFILE_VIEWS.map((tab) => {
         const selected = view === tab.id;
         return (

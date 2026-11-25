@@ -4,12 +4,12 @@ import {
   useMySavedCollections,
 } from '~/features/collections/hooks/data/useCollectionQueries';
 import { useSavedRexes } from '~/features/collections/hooks/data/useSavedRexes';
-import { useAuth } from '~/features/auth/providers';
+import { useAccountMode } from '~/features/business-account/hooks/useAccountMode';
 
 export function useGemsData(searchQuery: string) {
-  const { user } = useAuth();
+  const { activeProfileId } = useAccountMode();
 
-  const mine = useMyCollections(user?.id);
+  const mine = useMyCollections(activeProfileId);
   const saved = useMySavedCollections();
   const uncollectedQuery = useSavedRexes({
     uncollected: true,

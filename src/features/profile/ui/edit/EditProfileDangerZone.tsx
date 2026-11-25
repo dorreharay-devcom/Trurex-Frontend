@@ -1,9 +1,11 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
+import type { DeleteProfileCopy } from '~/features/profile/config/deleteProfile';
 import { Theme } from '~/shared/theme/Theme';
 
 type Props = {
+  deleteCopy: DeleteProfileCopy;
   blockedCount?: number;
   disabled?: boolean;
   onOpenBlockedUsers: () => void;
@@ -17,6 +19,7 @@ function blockedCountLabel(count: number | undefined): string {
 }
 
 const EditProfileDangerZone = ({
+  deleteCopy,
   blockedCount,
   disabled,
   onOpenBlockedUsers,
@@ -43,14 +46,12 @@ const EditProfileDangerZone = ({
       activeOpacity={0.7}
       disabled={disabled}
       accessibilityRole="button"
-      accessibilityLabel="Delete account"
+      accessibilityLabel={deleteCopy.action}
       className="items-center rounded-xl border border-destructive/30 bg-destructive/5 py-3 disabled:opacity-50"
     >
-      <Text className="text-sm font-semibold text-destructive">Delete account</Text>
+      <Text className="text-sm font-semibold text-destructive">{deleteCopy.action}</Text>
     </TouchableOpacity>
-    <Text className="text-center text-[11px] text-muted-foreground">
-      Permanently removes your account and all associated data.
-    </Text>
+    <Text className="text-center text-[11px] text-muted-foreground">{deleteCopy.hint}</Text>
   </View>
 );
 
