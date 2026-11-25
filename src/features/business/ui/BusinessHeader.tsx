@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { Text, View } from 'react-native';
 import BusinessPhotoGrid from '~/features/business/ui/BusinessPhotoGrid';
 import CategoryChip from '~/features/business/ui/common/CategoryChip';
 import type { PlaceSummaryRow } from '~/features/business/types/placeSummary';
+import { CATEGORY_ICON_FALLBACK } from '~/shared/api/categories';
 import { USER_AVATARS_BUCKET } from '~/shared/config/app';
 import { avatarImageTransform } from '~/shared/lib/media/imageTransform';
 import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
@@ -13,9 +14,10 @@ const LOGO_TRANSFORM = avatarImageTransform(48);
 type Props = {
   summary: PlaceSummaryRow;
   photoPaths: string[];
+  action?: ReactNode;
 };
 
-function BusinessHeader({ summary, photoPaths }: Props) {
+function BusinessHeader({ summary, photoPaths, action }: Props) {
   const name = summary.business_name ?? summary.place_name ?? 'Business';
   const logoPath = summary.business_photo_path ?? null;
 
@@ -41,7 +43,9 @@ function BusinessHeader({ summary, photoPaths }: Props) {
             {summary.is_verified_business ? <VerifiedBadge size={20} business /> : null}
           </View>
           {summary.normalized_address ? (
-            <Text className="mt-1 text-sm text-muted-foreground">{summary.normalized_address}</Text>
+            <Text className="mt-1 text-sm text-muted-foreground">
+              {CATEGORY_ICON_FALLBACK} {summary.normalized_address}
+            </Text>
           ) : null}
         </View>
       </View>
@@ -50,6 +54,7 @@ function BusinessHeader({ summary, photoPaths }: Props) {
           {summary.business_description}
         </Text>
       ) : null}
+      {action}
       {summary.categories.length > 0 ? (
         <View className="flex-row flex-wrap gap-2">
           {summary.categories.map((category) => (

@@ -3,6 +3,7 @@ import { View, TouchableOpacity, Image } from 'react-native';
 import { PlusCircle } from 'lucide-react-native';
 import { Theme } from '~/shared/theme/Theme';
 import NotificationBell from '~/widgets/NotificationBell';
+import AccountModeSwitcher from '~/features/business-account/ui/AccountModeSwitcher';
 import { SignedUserAvatar } from '~/shared/ui/media/SignedUserAvatar';
 import { cn } from '~/shared/lib/ui/styles';
 import type { RecommendationOpenOptions } from '~/shared/types/recommendation';
@@ -67,18 +68,20 @@ const HeaderActions = ({
       onMyBusinessPagePress={onMyBusinessPagePress}
     />
 
-    <TouchableOpacity
-      onPress={onProfilePress}
-      accessibilityRole="button"
-      accessibilityLabel="Profile"
-      className="items-center justify-center"
-    >
-      <SignedUserAvatar
-        name={profileName}
-        avatar={avatarPath}
-        className={profileActive ? 'border-primary' : undefined}
-      />
-    </TouchableOpacity>
+    <AccountModeSwitcher>
+      <TouchableOpacity
+        onPress={onProfilePress}
+        accessibilityRole="button"
+        accessibilityLabel="Profile"
+        className="items-center justify-center"
+      >
+        <SignedUserAvatar
+          name={profileName}
+          avatar={avatarPath}
+          className={profileActive ? 'border-primary' : undefined}
+        />
+      </TouchableOpacity>
+    </AccountModeSwitcher>
   </View>
 );
 

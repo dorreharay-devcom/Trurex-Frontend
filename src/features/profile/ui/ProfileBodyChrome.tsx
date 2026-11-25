@@ -1,6 +1,5 @@
 import React from 'react';
 import { View } from 'react-native';
-import AccountModeSwitcher from '~/features/business-account/ui/AccountModeSwitcher';
 import BusinessClaimProfileEntry from '~/features/business-account/ui/claim/BusinessClaimProfileEntry';
 import BusinessProfileViewTabs from '~/features/business-account/ui/profile/BusinessProfileViewTabs';
 import type { useProfileScreen } from '~/features/profile/hooks/useProfileScreen';
@@ -24,7 +23,11 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
 
   return (
     <View className="pb-3">
-      {headerProfile ? (
+      {business.active ? (
+        <BusinessProfileViewTabs view={business.view} onChange={business.setView} />
+      ) : null}
+
+      {headerProfile && business.showContentTabs ? (
         <ProfileHeader
           profile={headerProfile}
           isOwnProfile={flow.isOwnProfile}
@@ -46,27 +49,21 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
               : flow.openVerifyIdentity
           }
           avatarEditable={flow.isOwnProfile && !business.businessFace}
-          accessory={
-            business.canSwitch ? (
-              <AccountModeSwitcher mode={business.mode} onChange={business.setMode} />
-            ) : null
-          }
         />
       ) : null}
 
       {TEMPORARY_ENABLE_IDENTITY_VERIFICATION &&
       flow.isOwnProfile &&
+      business.showContentTabs &&
       profile &&
       !profile.verified ? (
         <ProfileVerifySection onPress={flow.openVerifyIdentity} />
       ) : null}
 
-      {flow.isOwnProfile && !business.showMyBusinessPage ? <BusinessClaimProfileEntry /> : null}
+      {flow.isOwnProfile && business.showContentTabs ? <BusinessClaimProfileEntry /> : null}
 
-      {flow.isOwnProfile ? <ProfileReferralsSection onPress={flow.openReferrals} /> : null}
-
-      {business.active ? (
-        <BusinessProfileViewTabs view={business.view} onChange={business.setView} />
+      {flow.isOwnProfile && business.showContentTabs ? (
+        <ProfileReferralsSection onPress={flow.openReferrals} />
       ) : null}
 
       {profile && business.showContentTabs ? (

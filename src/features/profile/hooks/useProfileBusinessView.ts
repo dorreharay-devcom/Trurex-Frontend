@@ -42,9 +42,6 @@ export function useProfileBusinessView({ isOwnProfile, profileKind, asBusiness }
 
   return {
     active,
-    canSwitch: isOwnProfile && own.canSwitch,
-    mode: own.mode,
-    setMode: own.setMode,
     view,
     setView,
     showMyBusinessPage,
