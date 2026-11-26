@@ -13,5 +13,4 @@ export type BusinessProfile = {
 
 export type UpdateBusinessProfileInput = {
   p_description?: string;
-  p_photo_path?: string;
 };

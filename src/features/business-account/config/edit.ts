@@ -1,5 +1,4 @@
 export const BUSINESS_DESCRIPTION_MAX_LENGTH = 500;
-export const BUSINESS_PHOTO_MAX_WIDTH = 1200;
 
 export const BUSINESS_PREMIUM_FIELDS = [
   { id: 'phone', label: 'Phone number' },

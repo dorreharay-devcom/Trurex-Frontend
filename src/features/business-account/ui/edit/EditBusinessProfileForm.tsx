@@ -8,21 +8,19 @@ import type { BusinessProfile } from '~/features/business-account/types/business
 import BusinessInfoSheet from '~/features/business-account/ui/common/BusinessInfoSheet';
 import BusinessPremiumFieldsSection from '~/features/business-account/ui/edit/BusinessPremiumFieldsSection';
 import EditBusinessHeader from '~/features/business-account/ui/edit/EditBusinessHeader';
-import EditBusinessPhoto from '~/features/business-account/ui/edit/EditBusinessPhoto';
 import LockedBusinessField from '~/features/business-account/ui/edit/LockedBusinessField';
 import { Theme } from '~/shared/theme/Theme';
 import { Input } from '~/shared/ui/primitives/Input';
 
 type Props = {
-  userId: string;
   initial: BusinessProfile;
   businessName: string | null;
   address: string | null;
   onClose: () => void;
 };
 
-function EditBusinessProfileForm({ userId, initial, businessName, address, onClose }: Props) {
-  const form = useEditBusinessProfileForm({ userId, initial, onClose });
+function EditBusinessProfileForm({ initial, businessName, address, onClose }: Props) {
+  const form = useEditBusinessProfileForm({ initial, onClose });
 
   return (
     <>
@@ -33,12 +31,6 @@ function EditBusinessProfileForm({ userId, initial, businessName, address, onClo
         canSave={form.canSave}
       />
       <View className="gap-6 px-4 py-6">
-        <EditBusinessPhoto
-          pendingPhoto={form.pendingPhoto}
-          currentPhotoPath={form.currentPhotoPath}
-          busy={form.picking || form.saving}
-          onPick={form.pickPhoto}
-        />
         <LockedBusinessField
           label="Business name"
           value={businessName}
