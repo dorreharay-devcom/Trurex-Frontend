@@ -16,7 +16,6 @@ type MyBusinessPageInput = {
   summary: {
     isPending: boolean;
     isError: boolean;
-    isVisible: boolean;
   };
 };
 
@@ -40,10 +39,10 @@ export function resolveMyBusinessPageState({
 }: MyBusinessPageInput): MyBusinessPageState {
   if (claimStatus === BUSINESS_CLAIM_STATUS.pending) return MY_BUSINESS_PAGE_STATE.pending;
   if (claimStatus !== BUSINESS_CLAIM_STATUS.approved) return MY_BUSINESS_PAGE_STATE.notClaimed;
-  if (!placeId) return MY_BUSINESS_PAGE_STATE.noRexes;
+  if (!placeId) return MY_BUSINESS_PAGE_STATE.noPlace;
   if (summary.isError) return MY_BUSINESS_PAGE_STATE.error;
   if (summary.isPending) return MY_BUSINESS_PAGE_STATE.loading;
-  return summary.isVisible ? MY_BUSINESS_PAGE_STATE.visible : MY_BUSINESS_PAGE_STATE.noRexes;
+  return MY_BUSINESS_PAGE_STATE.page;
 }
 
 export function resolveEditBusinessStatus({

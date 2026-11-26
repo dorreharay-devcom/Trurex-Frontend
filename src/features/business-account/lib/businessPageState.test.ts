@@ -11,7 +11,7 @@ import {
   resolveMyBusinessPageState,
 } from '~/features/business-account/lib/businessPageState';
 
-const readySummary = { isPending: false, isError: false, isVisible: true };
+const readySummary = { isPending: false, isError: false };
 
 describe('resolveMyBusinessPageState', () => {
   it('shows the pending notice while a claim is under review', () => {
@@ -32,14 +32,14 @@ describe('resolveMyBusinessPageState', () => {
     }
   });
 
-  it('shows no rexes when an approved business has no linked rex yet', () => {
+  it('waits for a linked place when an approved business has none yet', () => {
     expect(
       resolveMyBusinessPageState({
         claimStatus: BUSINESS_CLAIM_STATUS.approved,
         placeId: null,
-        summary: { isPending: true, isError: false, isVisible: false },
+        summary: { isPending: true, isError: false },
       }),
-    ).toBe(MY_BUSINESS_PAGE_STATE.noRexes);
+    ).toBe(MY_BUSINESS_PAGE_STATE.noPlace);
   });
 
   it('reflects the place summary query for approved businesses', () => {
@@ -47,24 +47,18 @@ describe('resolveMyBusinessPageState', () => {
     expect(
       resolveMyBusinessPageState({
         ...approved,
-        summary: { isPending: false, isError: true, isVisible: false },
+        summary: { isPending: false, isError: true },
       }),
     ).toBe(MY_BUSINESS_PAGE_STATE.error);
     expect(
       resolveMyBusinessPageState({
         ...approved,
-        summary: { isPending: true, isError: false, isVisible: false },
+        summary: { isPending: true, isError: false },
       }),
     ).toBe(MY_BUSINESS_PAGE_STATE.loading);
     expect(resolveMyBusinessPageState({ ...approved, summary: readySummary })).toBe(
-      MY_BUSINESS_PAGE_STATE.visible,
+      MY_BUSINESS_PAGE_STATE.page,
     );
-    expect(
-      resolveMyBusinessPageState({
-        ...approved,
-        summary: { isPending: false, isError: false, isVisible: false },
-      }),
-    ).toBe(MY_BUSINESS_PAGE_STATE.noRexes);
   });
 });
 

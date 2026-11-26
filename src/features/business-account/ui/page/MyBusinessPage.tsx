@@ -27,7 +27,7 @@ function ApprovedPageBody({ view }: { view: PageView }) {
   if (view.state === MY_BUSINESS_PAGE_STATE.error) {
     return <QueryErrorState title="Couldn't load your business page" onRetry={view.retry} />;
   }
-  if (view.state === MY_BUSINESS_PAGE_STATE.visible && summary) {
+  if (view.state === MY_BUSINESS_PAGE_STATE.page && summary) {
     return (
       <BusinessPageContent
         summary={summary}
@@ -35,7 +35,7 @@ function ApprovedPageBody({ view }: { view: PageView }) {
         onOpenRex={view.openRex}
         headerAction={
           <Button
-            title="Edit My Business Page"
+            title="Edit Public Page"
             variant={ButtonVariant.Secondary}
             onPress={view.openEdit}
           />
@@ -48,8 +48,8 @@ function ApprovedPageBody({ view }: { view: PageView }) {
       <MyBusinessProfileCard profile={view.profile} onEdit={view.openEdit} />
       <BusinessPlaceholder
         icon={<Store size={22} color={Theme.colors.accentForeground} />}
-        title="No rex added yet"
-        message="Your business page appears once at least two Rexes mention your business."
+        title="Linking your place"
+        message="Your business page appears here once your business is linked to its place."
       />
     </>
   );
