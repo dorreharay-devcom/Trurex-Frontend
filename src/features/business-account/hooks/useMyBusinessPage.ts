@@ -13,7 +13,7 @@ export function useMyBusinessPage() {
   const { claimStatus } = useBusinessAccount();
   const profile = useBusinessProfile();
   const placeId = profile.data?.placeId ?? null;
-  const page = usePlaceBusinessPage(placeIdRef(placeId));
+  const page = usePlaceBusinessPage(placeIdRef(placeId), { ownerView: true });
   const claim = useBusinessClaimFlow();
 
   const state = resolveMyBusinessPageState({
@@ -22,7 +22,6 @@ export function useMyBusinessPage() {
     summary: {
       isPending: page.summary.isPending,
       isError: page.summary.isError,
-      isVisible: page.summary.data?.is_visible_business_page === true,
     },
   });
 

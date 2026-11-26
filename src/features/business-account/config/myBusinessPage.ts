@@ -3,8 +3,8 @@ export const MY_BUSINESS_PAGE_STATE = {
   pending: 'pending',
   loading: 'loading',
   error: 'error',
-  noRexes: 'noRexes',
-  visible: 'visible',
+  noPlace: 'noPlace',
+  page: 'page',
 } as const;
 
 export type MyBusinessPageState =

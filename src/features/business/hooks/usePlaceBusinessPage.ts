@@ -5,11 +5,15 @@ import { buildScorecardRows } from '~/features/business/lib/placeScorecard';
 import { pickBusinessHeaderPhotos } from '~/features/business/lib/placePhotos';
 import type { PlaceRef } from '~/shared/types/placeRef';
 
-export function usePlaceBusinessPage(ref: PlaceRef | null) {
+type Options = {
+  ownerView?: boolean;
+};
+
+export function usePlaceBusinessPage(ref: PlaceRef | null, { ownerView = false }: Options = {}) {
   const [networkOnly, setNetworkOnly] = useState(false);
 
   const summary = usePlaceSummary(ref);
-  const ready = Boolean(summary.data?.is_visible_business_page);
+  const ready = Boolean(summary.data && (ownerView || summary.data.is_visible_business_page));
 
   const activeList = usePlaceRexesList(ref, networkOnly, ready);
   const allRexesForPhotos = usePlaceRexesList(ref, false, ready);
