@@ -34,11 +34,14 @@ function ApprovedPageBody({ view }: { view: PageView }) {
         page={view.page}
         onOpenRex={view.openRex}
         headerAction={
-          <Button
-            title="Edit Public Page"
-            variant={ButtonVariant.Secondary}
-            onPress={view.openEdit}
-          />
+          <View className="gap-4">
+            <Button
+              title="Edit Public Page"
+              variant={ButtonVariant.Secondary}
+              onPress={view.openEdit}
+            />
+            <View className="h-px bg-border" />
+          </View>
         }
       />
     );

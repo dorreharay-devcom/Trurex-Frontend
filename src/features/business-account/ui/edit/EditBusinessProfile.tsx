@@ -46,7 +46,6 @@ function EditBusinessBody({ screen, onClose }: { screen: Screen } & Props) {
   return (
     <EditBusinessProfileForm
       key={screen.userId}
-      userId={screen.userId}
       initial={screen.profile}
       businessName={screen.businessName}
       address={screen.address}
