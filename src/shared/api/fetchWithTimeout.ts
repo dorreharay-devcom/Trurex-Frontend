@@ -10,7 +10,11 @@ export class ApiTimeoutError extends Error {
 }
 
 export function isAbortError(error: unknown): boolean {
-  if (typeof DOMException !== 'undefined' && error instanceof DOMException && error.name === 'AbortError') {
+  if (
+    typeof DOMException !== 'undefined' &&
+    error instanceof DOMException &&
+    error.name === 'AbortError'
+  ) {
     return true;
   }
   if (error instanceof Error && error.name === 'AbortError') return true;
