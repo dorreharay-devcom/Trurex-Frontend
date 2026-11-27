@@ -6,7 +6,6 @@ import { Theme } from '~/shared/theme/Theme';
 const SIGNED_IN_ALLOWED_AUTH_ROUTES: readonly string[] = [
   Routes.ResetPassword,
   Routes.Mfa,
-  Routes.VerifyIdentity,
   Routes.BusinessSignup,
   Routes.Terms,
   Routes.CommunityGuidelines,

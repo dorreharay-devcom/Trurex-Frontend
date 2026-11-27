@@ -25,7 +25,6 @@ type Props = {
   onBlockPress?: () => void;
   onUnblockPress?: () => void;
   blockLoading?: boolean;
-  onVerifyIdentity?: () => void;
   avatarEditable?: boolean;
 };
 
@@ -44,7 +43,6 @@ const ProfileHeader = ({
   onBlockPress,
   onUnblockPress,
   blockLoading = false,
-  onVerifyIdentity,
   avatarEditable = isOwnProfile,
 }: Props) => {
   const onShare = () => void shareProfile(profile, isOwnProfile);
@@ -64,7 +62,6 @@ const ProfileHeader = ({
             onPress={onAvatarPress}
             verified={profile.verified}
             business={profile.isBusiness}
-            onVerifyPress={onVerifyIdentity}
           />
         </View>
 

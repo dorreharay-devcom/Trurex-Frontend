@@ -12,13 +12,12 @@ import {
   verifyMfaCode,
   getDeviceFingerprint,
 } from '~/features/auth/lib/mfa';
-import { attemptBiometricUnlock } from '~/features/auth/lib/biometrics';
 import { writeStoredBusinessSignupIntent } from '~/features/auth/lib/businessSignupIntentStorage';
 import { unknownErrorMessage } from '~/shared/lib/data/guards';
 
 const MIN_CODE_LENGTH = 6;
 
-type Pending = 'idle' | 'verify' | 'resend' | 'biometric';
+type Pending = 'idle' | 'verify' | 'resend';
 type Feedback = { tone: 'error' | 'notice'; text: string };
 
 export function useMfaVerification() {
@@ -30,24 +29,11 @@ export function useMfaVerification() {
   const [trustDevice, setTrustDevice] = useState(true);
   const [pending, setPending] = useState<Pending>('idle');
   const [feedback, setFeedback] = useState<Feedback>();
-  const [awaitingBiometric, setAwaitingBiometric] = useState(false);
 
   const busy = pending !== 'idle';
   const trimmedCode = code.trim();
   const canSubmit = !busy && trimmedCode.length >= MIN_CODE_LENGTH;
   const redirectTo = !session ? Routes.Login : !mfaPending && !busy ? Routes.Main : null;
-
-  async function completeSignIn() {
-    const biometricResult = await attemptBiometricUnlock();
-    if (biometricResult === 'failed') {
-      setAwaitingBiometric(true);
-      setFeedback({ tone: 'error', text: MfaMessage.biometricFailed });
-      return;
-    }
-
-    setAwaitingBiometric(false);
-    await enterApp();
-  }
 
   async function restartMfa(message: string) {
     const deviceFingerprint = await getDeviceFingerprint();
@@ -115,19 +101,9 @@ export function useMfaVerification() {
         throw new Error(MfaMessage.verifyFailed);
       }
 
-      await completeSignIn();
+      await enterApp();
     } catch (err) {
       await handleVerifyFailure(err);
-    } finally {
-      setPending('idle');
-    }
-  }
-
-  async function handleRetryBiometric() {
-    setPending('biometric');
-    setFeedback(undefined);
-    try {
-      await completeSignIn();
     } finally {
       setPending('idle');
     }
@@ -161,15 +137,12 @@ export function useMfaVerification() {
     busy,
     verifying: pending === 'verify',
     resending: pending === 'resend',
-    retryingBiometric: pending === 'biometric',
-    awaitingBiometric,
     error: feedback?.tone === 'error' ? feedback.text : undefined,
     notice: feedback?.tone === 'notice' ? feedback.text : undefined,
     canSubmit,
     onCodeChange,
     toggleTrustDevice: () => setTrustDevice((value) => !value),
     handleVerify,
-    handleRetryBiometric,
     handleResend,
     handleBackToLogin,
   };

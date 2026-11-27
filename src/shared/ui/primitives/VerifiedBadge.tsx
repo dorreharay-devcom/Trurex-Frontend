@@ -1,6 +1,5 @@
 import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { TEMPORARY_ENABLE_IDENTITY_VERIFICATION } from '~/shared/config/featureFlags';
 import { Theme } from '~/shared/theme/Theme';
 
 const SEAL_PATH =
@@ -13,43 +12,30 @@ const VERIFIED_COLORS = {
   check: Theme.colors.white,
 };
 
-const MUTED_COLORS = {
-  fill: Theme.colors.card,
-  outline: Theme.colors.border,
-  check: Theme.colors.secondaryText,
-};
-
 type Props = {
   size?: number;
-  muted?: boolean;
   business?: boolean;
   className?: string;
 };
 
-export const VerifiedBadge = ({ size = 16, muted = false, business = false, className }: Props) => {
-  if (!business && !TEMPORARY_ENABLE_IDENTITY_VERIFICATION) return null;
-
-  const colors = muted ? MUTED_COLORS : VERIFIED_COLORS;
-
+export const VerifiedBadge = ({ size = 16, business = false, className }: Props) => {
   return (
     <View
       className={className}
-      accessibilityLabel={
-        muted ? 'Not verified' : business ? 'Verified business' : 'Verified account'
-      }
+      accessibilityLabel={business ? 'Verified business' : 'Verified account'}
     >
       <Svg width={size} height={size} viewBox="0 0 24 24">
         <Path
           d={SEAL_PATH}
-          fill={colors.fill}
-          stroke={colors.outline}
+          fill={VERIFIED_COLORS.fill}
+          stroke={VERIFIED_COLORS.outline}
           strokeWidth={1.5}
           strokeLinejoin="round"
         />
         <Path
           d={CHECK_PATH}
           fill="none"
-          stroke={colors.check}
+          stroke={VERIFIED_COLORS.check}
           strokeWidth={2.3}
           strokeLinecap="round"
           strokeLinejoin="round"

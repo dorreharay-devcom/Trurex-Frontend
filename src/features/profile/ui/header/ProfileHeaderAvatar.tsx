@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { Camera } from 'lucide-react-native';
 import { USER_AVATARS_BUCKET } from '~/shared/config/app';
 import SignedStorageImage from '~/shared/ui/media/SignedStorageImage';
@@ -18,7 +18,6 @@ type Props = {
   onPress?: () => void;
   verified?: boolean;
   business?: boolean;
-  onVerifyPress?: () => void;
 };
 
 const ProfileHeaderAvatar = ({
@@ -30,7 +29,6 @@ const ProfileHeaderAvatar = ({
   onPress,
   verified,
   business = false,
-  onVerifyPress,
 }: Props) => {
   const initial = displayName.charAt(0).toUpperCase() || '?';
 
@@ -71,15 +69,6 @@ const ProfileHeaderAvatar = ({
             business={business}
             className="absolute -top-1 -right-1"
           />
-        ) : editable && !business && onVerifyPress ? (
-          <Pressable
-            onPress={onVerifyPress}
-            accessibilityRole="button"
-            accessibilityLabel="Verify your identity"
-            className="absolute -top-1 -right-1"
-          >
-            <VerifiedBadge size={CORNER_BADGE_SIZE} muted />
-          </Pressable>
         ) : null}
       </View>
     </TouchableOpacity>

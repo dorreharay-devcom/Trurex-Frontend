@@ -3,7 +3,6 @@ import { resolvePostAuthRoute } from './postAuthRoute';
 import { BUSINESS_SIGNUP_INTENT_STORAGE_KEY } from './businessSignupIntentStorage';
 
 const storage = new Map<string, string>();
-const identity = { prompt: false };
 const flags = { businessProfileClaim: true };
 const userConfig = { is_business_account: false as boolean | null };
 const fetchUserConfig = vi.fn(async () => userConfig);
@@ -30,13 +29,8 @@ vi.mock('~/shared/api/userConfigApi', () => ({
   fetchUserConfig: () => fetchUserConfig(),
 }));
 
-vi.mock('~/features/identity-verification/lib/shouldPromptIdentityVerification', () => ({
-  shouldPromptIdentityVerification: vi.fn(async () => identity.prompt),
-}));
-
 beforeEach(() => {
   storage.clear();
-  identity.prompt = false;
   flags.businessProfileClaim = true;
   userConfig.is_business_account = false;
   fetchUserConfig.mockClear();
@@ -57,16 +51,8 @@ describe('resolvePostAuthRoute', () => {
     expect(fetchUserConfig).not.toHaveBeenCalled();
   });
 
-  it('prompts identity verification without loading the user config when there is no intent', async () => {
-    identity.prompt = true;
-
-    expect(await resolvePostAuthRoute()).toBe('/verify-identity');
-    expect(fetchUserConfig).not.toHaveBeenCalled();
-  });
-
   it('asks a personal account to finish business sign-up and consumes the intent', async () => {
     storage.set(BUSINESS_SIGNUP_INTENT_STORAGE_KEY, 'true');
-    identity.prompt = true;
 
     expect(await resolvePostAuthRoute()).toBe('/business-signup');
     expect(storage.has(BUSINESS_SIGNUP_INTENT_STORAGE_KEY)).toBe(false);
@@ -79,14 +65,6 @@ describe('resolvePostAuthRoute', () => {
     expect(await resolvePostAuthRoute()).toBeNull();
     expect(fetchUserConfig).toHaveBeenCalledTimes(1);
     expect(storage.has(BUSINESS_SIGNUP_INTENT_STORAGE_KEY)).toBe(false);
-  });
-
-  it('falls through to identity verification for an existing business account', async () => {
-    storage.set(BUSINESS_SIGNUP_INTENT_STORAGE_KEY, 'true');
-    userConfig.is_business_account = true;
-    identity.prompt = true;
-
-    expect(await resolvePostAuthRoute()).toBe('/verify-identity');
   });
 
   it('asks to finish business sign-up when the user config cannot be loaded', async () => {
