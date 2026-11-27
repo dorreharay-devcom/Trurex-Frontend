@@ -25,7 +25,7 @@ function EditBusinessHeader({ onClose, onSave, saving = false, canSave = false }
         >
           <ArrowLeft size={20} color={Theme.colors.foreground} />
         </TouchableOpacity>
-        <Text className="text-lg font-bold text-foreground">Edit Public Page</Text>
+        <Text className="text-lg font-bold text-foreground">Edit Business Page</Text>
       </View>
       {onSave ? (
         <Button
