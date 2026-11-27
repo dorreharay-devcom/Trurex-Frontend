@@ -7,9 +7,7 @@ import CurrentlySection from '~/features/profile/ui/CurrentlySection';
 import ProfileHeader from '~/features/profile/ui/ProfileHeader';
 import ProfileReferralsSection from '~/features/profile/ui/ProfileReferralsSection';
 import ProfileTabs from '~/features/profile/ui/ProfileTabs';
-import ProfileVerifySection from '~/features/profile/ui/ProfileVerifySection';
 import ProfileWishListSection from '~/features/wish-list/ui/profile-section/ProfileWishListSection';
-import { TEMPORARY_ENABLE_IDENTITY_VERIFICATION } from '~/shared/config/featureFlags';
 
 type Flow = ReturnType<typeof useProfileScreen>;
 
@@ -43,21 +41,7 @@ function ProfileBodyChrome({ flow, avatarRefreshKey }: Props) {
           onBlockPress={social.openBlockConfirm}
           onUnblockPress={social.onUnblock}
           blockLoading={social.blockPending}
-          onVerifyIdentity={
-            profile.isBusiness || !TEMPORARY_ENABLE_IDENTITY_VERIFICATION
-              ? undefined
-              : flow.openVerifyIdentity
-          }
         />
-      ) : null}
-
-      {TEMPORARY_ENABLE_IDENTITY_VERIFICATION &&
-      flow.isOwnProfile &&
-      business.showContentTabs &&
-      profile &&
-      !profile.isBusiness &&
-      !profile.verified ? (
-        <ProfileVerifySection onPress={flow.openVerifyIdentity} />
       ) : null}
 
       {flow.isOwnProfile && business.showContentTabs ? <BusinessClaimProfileEntry /> : null}

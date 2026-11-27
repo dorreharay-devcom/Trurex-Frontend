@@ -59,24 +59,27 @@ function GemsPage({
     onOpenWishListWizard: onOpenWishListWizard ?? (() => {}),
   });
 
-  const wishList = {
-    ownList: myWishList,
-    explore: productBrandRexes,
-    onOpenItem: (item: WishListItemRow) => onOpenWishListItem?.(item, true),
-    onTriedThis: (item: WishListItemRow) => {
-      wishListPage.openTriedThis(item);
-      wishListPage.triedThis.open();
-    },
-    onAddProduct: () => wishListPage.openWizard(null),
-    onAddFromExplore: (row: ProductBrandRexRow) =>
-      wishListPage.openWizard({
-        kind: 'fromRex',
-        sourceRexId: row.id,
-        brandName: row.brand_name,
-        productName: row.product_name,
-      }),
-    onOpenExploreRex: (row: ProductBrandRexRow) => onOpenRexId?.(row.id),
-  };
+  const wishList = useMemo(
+    () => ({
+      ownList: myWishList,
+      explore: productBrandRexes,
+      onOpenItem: (item: WishListItemRow) => onOpenWishListItem?.(item, true),
+      onTriedThis: (item: WishListItemRow) => {
+        wishListPage.openTriedThis(item);
+        wishListPage.triedThis.open();
+      },
+      onAddProduct: () => wishListPage.openWizard(null),
+      onAddFromExplore: (row: ProductBrandRexRow) =>
+        wishListPage.openWizard({
+          kind: 'fromRex',
+          sourceRexId: row.id,
+          brandName: row.brand_name,
+          productName: row.product_name,
+        }),
+      onOpenExploreRex: (row: ProductBrandRexRow) => onOpenRexId?.(row.id),
+    }),
+    [myWishList, productBrandRexes, onOpenWishListItem, wishListPage, onOpenRexId],
+  );
 
   const rows = useMemo<GemsListRow[]>(() => {
     if (uncollected.items.length === 0) {

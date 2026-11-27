@@ -127,11 +127,13 @@ function CardTagsContent({ tags }: { tags: readonly string[] }) {
           if (width > 0) setRowWidth(width);
         }}
       >
-        {ready
-          ? visibleTags.map((tag, index) => (
-              <TagChip key={`${tag}-${index}`} label={discoverTagLabel(tag)} />
-            ))
-          : <TagRowSkeleton />}
+        {ready ? (
+          visibleTags.map((tag, index) => (
+            <TagChip key={`${tag}-${index}`} label={discoverTagLabel(tag)} />
+          ))
+        ) : (
+          <TagRowSkeleton />
+        )}
         {ready && hiddenCount > 0 ? <TagChip label={discoverOverflowLabel(hiddenCount)} /> : null}
       </View>
     </View>
