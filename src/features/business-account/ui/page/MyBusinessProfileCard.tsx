@@ -56,7 +56,7 @@ function MyBusinessProfileCard({ profile, onEdit }: Props) {
       <Text className="text-sm leading-relaxed text-foreground">
         {profile?.description ?? 'Add a description so people know what your business offers.'}
       </Text>
-      <Button title="Edit Public Page" variant={ButtonVariant.Secondary} onPress={onEdit} />
+      <Button title="Edit Business Page" variant={ButtonVariant.Secondary} onPress={onEdit} />
     </View>
   );
 }

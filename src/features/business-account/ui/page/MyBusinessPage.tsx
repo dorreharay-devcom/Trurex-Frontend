@@ -36,7 +36,7 @@ function ApprovedPageBody({ view }: { view: PageView }) {
         headerAction={
           <View className="gap-4">
             <Button
-              title="Edit Public Page"
+              title="Edit Business Page"
               variant={ButtonVariant.Secondary}
               onPress={view.openEdit}
             />

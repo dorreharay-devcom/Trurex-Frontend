@@ -8,7 +8,7 @@ export type BusinessProfileView =
 
 export const BUSINESS_PROFILE_VIEWS = [
   { id: BUSINESS_PROFILE_VIEW.asUser, label: 'Profile' },
-  { id: BUSINESS_PROFILE_VIEW.page, label: 'Public Page' },
+  { id: BUSINESS_PROFILE_VIEW.page, label: 'Business Page' },
 ] as const;
 
 const BUSINESS_PROFILE_VIEW_VALUES = new Set<string>(Object.values(BUSINESS_PROFILE_VIEW));
