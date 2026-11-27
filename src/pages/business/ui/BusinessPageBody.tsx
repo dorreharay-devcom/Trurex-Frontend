@@ -45,7 +45,7 @@ function BusinessPageBody({ page, onBack, onOpenRex }: Props) {
     return (
       <ScrollView
         className="flex-1 w-full"
-        contentContainerClassName="w-full max-w-xl mx-auto px-4 py-4"
+        contentContainerClassName="w-full px-4 py-4"
         showsVerticalScrollIndicator={false}
       >
         <BusinessPageContent

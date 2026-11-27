@@ -23,7 +23,7 @@ function BusinessPageContent({ summary, page, onOpenRex, headerAction, footer }:
   const firstCategoryIcon = summary.categories[0]?.icon ?? null;
 
   return (
-    <View className="gap-6">
+    <View className="w-full max-w-xl gap-6 self-center">
       <BusinessHeader summary={summary} photoPaths={page.headerPhotos} action={headerAction} />
       {showScoreSection ? <BusinessScoreCards summary={summary} /> : null}
       {showScorecardSection ? <BusinessScorecardBars rows={page.scorecardRows} /> : null}
